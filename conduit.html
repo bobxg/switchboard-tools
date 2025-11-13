@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Conduit Sizer - Switchboard Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active">
+      <span>TBC</span>
+      <div class="dropdown-content">
+        <a href="conduit.html">Conduit Sizer</a>
+        <a href="cablesizing.html">Cable Sizing</a>
+        <a href="cableweight.html">Cable Weight</a>
+        <a href="pvsizing.html">PV Sizing</a>
+        <a href="emergencylighting.html">Emergency Lighting</a>
+        <a href="inspection.html">Site Inspection</a>
+      </div>
+    </div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>Conduit Sizer (AS/NZS 3000)</h1>
+    <p>
+      Enter the number of each cable size to calculate the smallest conduit size required.<br>
+      <span style="color:#1976d2; font-size:0.95em;">
+        (Fill factors per AS/NZS 3000 Appendix C: 1 or 2 cables = 31%, 3+ cables = 40%)
+      </span>
+    </p>
+    <form id="cableForm" autocomplete="off">
+      <table style="margin:0 auto 20px auto; border-collapse:collapse; width:100%; max-width:350px; background:#fff; box-shadow:0 2px 8px #eee;">
+        <thead>
+          <tr>
+            <th>Cable Area (mm²)</th>
+            <th>Number of Cables</th>
+          </tr>
+        </thead>
+        <tbody id="cableTableBody"></tbody>
+      </table>
+      <div class="conduit-result" id="conduitResult">
+        Smallest Suitable Conduit: -
+      </div>
+    </form>
+  </div>
+  <script src="script.js"></script>
+  <script>
+    const cableData = [
+      { area: 1.5, diameter: 3.2 },
+      { area: 2.5, diameter: 3.7 },
+      { area: 4, diameter: 4.6 },
+      { area: 6, diameter: 5.2 },
+      { area: 10, diameter: 6.1 },
+      { area: 16, diameter: 7.2 },
+      { area: 25, diameter: 8.7 },
+      { area: 35, diameter: 10.1 },
+      { area: 50, diameter: 11.9 },
+      { area: 70, diameter: 13.3 },
+      { area: 95, diameter: 15.4 },
+      { area: 120, diameter: 16.8 },
+      { area: 150, diameter: 18.8 },
+      { area: 185, diameter: 21.4 },
+      { area: 240, diameter: 23.4 }
+    ];
+    const conduitDiameters = [20,25,32,40,50,63,80,100,125,150];
+    const conduitAreas = conduitDiameters.map(d => Math.PI * Math.pow(d/2,2));
+    function diameterToArea(d) {
+      return Math.PI * Math.pow(d/2, 2);
+    }
+    function getFillPercentage(numCables) {
+      // AS/NZS 3000:2018 Appendix C - Conduit fill factors
+      // 1 or 2 cables: 31% fill
+      // 3 or more cables: 40% fill
+      if (numCables <= 2) return 0.31;
+      if (numCables >= 3) return 0.40;
+      return 0;
+    }
+    function findSmallestConduit(totalCableArea, numCables) {
+      const fill = getFillPercentage(numCables);
+      for (let i=0; i<conduitDiameters.length; ++i) {
+        const allowed = conduitAreas[i] * fill;
+        if (totalCableArea <= allowed) {
+          return conduitDiameters[i];
+        }
+      }
+      return null;
+    }
+    function buildCableTable() {
+      const tbody = document.getElementById('cableTableBody');
+      tbody.innerHTML = '';
+      cableData.forEach((cable, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${cable.area}</td>
+          <td>
+            <input type="number" min="0" value="0" id="cableCount${idx}" data-idx="${idx}" />
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    function updateTotalArea() {
+      let total = 0;
+      let numCables = 0;
+      cableData.forEach((cable, idx) => {
+        const count = parseInt(document.getElementById(`cableCount${idx}`).value) || 0;
+        const area = diameterToArea(cable.diameter);
+        total += count * area;
+        numCables += count;
+      });
+      let resultText = "Smallest Suitable Conduit: -";
+      if (numCables > 0 && total > 0) {
+        const result = findSmallestConduit(total, numCables);
+        if (result) {
+          resultText = `Smallest Suitable Conduit: <b>${result} mm</b>`;
+        } else {
+          resultText = "No suitable conduit size found for this fill.";
+        }
+      }
+      document.getElementById('conduitResult').innerHTML = resultText;
+    }
+    function setupListeners() {
+      cableData.forEach((cable, idx) => {
+        document.getElementById(`cableCount${idx}`).addEventListener('input', updateTotalArea);
+      });
+    }
+    buildCableTable();
+    setupListeners();
+    updateTotalArea();
+  </script>
+</body>
+</html>

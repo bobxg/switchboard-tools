@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Switchboard Sizer - Switchboard Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Switchboard-specific styles */
+    .board-dimensions {
+      padding: 12px 24px; background: #e3f0fc; font-size: 1.2em;
+      border-bottom: 2px solid #1976d2; letter-spacing: 0.5px; text-align: center;
+      font-weight: normal;
+    }
+    .controls {
+      padding: 20px; background: #f8f8f8; border-bottom: 1px solid #ddd;
+      display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+    }
+    .fire-controls {
+      display: flex; gap: 18px; align-items: center; margin-top: 10px; margin-bottom: 0;
+    }
+    .controls label { margin-right: 8px; }
+    .controls input[type="number"] { width: 60px; padding: 4px 6px; margin-right: 16px; }
+    .controls input[type="checkbox"] { margin-left: 16px; margin-right: 6px; transform: scale(1.3);}
+    .controls button {
+      padding: 7px 18px; font-size: 1rem; background: #1976d2; color: #fff;
+      border: none; border-radius: 0; cursor: pointer; transition: background 0.2s;
+    }
+    .controls button:hover { background: #1256a1; }
+    button.orange-btn {
+      background: #ff6f00 !important;
+    }
+    button.orange-btn:hover { background: #e65100 !important; }
+    .layout-container { 
+      overflow-x: auto; 
+      background: #f5f5f5; 
+      padding: 30px 0 30px 30px; 
+      min-height: 800px; 
+    }
+    .switchboard-outer-border {
+      display: inline-block; 
+      border: 2px solid #333; 
+      box-sizing: content-box;
+      background: #fff;
+      margin: 0 auto; 
+      padding: 0;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 0;
+    }
+    .switchboard-layout { 
+      display: flex; 
+      align-items: flex-start; 
+      gap: 0; 
+      min-height: 733.33px;
+      background: #fafafa;
+      border: 1px solid #ddd;
+    }
+    .column {
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      border-right: 1px solid #ccc;
+      border-left: 1px solid #ccc;
+      min-width: 134px; 
+      background: #f8f8f8;
+      margin-right: 0; 
+      padding: 0; 
+      margin-bottom: 0;
+      position: relative; 
+      gap: 0; 
+      height: 733.33px; 
+      box-sizing: border-box; 
+      justify-content: flex-start;
+    }
+    .busbar-section {
+      border: 2px solid #666 !important;
+      background: #d0d0d0 !important;
+      color: #000;
+      cursor: default !important;
+      width: 100%;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      box-sizing: border-box;
+      font-weight: 700;
+      text-align: center;
+    }
+    .fire-column { 
+      background: #ffffff !important; 
+      border-right: 2px solid #666 !important; 
+      border-left: 2px solid #666 !important;
+    }
+    .fire-label { color: #000 !important; font-weight: 700; }
+    .ct-column { 
+      background: #ffffff !important; 
+      border-right: 2px solid #666 !important;
+      border-left: 2px solid #666 !important;
+    }
+    .ct-label { color: #000 !important; font-weight: 700; }
+    .module {
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      border: 2px solid #000;
+      background: #ffffff;
+      font-size: 1.15rem; 
+      cursor: grab; 
+      user-select: none;
+      transition: all 0.2s; 
+      box-sizing: border-box; 
+      margin: 0; 
+      gap: 0; 
+      width: 100%;
+      font-weight: 700;
+      text-align: center;
+      color: #000;
+    }
+    .module:hover {
+      background: #f0f8ff;
+      border-color: #1976d2;
+    }
+    .module.dragging { 
+      opacity: 0.7; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      border-color: #1976d2;
+    }
+    .incoming-section { 
+      border: 2px solid #000 !important;
+      background: #ffffff !important; 
+      color: #000;
+      font-weight: 700;
+      cursor: default !important;
+      font-size: 1.2rem;
+    }
+    .spare-section {
+      border: 2px dashed #666 !important;
+      background: #ffffff !important;
+      color: #666;
+      font-style: italic; 
+      cursor: grab !important;
+    }
+    .cable-zone {
+      border: 2px solid #666;
+      border-top: 2px solid #666;
+      border-bottom: 2px solid #666;
+      background: #d0d0d0;
+      color: #000; 
+      font-size: 1.05rem;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      margin: 0; 
+      gap: 0; 
+      width: 100%;
+      font-weight: 700;
+      text-align: center;
+      font-size: 0.95rem;
+      letter-spacing: 1.5px;
+    }
+    .fire-cable-zone { 
+      border: 2px solid #666;
+      background: #d0d0d0;
+      color: #000;
+    }
+    .ct-meter-filler-top {
+      width: 200px;
+      height: 166.67px;
+      background: #f8f8f8;
+      border: 1px solid #ccc;
+      border-bottom: none;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .ct-meter-box {
+      width: 200px;
+      height: 266.67px;
+      background: #ffffff;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      border: 2px solid #666;
+      border-radius: 0;
+      margin: 0;
+      box-sizing: border-box;
+      text-align: center;
+      font-weight: 700;
+    }
+    .ct-meter-filler-bottom {
+      width: 200px;
+      height: 166.67px;
+      background: #f8f8f8;
+      border: 1px solid #ccc;
+      border-top: none;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .incomer-200mm-column {
+      width: 66.67px;
+      min-width: 66.67px;
+      max-width: 66.67px;
+      height: 733.33px;
+      background: #f8f8f8;
+      color: #333;
+      border-right: 1px solid #ccc;
+      border-left: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .incomer-200mm-busbar {
+      width: 66.67px;
+      height: 133.33px;
+      background: #d0d0d0;
+      color: #000;
+      border: 2px solid #666;
+      border-top: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.88em;
+      text-align: center;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      flex-direction: column;
+      writing-mode: vertical-rl;
+      white-space: pre-line;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    .incomer-200mm-cablezone {
+      width: 66.67px;
+      height: 600px;
+      background: #e8e8e8;
+      color: #333;
+      border: 1px solid #ccc;
+      border-top: 1px dashed #999;
+      border-bottom: 1px dashed #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.88em;
+      font-weight: bold;
+      text-align: center;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      flex-direction: column;
+      writing-mode: vertical-rl;
+      white-space: pre-line;
+      letter-spacing: 1px;
+    }
+    .ruler-bar {
+      margin: 18px 0 6px 30px; display: flex; align-items: flex-end; height: 32px;
+      font-size: 0.9em; user-select: none;
+    }
+    .ruler-mm {
+      background: repeating-linear-gradient(
+        to right, #555 0, #555 2px, transparent 2px, transparent 60px
+      );
+      height: 16px; position: relative; width: 600px;
+    }
+    .ruler-mm span {
+      position: absolute; bottom: 0; font-size: 0.8em; color: #333; left: 0;
+    }
+    .switchboard-black-box {
+      width: 100%; height: 33.33px; background: #ddd; margin: 0; padding: 0;
+      display: block; transition: width 0.1s; border: 1px solid #bbb; border-top: none;
+      box-sizing: border-box;
+    }
+    @media print {
+      @page { 
+        size: A3 landscape; 
+        margin: 10mm;
+      }
+      
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      html, body { 
+        margin: 0; 
+        padding: 0; 
+        background: #fff !important;
+        width: 100%;
+        height: 100%;
+      }
+      
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
+      
+      .board-dimensions {
+        font-size: 18pt !important;
+        padding: 8mm 0 !important;
+        margin: 0 0 5mm 0 !important;
+        background: #e3f0fc !important;
+        border-bottom: 2px solid #1976d2 !important;
+        text-align: center;
+        width: 100%;
+        page-break-after: avoid;
+      }
+      
+      .layout-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #fff !important;
+        overflow: visible !important;
+        min-height: 0 !important;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+      }
+      
+      .switchboard-outer-border {
+        transform: scale(1);
+        transform-origin: top left;
+        page-break-inside: avoid !important;
+        margin: 0 !important;
+      }
+      
+      .controls, .ruler-bar, .topleft-icon, .top-tabs {
+        display: none !important;
+      }
+      
+      /* Ensure all borders print */
+      .switchboard-outer-border,
+      .column,
+      .module,
+      .busbar-section,
+      .cable-zone,
+      .ct-meter-box,
+      .incomer-200mm-column {
+        border-color: #000 !important;
+      }
+      
+      .switchboard-black-box {
+        background: #ddd !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab active" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown">
+      <span>TBC</span>
+      <div class="dropdown-content">
+        <a href="conduit.html">Conduit Sizer</a>
+        <a href="cablesizing.html">Cable Sizing</a>
+        <a href="cableweight.html">Cable Weight</a>
+        <a href="pvsizing.html">PV Sizing</a>
+        <a href="emergencylighting.html">Emergency Lighting</a>
+        <a href="inspection.html">Site Inspection</a>
+      </div>
+    </div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+
+  <div class="board-dimensions" id="boardDims"></div>
+  <div class="controls">
+    <label for="modules800">800A Modules:</label>
+    <input type="number" id="modules800" min="0" max="20" value="0" />
+    <label for="modules630">630A Modules:</label>
+    <input type="number" id="modules630" min="0" max="20" value="0" />
+    <label for="modules400">400A Modules:</label>
+    <input type="number" id="modules400" min="0" max="30" value="2" />
+    <label for="modules250">250A Modules:</label>
+    <input type="number" id="modules250" min="0" max="40" value="3" />
+    <input type="checkbox" id="fireServicesChk" />
+    <label for="fireServicesChk">Fire Services?</label>
+    <input type="checkbox" id="ctMeterChk" />
+    <label for="ctMeterChk">CT Meter</label>
+    <button id="generateBtn">Generate Layout</button>
+    <button id="exportBtn">Print / Export</button>
+    <button id="saveBtn">Save Board</button>
+    <button id="loadBtn">Load Board</button>
+    <button class="orange-btn" onclick="window.open('https://www.nhp.com.au/Support/Product-Selectors/Panelboard-Product-Selector', '_blank')">DB Selector (NHP)</button>
+  </div>
+  <div id="fire-controls-wrap"></div>
+  <div id="ct-controls-wrap"></div>
+  <div class="ruler-bar">
+    <div class="ruler-mm" style="width: 600px; position: relative;">
+      <span style="left: 0;">0mm</span>
+      <span style="left: 120px;">360mm</span>
+      <span style="left: 240px;">720mm</span>
+      <span style="left: 360px;">1080mm</span>
+      <span style="left: 480px;">1440mm</span>
+      <span style="left: 600px;">1800mm</span>
+    </div>
+  </div>
+  <div class="layout-container">
+    <div id="switchboard-border" class="switchboard-outer-border">
+      <div id="switchboard" class="switchboard-layout"></div>
+      <div id="switchboard-black-box" class="switchboard-black-box"></div>
+    </div>
+  </div>
+  <script>
+    const SCALE = 600 / 1800;
+    const MODULES = [
+      {
+        type: "800A",
+        label: "800A Module<br>600x1000mm",
+        width: 600 * SCALE,
+        height: 1000 * SCALE,
+      },
+      {
+        type: "630A",
+        label: "630A Module<br>600x600mm",
+        width: 600 * SCALE,
+        height: 600 * SCALE,
+      },
+      {
+        type: "400A",
+        label: "400A Module<br>600x400mm",
+        width: 600 * SCALE,
+        height: 400 * SCALE,
+      },
+      {
+        type: "250A",
+        label: "250A Module<br>600x200mm",
+        width: 600 * SCALE,
+        height: 200 * SCALE,
+      },
+    ];
+    const INCOMING_SECTION = {
+      type: "incoming",
+      label: "Incoming Section<br>600x1800mm",
+      width: 600 * SCALE,
+      height: 1800 * SCALE,
+    };
+    const BUSBAR_600 = {
+      type: "busbar",
+      label: "Busbar<br>600x400mm",
+      width: 600 * SCALE,
+      height: 400 * SCALE,
+    };
+    const BUSBAR_400 = {
+      type: "busbar",
+      label: "Busbar<br>400x400mm",
+      width: 400 * SCALE,
+      height: 400 * SCALE,
+    };
+    const CABLE_ZONE = {
+      type: "cable",
+      label: "Cable Zone<br>400x1800mm",
+      width: 400 * SCALE,
+      height: 1800 * SCALE,
+    };
+    const FIRE_CABLE_ZONE = {
+      type: "fire_cable",
+      label: "Cable Zone<br>400x1800mm",
+      width: 400 * SCALE,
+      height: 1800 * SCALE,
+    };
+    const SPARE_250A = {
+      type: "spare",
+      label: "250A SPARE<br>600x200mm",
+      width: 600 * SCALE,
+      height: 200 * SCALE,
+    };
+    const MAX_COLUMN_HEIGHT = 1800 * SCALE;
+    const BUSBAR_HEIGHT = 400 * SCALE;
+    const CT_METER_BOX_HEIGHT = 800 * SCALE;
+    const CT_METER_BOX_WIDTH = 600 * SCALE;
+    const CT_METER_FILLER_TOP_HEIGHT = 500 * SCALE;
+    const CT_METER_FILLER_BOTTOM_HEIGHT = 500 * SCALE;
+    const INCOMER_200MM_WIDTH = 200 * SCALE;
+    const INCOMER_200MM_BUSBAR_HEIGHT = 400 * SCALE; // 400mm
+    const INCOMER_200MM_CABLE_HEIGHT = 1800 * SCALE; // 1800mm
+    const TOTAL_COLUMN_HEIGHT = 2200 * SCALE;
+    const BLACK_BOX_HEIGHT = 100 * SCALE;
+
+    function generateModuleColumns(num250, num400, num630, num800) {
+      let modules = [];
+      for (let i = 0; i < num800; ++i) modules.push({ ...MODULES[0] });
+      for (let i = 0; i < num630; ++i) modules.push({ ...MODULES[1] });
+      for (let i = 0; i < num400; ++i) modules.push({ ...MODULES[2] });
+      for (let i = 0; i < num250; ++i) modules.push({ ...MODULES[3] });
+      let moduleColumns = [],
+        col = [],
+        colHeight = 0;
+      for (let i = 0; i < modules.length; ++i) {
+        let m = modules[i];
+        if (colHeight + m.height > MAX_COLUMN_HEIGHT) {
+          if (col.length) moduleColumns.push(col);
+          col = [];
+          colHeight = 0;
+        }
+        col.push(m);
+        colHeight += m.height;
+      }
+      if (col.length) moduleColumns.push(col);
+      // Fill with 250A spares
+      for (let i = 0; i < moduleColumns.length; ++i) {
+        let col = moduleColumns[i];
+        let colHeight = col.reduce((sum, m) => sum + m.height, 0);
+        while (colHeight + SPARE_250A.height <= MAX_COLUMN_HEIGHT + 1e-6) {
+          col.push({ ...SPARE_250A });
+          colHeight += SPARE_250A.height;
+        }
+        let gap = MAX_COLUMN_HEIGHT - colHeight;
+        if (gap > 1e-6) {
+          let spare = { ...SPARE_250A };
+          spare.height = gap;
+          spare.label = `250A SPARE<br>600x${Math.round(gap / SCALE)}mm`;
+          col.push(spare);
+        }
+      }
+      return moduleColumns;
+    }
+
+    function generateLayout(
+      num250,
+      num400,
+      num630,
+      num800,
+      fireActive,
+      fire250,
+      fire400,
+      fire630,
+      fire800,
+      ctMeterActive
+    ) {
+      let fireColumns = [];
+      if (fireActive) {
+        let fireModuleColumns = generateModuleColumns(
+          fire250,
+          fire400,
+          fire630,
+          fire800
+        );
+        for (let i = 0; i < fireModuleColumns.length; ++i) {
+          fireColumns.push(fireModuleColumns[i]);
+          fireColumns.push([{ ...FIRE_CABLE_ZONE }]);
+        }
+        fireColumns.reverse();
+      }
+      let incomerColumns = [];
+      incomerColumns.push([{ ...INCOMING_SECTION }]);
+      let ctMeterCol = [];
+      if (ctMeterActive) {
+        ctMeterCol.push([
+          {
+            type: "ct_meter_filler_top",
+            label: "",
+            width: CT_METER_BOX_WIDTH,
+            height: CT_METER_FILLER_TOP_HEIGHT,
+          },
+          {
+            type: "ct_meter_box",
+            label: "CT METER<br>600x800mm",
+            width: CT_METER_BOX_WIDTH,
+            height: CT_METER_BOX_HEIGHT,
+          },
+          {
+            type: "ct_meter_filler_bottom",
+            label: "",
+            width: CT_METER_BOX_WIDTH,
+            height: CT_METER_FILLER_BOTTOM_HEIGHT,
+          },
+        ]);
+      }
+      let busbar200mmCol = [
+        {
+          type: "incomer_200mm_busbar",
+          label: "Busbar<br>200x400mm",
+          width: INCOMER_200MM_WIDTH,
+          height: INCOMER_200MM_BUSBAR_HEIGHT,
+        },
+        {
+          type: "incomer_200mm_cable",
+          label: "Cable Zone<br>200x1800mm",
+          width: INCOMER_200MM_WIDTH,
+          height: INCOMER_200MM_CABLE_HEIGHT,
+        },
+      ];
+      let moduleColumns = generateModuleColumns(num250, num400, num630, num800);
+      let mainColumns = [];
+      for (let i = 0; i < moduleColumns.length; ++i) {
+        mainColumns.push(moduleColumns[i]);
+        mainColumns.push([{ ...CABLE_ZONE }]);
+      }
+      return [...fireColumns, ...incomerColumns, ...ctMeterCol, busbar200mmCol, ...mainColumns];
+    }
+
+    function getColumnType(col) {
+      if (!col.length) return "";
+      if (col[0].type === "fire_cable") return "fire_cable";
+      if (col[0].type === "cable") return "cable";
+      if (col[0].type === "incoming") return "incoming";
+      if (
+        col[0].type === "incomer_200mm_busbar" ||
+        col[0].type === "incomer_200mm_cable"
+      )
+        return "incomer_200mm";
+      if (
+        col[0].type === "ct_meter_box" ||
+        col[0].type === "ct_meter_filler_top" ||
+        col[0].type === "ct_meter_filler_bottom"
+      )
+        return "ct_meter";
+      return "module";
+    }
+    function isDroppableColumn(col) {
+      let type = getColumnType(col);
+      return type === "module";
+    }
+    function createModuleElement(module, idx, colIdx, colType, isFire, isCT) {
+      let div;
+      if (module.type === "busbar") {
+        div = document.createElement("div");
+        div.className = "busbar-section";
+        div.setAttribute("data-type", module.type);
+        div.setAttribute("data-idx", idx);
+        div.setAttribute("data-col", colIdx);
+        div.style.width = (module.width || 200) + "px";
+        div.style.height = (module.height || BUSBAR_HEIGHT) + "px";
+        div.innerHTML = module.label;
+      } else if (module.type === "ct_meter_filler_top") {
+        div = document.createElement("div");
+        div.className = "ct-meter-filler-top";
+        div.style.width = (module.width || 200) + "px";
+        div.style.height = (module.height || CT_METER_FILLER_TOP_HEIGHT) + "px";
+        div.innerHTML = "";
+      } else if (module.type === "ct_meter_box") {
+        div = document.createElement("div");
+        div.className = "ct-meter-box";
+        div.style.width = (module.width || 200) + "px";
+        div.style.height = (module.height || CT_METER_BOX_HEIGHT) + "px";
+        div.innerHTML = "CT METER<br>600x800mm";
+      } else if (module.type === "ct_meter_filler_bottom") {
+        div = document.createElement("div");
+        div.className = "ct-meter-filler-bottom";
+        div.style.width = (module.width || 200) + "px";
+        div.style.height = (module.height || CT_METER_FILLER_BOTTOM_HEIGHT) + "px";
+        div.innerHTML = "";
+      } else if (module.type === "incomer_200mm_busbar") {
+        div = document.createElement("div");
+        div.className = "incomer-200mm-busbar";
+        div.style.width = INCOMER_200MM_WIDTH + "px";
+        div.style.height = INCOMER_200MM_BUSBAR_HEIGHT + "px";
+        div.innerHTML = module.label;
+      } else if (module.type === "incomer_200mm_cable") {
+        div = document.createElement("div");
+        div.className = "incomer-200mm-cablezone";
+        div.style.width = INCOMER_200MM_WIDTH + "px";
+        div.style.height = INCOMER_200MM_CABLE_HEIGHT + "px";
+        div.innerHTML = module.label;
+      } else {
+        div = document.createElement("div");
+        div.className = "module";
+        if (isCT) div.classList.add("ct-label");
+        div.setAttribute(
+          "draggable",
+          module.type !== "incoming" &&
+            module.type !== "cable" &&
+            module.type !== "busbar" &&
+            module.type !== "fire_cable" &&
+            module.type !== "ct_meter_box" &&
+            module.type !== "ct_meter_filler_top" &&
+            module.type !== "ct_meter_filler_bottom"
+        );
+        div.setAttribute("data-type", module.type);
+        div.setAttribute("data-idx", idx);
+        div.setAttribute("data-col", colIdx);
+        div.style.width = module.width + "px";
+        div.style.height = module.height + "px";
+        div.style.margin = "0";
+        if (
+          [
+            "cable",
+            "fire_cable",
+            "spare",
+            "incoming",
+            "ct_meter_box",
+            "ct_meter_filler_top",
+            "ct_meter_filler_bottom",
+          ].includes(module.type)
+        ) {
+          div.innerHTML = module.label;
+        } else {
+          div.innerHTML = `<span class="editable-label" contenteditable="true" spellcheck="false" oninput="updateBlackBoxWidth()">${module.label}</span>`;
+        }
+        if (module.type === "incoming") div.classList.add("incoming-section");
+        if (isFire) div.classList.add("fire-label");
+        if (isCT) div.classList.add("ct-label");
+        if (module.type === "spare") div.classList.add("spare-section");
+        if (module.type === "cable") {
+          div.className = "cable-zone module";
+          div.setAttribute("draggable", false);
+        }
+        if (module.type === "fire_cable") {
+          div.className = "cable-zone fire-cable-zone module";
+          div.setAttribute("draggable", false);
+        }
+      }
+      return div;
+    }
+    function renderLayout(columns) {
+      const board = document.getElementById("switchboard");
+      board.innerHTML = "";
+      columns.forEach((col, colIdx) => {
+        let colType = getColumnType(col);
+        let isFire =
+          colType === "fire_cable" ||
+          (colType !== "cable" &&
+            colType !== "incomer_200mm" &&
+            colType !== "incoming" &&
+            colType !== "busbar" &&
+            colType !== "spare" &&
+            colType !== "ct_meter_box" &&
+            colType !== "ct_meter_filler_top" &&
+            colType !== "ct_meter_filler_bottom" &&
+            colType !== "cable" &&
+            colType !== "fire_cable" &&
+            col[0].label &&
+            col[0].label.indexOf("FIRE") !== -1);
+        let isCT =
+          colType === "ct_meter_box" ||
+          colType === "ct_meter_filler_top" ||
+          colType === "ct_meter_filler_bottom";
+        if (colType === "incomer_200mm") {
+          const incomerDiv = document.createElement("div");
+          incomerDiv.className = "incomer-200mm-column";
+          incomerDiv.style.width = INCOMER_200MM_WIDTH + "px";
+          incomerDiv.style.height = TOTAL_COLUMN_HEIGHT + "px";
+          incomerDiv.style.display = "flex";
+          incomerDiv.style.flexDirection = "column";
+          incomerDiv.style.alignItems = "center";
+          incomerDiv.style.justifyContent = "flex-start";
+          incomerDiv.style.background = "#fff";
+          incomerDiv.style.color = "#000";
+          // Busbar
+          let busbarDiv = createModuleElement(col[0], 0, colIdx, colType, false, false);
+          incomerDiv.appendChild(busbarDiv);
+          // Cable zone
+          let cableDiv = createModuleElement(col[1], 1, colIdx, colType, false, false);
+          incomerDiv.appendChild(cableDiv);
+          board.appendChild(incomerDiv);
+          return;
+        }
+        let busbar =
+          colType === "cable" || colType === "fire_cable"
+            ? { ...BUSBAR_400 }
+            : { ...BUSBAR_600 };
+        const colDiv = document.createElement("div");
+        colDiv.className = "column";
+        if (colType === "fire_cable" || isFire) colDiv.classList.add("fire-column");
+        if (isCT) colDiv.classList.add("ct-column");
+        colDiv.setAttribute("data-col", colIdx);
+        colDiv.style.margin = "0";
+        colDiv.style.padding = "0";
+        colDiv.style.gap = "0";
+        colDiv.style.height = TOTAL_COLUMN_HEIGHT + "px";
+        colDiv.style.width =
+          (colType === "cable" || colType === "fire_cable"
+            ? BUSBAR_400.width
+            : BUSBAR_600.width) + "px";
+        const busbarDiv = createModuleElement(
+          busbar,
+          0,
+          colIdx,
+          colType,
+          colType === "fire_cable" || isFire,
+          isCT
+        );
+        colDiv.appendChild(busbarDiv);
+        col.forEach((mod, idx) => {
+          const modDiv = createModuleElement(
+            mod,
+            idx,
+            colIdx,
+            colType,
+            colType === "fire_cable" || isFire,
+            isCT
+          );
+          modDiv.style.margin = "0";
+          colDiv.appendChild(modDiv);
+        });
+        board.appendChild(colDiv);
+      });
+      updateBlackBoxWidth();
+      enableDragAndDrop(columns);
+      showBoardDimensions(columns);
+    }
+    function updateBlackBoxWidth() {
+      const border = document.getElementById("switchboard-border");
+      const blackBox = document.getElementById("switchboard-black-box");
+      if (border && blackBox) {
+        const board = document.getElementById("switchboard");
+        blackBox.style.width = board.offsetWidth + "px";
+        blackBox.style.height = BLACK_BOX_HEIGHT + "px";
+      }
+    }
+    function showBoardDimensions(columns) {
+      let width = 0;
+      columns.forEach((col) => {
+        if (col[0].type === "cable" || col[0].type === "fire_cable") width += 400;
+        else if (
+          col[0].type === "incomer_200mm_busbar" ||
+          col[0].type === "incomer_200mm_cable"
+        )
+          width += 200;
+        else if (
+          col[0].type === "ct_meter_box" ||
+          col[0].type === "ct_meter_filler_top" ||
+          col[0].type === "ct_meter_filler_bottom"
+        )
+          width += 600;
+        else width += 600;
+      });
+      let height = 2200 + 100;
+      let depth = 600;
+      document.getElementById("boardDims").textContent = `Total Board Size: ${width}mm (W) x ${height}mm (H) x ${depth}mm (D)`;
+      // Save board dimensions for switchroom sizer integration
+      localStorage.setItem('switchboardDims', `Total Board Size: ${width}mm (W) x ${height}mm (H) x ${depth}mm (D)`);
+    }
+    function enableDragAndDrop(columns) {
+      const allCols = Array.from(document.querySelectorAll(".column"));
+      allCols.forEach((colDiv, colIdx) => {
+        if (!isDroppableColumn(columns[colIdx])) return;
+        colDiv.addEventListener("dragover", handleDragOver);
+        colDiv.addEventListener("drop", handleDrop);
+      });
+      document.querySelectorAll('.module[draggable="true"]').forEach((mod) => {
+        mod.addEventListener("dragstart", handleDragStart);
+        mod.addEventListener("dragend", handleDragEnd);
+      });
+    }
+    let dragSrcEl = null,
+      dragSrcColIdx = null,
+      dragSrcIdx = null;
+    function handleDragStart(e) {
+      dragSrcEl = this;
+      dragSrcColIdx = parseInt(this.getAttribute("data-col"));
+      dragSrcIdx = parseInt(this.getAttribute("data-idx"));
+      this.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", "");
+    }
+    function handleDragEnd() {
+      this.classList.remove("dragging");
+      updateBlackBoxWidth();
+    }
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    }
+    function handleDrop(e) {
+      e.preventDefault();
+      const tgtColDiv = this;
+      const tgtColIdx = parseInt(tgtColDiv.getAttribute("data-col"));
+      if (dragSrcColIdx === null || dragSrcIdx === null) return;
+      if (dragSrcColIdx === tgtColIdx) return;
+      const allCols = Array.from(document.querySelectorAll(".column"));
+      const columns = allCols.map((colDiv) => {
+        const mods = Array.from(colDiv.querySelectorAll(".module"));
+        return mods.map((md) => ({
+          type: md.getAttribute("data-type"),
+          width: parseFloat(md.style.width),
+          height: parseFloat(md.style.height),
+          label: md.querySelector(".editable-label")
+            ? md.querySelector(".editable-label").innerHTML
+            : md.innerHTML,
+        }));
+      });
+      const fireActive = document.getElementById("fireServicesChk").checked;
+      const ctMeterActive = document.getElementById("ctMeterChk").checked;
+      const srcType = getColumnType(columns[dragSrcColIdx]);
+      const tgtType = getColumnType(columns[tgtColIdx]);
+      if (srcType !== "module" || tgtType !== "module") return;
+      let fireModuleColIndices = [],
+        mainModuleColIndices = [],
+        ctModuleColIndices = [];
+      let foundIncomer = false,
+        found200mm = false,
+        foundCT = false;
+      for (let i = 0; i < columns.length; ++i) {
+        const t = getColumnType(columns[i]);
+        if (t === "module" && !foundIncomer) fireModuleColIndices.push(i);
+        else if (t === "incoming") foundIncomer = true;
+        else if (t === "incomer_200mm_busbar" || t === "incomer_200mm_cable")
+          found200mm = true;
+        else if (
+          t === "ct_meter_box" ||
+          t === "ct_meter_filler_top" ||
+          t === "ct_meter_filler_bottom"
+        )
+          foundCT = true;
+        else if (t === "module" && foundCT && !found200mm)
+          ctModuleColIndices.push(i);
+        else if (t === "module" && foundIncomer && found200mm)
+          mainModuleColIndices.push(i);
+      }
+      const inFire =
+        fireModuleColIndices.includes(dragSrcColIdx) &&
+        fireModuleColIndices.includes(tgtColIdx);
+      const inMain =
+        mainModuleColIndices.includes(dragSrcColIdx) &&
+        mainModuleColIndices.includes(tgtColIdx);
+      const inCT =
+        ctModuleColIndices.includes(dragSrcColIdx) &&
+        ctModuleColIndices.includes(tgtColIdx);
+      
+      // Allow cross-section moves
+      const srcInFire = fireModuleColIndices.includes(dragSrcColIdx);
+      const srcInMain = mainModuleColIndices.includes(dragSrcColIdx);
+      const srcInCT = ctModuleColIndices.includes(dragSrcColIdx);
+      const tgtInFire = fireModuleColIndices.includes(tgtColIdx);
+      const tgtInMain = mainModuleColIndices.includes(tgtColIdx);
+      const tgtInCT = ctModuleColIndices.includes(tgtColIdx);
+      
+      // Allow any combination
+      const movingModule = columns[dragSrcColIdx].splice(dragSrcIdx, 1)[0];
+      columns[tgtColIdx].push(movingModule);
+      let newColumns;
+      function reflowSection(colIndices) {
+        let cols = colIndices.map((idx) => columns[idx]);
+        let moduleColumns = [];
+        let col = [],
+          colHeight = 0,
+          modules = [];
+        cols.forEach((colArr) => colArr.forEach((m) => modules.push(m)));
+        modules.sort((a, b) => {
+          const order = { "800A": 0, "630A": 1, "400A": 2, "250A": 3 };
+          return (order[a.type] ?? 99) - (order[b.type] ?? 99);
+        });
+        for (let m of modules) {
+          if (colHeight + m.height > MAX_COLUMN_HEIGHT) {
+            if (col.length) moduleColumns.push(col);
+            col = [];
+            colHeight = 0;
+          }
+          col.push(m);
+          colHeight += m.height;
+        }
+        if (col.length) moduleColumns.push(col);
+        for (let i = 0; i < moduleColumns.length; ++i) {
+          let col = moduleColumns[i],
+            colHeight = col.reduce((sum, m) => sum + m.height, 0);
+          while (colHeight + SPARE_250A.height <= MAX_COLUMN_HEIGHT + 1e-6) {
+            col.push({ ...SPARE_250A });
+            colHeight += SPARE_250A.height;
+          }
+          let gap = MAX_COLUMN_HEIGHT - colHeight;
+          if (gap > 1e-6) {
+            let spare = { ...SPARE_250A };
+            spare.height = gap;
+            spare.label = `250A SPARE<br>600x${Math.round(gap / SCALE)}mm`;
+            col.push(spare);
+          }
+        }
+        return moduleColumns;
+      }
+      if (inFire || srcInFire || tgtInFire) {
+        let newFireColumns = [];
+        let fireModuleColumns = reflowSection(fireModuleColIndices);
+        for (let i = 0; i < fireModuleColumns.length; ++i) {
+          newFireColumns.push(fireModuleColumns[i]);
+          newFireColumns.push([{ ...FIRE_CABLE_ZONE }]);
+        }
+        newFireColumns.reverse();
+        newColumns = [];
+        let fireIdx = 0;
+        for (let i = 0; i < columns.length; ++i) {
+          if (fireModuleColIndices.includes(i)) {
+            newColumns.push(newFireColumns[fireIdx++]);
+          } else {
+            newColumns.push(columns[i]);
+          }
+        }
+      } else if (inMain || srcInMain || tgtInMain) {
+        let newMainColumns = [];
+        let mainModuleColumns = reflowSection(mainModuleColIndices);
+        for (let i = 0; i < mainModuleColumns.length; ++i) {
+          newMainColumns.push(mainModuleColumns[i]);
+          newMainColumns.push([{ ...CABLE_ZONE }]);
+        }
+        newColumns = [];
+        let mainIdx = 0;
+        for (let i = 0; i < columns.length; ++i) {
+          if (mainModuleColIndices.includes(i)) {
+            newColumns.push(newMainColumns[mainIdx++]);
+          } else {
+            newColumns.push(columns[i]);
+          }
+        }
+      } else if (inCT || srcInCT || tgtInCT) {
+        let newCTColumns = reflowSection(ctModuleColIndices);
+        newColumns = [];
+        let ctIdx = 0;
+        for (let i = 0; i < columns.length; ++i) {
+          if (ctModuleColIndices.includes(i)) {
+            newColumns.push(newCTColumns[ctIdx++]);
+          } else {
+            newColumns.push(columns[i]);
+          }
+        }
+      }
+      renderLayout(newColumns);
+      dragSrcColIdx = null;
+      dragSrcIdx = null;
+    }
+
+    function updateFireControls() {
+      const checked = document.getElementById("fireServicesChk").checked;
+      let html = "";
+      if (checked) {
+        html += `
+          <div class="fire-controls">
+            <label class="fire-label" for="fireModules800">Fire 800A:</label>
+            <input type="number" id="fireModules800" min="0" max="20" value="0" />
+            <label class="fire-label" for="fireModules630">Fire 630A:</label>
+            <input type="number" id="fireModules630" min="0" max="20" value="0" />
+            <label class="fire-label" for="fireModules400">Fire 400A:</label>
+            <input type="number" id="fireModules400" min="0" max="30" value="0" />
+            <label class="fire-label" for="fireModules250">Fire 250A:</label>
+            <input type="number" id="fireModules250" min="0" max="40" value="0" />
+          </div>
+        `;
+      }
+      document.getElementById("fire-controls-wrap").innerHTML = html;
+      if (checked) {
+        [
+          "fireModules800",
+          "fireModules630",
+          "fireModules400",
+          "fireModules250",
+        ].forEach((id) => {
+          document.getElementById(id).addEventListener("input", doGenerate);
+        });
+      }
+      doGenerate();
+    }
+    function updateCTControls() {
+      document.getElementById("ct-controls-wrap").innerHTML = "";
+      doGenerate();
+    }
+    document
+      .getElementById("fireServicesChk")
+      .addEventListener("change", updateFireControls);
+    document
+      .getElementById("ctMeterChk")
+      .addEventListener("change", updateCTControls);
+
+    function doGenerate() {
+      const num800 = parseInt(document.getElementById("modules800").value) || 0;
+      const num630 = parseInt(document.getElementById("modules630").value) || 0;
+      const num400 = parseInt(document.getElementById("modules400").value) || 0;
+      const num250 = parseInt(document.getElementById("modules250").value) || 0;
+      const fireActive = document.getElementById("fireServicesChk").checked;
+      const ctMeterActive = document.getElementById("ctMeterChk").checked;
+      let fire800 = 0,
+        fire630 = 0,
+        fire400 = 0,
+        fire250 = 0;
+      if (fireActive) {
+        fire800 = parseInt(document.getElementById("fireModules800").value) || 0;
+        fire630 = parseInt(document.getElementById("fireModules630").value) || 0;
+        fire400 = parseInt(document.getElementById("fireModules400").value) || 0;
+        fire250 = parseInt(document.getElementById("fireModules250").value) || 0;
+      }
+      const columns = generateLayout(
+        num250,
+        num400,
+        num630,
+        num800,
+        fireActive,
+        fire250,
+        fire400,
+        fire630,
+        fire800,
+        ctMeterActive
+      );
+      renderLayout(columns);
+      updateBlackBoxWidth();
+    }
+    document.getElementById("generateBtn").addEventListener("click", doGenerate);
+    window.addEventListener("DOMContentLoaded", doGenerate);
+
+    document
+      .getElementById("modules800")
+      .addEventListener("input", doGenerate);
+    document
+      .getElementById("modules630")
+      .addEventListener("input", doGenerate);
+    document
+      .getElementById("modules400")
+      .addEventListener("input", doGenerate);
+    document
+      .getElementById("modules250")
+      .addEventListener("input", doGenerate);
+
+    document.getElementById("exportBtn").addEventListener("click", function () {
+      window.print();
+    });
+    window.addEventListener("resize", updateBlackBoxWidth);
+
+    document.addEventListener("input", function (e) {
+      if (e.target.classList && e.target.classList.contains("editable-label")) {
+        updateBlackBoxWidth();
+      }
+    });
+
+    // --- SAVE/LOAD BOARD CONFIGURATION ---
+    function saveBoardConfig() {
+      const config = {
+        modules800: document.getElementById("modules800").value,
+        modules630: document.getElementById("modules630").value,
+        modules400: document.getElementById("modules400").value,
+        modules250: document.getElementById("modules250").value,
+        fireServicesChk: document.getElementById("fireServicesChk").checked,
+        ctMeterChk: document.getElementById("ctMeterChk").checked,
+        fireModules800: document.getElementById("fireModules800")
+          ? document.getElementById("fireModules800").value
+          : null,
+        fireModules630: document.getElementById("fireModules630")
+          ? document.getElementById("fireModules630").value
+          : null,
+        fireModules400: document.getElementById("fireModules400")
+          ? document.getElementById("fireModules400").value
+          : null,
+        fireModules250: document.getElementById("fireModules250")
+          ? document.getElementById("fireModules250").value
+          : null,
+        labels: [],
+      };
+      document.querySelectorAll(".editable-label").forEach((label) => {
+        config.labels.push(label.innerHTML);
+      });
+      localStorage.setItem("switchboardConfig", JSON.stringify(config));
+      alert("Board configuration saved!");
+    }
+    function loadBoardConfig() {
+      const config = JSON.parse(localStorage.getItem("switchboardConfig") || "{}");
+      if (!config || !config.modules800) {
+        alert("No saved configuration found.");
+        return;
+      }
+      document.getElementById("modules800").value = config.modules800;
+      document.getElementById("modules630").value = config.modules630;
+      document.getElementById("modules400").value = config.modules400;
+      document.getElementById("modules250").value = config.modules250;
+      document.getElementById("fireServicesChk").checked = !!config.fireServicesChk;
+      document.getElementById("ctMeterChk").checked = !!config.ctMeterChk;
+      updateFireControls();
+      if (config.fireModules800 !== null && document.getElementById("fireModules800"))
+        document.getElementById("fireModules800").value = config.fireModules800;
+      if (config.fireModules630 !== null && document.getElementById("fireModules630"))
+        document.getElementById("fireModules630").value = config.fireModules630;
+      if (config.fireModules400 !== null && document.getElementById("fireModules400"))
+        document.getElementById("fireModules400").value = config.fireModules400;
+      if (config.fireModules250 !== null && document.getElementById("fireModules250"))
+        document.getElementById("fireModules250").value = config.fireModules250;
+      doGenerate();
+      setTimeout(() => {
+        let i = 0;
+        document.querySelectorAll(".editable-label").forEach((label) => {
+          if (config.labels && typeof config.labels[i] !== "undefined") {
+            label.innerHTML = config.labels[i];
+          }
+          i++;
+        });
+      }, 100);
+      alert("Board configuration loaded!");
+    }
+    document.getElementById("saveBtn").addEventListener("click", saveBoardConfig);
+    document.getElementById("loadBtn").addEventListener("click", loadBoardConfig);
+
+    // Tab highlight (visual only)
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", function () {
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+      });
+    });
+
+  </script>
+
+</body>
+</html>

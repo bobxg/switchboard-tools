@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emergency Lighting - Switchboard Tools</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .calc-section {
+      background: #fff;
+      border: 2px solid #1976d2;
+      border-radius: 0;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .calc-section h2 {
+      color: #1976d2;
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+      border-bottom: 2px solid #1976d2;
+      padding-bottom: 10px;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    .input-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #333;
+    }
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .result-box {
+      background: #e3f2fd;
+      border: 2px solid #1976d2;
+      border-radius: 4px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .result-box h3 {
+      color: #1976d2;
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+    .result-value {
+      font-size: 2em;
+      font-weight: bold;
+      color: #1976d2;
+      margin: 10px 0;
+    }
+    .result-detail {
+      font-size: 1em;
+      color: #555;
+      margin: 8px 0;
+    }
+    .warning-box {
+      background: #fff3cd;
+      border-left: 4px solid #ff9800;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .info-box {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .reference-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+    .reference-table th,
+    .reference-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    .reference-table th {
+      background: #1976d2;
+      color: white;
+      font-weight: bold;
+    }
+    .reference-table tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active">
+      <span>TBC</span>
+      <div class="dropdown-content">
+        <a href="conduit.html">Conduit Sizer</a>
+        <a href="cablesizing.html">Cable Sizing</a>
+        <a href="cableweight.html">Cable Weight</a>
+        <a href="pvsizing.html">PV Sizing</a>
+        <a href="emergencylighting.html">Emergency Lighting</a>
+        <a href="inspection.html">Site Inspection</a>
+      </div>
+    </div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+
+  <div class="calc-container">
+    <div class="calc-section">
+      <h2>Emergency Luminaire Spacing Calculator - AS/NZS 2293</h2>
+      
+      <div class="input-group">
+        <label for="areaType">Area Classification:</label>
+        <select id="areaType">
+          <option value="escape">Escape Routes / Corridors (1.0 lux required)</option>
+          <option value="open">Open Areas > 60m² (0.5 lux required)</option>
+          <option value="highrisk">High Risk Task Areas (10 lux required)</option>
+          <option value="carpark">Covered Car Parks (1.0 lux required)</option>
+        </select>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="lumens">Luminaire Output (lumens):</label>
+          <input type="number" id="lumens" value="400" min="50" step="10">
+        </div>
+        <div class="input-group">
+          <label for="mountHeight">Mounting Height (m):</label>
+          <input type="number" id="mountHeight" value="2.5" min="1.5" max="6" step="0.1">
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="corridorWidth">Corridor/Path Width (m):</label>
+          <input type="number" id="corridorWidth" value="2" min="0.5" max="10" step="0.1">
+        </div>
+        <div class="input-group">
+          <label for="reflectance">Wall/Ceiling Reflectance:</label>
+          <select id="reflectance">
+            <option value="0.7">Light (70% - White/Cream)</option>
+            <option value="0.5" selected>Medium (50% - Light Grey/Beige)</option>
+            <option value="0.3">Dark (30% - Dark Grey/Wood)</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="calculateSpacing()" style="width: 100%; padding: 14px; font-size: 1.1em; margin-top: 10px;">Calculate Spacing</button>
+
+      <div id="results" style="display: none;">
+        <div class="result-box">
+          <h3>Maximum Luminaire Spacing</h3>
+          <div class="result-value" id="maxSpacing">-</div>
+          <div class="result-detail" id="spacingDetail">-</div>
+        </div>
+
+        <div id="complianceCheck"></div>
+
+        <div class="info-box">
+          <strong>Calculation Method:</strong>
+          <p id="calcMethod" style="margin: 8px 0 0 0;">-</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-section">
+      <h2>Quick Reference - Typical Luminaire Outputs</h2>
+
+      <table class="reference-table">
+        <thead>
+          <tr>
+            <th>Luminaire Type</th>
+            <th>Typical Output</th>
+            <th>Application</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2W LED Emergency</td>
+            <td>200-300 lm</td>
+            <td>Small corridors, narrow paths</td>
+          </tr>
+          <tr>
+            <td>3W LED Emergency</td>
+            <td>300-450 lm</td>
+            <td>Standard corridors (1.5-2m wide)</td>
+          </tr>
+          <tr>
+            <td>5W LED Emergency</td>
+            <td>500-700 lm</td>
+            <td>Wide corridors, medium rooms</td>
+          </tr>
+          <tr>
+            <td>8W LED Emergency</td>
+            <td>800-1000 lm</td>
+            <td>Large open areas, warehouses</td>
+          </tr>
+          <tr>
+            <td>Exit Sign with Spear</td>
+            <td>150-250 lm</td>
+            <td>Exit indication + limited path light</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="warning-box">
+        <strong>Important Notes:</strong>
+        <ul style="margin: 8px 0 0 20px;">
+          <li>Values assume clean, maintained luminaires</li>
+          <li>Reduce spacing by 20-30% for dark surfaces or complex layouts</li>
+          <li>Heights above 3.5m require increased luminaire output or reduced spacing</li>
+          <li>Check manufacturer's photometric data for specific luminaires</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="calc-section">
+      <h2>AS/NZS 2293 Requirements Summary</h2>
+      
+      <table class="reference-table">
+        <thead>
+          <tr>
+            <th>Area Type</th>
+            <th>Required Lux</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Escape Routes / Corridors</td>
+            <td>1.0 lux minimum</td>
+            <td>90 minutes</td>
+          </tr>
+          <tr>
+            <td>Open Areas > 60m²</td>
+            <td>0.5 lux minimum</td>
+            <td>90 minutes</td>
+          </tr>
+          <tr>
+            <td>High Risk Task Areas</td>
+            <td>10 lux minimum</td>
+            <td>90 minutes</td>
+          </tr>
+          <tr>
+            <td>Covered Car Parks</td>
+            <td>1.0 lux minimum</td>
+            <td>90 minutes</td>
+          </tr>
+          <tr>
+            <td>Staged Evacuation Buildings</td>
+            <td>As per area type</td>
+            <td>120 minutes</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="info-box">
+        <strong>Testing Requirements:</strong>
+        <ul style="margin: 8px 0 0 20px;">
+          <li>Simulated power failure test: Every 6 months</li>
+          <li>Full duration discharge test: Annually</li>
+          <li>Visual inspection: Monthly</li>
+          <li>Record all tests in maintenance log</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    function calculateSpacing() {
+      // Get inputs
+      const areaType = document.getElementById('areaType').value;
+      const lumens = parseFloat(document.getElementById('lumens').value);
+      const mountHeight = parseFloat(document.getElementById('mountHeight').value);
+      const corridorWidth = parseFloat(document.getElementById('corridorWidth').value);
+      const reflectance = parseFloat(document.getElementById('reflectance').value);
+
+      // Determine required lux based on area type
+      let requiredLux;
+      let areaName;
+      switch(areaType) {
+        case 'escape':
+          requiredLux = 1.0;
+          areaName = 'Escape Routes';
+          break;
+        case 'open':
+          requiredLux = 0.5;
+          areaName = 'Open Areas > 60m²';
+          break;
+        case 'highrisk':
+          requiredLux = 10.0;
+          areaName = 'High Risk Task Areas';
+          break;
+        case 'carpark':
+          requiredLux = 1.0;
+          areaName = 'Covered Car Parks';
+          break;
+      }
+
+      // Apply reflectance factor (lower reflectance reduces effective lumens)
+      const effectiveLumens = lumens * (0.5 + reflectance * 0.5);
+
+      // Calculate spacing using lumen method with corridor geometry
+      // Formula: S = sqrt((L × UF × MF) / (E × W))
+      // Where: L = lumens, UF = utilization factor (~0.5 for corridor), MF = maintenance factor (0.8)
+      // E = required lux, W = corridor width
+      
+      const utilizationFactor = 0.4 + (reflectance * 0.2); // 0.4-0.6 depending on reflectance
+      const maintenanceFactor = 0.8; // Account for dirt and aging
+      
+      // Simplified spacing calculation
+      let maxSpacing = Math.sqrt((effectiveLumens * utilizationFactor * maintenanceFactor) / (requiredLux * corridorWidth));
+      
+      // Apply mounting height constraint (spacing shouldn't exceed 3x mounting height for corridors)
+      const heightLimit = mountHeight * 3;
+      if (maxSpacing > heightLimit) {
+        maxSpacing = heightLimit;
+      }
+
+      // Round to 1 decimal
+      maxSpacing = Math.round(maxSpacing * 10) / 10;
+
+      // Calculate number of luminaires needed for a typical 50m corridor
+      const testLength = 50;
+      const numLuminaires = Math.ceil(testLength / maxSpacing);
+      const actualSpacing = testLength / numLuminaires;
+
+      // Display results
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('maxSpacing').textContent = maxSpacing.toFixed(1) + ' meters';
+      document.getElementById('spacingDetail').textContent = 
+        `For a ${testLength}m corridor: ${numLuminaires} luminaires at ${actualSpacing.toFixed(1)}m spacing`;
+
+      // Compliance check
+      let complianceHTML = '';
+      if (maxSpacing < 6) {
+        complianceHTML = '<div class="warning-box"><strong>Warning:</strong> Very close spacing required. Consider higher output luminaires.</div>';
+      } else if (maxSpacing > 18) {
+        complianceHTML = '<div class="warning-box"><strong>Note:</strong> Wide spacing possible. Verify with photometric data and check for obstructions.</div>';
+      } else {
+        complianceHTML = '<div class="info-box"><strong>Compliant:</strong> Spacing is within typical range for emergency lighting.</div>';
+      }
+
+      // Add height warning
+      if (mountHeight > 3.5) {
+        complianceHTML += '<div class="warning-box"><strong>High Mounting:</strong> Height > 3.5m may require increased output or reduced spacing. Verify with photometric calculations.</div>';
+      }
+
+      document.getElementById('complianceCheck').innerHTML = complianceHTML;
+
+      // Calculation method explanation
+      document.getElementById('calcMethod').textContent = 
+        `Calculated for ${areaName} (${requiredLux} lux required) with ${lumens}lm luminaire at ${mountHeight}m height. ` +
+        `Effective lumens: ${effectiveLumens.toFixed(0)}lm (reflectance factor: ${reflectance}). ` +
+        `Utilization factor: ${utilizationFactor.toFixed(2)}, Maintenance factor: ${maintenanceFactor}.`;
+
+      // Scroll to results
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Calculate on load with default values
+    window.addEventListener('load', () => {
+      calculateSpacing();
+    });
+  </script>
+</body>
+</html>

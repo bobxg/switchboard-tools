@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Site Inspection - Switchboard Tools</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    .inspection-container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+      height: calc(100vh - 80px);
+    }
+    .viewer-section {
+      flex: 1;
+      background: #fff;
+      border: 2px solid #1976d2;
+      border-radius: 0;
+      padding: 20px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar {
+      width: 380px;
+      background: #fff;
+      border: 2px solid #1976d2;
+      border-radius: 0;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .upload-area {
+      border: 3px dashed #1976d2;
+      padding: 40px;
+      text-align: center;
+      background: #f5f9fc;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 20px;
+    }
+    .upload-area:hover {
+      background: #e3f0fc;
+    }
+    .upload-area.dragover {
+      background: #d1e7f5;
+      border-color: #0d47a1;
+    }
+    .pdf-viewer {
+      position: relative;
+      background: #f5f5f5;
+      flex: 1;
+      overflow: hidden;
+      border: 1px solid #ddd;
+      display: none;
+    }
+    .pdf-viewer-inner {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      position: relative;
+      scroll-behavior: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .pdf-viewer-inner::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+    .pdf-viewer-inner::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    .pdf-viewer-inner::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 6px;
+    }
+    .pdf-viewer-inner::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    .pdf-canvas-container {
+      position: relative;
+      display: inline-block;
+      margin: 20px;
+      transform-origin: 0 0;
+    }
+    #pdfCanvas {
+      display: block;
+      cursor: crosshair;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      background: white;
+      max-width: none;
+      height: auto;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+    }
+    .pin {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: #d32f2f;
+      border: 3px solid #fff;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+      z-index: 10;
+    }
+    .pin:hover {
+      transform: rotate(-45deg) scale(1.2);
+    }
+    .pin-number {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .defect-item {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-left: 4px solid #d32f2f;
+      padding: 14px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 4px;
+    }
+    .defect-item:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transform: translateX(2px);
+    }
+    .defect-item.selected {
+      background: #fff3e0;
+      border-left-color: #ff6f00;
+      box-shadow: 0 2px 8px rgba(255,111,0,0.2);
+    }
+    .defect-item.status-open {
+      border-left-color: #d32f2f;
+    }
+    .defect-item.status-in-progress {
+      border-left-color: #ff9800;
+    }
+    .defect-item.status-resolved {
+      border-left-color: #4caf50;
+    }
+    .defect-item.status-verified {
+      border-left-color: #2196f3;
+    }
+    .defect-header {
+      font-weight: bold;
+      color: #1976d2;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .defect-category {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 0.75em;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .category-electrical { background: #ffd54f; color: #f57f17; }
+    .category-plumbing { background: #81d4fa; color: #01579b; }
+    .category-structural { background: #ffccbc; color: #bf360c; }
+    .category-hvac { background: #b39ddb; color: #4527a0; }
+    .category-safety { background: #ef9a9a; color: #b71c1c; }
+    .category-other { background: #e0e0e0; color: #424242; }
+    .defect-status {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 8px;
+    }
+    .status-open { background: #ffebee; color: #c62828; }
+    .status-in-progress { background: #fff3e0; color: #e65100; }
+    .status-resolved { background: #e8f5e9; color: #2e7d32; }
+    .status-verified { background: #e3f2fd; color: #1565c0; }
+    .defect-comment {
+      font-size: 0.9em;
+      color: #444;
+      margin-bottom: 8px;
+      word-wrap: break-word;
+      line-height: 1.4;
+    }
+    .defect-meta {
+      font-size: 0.8em;
+      color: #666;
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .defect-assignee {
+      font-weight: 600;
+      color: #1976d2;
+    }
+    .defect-photo {
+      max-width: 100%;
+      margin-top: 8px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+    .defect-timestamp {
+      font-size: 0.75em;
+      color: #666;
+      font-style: italic;
+    }
+    .btn {
+      background: #1976d2;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.2s;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .btn:hover {
+      background: #1565c0;
+    }
+    .btn-danger {
+      background: #d32f2f;
+    }
+    .btn-danger:hover {
+      background: #b71c1c;
+    }
+    .btn-success {
+      background: #388e3c;
+    }
+    .btn-success:hover {
+      background: #2e7d32;
+    }
+    .controls {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .controls button {
+      flex: 1;
+      min-width: 100px;
+    }
+    .page-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #f5f9fc;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      flex-wrap: wrap;
+    }
+    .page-nav button {
+      padding: 8px 16px;
+      white-space: nowrap;
+    }
+    .page-info {
+      font-weight: bold;
+      color: #1976d2;
+      white-space: nowrap;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      border-radius: 0;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .modal-content h3 {
+      margin-top: 0;
+      color: #1976d2;
+    }
+    .modal-content label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+      color: #333;
+    }
+    .modal-content textarea,
+    .modal-content input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #b7c5dd;
+      border-radius: 0;
+      margin-top: 4px;
+      font-family: inherit;
+    }
+    .modal-content textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    @media (max-width: 1024px) {
+      .inspection-container {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active">
+      <span>TBC</span>
+      <div class="dropdown-content">
+        <a href="conduit.html">Conduit Sizer</a>
+        <a href="cablesizing.html">Cable Sizing</a>
+        <a href="cableweight.html">Cable Weight</a>
+        <a href="pvsizing.html">PV Sizing</a>
+        <a href="emergencylighting.html">Emergency Lighting</a>
+        <a href="inspection.html">Site Inspection</a>
+      </div>
+    </div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+
+  <div class="inspection-container">
+    <div class="viewer-section">
+      <h2 style="color: #1976d2; margin-top: 0;">Blueprint Viewer</h2>
+      
+      <div id="uploadArea" class="upload-area">
+        <h3>Upload PDF Blueprint</h3>
+        <p>Click to browse or drag & drop PDF file here</p>
+        <input type="file" id="pdfInput" accept=".pdf" style="display: none;" />
+      </div>
+
+      <div id="pdfViewer" class="pdf-viewer">
+        <div class="page-nav">
+          <button class="btn" id="prevPage">← Previous</button>
+          <span class="page-info">Page <span id="pageNum">1</span> of <span id="pageCount">1</span></span>
+          <button class="btn" id="nextPage">Next →</button>
+          <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+            <button class="btn" id="zoomOut">Zoom Out</button>
+            <span class="page-info"><span id="zoomLevel">100</span>%</span>
+            <button class="btn" id="zoomIn">Zoom In</button>
+            <button class="btn" id="fitWidth">Fit Width</button>
+            <button class="btn" id="togglePan" title="Toggle pan mode">Pan Mode</button>
+            <button class="btn" id="resetView">Reset View</button>
+          </div>
+        </div>
+        <div class="pdf-viewer-inner" id="pdfViewerInner">
+          <div class="pdf-canvas-container" id="canvasContainer">
+            <canvas id="pdfCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <h2 style="color: #1976d2; margin-top: 0; margin-bottom: 15px;">Observations</h2>
+      
+      <!-- Summary stats -->
+      <div id="summaryStats" style="display: none; margin-bottom: 15px; padding: 12px; background: #e3f2fd; border: 1px solid #90caf9; border-radius: 4px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.85em;">
+          <div><strong>Total:</strong> <span id="statTotal">0</span></div>
+          <div><strong>🔴 Open:</strong> <span id="statOpen">0</span></div>
+          <div><strong>🟡 Progress:</strong> <span id="statProgress">0</span></div>
+          <div><strong>🟢 Resolved:</strong> <span id="statResolved">0</span></div>
+        </div>
+      </div>
+      
+      <!-- Filter controls -->
+      <div style="margin-bottom: 15px; padding: 12px; background: #f5f9fc; border: 1px solid #ddd; border-radius: 4px;">
+        <label style="font-size: 0.9em; color: #666; margin-bottom: 6px; display: block;">Filter by Status:</label>
+        <select id="filterStatus" style="width: 100%; padding: 6px; border: 1px solid #ddd; font-size: 0.9em;">
+          <option value="all">All Statuses</option>
+          <option value="open">Open</option>
+          <option value="in-progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+          <option value="verified">Verified</option>
+        </select>
+        
+        <label style="font-size: 0.9em; color: #666; margin-top: 8px; margin-bottom: 6px; display: block;">Filter by Category:</label>
+        <select id="filterCategory" style="width: 100%; padding: 6px; border: 1px solid #ddd; font-size: 0.9em;">
+          <option value="all">All Categories</option>
+          <option value="electrical">Electrical</option>
+          <option value="plumbing">Plumbing</option>
+          <option value="structural">Structural</option>
+          <option value="hvac">HVAC</option>
+          <option value="safety">Safety</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      
+      <div class="controls">
+        <div style="position: relative; display: inline-block;">
+          <button class="btn btn-success" id="exportReport">Export Report ▼</button>
+          <div id="exportMenu" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ccc; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; min-width: 150px; margin-top: 4px;">
+            <button class="btn" id="exportPDF" style="width: 100%; text-align: left; border: none; border-radius: 0; background: white; color: #333;">Export as PDF</button>
+            <button class="btn" id="exportWord" style="width: 100%; text-align: left; border: none; border-radius: 0; background: white; color: #333;">Export as Word</button>
+            <button class="btn" id="exportJSON" style="width: 100%; text-align: left; border: none; border-radius: 0; background: white; color: #333;">Export as JSON</button>
+          </div>
+        </div>
+        <button class="btn" id="saveInspection">Save Inspection</button>
+        <button class="btn" id="loadInspection">Load Inspection</button>
+        <button class="btn btn-danger" id="clearAll">Clear All</button>
+      </div>
+
+      <div id="defectsList">
+        <p style="color: #666; font-style: italic;">Click on the blueprint to add defect markers</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for adding defect details -->
+  <div id="defectModal" class="modal">
+    <div class="modal-content">
+      <h3>Add Observation</h3>
+      
+      <label for="defectCategory">Category:</label>
+      <select id="defectCategory" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; font-size: 1em;">
+        <option value="electrical">⚡ Electrical</option>
+        <option value="plumbing">🚰 Plumbing</option>
+        <option value="structural">🏗️ Structural</option>
+        <option value="hvac">❄️ HVAC</option>
+        <option value="safety">⚠️ Safety</option>
+        <option value="other">📋 Other</option>
+      </select>
+      
+      <label for="defectStatus">Status:</label>
+      <select id="defectStatus" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; font-size: 1em;">
+        <option value="open">🔴 Open</option>
+        <option value="in-progress">🟡 In Progress</option>
+        <option value="resolved">🟢 Resolved</option>
+        <option value="verified">🔵 Verified</option>
+      </select>
+      
+      <label for="defectAssignee">Assigned To (optional):</label>
+      <input type="text" id="defectAssignee" placeholder="Name or trade" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; font-size: 1em;" />
+      
+      <label for="defectComment">Description:</label>
+      <textarea id="defectComment" placeholder="Describe the issue, observation, or work required..."></textarea>
+      
+      <label for="defectPhoto">Upload Photo (optional):</label>
+      <input type="file" id="defectPhoto" accept="image/*" />
+      
+      <div class="modal-buttons">
+        <button class="btn btn-success" id="saveDefect">Save</button>
+        <button class="btn" id="cancelDefect">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="script.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    let pdfDoc = null;
+    let pageNum = 1;
+    let pageRendering = false;
+    let pageNumPending = null;
+    let scale = 1.0; // Adjusted for A1 size PDFs (594 x 841mm @ 72dpi = 1684 x 2384 pixels)
+    let baseScale = 1.0; // Store the base scale for zoom calculations
+    let zoomLevel = 100; // Zoom percentage
+    let defects = [];
+    let defectCounter = 1;
+    let currentPinPosition = null;
+
+    const canvas = document.getElementById('pdfCanvas');
+    const ctx = canvas.getContext('2d');
+    const uploadArea = document.getElementById('uploadArea');
+    const pdfInput = document.getElementById('pdfInput');
+    const pdfViewer = document.getElementById('pdfViewer');
+    const canvasContainer = document.getElementById('canvasContainer');
+    const defectModal = document.getElementById('defectModal');
+
+    // Upload handling
+    uploadArea.addEventListener('click', () => pdfInput.click());
+    pdfInput.addEventListener('change', handleFileSelect);
+    
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') {
+        loadPDF(file);
+      }
+    });
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) loadPDF(file);
+    }
+
+    function loadPDF(file) {
+      const fileReader = new FileReader();
+      fileReader.onload = function() {
+        const typedarray = new Uint8Array(this.result);
+        pdfjsLib.getDocument(typedarray).promise.then(pdf => {
+          pdfDoc = pdf;
+          document.getElementById('pageCount').textContent = pdf.numPages;
+          uploadArea.style.display = 'none';
+          pdfViewer.style.display = 'block';
+          renderPage(pageNum);
+        });
+      };
+      fileReader.readAsArrayBuffer(file);
+    }
+
+    function renderPage(num, maintainZoom = false, centerPoint = null) {
+      pageRendering = true;
+      
+      // Store current scroll position and viewport center before render
+      const scrollX = viewerInner.scrollLeft;
+      const scrollY = viewerInner.scrollTop;
+      const viewportCenterX = scrollX + viewerInner.clientWidth / 2;
+      const viewportCenterY = scrollY + viewerInner.clientHeight / 2;
+      
+      // Calculate ratios of center point relative to canvas
+      const oldCanvasWidth = canvas.width || 1;
+      const oldCanvasHeight = canvas.height || 1;
+      const centerRatioX = viewportCenterX / oldCanvasWidth;
+      const centerRatioY = viewportCenterY / oldCanvasHeight;
+      
+      pdfDoc.getPage(num).then(page => {
+        // Get viewport with base scale to calculate fit-to-width
+        let viewport = page.getViewport({scale: 1.0});
+        
+        // Calculate scale to fit width of viewer (accounting for padding)
+        const viewerWidth = viewerInner.clientWidth - 40;
+        const scaleToFit = viewerWidth / viewport.width;
+        
+        if (!maintainZoom) {
+          // Set base scale for first render or when fitting to width
+          baseScale = Math.min(scaleToFit, 1.2); // Max 1.2x base scale
+          scale = baseScale * (zoomLevel / 100);
+        } else {
+          // Maintain current zoom level
+          scale = baseScale * (zoomLevel / 100);
+        }
+        
+        // Re-calculate viewport with final scale
+        viewport = page.getViewport({scale: scale});
+        
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        const renderContext = {
+          canvasContext: ctx,
+          viewport: viewport
+        };
+        
+        const renderTask = page.render(renderContext);
+        renderTask.promise.then(() => {
+          pageRendering = false;
+          if (pageNumPending !== null) {
+            renderPage(pageNumPending);
+            pageNumPending = null;
+          }
+          
+          // Restore scroll position to keep center point stable after zoom
+          if (maintainZoom && canvas.width > 0) {
+            const newCenterX = centerRatioX * canvas.width;
+            const newCenterY = centerRatioY * canvas.height;
+            
+            viewerInner.scrollLeft = newCenterX - viewerInner.clientWidth / 2;
+            viewerInner.scrollTop = newCenterY - viewerInner.clientHeight / 2;
+          }
+          
+          renderPins();
+        });
+      });
+
+      document.getElementById('pageNum').textContent = num;
+      document.getElementById('zoomLevel').textContent = zoomLevel;
+    }
+
+    function queueRenderPage(num) {
+      if (pageRendering) {
+        pageNumPending = num;
+      } else {
+        renderPage(num);
+      }
+    }
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+      if (pageNum <= 1) return;
+      pageNum--;
+      renderPage(pageNum, true); // Maintain zoom when changing pages
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+      if (pageNum >= pdfDoc.numPages) return;
+      pageNum++;
+      renderPage(pageNum, true); // Maintain zoom when changing pages
+    });
+
+    // Zoom controls with center maintenance
+    document.getElementById('zoomIn').addEventListener('click', () => {
+      if (zoomLevel >= 300) return;
+      zoomLevel = Math.min(zoomLevel + 25, 300);
+      renderPage(pageNum, true);
+    });
+
+    document.getElementById('zoomOut').addEventListener('click', () => {
+      if (zoomLevel <= 50) return;
+      zoomLevel = Math.max(zoomLevel - 25, 50);
+      renderPage(pageNum, true);
+    });
+
+    document.getElementById('fitWidth').addEventListener('click', () => {
+      zoomLevel = 100;
+      renderPage(pageNum, false);
+    });
+
+    document.getElementById('resetView').addEventListener('click', () => {
+      zoomLevel = 100;
+      const viewerInner = document.getElementById('pdfViewerInner');
+      viewerInner.scrollLeft = 0;
+      viewerInner.scrollTop = 0;
+      renderPage(pageNum, false);
+    });
+
+    // Pan mode variables
+    let isPanMode = false;
+    let isPanning = false;
+    let panStart = {x: 0, y: 0};
+    let scrollStart = {x: 0, y: 0};
+    let dragThreshold = 5; // Minimum distance to be considered a drag
+    let dragDistance = 0;
+
+    const viewerInner = document.getElementById('pdfViewerInner');
+
+    // Toggle pan mode - always on for better UX
+    document.getElementById('togglePan').addEventListener('click', () => {
+      isPanMode = !isPanMode;
+      const btn = document.getElementById('togglePan');
+      if (isPanMode) {
+        btn.style.background = '#1976d2';
+        btn.style.color = '#fff';
+        btn.textContent = 'Pin Mode';
+        canvas.style.cursor = 'grab';
+      } else {
+        btn.style.background = '';
+        btn.style.color = '';
+        btn.textContent = 'Pan Mode';
+        canvas.style.cursor = 'crosshair';
+      }
+    });
+
+    // Better pan implementation
+    canvas.addEventListener('mousedown', (e) => {
+      // Always allow panning when zoomed in
+      if (zoomLevel > 100 || isPanMode) {
+        isPanning = true;
+        dragDistance = 0;
+        panStart = {x: e.clientX, y: e.clientY};
+        scrollStart = {x: viewerInner.scrollLeft, y: viewerInner.scrollTop};
+        canvas.style.cursor = 'grabbing';
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isPanning) {
+        const dx = panStart.x - e.clientX;
+        const dy = panStart.y - e.clientY;
+        dragDistance = Math.sqrt(dx * dx + dy * dy);
+        
+        viewerInner.scrollLeft = scrollStart.x + dx;
+        viewerInner.scrollTop = scrollStart.y + dy;
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener('mouseup', (e) => {
+      if (isPanning) {
+        isPanning = false;
+        canvas.style.cursor = (zoomLevel > 100 || isPanMode) ? 'grab' : 'crosshair';
+      }
+    });
+
+    // Update cursor based on zoom level
+    canvas.addEventListener('mouseenter', () => {
+      if (!isPanning) {
+        canvas.style.cursor = (zoomLevel > 100 || isPanMode) ? 'grab' : 'crosshair';
+      }
+    });
+
+    // Smooth zoom with mouse wheel - centered on mouse position
+    let zoomTimeout;
+    let targetZoom = zoomLevel;
+    
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      
+      if (e.deltaY < 0) {
+        targetZoom = Math.min(targetZoom + 10, 300);
+      } else {
+        targetZoom = Math.max(targetZoom - 10, 50);
+      }
+      
+      // Update display immediately
+      document.getElementById('zoomLevel').textContent = targetZoom;
+      
+      // Debounce the actual rendering
+      clearTimeout(zoomTimeout);
+      zoomTimeout = setTimeout(() => {
+        zoomLevel = targetZoom;
+        renderPage(pageNum, true);
+      }, 150);
+      
+    }, {passive: false});
+
+    // Add pin on canvas click (only if not dragged)
+    canvas.addEventListener('click', (e) => {
+      // Don't add pin if we just finished a drag
+      if (dragDistance > dragThreshold) {
+        dragDistance = 0;
+        return;
+      }
+      
+      // Don't add pin in pan mode
+      if (isPanMode) return;
+      
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      currentPinPosition = {x, y, page: pageNum};
+      defectModal.classList.add('active');
+    });
+
+    // Save defect
+    document.getElementById('saveDefect').addEventListener('click', () => {
+      const comment = document.getElementById('defectComment').value;
+      const category = document.getElementById('defectCategory').value;
+      const status = document.getElementById('defectStatus').value;
+      const assignee = document.getElementById('defectAssignee').value;
+      const photoInput = document.getElementById('defectPhoto');
+      
+      if (!comment.trim()) {
+        alert('Please enter a description');
+        return;
+      }
+
+      const defect = {
+        id: defectCounter++,
+        page: currentPinPosition.page,
+        x: currentPinPosition.x,
+        y: currentPinPosition.y,
+        category: category,
+        status: status,
+        assignee: assignee.trim(),
+        comment: comment,
+        photo: null,
+        timestamp: new Date().toLocaleString()
+      };
+
+      if (photoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          defect.photo = e.target.result;
+          defects.push(defect);
+          updateDefectsList();
+          renderPins();
+          closeModal();
+        };
+        reader.readAsDataURL(photoInput.files[0]);
+      } else {
+        defects.push(defect);
+        updateDefectsList();
+        renderPins();
+        closeModal();
+      }
+    });
+
+    document.getElementById('cancelDefect').addEventListener('click', closeModal);
+
+    function closeModal() {
+      defectModal.classList.remove('active');
+      document.getElementById('defectComment').value = '';
+      document.getElementById('defectCategory').value = 'electrical';
+      document.getElementById('defectStatus').value = 'open';
+      document.getElementById('defectAssignee').value = '';
+      document.getElementById('defectPhoto').value = '';
+      currentPinPosition = null;
+    }
+
+    function renderPins() {
+      // Remove existing pins
+      document.querySelectorAll('.pin').forEach(pin => pin.remove());
+      
+      // Add pins for current page
+      defects.filter(d => d.page === pageNum).forEach(defect => {
+        const pin = document.createElement('div');
+        pin.className = 'pin';
+        pin.style.left = (defect.x - 15) + 'px';
+        pin.style.top = (defect.y - 30) + 'px';
+        pin.innerHTML = `<div class="pin-number">${defect.id}</div>`;
+        pin.addEventListener('click', (e) => {
+          e.stopPropagation();
+          highlightDefect(defect.id);
+        });
+        canvasContainer.appendChild(pin);
+      });
+    }
+
+    function updateDefectsList() {
+      const list = document.getElementById('defectsList');
+      
+      // Update summary stats
+      if (defects.length > 0) {
+        document.getElementById('summaryStats').style.display = 'block';
+        document.getElementById('statTotal').textContent = defects.length;
+        document.getElementById('statOpen').textContent = defects.filter(d => d.status === 'open').length;
+        document.getElementById('statProgress').textContent = defects.filter(d => d.status === 'in-progress').length;
+        document.getElementById('statResolved').textContent = defects.filter(d => d.status === 'resolved').length + defects.filter(d => d.status === 'verified').length;
+      } else {
+        document.getElementById('summaryStats').style.display = 'none';
+      }
+
+      if (defects.length === 0) {
+        list.innerHTML = '<p style="color: #666; font-style: italic;">Click on the blueprint to add observations</p>';
+        return;
+      }
+
+      // Apply filters
+      const statusFilter = document.getElementById('filterStatus')?.value || 'all';
+      const categoryFilter = document.getElementById('filterCategory')?.value || 'all';
+      
+      const filteredDefects = defects.filter(d => {
+        const statusMatch = statusFilter === 'all' || d.status === statusFilter;
+        const categoryMatch = categoryFilter === 'all' || d.category === categoryFilter;
+        return statusMatch && categoryMatch;
+      });
+
+      if (filteredDefects.length === 0) {
+        list.innerHTML = '<p style="color: #666; font-style: italic;">No observations match the current filters</p>';
+        return;
+      }
+
+      list.innerHTML = filteredDefects.map(d => `
+        <div class="defect-item status-${d.status}" data-id="${d.id}" onclick="highlightDefect(${d.id})">
+          <div class="defect-header">
+            <span>
+              <span class="defect-category category-${d.category}">${d.category.toUpperCase()}</span>
+              <strong>#${d.id}</strong>
+            </span>
+            <span class="defect-status status-${d.status}">${getStatusText(d.status)}</span>
+          </div>
+          <div class="defect-comment">${d.comment}</div>
+          ${d.photo ? `<img src="${d.photo}" class="defect-photo" onclick="window.open('${d.photo}', '_blank')" />` : ''}
+          <div class="defect-meta">
+            <span>Page ${d.page}</span>
+            ${d.assignee ? `<span class="defect-assignee">${d.assignee}</span>` : ''}
+            <span>${d.timestamp}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function getCategoryIcon(category) {
+      return '';
+    }
+
+    function getStatusText(status) {
+      const texts = {
+        open: 'Open',
+        'in-progress': 'In Progress',
+        resolved: 'Resolved',
+        verified: 'Verified'
+      };
+      return texts[status] || 'Open';
+    }
+
+    function highlightDefect(id) {
+      const defect = defects.find(d => d.id === id);
+      if (!defect) return;
+      
+      // Navigate to page if needed
+      if (defect.page !== pageNum) {
+        pageNum = defect.page;
+        queueRenderPage(pageNum);
+      }
+      
+      // Highlight in list
+      document.querySelectorAll('.defect-item').forEach(item => {
+        item.classList.remove('selected');
+      });
+      document.querySelector(`[data-id="${id}"]`)?.classList.add('selected');
+      
+      // Scroll to defect in list
+      document.querySelector(`[data-id="${id}"]`)?.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+
+    // Filter event listeners
+    document.getElementById('filterStatus')?.addEventListener('change', updateDefectsList);
+    document.getElementById('filterCategory')?.addEventListener('change', updateDefectsList);
+
+    // Toggle export menu
+    const exportButton = document.getElementById('exportReport');
+    const exportMenu = document.getElementById('exportMenu');
+    
+    exportButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      exportMenu.style.display = exportMenu.style.display === 'none' ? 'block' : 'none';
+    });
+    
+    document.addEventListener('click', () => {
+      exportMenu.style.display = 'none';
+    });
+    
+    exportMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Helper function to get report data
+    function getReportData() {
+      const statusCounts = {
+        open: defects.filter(d => d.status === 'open').length,
+        'in-progress': defects.filter(d => d.status === 'in-progress').length,
+        resolved: defects.filter(d => d.status === 'resolved').length,
+        verified: defects.filter(d => d.status === 'verified').length
+      };
+
+      const categoryCounts = {
+        electrical: defects.filter(d => d.category === 'electrical').length,
+        plumbing: defects.filter(d => d.category === 'plumbing').length,
+        structural: defects.filter(d => d.category === 'structural').length,
+        hvac: defects.filter(d => d.category === 'hvac').length,
+        safety: defects.filter(d => d.category === 'safety').length,
+        other: defects.filter(d => d.category === 'other').length
+      };
+
+      return {
+        exportDate: new Date().toLocaleString(),
+        projectSummary: {
+          totalObservations: defects.length,
+          byStatus: statusCounts,
+          byCategory: categoryCounts
+        },
+        observations: defects
+      };
+    }
+
+    // Export as PDF
+    document.getElementById('exportPDF').addEventListener('click', async () => {
+      exportMenu.style.display = 'none';
+      const report = getReportData();
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      let yPos = 20;
+      const pageHeight = doc.internal.pageSize.height;
+      const margin = 20;
+      
+      // Helper to check if new page needed
+      function checkNewPage(requiredSpace) {
+        if (yPos + requiredSpace > pageHeight - margin) {
+          doc.addPage();
+          yPos = 20;
+        }
+      }
+      
+      // Title
+      doc.setFontSize(20);
+      doc.setFont(undefined, 'bold');
+      doc.text('Site Inspection Report', margin, yPos);
+      yPos += 10;
+      
+      // Export date
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Generated: ${report.exportDate}`, margin, yPos);
+      yPos += 15;
+      
+      // Summary section
+      checkNewPage(40);
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Summary', margin, yPos);
+      yPos += 8;
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Total Observations: ${report.projectSummary.totalObservations}`, margin, yPos);
+      yPos += 7;
+      doc.text(`Open: ${report.projectSummary.byStatus.open}  |  In Progress: ${report.projectSummary.byStatus['in-progress']}  |  Resolved: ${report.projectSummary.byStatus.resolved}  |  Verified: ${report.projectSummary.byStatus.verified}`, margin, yPos);
+      yPos += 15;
+      
+      // Observations
+      checkNewPage(30);
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Observations', margin, yPos);
+      yPos += 10;
+      
+      for (let index = 0; index < report.observations.length; index++) {
+        const obs = report.observations[index];
+        checkNewPage(35);
+        
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text(`${index + 1}. Observation #${obs.id}`, margin, yPos);
+        yPos += 6;
+        
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Status: ${getStatusText(obs.status)}  |  Category: ${obs.category}`, margin + 5, yPos);
+        yPos += 5;
+        
+        if (obs.assignee) {
+          doc.text(`Assignee: ${obs.assignee}`, margin + 5, yPos);
+          yPos += 5;
+        }
+        
+        if (obs.description) {
+          const lines = doc.splitTextToSize(`Description: ${obs.description}`, 170);
+          lines.forEach(line => {
+            checkNewPage(5);
+            doc.text(line, margin + 5, yPos);
+            yPos += 5;
+          });
+        }
+        
+        // Add photos to PDF
+        if (obs.photos && obs.photos.length > 0) {
+          doc.setFontSize(9);
+          doc.setFont(undefined, 'bold');
+          doc.text(`Photos (${obs.photos.length}):`, margin + 5, yPos);
+          yPos += 5;
+          
+          for (let i = 0; i < obs.photos.length; i++) {
+            const photo = obs.photos[i];
+            checkNewPage(80); // Space for photo
+            
+            try {
+              // Add photo to PDF (Base64 encoded)
+              const imgWidth = 80;
+              const imgHeight = 60;
+              doc.addImage(photo, 'JPEG', margin + 10, yPos, imgWidth, imgHeight);
+              yPos += imgHeight + 5;
+            } catch (error) {
+              console.error('Error adding photo to PDF:', error);
+              doc.setFont(undefined, 'normal');
+              doc.text(`[Photo ${i + 1} - Error loading]`, margin + 10, yPos);
+              yPos += 5;
+            }
+          }
+        }
+        
+        yPos += 5;
+      }
+      
+      doc.save(`inspection-report-${Date.now()}.pdf`);
+    });
+
+    // Export as Word (HTML format)
+    document.getElementById('exportWord').addEventListener('click', () => {
+      exportMenu.style.display = 'none';
+      const report = getReportData();
+      
+      let html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Inspection Report</title>
+  <style>
+    body { font-family: Calibri, Arial, sans-serif; margin: 40px; }
+    h1 { color: #1976d2; border-bottom: 3px solid #1976d2; padding-bottom: 10px; }
+    h2 { color: #1976d2; margin-top: 30px; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
+    .summary { background: #f5f9fc; padding: 15px; border-left: 4px solid #1976d2; margin: 20px 0; }
+    .observation { margin: 20px 0; padding: 15px; border: 1px solid #ddd; page-break-inside: avoid; }
+    .obs-header { font-weight: bold; font-size: 14px; color: #1976d2; margin-bottom: 8px; }
+    .obs-meta { color: #666; font-size: 12px; margin-bottom: 8px; }
+    .obs-desc { margin-top: 8px; }
+    .obs-photos { margin-top: 12px; }
+    .obs-photo { max-width: 400px; height: auto; margin: 8px 8px 8px 0; border: 1px solid #ddd; display: inline-block; }
+    .status-badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; margin-right: 8px; }
+    .status-open { background: #ffebee; color: #c62828; }
+    .status-in-progress { background: #fff3e0; color: #ef6c00; }
+    .status-resolved { background: #e8f5e9; color: #2e7d32; }
+    .status-verified { background: #e3f2fd; color: #1565c0; }
+  </style>
+</head>
+<body>
+  <h1>Site Inspection Report</h1>
+  <p><strong>Generated:</strong> ${report.exportDate}</p>
+  
+  <div class="summary">
+    <h2>Summary</h2>
+    <p><strong>Total Observations:</strong> ${report.projectSummary.totalObservations}</p>
+    <p>
+      <strong>By Status:</strong><br>
+      Open: ${report.projectSummary.byStatus.open} | 
+      In Progress: ${report.projectSummary.byStatus['in-progress']} | 
+      Resolved: ${report.projectSummary.byStatus.resolved} | 
+      Verified: ${report.projectSummary.byStatus.verified}
+    </p>
+    <p>
+      <strong>By Category:</strong><br>
+      Electrical: ${report.projectSummary.byCategory.electrical} | 
+      Plumbing: ${report.projectSummary.byCategory.plumbing} | 
+      Structural: ${report.projectSummary.byCategory.structural}<br>
+      HVAC: ${report.projectSummary.byCategory.hvac} | 
+      Safety: ${report.projectSummary.byCategory.safety} | 
+      Other: ${report.projectSummary.byCategory.other}
+    </p>
+  </div>
+  
+  <h2>Observations</h2>`;
+      
+      report.observations.forEach((obs, index) => {
+        const statusClass = `status-${obs.status}`;
+        html += `
+  <div class="observation">
+    <div class="obs-header">${index + 1}. Observation #${obs.id}</div>
+    <div class="obs-meta">
+      <span class="status-badge ${statusClass}">${getStatusText(obs.status)}</span>
+      <span>${obs.category.charAt(0).toUpperCase() + obs.category.slice(1)}</span>
+      ${obs.assignee ? `<br><strong>Assignee:</strong> ${obs.assignee}` : ''}
+    </div>
+    ${obs.description ? `<div class="obs-desc"><strong>Description:</strong> ${obs.description}</div>` : ''}`;
+    
+        // Add photos to Word document
+        if (obs.photos && obs.photos.length > 0) {
+          html += `<div class="obs-photos"><strong>Photos (${obs.photos.length}):</strong><br>`;
+          obs.photos.forEach((photo, photoIndex) => {
+            html += `<img src="${photo}" class="obs-photo" alt="Photo ${photoIndex + 1}">`;
+          });
+          html += `</div>`;
+        }
+        
+        html += `
+  </div>`;
+      });
+      
+      html += `
+</body>
+</html>`;
+      
+      const blob = new Blob([html], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `inspection-report-${Date.now()}.doc`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Export as JSON
+    document.getElementById('exportJSON').addEventListener('click', () => {
+      exportMenu.style.display = 'none';
+      const report = getReportData();
+      
+      const blob = new Blob([JSON.stringify(report, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `inspection-report-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Save/Load inspection
+    document.getElementById('saveInspection').addEventListener('click', () => {
+      localStorage.setItem('inspection_data', JSON.stringify(defects));
+      alert('Inspection saved!');
+    });
+
+    document.getElementById('loadInspection').addEventListener('click', () => {
+      const saved = localStorage.getItem('inspection_data');
+      if (saved) {
+        defects = JSON.parse(saved);
+        defectCounter = Math.max(...defects.map(d => d.id), 0) + 1;
+        updateDefectsList();
+        renderPins();
+        alert('Inspection loaded!');
+      } else {
+        alert('No saved inspection found');
+      }
+    });
+
+    // Clear all
+    document.getElementById('clearAll').addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear all defects?')) {
+        defects = [];
+        defectCounter = 1;
+        updateDefectsList();
+        renderPins();
+      }
+    });
+  </script>
+</body>
+</html>

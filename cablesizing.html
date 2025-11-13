@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cable Sizing - Switchboard Tools</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calculator-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .calc-section {
+      background: #fff;
+      border: 2px solid #1976d2;
+      border-radius: 0;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .calc-section h2 {
+      color: #1976d2;
+      margin-bottom: 18px;
+      font-size: 1.6em;
+      font-weight: normal;
+    }
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .input-group label {
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #333;
+    }
+    .input-group input,
+    .input-group select {
+      padding: 8px 12px;
+      border: 1px solid #b7c5dd;
+      border-radius: 0;
+      font-size: 1em;
+    }
+    .result-box {
+      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 0;
+      margin-top: 24px;
+      text-align: center;
+    }
+    .result-value {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin: 12px 0;
+    }
+    .calc-button {
+      background: #1976d2;
+      color: white;
+      padding: 12px 32px;
+      border: none;
+      border-radius: 0;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+      margin-top: 12px;
+    }
+    .calc-button:hover {
+      background: #1565c0;
+    }
+    .info-box {
+      background: #e3f0fc;
+      border-left: 4px solid #1976d2;
+      padding: 16px;
+      margin: 16px 0;
+      border-radius: 0;
+    }
+    @media (max-width: 768px) {
+      .input-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active">
+      <span>TBC</span>
+      <div class="dropdown-content">
+        <a href="conduit.html">Conduit Sizer</a>
+        <a href="cablesizing.html">Cable Sizing</a>
+        <a href="cableweight.html">Cable Weight</a>
+        <a href="pvsizing.html">PV Sizing</a>
+        <a href="emergencylighting.html">Emergency Lighting</a>
+        <a href="inspection.html">Site Inspection</a>
+      </div>
+    </div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+
+  <div class="calculator-container">
+    <div class="calc-section">
+      <h2>Cable Sizing Calculator (AS/NZS 3008)</h2>
+      
+      <div class="input-row">
+        <div class="input-group">
+          <label for="loadCurrent">Load Current (A)</label>
+          <input type="number" id="loadCurrent" value="32" min="0" step="0.1" />
+        </div>
+        <div class="input-group">
+          <label for="cableLength">Cable Length (m)</label>
+          <input type="number" id="cableLength" value="50" min="0" step="1" />
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="voltage">System Voltage (V)</label>
+          <select id="voltage">
+            <option value="230">230V Single Phase</option>
+            <option value="400" selected>400V Three Phase</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="phases">Phases</label>
+          <select id="phases">
+            <option value="1">Single Phase</option>
+            <option value="3" selected>Three Phase</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="installMethod">Installation Method</label>
+          <select id="installMethod">
+            <option value="1">Method 1 - Enclosed in conduit in thermally insulated wall</option>
+            <option value="3">Method 3 - Cables in conduit on surface/in trunking</option>
+            <option value="12" selected>Method 12 - Multicore cable, direct burial</option>
+            <option value="21">Method 21 - Cables in conduit underground</option>
+            <option value="31">Method 31 - Multicore cable on cable tray, unperforated</option>
+            <option value="32">Method 32 - Multicore cable on cable ladder/cleats</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="ambientTemp">Ambient Temperature (°C)</label>
+          <input type="number" id="ambientTemp" value="30" min="0" max="60" />
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="grouping">Number of Circuits Grouped</label>
+          <input type="number" id="grouping" value="1" min="1" max="20" />
+        </div>
+        <div class="input-group">
+          <label for="voltDropPercent">Max Voltage Drop (%)</label>
+          <input type="number" id="voltDropPercent" value="5" min="1" max="10" step="0.5" />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="cableType">Cable Type</label>
+        <select id="cableType">
+          <option value="cu">Copper Conductor</option>
+          <option value="al">Aluminium Conductor</option>
+        </select>
+      </div>
+
+      <button class="calc-button" onclick="calculateCable()">Calculate Cable Size</button>
+
+      <div id="resultBox" style="display:none;">
+        <div class="result-box">
+          <h3>Recommended Cable Size</h3>
+          <div class="result-value" id="cableSize"></div>
+          <div id="resultDetails"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h4>AS/NZS 3008.1.1 Cable Sizing</h4>
+      <ul style="margin-left: 20px; line-height: 1.8;">
+        <li>Calculates based on current carrying capacity and voltage drop</li>
+        <li>Applies derating factors for temperature and grouping</li>
+        <li>Default voltage drop: 5% for general circuits, 3% for lighting</li>
+        <li>Assumes XLPE insulation (90°C operating temp)</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Simplified cable data (mm² : ampacity)
+    const CABLE_AMPACITY = {
+      cu: {
+        1: { 1: 19, 3: 23, 12: 24, 21: 20, 31: 21, 32: 22 },
+        1.5: { 1: 24, 3: 28, 12: 30, 21: 25, 31: 27, 32: 28 },
+        2.5: { 1: 32, 3: 37, 12: 41, 21: 34, 31: 36, 32: 38 },
+        4: { 1: 42, 3: 49, 12: 54, 21: 45, 31: 48, 32: 51 },
+        6: { 1: 54, 3: 63, 12: 70, 21: 58, 31: 62, 32: 65 },
+        10: { 1: 73, 3: 86, 12: 95, 21: 79, 31: 84, 32: 88 },
+        16: { 1: 98, 3: 115, 12: 128, 21: 107, 31: 113, 32: 119 },
+        25: { 1: 129, 3: 151, 12: 168, 21: 140, 31: 148, 32: 156 },
+        35: { 1: 158, 3: 185, 12: 206, 21: 172, 31: 182, 32: 191 },
+        50: { 1: 198, 3: 232, 12: 258, 21: 215, 31: 228, 32: 239 },
+        70: { 1: 245, 3: 287, 12: 320, 21: 267, 31: 283, 32: 297 },
+        95: { 1: 292, 3: 341, 12: 381, 21: 318, 31: 337, 32: 354 },
+        120: { 1: 334, 3: 391, 12: 437, 21: 365, 31: 386, 32: 406 },
+        150: { 1: 382, 3: 447, 12: 500, 21: 417, 31: 442, 32: 464 },
+        185: { 1: 435, 3: 509, 12: 570, 21: 476, 31: 504, 32: 529 },
+        240: { 1: 514, 3: 601, 12: 673, 21: 562, 31: 596, 32: 625 }
+      }
+    };
+
+    // Cable resistance (mΩ/m at 75°C)
+    const CABLE_RESISTANCE = {
+      cu: { 1: 21.9, 1.5: 14.6, 2.5: 8.76, 4: 5.48, 6: 3.65, 10: 2.19, 16: 1.37, 25: 0.876, 
+            35: 0.626, 50: 0.438, 70: 0.313, 95: 0.230, 120: 0.183, 150: 0.146, 185: 0.122, 240: 0.0913 }
+    };
+
+    const STANDARD_SIZES = [1, 1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630];
+
+    function calculateCable() {
+      const current = parseFloat(document.getElementById('loadCurrent').value);
+      const length = parseFloat(document.getElementById('cableLength').value);
+      const voltage = parseFloat(document.getElementById('voltage').value);
+      const phases = parseInt(document.getElementById('phases').value);
+      const method = parseInt(document.getElementById('installMethod').value);
+      const ambientTemp = parseFloat(document.getElementById('ambientTemp').value);
+      const grouping = parseInt(document.getElementById('grouping').value);
+      const maxVdPercent = parseFloat(document.getElementById('voltDropPercent').value);
+      const cableType = document.getElementById('cableType').value;
+
+      // Temperature derating (AS/NZS 3008.1.1 Table 27)
+      // For 75°C rated cables (V90, XLPE)
+      const tempDeratingFactors = {
+        25: 1.08, 30: 1.00, 35: 0.91, 40: 0.82, 45: 0.71, 50: 0.58, 55: 0.41
+      };
+      let tempFactor = 1.0;
+      if (ambientTemp <= 25) {
+        tempFactor = 1.08;
+      } else if (ambientTemp >= 55) {
+        tempFactor = 0.41;
+      } else {
+        // Linear interpolation between temperature points
+        const temps = [25, 30, 35, 40, 45, 50, 55];
+        for (let i = 0; i < temps.length - 1; i++) {
+          if (ambientTemp >= temps[i] && ambientTemp <= temps[i + 1]) {
+            const t1 = temps[i];
+            const t2 = temps[i + 1];
+            const f1 = tempDeratingFactors[t1];
+            const f2 = tempDeratingFactors[t2];
+            tempFactor = f1 + (f2 - f1) * (ambientTemp - t1) / (t2 - t1);
+            break;
+          }
+        }
+      }
+
+      // Grouping derating (AS/NZS 3008.1.1 Table 28)
+      const groupFactors = [1.00, 1.00, 0.80, 0.70, 0.65, 0.60, 0.57, 0.54, 0.52, 0.50, 
+                           0.48, 0.46, 0.45, 0.44, 0.43, 0.42, 0.41, 0.41, 0.40, 0.40];
+      const groupFactor = groupFactors[Math.min(grouping - 1, 19)];
+
+      const totalDeratingFactor = tempFactor * groupFactor;
+      const requiredAmpacity = current / totalDeratingFactor;
+
+      // Find cable size based on ampacity
+      let sizeByAmpacity = null;
+      const ampData = CABLE_AMPACITY[cableType];
+      for (let size of STANDARD_SIZES) {
+        if (ampData[size] && ampData[size][method]) {
+          if (ampData[size][method] >= requiredAmpacity) {
+            sizeByAmpacity = size;
+            break;
+          }
+        }
+      }
+
+      // Calculate voltage drop
+      const maxVdVolts = (voltage * maxVdPercent) / 100;
+      let sizeByVoltDrop = null;
+
+      for (let size of STANDARD_SIZES) {
+        if (CABLE_RESISTANCE[cableType][size]) {
+          const resistance = CABLE_RESISTANCE[cableType][size] / 1000; // Convert to Ω/m
+          let voltDrop;
+          if (phases === 3) {
+            voltDrop = Math.sqrt(3) * current * resistance * length;
+          } else {
+            voltDrop = 2 * current * resistance * length; // 2x for single phase (out and back)
+          }
+          
+          if (voltDrop <= maxVdVolts) {
+            sizeByVoltDrop = size;
+            break;
+          }
+        }
+      }
+
+      // Select larger of the two
+      const finalSize = Math.max(sizeByAmpacity || 0, sizeByVoltDrop || 0);
+
+      if (finalSize === 0) {
+        alert('Cable size exceeds standard range. Consider parallel cables or larger size.');
+        return;
+      }
+
+      // Calculate actual voltage drop
+      const finalResistance = CABLE_RESISTANCE[cableType][finalSize] / 1000;
+      let actualVd;
+      if (phases === 3) {
+        actualVd = Math.sqrt(3) * current * finalResistance * length;
+      } else {
+        actualVd = 2 * current * finalResistance * length;
+      }
+      const actualVdPercent = (actualVd / voltage) * 100;
+
+      const actualAmpacity = ampData[finalSize][method] * totalDeratingFactor;
+
+      document.getElementById('cableSize').textContent = finalSize + ' mm²';
+      document.getElementById('resultDetails').innerHTML = `
+        <p style="margin:8px 0;"><strong>Derated Ampacity:</strong> ${actualAmpacity.toFixed(1)} A (${(actualAmpacity/current * 100).toFixed(0)}% margin)</p>
+        <p style="margin:8px 0;"><strong>Voltage Drop:</strong> ${actualVd.toFixed(2)} V (${actualVdPercent.toFixed(2)}%)</p>
+        <p style="margin:8px 0;"><strong>Temperature Factor:</strong> ${tempFactor.toFixed(2)}</p>
+        <p style="margin:8px 0;"><strong>Grouping Factor:</strong> ${groupFactor.toFixed(2)}</p>
+        <p style="margin:8px 0; font-size:0.9em;"><em>Sized by: ${sizeByAmpacity > sizeByVoltDrop ? 'Current Capacity' : 'Voltage Drop'}</em></p>
+      `;
+      
+      document.getElementById('resultBox').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
