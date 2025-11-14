@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Single Line Diagram Generator - Switchboard Tools</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    .input-section {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+    .load-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+    .load-table th {
+      background: #2c5f8d;
+      color: white;
+      padding: 10px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .load-table td {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    .load-table input[type="text"],
+    .load-table input[type="number"],
+    .load-table select {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .load-table input[type="number"] {
+      width: 80px;
+    }
+    .load-table select {
+      width: auto;
+      min-width: 80px;
+    }
+    .load-table .small-select {
+      width: 60px;
+    }
+    .load-table .type-select {
+      width: 120px;
+    }
+    .add-row-btn, .remove-row-btn {
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      border: none;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+    .add-row-btn {
+      background: #4caf50;
+      color: white;
+    }
+    .add-row-btn:hover {
+      background: #45a049;
+    }
+    .remove-row-btn {
+      background: #f44336;
+      color: white;
+    }
+    .remove-row-btn:hover {
+      background: #da190b;
+    }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    .setting-item label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    .setting-item input, .setting-item select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .symbol-legend {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .symbol-legend h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 8px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .legend-symbol {
+      width: 40px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-primary {
+      background: #2c5f8d;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1a3a52;
+    }
+    .btn-secondary {
+      background: #666;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #444;
+    }
+    .diagram-container {
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      max-width: 1200px;
+      overflow-x: auto;
+    }
+    #sldCanvas {
+      display: block;
+      margin: 0 auto;
+      border: 1px solid #ddd;
+    }
+    .example-text {
+      font-size: 12px;
+      color: #666;
+      font-style: italic;
+      margin-top: 5px;
+    }
+    .load-type-legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="tab"><a href="index.html">Home</a></div>
+    <div class="tab"><a href="switchboard.html">Switchboard Sizer</a></div>
+    <div class="tab"><a href="switchroom.html">Switchroom Sizer</a></div>
+    <div class="tab"><a href="lightingsearch.html">Lighting Search</a></div>
+    <div class="tab has-dropdown active">
+      <a href="#" onclick="return false;">TBC</a>
+      <div class="dropdown-content">
+        <a href="conduit.html">Conduit Sizer</a>
+        <a href="cablesizing.html">Cable Sizing</a>
+        <a href="cableweight.html">Cable Weight</a>
+        <a href="pvsizing.html">PV Sizing</a>
+        <a href="emergencylighting.html">Emergency Lighting</a>
+        <a href="inspection.html">Site Inspection</a>
+        <a href="sld.html">Single Line Diagram</a>
+      </div>
+    </div>
+    <div class="tab"><a href="qa.html">Verification</a></div>
+  </div>
+
+  <div class="container">
+    <h1>Single Line Diagram Generator</h1>
+    <p>Generate AS/NZS compliant single line diagrams. Breakers automatically sized: MCB (≤100A), MCCB (100-800A), ACB (>800A)</p>
+
+    <div class="input-section">
+      <h3>Main Switch Configuration</h3>
+      <div class="settings-grid" style="grid-template-columns: 1fr 1fr 2fr; margin-bottom: 20px;">
+        <div class="setting-item">
+          <label for="mainSwitchRating">Main Switch Rating (A)</label>
+          <input type="number" id="mainSwitchRating" value="400" min="63" step="1">
+        </div>
+        <div class="setting-item">
+          <label for="mainSwitchType">Main Switch Type</label>
+          <select id="mainSwitchType">
+            <option value="breaker" selected>Circuit Breaker</option>
+            <option value="isolator">Isolator</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label for="boardName">Board Name</label>
+          <input type="text" id="boardName" value="Main Switchboard" placeholder="MSB, DB1, etc.">
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
+          <input type="checkbox" id="safetyServices" style="width: 18px; height: 18px; cursor: pointer;">
+          <span>Include Safety Services (Separate Busbar)</span>
+        </label>
+        <p style="font-size: 12px; color: #666; margin-top: 5px; margin-left: 26px;">
+          Creates a dedicated busbar for fire services, emergency lighting, and critical safety systems
+        </p>
+      </div>
+
+      <h3>Load Input</h3>
+      <table class="load-table" id="loadTable">
+        <thead>
+          <tr>
+            <th style="width: 35%;">Circuit Name</th>
+            <th style="width: 15%;">Rating</th>
+            <th style="width: 10%;">Unit</th>
+            <th style="width: 20%;">Type</th>
+            <th style="width: 15%;">Breaker Type</th>
+            <th style="width: 5%;"></th>
+          </tr>
+        </thead>
+        <tbody id="loadTableBody">
+          <tr>
+            <td><input type="text" class="load-name" value="Main Pump" placeholder="Circuit name"></td>
+            <td><input type="number" class="load-rating" value="15" min="0" step="0.1"></td>
+            <td>
+              <select class="load-unit small-select">
+                <option value="kW" selected>kW</option>
+                <option value="A">A</option>
+              </select>
+            </td>
+            <td>
+              <select class="load-type type-select">
+                <option value="motor">Motor</option>
+                <option value="lighting">Lighting</option>
+                <option value="power" selected>Power</option>
+                <option value="heating">Heating</option>
+                <option value="safety">Safety Service</option>
+                <option value="other">Other</option>
+              </select>
+            </td>
+            <td>
+              <select class="breaker-type type-select">
+                <option value="standard" selected>Standard CB</option>
+                <option value="rcd">RCD CB</option>
+                <option value="rcbo">RCBO</option>
+                <option value="air">Air CB</option>
+              </select>
+            </td>
+            <td><button class="remove-row-btn" onclick="removeRow(this)">✕</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="add-row-btn" onclick="addRow()">+ Add Circuit</button>
+
+      <div class="symbol-legend">
+        <h4>Schematics Legend</h4>
+        <div class="legend-grid">
+          <div class="legend-item">
+            <div class="legend-symbol">
+              <svg width="40" height="25">
+                <circle cx="10" cy="12" r="6" fill="none" stroke="black" stroke-width="2"/>
+                <line x1="16" y1="12" x2="25" y2="12" stroke="black" stroke-width="2"/>
+                <line x1="25" y1="8" x2="25" y2="16" stroke="black" stroke-width="2"/>
+              </svg>
+            </div>
+            <span>CIRCUIT BREAKER</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-symbol">
+              <svg width="40" height="25">
+                <circle cx="10" cy="12" r="6" fill="none" stroke="black" stroke-width="2"/>
+                <line x1="16" y1="12" x2="25" y2="12" stroke="black" stroke-width="2"/>
+                <line x1="25" y1="8" x2="25" y2="16" stroke="black" stroke-width="2"/>
+                <line x1="22" y1="12" x2="28" y2="12" stroke="black" stroke-width="2"/>
+              </svg>
+            </div>
+            <span>NON AUTO CIRCUIT BREAKER</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-symbol">
+              <svg width="40" height="25">
+                <circle cx="8" cy="12" r="4" fill="none" stroke="black" stroke-width="1.5"/>
+                <line x1="12" y1="12" x2="20" y2="12" stroke="black" stroke-width="1.5"/>
+                <path d="M 20 12 L 28 8 M 28 8 L 32 12 M 32 12 L 28 16 M 28 16 L 20 12" fill="none" stroke="black" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <span>AIR CIRCUIT BREAKER</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-symbol">
+              <svg width="40" height="25">
+                <text x="0" y="10" font-size="8" font-weight="bold">RCD</text>
+                <circle cx="10" cy="15" r="4" fill="none" stroke="black" stroke-width="1.5"/>
+                <line x1="14" y1="15" x2="22" y2="15" stroke="black" stroke-width="1.5"/>
+                <line x1="22" y1="11" x2="22" y2="19" stroke="black" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <span>RCD CIRCUIT BREAKER</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-symbol">
+              <svg width="40" height="25">
+                <line x1="5" y1="12" x2="15" y2="12" stroke="black" stroke-width="2"/>
+                <line x1="15" y1="8" x2="15" y2="16" stroke="black" stroke-width="2"/>
+                <line x1="25" y1="12" x2="35" y2="12" stroke="black" stroke-width="2"/>
+                <line x1="25" y1="8" x2="25" y2="16" stroke="black" stroke-width="2"/>
+              </svg>
+            </div>
+            <span>3-PHASE OR 1-PHASE</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-symbol">
+              <svg width="40" height="25">
+                <rect x="10" y="7" width="20" height="10" fill="none" stroke="black" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <span>FUSE</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-symbol">
+              <svg width="40" height="25">
+                <rect x="8" y="6" width="24" height="12" fill="none" stroke="black" stroke-width="1.5"/>
+                <text x="20" y="14" font-size="7" text-anchor="middle" font-weight="bold">EA</text>
+              </svg>
+            </div>
+            <span>ENERGY ANALYSER</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-symbol">
+              <svg width="40" height="25">
+                <rect x="8" y="6" width="24" height="12" fill="none" stroke="black" stroke-width="1.5"/>
+                <text x="20" y="14" font-size="7" text-anchor="middle" font-weight="bold">kWh</text>
+              </svg>
+            </div>
+            <span>SUPPLY AUTHORITY METER</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-symbol">
+              <svg width="40" height="25">
+                <rect x="8" y="6" width="24" height="12" fill="none" stroke="black" stroke-width="1.5"/>
+                <text x="20" y="14" font-size="7" text-anchor="middle" font-weight="bold">MP</text>
+              </svg>
+            </div>
+            <span>METER PANEL</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-symbol">
+              <svg width="40" height="25">
+                <rect x="8" y="8" width="24" height="10" fill="none" stroke="black" stroke-width="1.5"/>
+                <path d="M 15 13 Q 20 8, 25 13" fill="none" stroke="black" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <span>SURGE DIVERTER</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label for="supplyVoltage">Supply Voltage (V)</label>
+          <select id="supplyVoltage">
+            <option value="230">230V Single Phase</option>
+            <option value="400" selected>400V Three Phase</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label for="powerFactor">Power Factor</label>
+          <input type="number" id="powerFactor" value="0.9" min="0.5" max="1" step="0.05">
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="generateDiagram()">Generate Diagram</button>
+        <button class="btn btn-secondary" onclick="exportSVG()">Export SVG</button>
+        <button class="btn btn-secondary" onclick="exportPNG()">Export PNG</button>
+        <button class="btn btn-secondary" onclick="exportA1()">Export A1 PDF</button>
+      </div>
+
+      <div class="load-type-legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background: #ffcccc;"></div>
+          <span>Motor</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #fff9c4;"></div>
+          <span>Lighting</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #cce5ff;"></div>
+          <span>Power</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #ffe0cc;"></div>
+          <span>Heating</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #e0e0e0;"></div>
+          <span>Other</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="diagram-container">
+      <svg id="sldCanvas" width="1000" height="600"></svg>
+    </div>
+  </div>
+
+  <script>
+    const loadTypeColors = {
+      motor: '#ffcccc',
+      lighting: '#fff9c4',
+      power: '#cce5ff',
+      heating: '#ffe0cc',
+      safety: '#ffe0f0',
+      other: '#e0e0e0'
+    };
+
+    function addRow() {
+      const tbody = document.getElementById('loadTableBody');
+      const newRow = document.createElement('tr');
+      newRow.innerHTML = `
+        <td><input type="text" class="load-name" placeholder="Circuit name"></td>
+        <td><input type="number" class="load-rating" value="10" min="0" step="0.1"></td>
+        <td>
+          <select class="load-unit small-select">
+            <option value="kW" selected>kW</option>
+            <option value="A">A</option>
+          </select>
+        </td>
+        <td>
+          <select class="load-type type-select">
+            <option value="motor">Motor</option>
+            <option value="lighting">Lighting</option>
+            <option value="power" selected>Power</option>
+            <option value="heating">Heating</option>
+            <option value="safety">Safety Service</option>
+            <option value="other">Other</option>
+          </select>
+        </td>
+        <td>
+          <select class="breaker-type type-select">
+            <option value="standard" selected>Standard CB</option>
+            <option value="rcd">RCD CB</option>
+            <option value="rcbo">RCBO</option>
+            <option value="air">Air CB</option>
+          </select>
+        </td>
+        <td><button class="remove-row-btn" onclick="removeRow(this)">✕</button></td>
+      `;
+      tbody.appendChild(newRow);
+    }
+
+    function removeRow(btn) {
+      const tbody = document.getElementById('loadTableBody');
+      if (tbody.children.length > 1) {
+        btn.closest('tr').remove();
+      } else {
+        alert('At least one circuit is required.');
+      }
+    }
+
+    function parseLoads() {
+      const rows = document.querySelectorAll('#loadTableBody tr');
+      const loads = [];
+      const voltage = parseInt(document.getElementById('supplyVoltage').value);
+      const powerFactor = parseFloat(document.getElementById('powerFactor').value);
+      
+      rows.forEach(row => {
+        const name = row.querySelector('.load-name').value.trim();
+        const rating = parseFloat(row.querySelector('.load-rating').value);
+        const unit = row.querySelector('.load-unit').value;
+        const type = row.querySelector('.load-type').value;
+        const breakerType = row.querySelector('.breaker-type').value;
+        
+        if (name && !isNaN(rating) && rating > 0) {
+          let powerKW, current;
+          
+          if (unit === 'kW') {
+            powerKW = rating;
+            current = calculateCurrent(powerKW, voltage, powerFactor, type === 'motor');
+          } else {
+            // Unit is A (Amps)
+            current = rating;
+            // Calculate power from current
+            if (voltage === 230) {
+              powerKW = (current * voltage * powerFactor) / 1000;
+            } else {
+              powerKW = (current * Math.sqrt(3) * voltage * powerFactor) / 1000;
+            }
+          }
+          
+          loads.push({ name, power: powerKW, type, breakerType, current });
+        }
+      });
+      
+      return loads;
+    }
+
+    function calculateCurrent(powerKW, voltage, powerFactor, isMotor) {
+      if (voltage === 230) {
+        // Single phase
+        return (powerKW * 1000) / (voltage * powerFactor);
+      } else {
+        // Three phase
+        return (powerKW * 1000) / (Math.sqrt(3) * voltage * powerFactor);
+      }
+    }
+
+    function selectCBSize(current, isMotor) {
+      // Motor circuits: 1.5x current for starting
+      const designCurrent = isMotor ? current * 1.5 : current;
+      
+      const standardSizes = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000];
+      
+      for (const size of standardSizes) {
+        if (size >= designCurrent) {
+          return size;
+        }
+      }
+      
+      return standardSizes[standardSizes.length - 1];
+    }
+
+    function getBreakerType(rating) {
+      if (rating > 800) return 'ACB';
+      if (rating > 100) return 'MCCB';
+      return 'MCB';
+    }
+
+    function drawCircuitBreaker(svg, x, y, rating, breakerType, label) {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      
+      if (breakerType === 'rcd') {
+        // RCD Circuit Breaker
+        const rcdText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        rcdText.setAttribute('x', x - 15);
+        rcdText.setAttribute('y', y - 8);
+        rcdText.setAttribute('font-size', '8');
+        rcdText.setAttribute('font-weight', 'bold');
+        rcdText.textContent = 'RCD';
+        g.appendChild(rcdText);
+        
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', 12);
+        circle.setAttribute('fill', 'white');
+        circle.setAttribute('stroke', '#000');
+        circle.setAttribute('stroke-width', '2');
+        g.appendChild(circle);
+        
+        const crossLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        crossLine.setAttribute('x1', x + 12);
+        crossLine.setAttribute('y1', y - 8);
+        crossLine.setAttribute('x2', x + 12);
+        crossLine.setAttribute('y2', y + 8);
+        crossLine.setAttribute('stroke', '#000');
+        crossLine.setAttribute('stroke-width', '2');
+        g.appendChild(crossLine);
+      } else if (breakerType === 'air') {
+        // Air Circuit Breaker
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', 12);
+        circle.setAttribute('fill', 'white');
+        circle.setAttribute('stroke', '#000');
+        circle.setAttribute('stroke-width', '2');
+        g.appendChild(circle);
+        
+        const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        arrow.setAttribute('d', `M ${x+12} ${y} L ${x+25} ${y-6} L ${x+30} ${y} L ${x+25} ${y+6} L ${x+12} ${y}`);
+        arrow.setAttribute('fill', 'none');
+        arrow.setAttribute('stroke', '#000');
+        arrow.setAttribute('stroke-width', '2');
+        g.appendChild(arrow);
+      } else if (breakerType === 'rcbo') {
+        // RCBO - combination of RCD and standard
+        const rcdText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        rcdText.setAttribute('x', x - 20);
+        rcdText.setAttribute('y', y - 8);
+        rcdText.setAttribute('font-size', '7');
+        rcdText.setAttribute('font-weight', 'bold');
+        rcdText.textContent = 'RCBO';
+        g.appendChild(rcdText);
+        
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', 12);
+        circle.setAttribute('fill', 'white');
+        circle.setAttribute('stroke', '#000');
+        circle.setAttribute('stroke-width', '2');
+        g.appendChild(circle);
+        
+        const crossLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        crossLine.setAttribute('x1', x + 12);
+        crossLine.setAttribute('y1', y - 8);
+        crossLine.setAttribute('x2', x + 12);
+        crossLine.setAttribute('y2', y + 8);
+        crossLine.setAttribute('stroke', '#000');
+        crossLine.setAttribute('stroke-width', '2');
+        g.appendChild(crossLine);
+      } else {
+        // Standard Circuit Breaker
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', 15);
+        circle.setAttribute('fill', 'white');
+        circle.setAttribute('stroke', '#000');
+        circle.setAttribute('stroke-width', '2');
+        g.appendChild(circle);
+        
+        const crossLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        crossLine.setAttribute('x1', x + 15);
+        crossLine.setAttribute('y1', y - 8);
+        crossLine.setAttribute('x2', x + 15);
+        crossLine.setAttribute('y2', y + 8);
+        crossLine.setAttribute('stroke', '#000');
+        crossLine.setAttribute('stroke-width', '2');
+        g.appendChild(crossLine);
+      }
+      
+      // Rating text with breaker type
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', x + 35);
+      text.setAttribute('y', y + 5);
+      text.setAttribute('font-size', '12');
+      text.setAttribute('font-weight', 'bold');
+      const breakerClass = getBreakerType(rating);
+      text.textContent = `${rating}A ${breakerClass}`;
+      g.appendChild(text);
+      
+      // Label text
+      if (label) {
+        const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        labelText.setAttribute('x', x + 35);
+        labelText.setAttribute('y', y + 18);
+        labelText.setAttribute('font-size', '10');
+        labelText.setAttribute('fill', '#666');
+        labelText.textContent = label;
+        g.appendChild(labelText);
+      }
+      
+      svg.appendChild(g);
+      return g;
+    }
+
+    function drawLoad(svg, x, y, load, current) {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      
+      // Load box
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x);
+      rect.setAttribute('y', y - 20);
+      rect.setAttribute('width', 200);
+      rect.setAttribute('height', 40);
+      rect.setAttribute('fill', loadTypeColors[load.type] || loadTypeColors.other);
+      rect.setAttribute('stroke', '#000');
+      rect.setAttribute('stroke-width', '2');
+      g.appendChild(rect);
+      
+      // Load name
+      const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      nameText.setAttribute('x', x + 100);
+      nameText.setAttribute('y', y - 2);
+      nameText.setAttribute('font-size', '13');
+      nameText.setAttribute('font-weight', 'bold');
+      nameText.setAttribute('text-anchor', 'middle');
+      nameText.textContent = load.name;
+      g.appendChild(nameText);
+      
+      // Power and current
+      const detailText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      detailText.setAttribute('x', x + 100);
+      detailText.setAttribute('y', y + 12);
+      detailText.setAttribute('font-size', '11');
+      detailText.setAttribute('text-anchor', 'middle');
+      detailText.textContent = `${load.power}kW | ${current.toFixed(1)}A`;
+      g.appendChild(detailText);
+      
+      svg.appendChild(g);
+      return g;
+    }
+
+    function drawLine(svg, x1, y1, x2, y2) {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      line.setAttribute('stroke', '#000');
+      line.setAttribute('stroke-width', '2');
+      svg.appendChild(line);
+    }
+
+    function generateDiagram() {
+      const voltage = parseInt(document.getElementById('supplyVoltage').value);
+      const powerFactor = parseFloat(document.getElementById('powerFactor').value);
+      const mainSwitchRating = parseInt(document.getElementById('mainSwitchRating').value);
+      const mainSwitchType = document.getElementById('mainSwitchType').value;
+      const boardName = document.getElementById('boardName').value;
+      const hasSafetyServices = document.getElementById('safetyServices').checked;
+      
+      const loads = parseLoads();
+      
+      if (loads.length === 0) {
+        alert('Please add at least one circuit.');
+        return;
+      }
+      
+      // Separate loads into normal and safety
+      const normalLoads = loads.filter(l => l.type !== 'safety');
+      const safetyLoads = loads.filter(l => l.type === 'safety');
+      
+      if (hasSafetyServices && safetyLoads.length === 0) {
+        alert('Safety Services is enabled but no safety service loads are defined. Please add loads with type "Safety Service" or uncheck the option.');
+        return;
+      }
+      
+      const svg = document.getElementById('sldCanvas');
+      svg.innerHTML = ''; // Clear previous diagram
+      
+      // Calculate diagram dimensions - HORIZONTAL LAYOUT
+      const startX = 150;
+      const startY = 500; // Busbar will be at bottom
+      const columnWidth = 120;
+      const normalWidth = startX + (normalLoads.length * columnWidth) + 200;
+      const safetyWidth = hasSafetyServices ? (startX + (safetyLoads.length * columnWidth) + 200) : 0;
+      const totalWidth = Math.max(normalWidth, safetyWidth, 1200);
+      const totalHeight = 700;
+      
+      svg.setAttribute('height', totalHeight);
+      svg.setAttribute('width', totalWidth);
+      
+      // Draw title
+      const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      title.setAttribute('x', totalWidth / 2);
+      title.setAttribute('y', 30);
+      title.setAttribute('font-size', '20');
+      title.setAttribute('font-weight', 'bold');
+      title.setAttribute('text-anchor', 'middle');
+      title.textContent = boardName;
+      svg.appendChild(title);
+      
+      // Draw incoming supply/main switch
+      if (mainSwitchType === 'isolator') {
+        // ISOLATOR SWITCH - two parallel vertical lines
+        const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line1.setAttribute('x1', startX - 75);
+        line1.setAttribute('y1', startY - 15);
+        line1.setAttribute('x2', startX - 75);
+        line1.setAttribute('y2', startY + 15);
+        line1.setAttribute('stroke', '#000');
+        line1.setAttribute('stroke-width', '2');
+        svg.appendChild(line1);
+        
+        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line2.setAttribute('x1', startX - 65);
+        line2.setAttribute('y1', startY - 15);
+        line2.setAttribute('x2', startX - 65);
+        line2.setAttribute('y2', startY + 15);
+        line2.setAttribute('stroke', '#000');
+        line2.setAttribute('stroke-width', '2');
+        svg.appendChild(line2);
+        
+        const isoText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        isoText.setAttribute('x', startX - 70);
+        isoText.setAttribute('y', startY - 25);
+        isoText.setAttribute('font-size', '11');
+        isoText.setAttribute('font-weight', 'bold');
+        isoText.setAttribute('text-anchor', 'middle');
+        const mainSwitchClass = getBreakerType(mainSwitchRating);
+        isoText.textContent = `${mainSwitchRating}A ${mainSwitchClass}`;
+        svg.appendChild(isoText);
+        
+        const isoLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        isoLabel.setAttribute('x', startX - 70);
+        isoLabel.setAttribute('y', startY + 30);
+        isoLabel.setAttribute('font-size', '9');
+        isoLabel.setAttribute('text-anchor', 'middle');
+        isoLabel.textContent = 'ISOLATOR';
+        svg.appendChild(isoLabel);
+      } else {
+        // CIRCUIT BREAKER - line with X then circle (main switch version)
+        const cbX = startX - 70;
+        const cbY = startY;
+        
+        // Line from supply
+        const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line1.setAttribute('x1', cbX);
+        line1.setAttribute('y1', cbY - 50);
+        line1.setAttribute('x2', cbX);
+        line1.setAttribute('y2', cbY - 30);
+        line1.setAttribute('stroke', '#000');
+        line1.setAttribute('stroke-width', '2');
+        svg.appendChild(line1);
+        
+        // X symbol
+        const x1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        x1.setAttribute('x1', cbX - 7);
+        x1.setAttribute('y1', cbY - 23);
+        x1.setAttribute('x2', cbX + 7);
+        x1.setAttribute('y2', cbY - 7);
+        x1.setAttribute('stroke', '#000');
+        x1.setAttribute('stroke-width', '2');
+        svg.appendChild(x1);
+        
+        const x2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        x2.setAttribute('x1', cbX - 7);
+        x2.setAttribute('y1', cbY - 7);
+        x2.setAttribute('x2', cbX + 7);
+        x2.setAttribute('y2', cbY - 23);
+        x2.setAttribute('stroke', '#000');
+        x2.setAttribute('stroke-width', '2');
+        svg.appendChild(x2);
+        
+        // Line to circle
+        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line2.setAttribute('x1', cbX);
+        line2.setAttribute('y1', cbY);
+        line2.setAttribute('x2', cbX);
+        line2.setAttribute('y2', cbY + 10);
+        line2.setAttribute('stroke', '#000');
+        line2.setAttribute('stroke-width', '2');
+        svg.appendChild(line2);
+        
+        // Circle
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', cbX);
+        circle.setAttribute('cy', cbY + 20);
+        circle.setAttribute('r', 10);
+        circle.setAttribute('fill', 'none');
+        circle.setAttribute('stroke', '#000');
+        circle.setAttribute('stroke-width', '2');
+        svg.appendChild(circle);
+        
+        const incomerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        incomerText.setAttribute('x', cbX);
+        incomerText.setAttribute('y', cbY - 60);
+        incomerText.setAttribute('font-size', '11');
+        incomerText.setAttribute('font-weight', 'bold');
+        incomerText.setAttribute('text-anchor', 'middle');
+        const mainSwitchClass = getBreakerType(mainSwitchRating);
+        incomerText.textContent = `${mainSwitchRating}A ${mainSwitchClass}`;
+        svg.appendChild(incomerText);
+        
+        const cbLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        cbLabel.setAttribute('x', cbX);
+        cbLabel.setAttribute('y', cbY + 40);
+        cbLabel.setAttribute('font-size', '9');
+        cbLabel.setAttribute('text-anchor', 'middle');
+        cbLabel.textContent = 'MAIN CB';
+        svg.appendChild(cbLabel);
+      }
+      
+      const voltageText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      voltageText.setAttribute('x', startX + 30);
+      voltageText.setAttribute('y', startY + 20);
+      voltageText.setAttribute('font-size', '11');
+      voltageText.setAttribute('fill', '#666');
+      voltageText.textContent = voltage === 230 ? '230V 1Ph' : '400V 3Ph';
+      svg.appendChild(voltageText);
+      
+      // Draw NORMAL LOADS section
+      drawBusbarSection(svg, startX, startY, normalLoads, 'MSB', voltage, powerFactor, false);
+      
+      // Draw SAFETY SERVICES section if enabled
+      if (hasSafetyServices && safetyLoads.length > 0) {
+        const safetyStartY = startY - 350;
+        drawBusbarSection(svg, startX, safetyStartY, safetyLoads, 'SAFETY SERVICES', voltage, powerFactor, true);
+      }
+    }
+    
+    function drawBusbarSection(svg, startX, busbarY, loads, sectionLabel, voltage, powerFactor, isSafety) {
+      const columnWidth = 120;
+      
+      // Draw horizontal busbar line at bottom
+      const busbarStartX = startX - 50;
+      const busbarEndX = startX + (loads.length * columnWidth) + 50;
+      
+      // Thick busbar line
+      const busbar = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      busbar.setAttribute('x1', busbarStartX);
+      busbar.setAttribute('y1', busbarY);
+      busbar.setAttribute('x2', busbarEndX);
+      busbar.setAttribute('y2', busbarY);
+      busbar.setAttribute('stroke', '#000');
+      busbar.setAttribute('stroke-width', '8');
+      svg.appendChild(busbar);
+      
+      // Section label below busbar
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', (busbarStartX + busbarEndX) / 2);
+      label.setAttribute('y', busbarY + 35);
+      label.setAttribute('font-size', '18');
+      label.setAttribute('font-weight', 'bold');
+      label.setAttribute('fill', isSafety ? '#c2185b' : '#000');
+      label.setAttribute('text-anchor', 'middle');
+      label.textContent = sectionLabel;
+      svg.appendChild(label);
+      
+      // Draw each load circuit - VERTICAL from busbar going UP
+      let totalCurrent = 0;
+      let totalPower = 0;
+      loads.forEach((load, index) => {
+        const x = startX + (index * columnWidth);
+        
+        // Calculate CB size
+        const isMotor = load.type === 'motor';
+        const cbSize = selectCBSize(load.current, isMotor);
+        totalCurrent += load.current;
+        totalPower += load.power;
+        
+        // Vertical line from busbar going UP to CB
+        const cbY = busbarY - 80;
+        drawLine(svg, x, busbarY, x, cbY);
+        
+        // Circuit breaker
+        drawCircuitBreakerVertical(svg, x, cbY - 20, cbSize, load.breakerType, isMotor ? '(Motor)' : '');
+        
+        // Vertical line from CB to load
+        const loadY = busbarY - 200;
+        drawLine(svg, x, cbY - 35, x, loadY);
+        
+        // Load box or DB representation
+        drawLoadVertical(svg, x, loadY - 80, load, load.current);
+      });
+      
+      // Draw total load summary
+      const summaryText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      summaryText.setAttribute('x', startX - 50);
+      summaryText.setAttribute('y', busbarY + 55);
+      summaryText.setAttribute('font-size', '12');
+      summaryText.setAttribute('font-weight', 'bold');
+      summaryText.setAttribute('fill', isSafety ? '#c2185b' : '#666');
+      summaryText.textContent = `Total: ${totalPower.toFixed(1)}kW | ${totalCurrent.toFixed(1)}A`;
+      svg.appendChild(summaryText);
+    }
+    
+    function drawCircuitBreakerVertical(svg, x, y, rating, breakerType, label) {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      
+      if (breakerType === 'rcd') {
+        // RCD CIRCUIT BREAKER - from top: circle, arrow down, X, circle with X, X, circle
+        // Line from load
+        const line0 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line0.setAttribute('x1', x);
+        line0.setAttribute('y1', y - 80);
+        line0.setAttribute('x2', x);
+        line0.setAttribute('y2', y - 70);
+        line0.setAttribute('stroke', '#000');
+        line0.setAttribute('stroke-width', '1.5');
+        g.appendChild(line0);
+        
+        // Top circle
+        const circle1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle1.setAttribute('cx', x);
+        circle1.setAttribute('cy', y - 62);
+        circle1.setAttribute('r', 8);
+        circle1.setAttribute('fill', 'none');
+        circle1.setAttribute('stroke', '#000');
+        circle1.setAttribute('stroke-width', '1.5');
+        g.appendChild(circle1);
+        
+        // Arrow pointing down
+        const arrowLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        arrowLine1.setAttribute('x1', x);
+        arrowLine1.setAttribute('y1', y - 54);
+        arrowLine1.setAttribute('x2', x);
+        arrowLine1.setAttribute('y2', y - 44);
+        arrowLine1.setAttribute('stroke', '#000');
+        arrowLine1.setAttribute('stroke-width', '1.5');
+        g.appendChild(arrowLine1);
+        
+        const arrowHead1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        arrowHead1.setAttribute('x1', x - 4);
+        arrowHead1.setAttribute('y1', y - 48);
+        arrowHead1.setAttribute('x2', x);
+        arrowHead1.setAttribute('y2', y - 44);
+        arrowHead1.setAttribute('stroke', '#000');
+        arrowHead1.setAttribute('stroke-width', '1.5');
+        g.appendChild(arrowHead1);
+        
+        const arrowHead2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        arrowHead2.setAttribute('x1', x + 4);
+        arrowHead2.setAttribute('y1', y - 48);
+        arrowHead2.setAttribute('x2', x);
+        arrowHead2.setAttribute('y2', y - 44);
+        arrowHead2.setAttribute('stroke', '#000');
+        arrowHead2.setAttribute('stroke-width', '1.5');
+        g.appendChild(arrowHead2);
+        
+        // Line
+        const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line1.setAttribute('x1', x);
+        line1.setAttribute('y1', y - 44);
+        line1.setAttribute('x2', x);
+        line1.setAttribute('y2', y - 36);
+        line1.setAttribute('stroke', '#000');
+        line1.setAttribute('stroke-width', '1.5');
+        g.appendChild(line1);
+        
+        // X symbol
+        const x1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        x1.setAttribute('x1', x - 5);
+        x1.setAttribute('y1', y - 31);
+        x1.setAttribute('x2', x + 5);
+        x1.setAttribute('y2', y - 21);
+        x1.setAttribute('stroke', '#000');
+        x1.setAttribute('stroke-width', '1.5');
+        g.appendChild(x1);
+        
+        const x2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        x2.setAttribute('x1', x - 5);
+        x2.setAttribute('y1', y - 21);
+        x2.setAttribute('x2', x + 5);
+        x2.setAttribute('y2', y - 31);
+        x2.setAttribute('stroke', '#000');
+        x2.setAttribute('stroke-width', '1.5');
+        g.appendChild(x2);
+        
+        // Line to circle with X
+        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line2.setAttribute('x1', x);
+        line2.setAttribute('y1', y - 16);
+        line2.setAttribute('x2', x);
+        line2.setAttribute('y2', y - 8);
+        line2.setAttribute('stroke', '#000');
+        line2.setAttribute('stroke-width', '1.5');
+        g.appendChild(line2);
+        
+        // Circle with X inside (RCD symbol)
+        const circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle2.setAttribute('cx', x);
+        circle2.setAttribute('cy', y);
+        circle2.setAttribute('r', 8);
+        circle2.setAttribute('fill', 'none');
+        circle2.setAttribute('stroke', '#000');
+        circle2.setAttribute('stroke-width', '1.5');
+        g.appendChild(circle2);
+        
+        // X inside circle
+        const xIn1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        xIn1.setAttribute('x1', x - 5);
+        xIn1.setAttribute('y1', y - 5);
+        xIn1.setAttribute('x2', x + 5);
+        xIn1.setAttribute('y2', y + 5);
+        xIn1.setAttribute('stroke', '#000');
+        xIn1.setAttribute('stroke-width', '1.5');
+        g.appendChild(xIn1);
+        
+        const xIn2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        xIn2.setAttribute('x1', x - 5);
+        xIn2.setAttribute('y1', y + 5);
+        xIn2.setAttribute('x2', x + 5);
+        xIn2.setAttribute('y2', y - 5);
+        xIn2.setAttribute('stroke', '#000');
+        xIn2.setAttribute('stroke-width', '1.5');
+        g.appendChild(xIn2);
+        
+        // Line
+        const line3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line3.setAttribute('x1', x);
+        line3.setAttribute('y1', y + 8);
+        line3.setAttribute('x2', x);
+        line3.setAttribute('y2', y + 16);
+        line3.setAttribute('stroke', '#000');
+        line3.setAttribute('stroke-width', '1.5');
+        g.appendChild(line3);
+        
+        // X symbol
+        const x3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        x3.setAttribute('x1', x - 5);
+        x3.setAttribute('y1', y + 21);
+        x3.setAttribute('x2', x + 5);
+        x3.setAttribute('y2', y + 31);
+        x3.setAttribute('stroke', '#000');
+        x3.setAttribute('stroke-width', '1.5');
+        g.appendChild(x3);
+        
+        const x4 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        x4.setAttribute('x1', x - 5);
+        x4.setAttribute('y1', y + 31);
+        x4.setAttribute('x2', x + 5);
+        x4.setAttribute('y2', y + 21);
+        x4.setAttribute('stroke', '#000');
+        x4.setAttribute('stroke-width', '1.5');
+        g.appendChild(x4);
+        
+        // Line to bottom circle
+        const line4 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line4.setAttribute('x1', x);
+        line4.setAttribute('y1', y + 36);
+        line4.setAttribute('x2', x);
+        line4.setAttribute('y2', y + 44);
+        line4.setAttribute('stroke', '#000');
+        line4.setAttribute('stroke-width', '1.5');
+        g.appendChild(line4);
+        
+        // Bottom circle
+        const circle3 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle3.setAttribute('cx', x);
+        circle3.setAttribute('cy', y + 52);
+        circle3.setAttribute('r', 8);
+        circle3.setAttribute('fill', 'none');
+        circle3.setAttribute('stroke', '#000');
+        circle3.setAttribute('stroke-width', '1.5');
+        g.appendChild(circle3);
+        
+        // Line to busbar
+        const line5 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line5.setAttribute('x1', x);
+        line5.setAttribute('y1', y + 60);
+        line5.setAttribute('x2', x);
+        line5.setAttribute('y2', y + 70);
+        line5.setAttribute('stroke', '#000');
+        line5.setAttribute('stroke-width', '1.5');
+        g.appendChild(line5);
+        
+      } else {
+        // CIRCUIT BREAKER - from top: circle, arrow down, X, circle
+        // Line from load
+        const line0 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line0.setAttribute('x1', x);
+        line0.setAttribute('y1', y - 50);
+        line0.setAttribute('x2', x);
+        line0.setAttribute('y2', y - 40);
+        line0.setAttribute('stroke', '#000');
+        line0.setAttribute('stroke-width', '1.5');
+        g.appendChild(line0);
+        
+        // Top circle
+        const circle1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle1.setAttribute('cx', x);
+        circle1.setAttribute('cy', y - 32);
+        circle1.setAttribute('r', 8);
+        circle1.setAttribute('fill', 'none');
+        circle1.setAttribute('stroke', '#000');
+        circle1.setAttribute('stroke-width', '1.5');
+        g.appendChild(circle1);
+        
+        // Arrow pointing down
+        const arrowLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        arrowLine.setAttribute('x1', x);
+        arrowLine.setAttribute('y1', y - 24);
+        arrowLine.setAttribute('x2', x);
+        arrowLine.setAttribute('y2', y - 14);
+        arrowLine.setAttribute('stroke', '#000');
+        arrowLine.setAttribute('stroke-width', '1.5');
+        g.appendChild(arrowLine);
+        
+        const arrowHead1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        arrowHead1.setAttribute('x1', x - 4);
+        arrowHead1.setAttribute('y1', y - 18);
+        arrowHead1.setAttribute('x2', x);
+        arrowHead1.setAttribute('y2', y - 14);
+        arrowHead1.setAttribute('stroke', '#000');
+        arrowHead1.setAttribute('stroke-width', '1.5');
+        g.appendChild(arrowHead1);
+        
+        const arrowHead2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        arrowHead2.setAttribute('x1', x + 4);
+        arrowHead2.setAttribute('y1', y - 18);
+        arrowHead2.setAttribute('x2', x);
+        arrowHead2.setAttribute('y2', y - 14);
+        arrowHead2.setAttribute('stroke', '#000');
+        arrowHead2.setAttribute('stroke-width', '1.5');
+        g.appendChild(arrowHead2);
+        
+        // Line
+        const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line1.setAttribute('x1', x);
+        line1.setAttribute('y1', y - 14);
+        line1.setAttribute('x2', x);
+        line1.setAttribute('y2', y - 6);
+        line1.setAttribute('stroke', '#000');
+        line1.setAttribute('stroke-width', '1.5');
+        g.appendChild(line1);
+        
+        // X symbol
+        const x1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        x1.setAttribute('x1', x - 5);
+        x1.setAttribute('y1', y - 1);
+        x1.setAttribute('x2', x + 5);
+        x1.setAttribute('y2', y + 9);
+        x1.setAttribute('stroke', '#000');
+        x1.setAttribute('stroke-width', '1.5');
+        g.appendChild(x1);
+        
+        const x2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        x2.setAttribute('x1', x - 5);
+        x2.setAttribute('y1', y + 9);
+        x2.setAttribute('x2', x + 5);
+        x2.setAttribute('y2', y - 1);
+        x2.setAttribute('stroke', '#000');
+        x2.setAttribute('stroke-width', '1.5');
+        g.appendChild(x2);
+        
+        // Line to circle
+        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line2.setAttribute('x1', x);
+        line2.setAttribute('y1', y + 14);
+        line2.setAttribute('x2', x);
+        line2.setAttribute('y2', y + 22);
+        line2.setAttribute('stroke', '#000');
+        line2.setAttribute('stroke-width', '1.5');
+        g.appendChild(line2);
+        
+        // Bottom circle
+        const circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle2.setAttribute('cx', x);
+        circle2.setAttribute('cy', y + 30);
+        circle2.setAttribute('r', 8);
+        circle2.setAttribute('fill', 'none');
+        circle2.setAttribute('stroke', '#000');
+        circle2.setAttribute('stroke-width', '1.5');
+        g.appendChild(circle2);
+        
+        // Line to busbar
+        const line3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line3.setAttribute('x1', x);
+        line3.setAttribute('y1', y + 38);
+        line3.setAttribute('x2', x);
+        line3.setAttribute('y2', y + 48);
+        line3.setAttribute('stroke', '#000');
+        line3.setAttribute('stroke-width', '1.5');
+        g.appendChild(line3);
+      }
+      
+      // Rating text beside top circle
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', x + 15);
+      text.setAttribute('y', y - 28);
+      text.setAttribute('font-size', '9');
+      text.setAttribute('font-weight', 'bold');
+      const breakerClass = getBreakerType(rating);
+      text.textContent = `${rating}A`;
+      g.appendChild(text);
+      
+      const typeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      typeText.setAttribute('x', x + 15);
+      typeText.setAttribute('y', y + 13);
+      typeText.setAttribute('font-size', '7');
+      typeText.setAttribute('fill', '#666');
+      typeText.textContent = breakerClass;
+      g.appendChild(typeText);
+      
+      svg.appendChild(g);
+      return g;
+    }
+    
+    function drawLoadVertical(svg, x, y, load, current) {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      
+      // Check if it's a distribution board (power > 50kW or name contains DB/MSB/BOARD)
+      const isDB = load.power > 50 || /db|msb|board|distribution/i.test(load.name);
+      
+      if (isDB) {
+        // Draw as distribution board - larger rectangle
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x - 50);
+        rect.setAttribute('y', y);
+        rect.setAttribute('width', 100);
+        rect.setAttribute('height', 60);
+        rect.setAttribute('fill', '#f0f0f0');
+        rect.setAttribute('stroke', '#000');
+        rect.setAttribute('stroke-width', '3');
+        g.appendChild(rect);
+        
+        // DB label
+        const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        nameText.setAttribute('x', x);
+        nameText.setAttribute('y', y + 25);
+        nameText.setAttribute('font-size', '12');
+        nameText.setAttribute('font-weight', 'bold');
+        nameText.setAttribute('text-anchor', 'middle');
+        nameText.textContent = load.name;
+        g.appendChild(nameText);
+        
+        // Power and current
+        const detailText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        detailText.setAttribute('x', x);
+        detailText.setAttribute('y', y + 42);
+        detailText.setAttribute('font-size', '10');
+        detailText.setAttribute('text-anchor', 'middle');
+        detailText.textContent = `${load.power.toFixed(1)}kW`;
+        g.appendChild(detailText);
+        
+        const currentText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        currentText.setAttribute('x', x);
+        currentText.setAttribute('y', y + 54);
+        currentText.setAttribute('font-size', '9');
+        currentText.setAttribute('text-anchor', 'middle');
+        currentText.setAttribute('fill', '#666');
+        currentText.textContent = `${current.toFixed(1)}A`;
+        g.appendChild(currentText);
+      } else {
+        // Regular load - smaller box
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x - 40);
+        rect.setAttribute('y', y);
+        rect.setAttribute('width', 80);
+        rect.setAttribute('height', 50);
+        rect.setAttribute('fill', loadTypeColors[load.type] || loadTypeColors.other);
+        rect.setAttribute('stroke', '#000');
+        rect.setAttribute('stroke-width', '2');
+        g.appendChild(rect);
+        
+        // Load name
+        const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        nameText.setAttribute('x', x);
+        nameText.setAttribute('y', y + 20);
+        nameText.setAttribute('font-size', '10');
+        nameText.setAttribute('font-weight', 'bold');
+        nameText.setAttribute('text-anchor', 'middle');
+        
+        // Wrap long text
+        if (load.name.length > 12) {
+          const words = load.name.split(' ');
+          const line1 = words.slice(0, Math.ceil(words.length/2)).join(' ');
+          const line2 = words.slice(Math.ceil(words.length/2)).join(' ');
+          nameText.textContent = line1;
+          g.appendChild(nameText);
+          
+          const nameText2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          nameText2.setAttribute('x', x);
+          nameText2.setAttribute('y', y + 30);
+          nameText2.setAttribute('font-size', '10');
+          nameText2.setAttribute('font-weight', 'bold');
+          nameText2.setAttribute('text-anchor', 'middle');
+          nameText2.textContent = line2;
+          g.appendChild(nameText2);
+        } else {
+          nameText.textContent = load.name;
+          g.appendChild(nameText);
+          
+          // Power and current
+          const detailText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          detailText.setAttribute('x', x);
+          detailText.setAttribute('y', y + 35);
+          detailText.setAttribute('font-size', '9');
+          detailText.setAttribute('text-anchor', 'middle');
+          detailText.textContent = `${load.power.toFixed(1)}kW | ${current.toFixed(1)}A`;
+          g.appendChild(detailText);
+        }
+      }
+      
+      svg.appendChild(g);
+      return g;
+    }
+
+    function exportSVG() {
+      const svg = document.getElementById('sldCanvas');
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svg);
+      const blob = new Blob([svgString], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'single-line-diagram.svg';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportA1() {
+      const svg = document.getElementById('sldCanvas');
+      const svgWidth = parseInt(svg.getAttribute('width'));
+      const svgHeight = parseInt(svg.getAttribute('height'));
+      
+      // A1 size LANDSCAPE: 841mm x 594mm at 300 DPI = 9933 x 7016 pixels
+      const a1Width = 9933;
+      const a1Height = 7016;
+      
+      // Position diagram slightly left of center
+      const offsetX = (a1Width * 0.4) - (svgWidth / 2);
+      const offsetY = (a1Height / 2) - (svgHeight / 2);
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = a1Width;
+      canvas.height = a1Height;
+      const ctx = canvas.getContext('2d');
+      
+      // White background
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, a1Width, a1Height);
+      
+      // Add border
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 10;
+      ctx.strokeRect(50, 50, a1Width - 100, a1Height - 100);
+      
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svg);
+      const img = new Image();
+      
+      img.onload = function() {
+        ctx.drawImage(img, offsetX, offsetY);
+        
+        // Add title block (bottom right)
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 60px Arial';
+        ctx.fillText(document.getElementById('boardName').value, a1Width - 800, a1Height - 200);
+        ctx.font = '40px Arial';
+        ctx.fillText('Single Line Diagram', a1Width - 800, a1Height - 140);
+        ctx.fillText(new Date().toLocaleDateString(), a1Width - 800, a1Height - 90);
+        
+        // Convert canvas to PDF using jsPDF
+        canvas.toBlob(function(blob) {
+          const imgData = canvas.toDataURL('image/png');
+          
+          // Initialize jsPDF with A1 landscape dimensions
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a1'
+          });
+          
+          // Add image to PDF (A1 = 841mm x 594mm in landscape)
+          pdf.addImage(imgData, 'PNG', 0, 0, 841, 594);
+          
+          // Save PDF
+          const boardName = document.getElementById('boardName').value || 'Switchboard';
+          pdf.save(`${boardName.replace(/\s+/g, '_')}_SLD_A1.pdf`);
+        });
+      };
+      
+      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+    }
+
+    // Generate example diagram on page load
+    window.addEventListener('load', function() {
+      // Add a few more example rows
+      addRow();
+      const rows = document.querySelectorAll('#loadTableBody tr');
+      rows[1].querySelector('.load-name').value = 'Office Lighting';
+      rows[1].querySelector('.load-rating').value = '5';
+      rows[1].querySelector('.load-type').value = 'lighting';
+      
+      addRow();
+      rows[2].querySelector('.load-name').value = 'HVAC Unit';
+      rows[2].querySelector('.load-rating').value = '22';
+      rows[2].querySelector('.load-type').value = 'motor';
+      
+      generateDiagram();
+    });
+  </script>
+</body>
+</html>
