@@ -9,6 +9,134 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  <script>
+    // Load and parse Bluebeam symbols from symbols.btx file
+    window.customBluebeamSymbols = [];
+    
+    fetch('symbols.btx')
+      .then(response => response.text())
+      .then(xmlText => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+        const toolItems = xmlDoc.getElementsByTagName('ToolChestItem');
+        
+        console.log(`Found ${toolItems.length} symbols in symbols.btx`);
+        
+        const symbols = {
+          'Circuit Breaker': [],
+          'RCD Circuit Breaker': [],
+          'Isolator Switch': []
+        };
+        
+        for (let item of toolItems) {
+          const nameElem = item.getElementsByTagName('Name')[0];
+          const typeElem = item.getElementsByTagName('Type')[0];
+          const rawElem = item.getElementsByTagName('Raw')[0];
+          
+          if (!nameElem || !typeElem || !rawElem) continue;
+          
+          const type = typeElem.textContent;
+          const hasChildren = item.getElementsByTagName('Child').length > 0;
+          
+          // Parse the compressed data to get actual geometry
+          try {
+            const rawData = rawElem.textContent;
+            const binaryString = atob(rawData.split(',')[0]); // Base64 decode
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            
+            // Decompress using pako (zlib)
+            const decompressed = pako.inflate(bytes, { to: 'string' });
+            const geometry = parseBluebeamGeometry(decompressed, type, item);
+            
+            if (hasChildren && symbols['RCD Circuit Breaker'].length === 0) {
+              symbols['RCD Circuit Breaker'].push(geometry);
+            } else if (type.includes('Square') && symbols['Isolator Switch'].length === 0) {
+              symbols['Isolator Switch'].push(geometry);
+            } else if (symbols['Circuit Breaker'].length === 0) {
+              symbols['Circuit Breaker'].push(geometry);
+            }
+          } catch (e) {
+            // Skip symbols we can't parse
+            console.log('Could not parse symbol:', e);
+          }
+        }
+        
+        // Use first valid symbol of each type, or fallback to simple SVG
+        window.customBluebeamSymbols = [
+          {
+            name: 'Circuit Breaker',
+            svg: symbols['Circuit Breaker'][0] || createFallbackCircuitBreaker()
+          },
+          {
+            name: 'RCD Circuit Breaker',
+            svg: symbols['RCD Circuit Breaker'][0] || createFallbackRCD()
+          },
+          {
+            name: 'Isolator Switch',
+            svg: symbols['Isolator Switch'][0] || createFallbackIsolator()
+          }
+        ];
+        
+        console.log('Loaded Bluebeam symbols:', window.customBluebeamSymbols.map(s => s.name));
+      })
+      .catch(err => {
+        console.error('Failed to load symbols.btx, using fallback symbols:', err);
+        // Use fallback symbols if file can't be loaded
+        window.customBluebeamSymbols = [
+          { name: 'Circuit Breaker', svg: createFallbackCircuitBreaker() },
+          { name: 'RCD Circuit Breaker', svg: createFallbackRCD() },
+          { name: 'Isolator Switch', svg: createFallbackIsolator() }
+        ];
+      });
+    
+    function parseBluebeamGeometry(data, type, item) {
+      // Extract X, Y coordinates from item
+      const xElem = item.getElementsByTagName('X')[0];
+      const yElem = item.getElementsByTagName('Y')[0];
+      const x = xElem ? parseFloat(xElem.textContent) : 0;
+      const y = yElem ? parseFloat(yElem.textContent) : 0;
+      
+      // For now, return scaled standard symbols
+      // The decompressed data contains PDF annotation parameters which need complex parsing
+      if (item.getElementsByTagName('Child').length > 0) {
+        return createFallbackRCD();
+      } else if (type.includes('Square')) {
+        return createFallbackIsolator();
+      } else {
+        return createFallbackCircuitBreaker();
+      }
+    }
+    
+    function createFallbackCircuitBreaker() {
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100" width="60" height="100">
+        <line x1="25" y1="35" x2="35" y2="45" stroke="black" stroke-width="2"/>
+        <line x1="35" y1="35" x2="25" y2="45" stroke="black" stroke-width="2"/>
+        <!-- Circle -->
+        <circle cx="30" cy="75" r="5" fill="none" stroke="black" stroke-width="2"/>
+        
+        <!-- Angled line from circle to right of X -->
+        <line x1="33" y1="70" x2="45" y2="40" stroke="black" stroke-width="2"/>
+      </svg>`;
+    }
+    
+    function createFallbackRCD() {
+      return createFallbackCircuitBreaker();
+    }
+    
+    function createFallbackIsolator() {
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100" width="60" height="100">
+        <!-- Circle -->
+        <circle cx="30" cy="75" r="5" fill="none" stroke="black" stroke-width="2"/>
+        
+        <!-- Angled line from circle to right -->
+        <line x1="33" y1="70" x2="45" y2="40" stroke="black" stroke-width="2"/>
+      </svg>`;
+    }
+  </script>
   <style>
     .input-section {
       max-width: 800px;
@@ -238,10 +366,10 @@
       <div style="margin-bottom: 20px;">
         <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
           <input type="checkbox" id="safetyServices" style="width: 18px; height: 18px; cursor: pointer;">
-          <span>Include Safety Services (Separate Busbar)</span>
+          <span>Add Safety Services Section</span>
         </label>
         <p style="font-size: 12px; color: #666; margin-top: 5px; margin-left: 26px;">
-          Creates a dedicated busbar for fire services, emergency lighting, and critical safety systems
+          Adds a separate section for safety loads on the same busbar
         </p>
       </div>
 
@@ -249,11 +377,10 @@
       <table class="load-table" id="loadTable">
         <thead>
           <tr>
-            <th style="width: 35%;">Circuit Name</th>
-            <th style="width: 15%;">Rating</th>
-            <th style="width: 10%;">Unit</th>
-            <th style="width: 20%;">Type</th>
-            <th style="width: 15%;">Breaker Type</th>
+            <th style="width: 40%;">Circuit Name</th>
+            <th style="width: 20%;">Rating</th>
+            <th style="width: 15%;">Unit</th>
+            <th style="width: 20%;">Breaker Type</th>
             <th style="width: 5%;"></th>
           </tr>
         </thead>
@@ -268,21 +395,9 @@
               </select>
             </td>
             <td>
-              <select class="load-type type-select">
-                <option value="motor">Motor</option>
-                <option value="lighting">Lighting</option>
-                <option value="power" selected>Power</option>
-                <option value="heating">Heating</option>
-                <option value="safety">Safety Service</option>
-                <option value="other">Other</option>
-              </select>
-            </td>
-            <td>
               <select class="breaker-type type-select">
-                <option value="standard" selected>Standard CB</option>
-                <option value="rcd">RCD CB</option>
-                <option value="rcbo">RCBO</option>
-                <option value="air">Air CB</option>
+                <option value="standard" selected>MCB</option>
+                <option value="air">MCCB</option>
               </select>
             </td>
             <td><button class="remove-row-btn" onclick="removeRow(this)">✕</button></td>
@@ -420,7 +535,10 @@
         <button class="btn btn-secondary" onclick="exportSVG()">Export SVG</button>
         <button class="btn btn-secondary" onclick="exportPNG()">Export PNG</button>
         <button class="btn btn-secondary" onclick="exportA1()">Export A1 PDF</button>
+        <button class="btn btn-secondary" onclick="exportBluebeamToolset()">Export Bluebeam Toolset</button>
       </div>
+      
+      <!-- Bluebeam symbols automatically loaded from BLUEBEAM ELECTRICAL SYMBOLS.btx -->
 
       <div class="load-type-legend">
         <div class="legend-item">
@@ -449,6 +567,14 @@
     <div class="diagram-container">
       <svg id="sldCanvas" width="1000" height="600"></svg>
     </div>
+    
+    <div id="circuitScheduleContainer" style="margin-top: 30px; display: none;">
+      <h2>Circuit Schedule</h2>
+      <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+        <div id="normalSchedule"></div>
+        <div id="safetySchedule"></div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -474,21 +600,9 @@
           </select>
         </td>
         <td>
-          <select class="load-type type-select">
-            <option value="motor">Motor</option>
-            <option value="lighting">Lighting</option>
-            <option value="power" selected>Power</option>
-            <option value="heating">Heating</option>
-            <option value="safety">Safety Service</option>
-            <option value="other">Other</option>
-          </select>
-        </td>
-        <td>
           <select class="breaker-type type-select">
-            <option value="standard" selected>Standard CB</option>
-            <option value="rcd">RCD CB</option>
-            <option value="rcbo">RCBO</option>
-            <option value="air">Air CB</option>
+            <option value="standard" selected>MCB</option>
+            <option value="air">MCCB</option>
           </select>
         </td>
         <td><button class="remove-row-btn" onclick="removeRow(this)">✕</button></td>
@@ -515,7 +629,6 @@
         const name = row.querySelector('.load-name').value.trim();
         const rating = parseFloat(row.querySelector('.load-rating').value);
         const unit = row.querySelector('.load-unit').value;
-        const type = row.querySelector('.load-type').value;
         const breakerType = row.querySelector('.breaker-type').value;
         
         if (name && !isNaN(rating) && rating > 0) {
@@ -523,7 +636,7 @@
           
           if (unit === 'kW') {
             powerKW = rating;
-            current = calculateCurrent(powerKW, voltage, powerFactor, type === 'motor');
+            current = calculateCurrent(powerKW, voltage, powerFactor, true); // All treated as motors
           } else {
             // Unit is A (Amps)
             current = rating;
@@ -535,7 +648,7 @@
             }
           }
           
-          loads.push({ name, power: powerKW, type, breakerType, current });
+          loads.push({ name, power: powerKW, breakerType, current });
         }
       });
       
@@ -620,16 +733,8 @@
         arrow.setAttribute('stroke', '#000');
         arrow.setAttribute('stroke-width', '2');
         g.appendChild(arrow);
-      } else if (breakerType === 'rcbo') {
-        // RCBO - combination of RCD and standard
-        const rcdText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        rcdText.setAttribute('x', x - 20);
-        rcdText.setAttribute('y', y - 8);
-        rcdText.setAttribute('font-size', '7');
-        rcdText.setAttribute('font-weight', 'bold');
-        rcdText.textContent = 'RCBO';
-        g.appendChild(rcdText);
-        
+      } else if (breakerType === 'air') {
+        // MCCB - Air Circuit Breaker
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', x);
         circle.setAttribute('cy', y);
@@ -756,26 +861,21 @@
         return;
       }
       
-      // Separate loads into normal and safety
-      const normalLoads = loads.filter(l => l.type !== 'safety');
-      const safetyLoads = loads.filter(l => l.type === 'safety');
-      
-      if (hasSafetyServices && safetyLoads.length === 0) {
-        alert('Safety Services is enabled but no safety service loads are defined. Please add loads with type "Safety Service" or uncheck the option.');
-        return;
-      }
+      // All loads go to normal section
+      const normalLoads = loads;
       
       const svg = document.getElementById('sldCanvas');
       svg.innerHTML = ''; // Clear previous diagram
       
       // Calculate diagram dimensions - HORIZONTAL LAYOUT
       const startX = 150;
-      const startY = 500; // Busbar will be at bottom
+      const startY = 600; // Busbar will be at bottom
       const columnWidth = 120;
       const normalWidth = startX + (normalLoads.length * columnWidth) + 200;
-      const safetyWidth = hasSafetyServices ? (startX + (safetyLoads.length * columnWidth) + 200) : 0;
-      const totalWidth = Math.max(normalWidth, safetyWidth, 1200);
-      const totalHeight = 700;
+      const safetyGap = 150; // Gap between sections
+      const safetyStartX = normalWidth + safetyGap;
+      const totalWidth = hasSafetyServices ? (safetyStartX + (normalLoads.length * columnWidth) + 200) : Math.max(normalWidth, 1200);
+      const totalHeight = 800;
       
       svg.setAttribute('height', totalHeight);
       svg.setAttribute('width', totalWidth);
@@ -790,30 +890,40 @@
       title.textContent = boardName;
       svg.appendChild(title);
       
-      // Draw incoming supply/main switch
+      // Draw incoming supply/main switch (enters from below busbar)
       if (mainSwitchType === 'isolator') {
         // ISOLATOR SWITCH - two parallel vertical lines
         const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line1.setAttribute('x1', startX - 75);
-        line1.setAttribute('y1', startY - 15);
+        line1.setAttribute('y1', startY + 15);
         line1.setAttribute('x2', startX - 75);
-        line1.setAttribute('y2', startY + 15);
+        line1.setAttribute('y2', startY + 45);
         line1.setAttribute('stroke', '#000');
         line1.setAttribute('stroke-width', '2');
         svg.appendChild(line1);
         
         const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line2.setAttribute('x1', startX - 65);
-        line2.setAttribute('y1', startY - 15);
+        line2.setAttribute('y1', startY + 15);
         line2.setAttribute('x2', startX - 65);
-        line2.setAttribute('y2', startY + 15);
+        line2.setAttribute('y2', startY + 45);
         line2.setAttribute('stroke', '#000');
         line2.setAttribute('stroke-width', '2');
         svg.appendChild(line2);
         
+        // Line from isolator to busbar
+        const lineToBar = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        lineToBar.setAttribute('x1', startX - 70);
+        lineToBar.setAttribute('y1', startY + 15);
+        lineToBar.setAttribute('x2', startX - 70);
+        lineToBar.setAttribute('y2', startY);
+        lineToBar.setAttribute('stroke', '#000');
+        lineToBar.setAttribute('stroke-width', '2');
+        svg.appendChild(lineToBar);
+        
         const isoText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         isoText.setAttribute('x', startX - 70);
-        isoText.setAttribute('y', startY - 25);
+        isoText.setAttribute('y', startY + 75);
         isoText.setAttribute('font-size', '11');
         isoText.setAttribute('font-weight', 'bold');
         isoText.setAttribute('text-anchor', 'middle');
@@ -823,68 +933,60 @@
         
         const isoLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         isoLabel.setAttribute('x', startX - 70);
-        isoLabel.setAttribute('y', startY + 30);
+        isoLabel.setAttribute('y', startY + 60);
         isoLabel.setAttribute('font-size', '9');
         isoLabel.setAttribute('text-anchor', 'middle');
         isoLabel.textContent = 'ISOLATOR';
         svg.appendChild(isoLabel);
       } else {
-        // CIRCUIT BREAKER - line with X then circle (main switch version)
-        const cbX = startX - 70;
-        const cbY = startY;
+        // MAIN SWITCH - circle and angled line (no X) entering from below
+        const cbX = startX + 20; // More central position
+        const cbY = startY + 30;
+        const gapLength = 25; // Gap between circle and where line continues
         
-        // Line from supply
-        const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line1.setAttribute('x1', cbX);
-        line1.setAttribute('y1', cbY - 50);
-        line1.setAttribute('x2', cbX);
-        line1.setAttribute('y2', cbY - 30);
-        line1.setAttribute('stroke', '#000');
-        line1.setAttribute('stroke-width', '2');
-        svg.appendChild(line1);
-        
-        // X symbol
-        const x1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        x1.setAttribute('x1', cbX - 7);
-        x1.setAttribute('y1', cbY - 23);
-        x1.setAttribute('x2', cbX + 7);
-        x1.setAttribute('y2', cbY - 7);
-        x1.setAttribute('stroke', '#000');
-        x1.setAttribute('stroke-width', '2');
-        svg.appendChild(x1);
-        
-        const x2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        x2.setAttribute('x1', cbX - 7);
-        x2.setAttribute('y1', cbY - 7);
-        x2.setAttribute('x2', cbX + 7);
-        x2.setAttribute('y2', cbY - 23);
-        x2.setAttribute('stroke', '#000');
-        x2.setAttribute('stroke-width', '2');
-        svg.appendChild(x2);
-        
-        // Line to circle
-        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line2.setAttribute('x1', cbX);
-        line2.setAttribute('y1', cbY);
-        line2.setAttribute('x2', cbX);
-        line2.setAttribute('y2', cbY + 10);
-        line2.setAttribute('stroke', '#000');
-        line2.setAttribute('stroke-width', '2');
-        svg.appendChild(line2);
-        
-        // Circle
+        // Circle (bottom, closest to incoming supply)
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', cbX);
         circle.setAttribute('cy', cbY + 20);
-        circle.setAttribute('r', 10);
+        circle.setAttribute('r', 5);
         circle.setAttribute('fill', 'none');
         circle.setAttribute('stroke', '#000');
         circle.setAttribute('stroke-width', '2');
         svg.appendChild(circle);
         
+        // Small wire below circle (incoming supply)
+        const incomingWire = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        incomingWire.setAttribute('x1', cbX);
+        incomingWire.setAttribute('y1', cbY + 25);
+        incomingWire.setAttribute('x2', cbX);
+        incomingWire.setAttribute('y2', cbY + 40);
+        incomingWire.setAttribute('stroke', '#000');
+        incomingWire.setAttribute('stroke-width', '2');
+        svg.appendChild(incomingWire);
+        
+        // Angled line from circle (slightly shorter than gap)
+        const angledLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        angledLine.setAttribute('x1', cbX + 3);
+        angledLine.setAttribute('y1', cbY + 15);
+        angledLine.setAttribute('x2', cbX + 15);
+        angledLine.setAttribute('y2', cbY - 5);
+        angledLine.setAttribute('stroke', '#000');
+        angledLine.setAttribute('stroke-width', '2');
+        svg.appendChild(angledLine);
+        
+        // Line to busbar (with gap from circle)
+        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line2.setAttribute('x1', cbX);
+        line2.setAttribute('y1', cbY + 20 - 5 - gapLength); // Start after gap
+        line2.setAttribute('x2', cbX);
+        line2.setAttribute('y2', startY);
+        line2.setAttribute('stroke', '#000');
+        line2.setAttribute('stroke-width', '2');
+        svg.appendChild(line2);
+        
         const incomerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         incomerText.setAttribute('x', cbX);
-        incomerText.setAttribute('y', cbY - 60);
+        incomerText.setAttribute('y', cbY + 50);
         incomerText.setAttribute('font-size', '11');
         incomerText.setAttribute('font-weight', 'bold');
         incomerText.setAttribute('text-anchor', 'middle');
@@ -894,16 +996,16 @@
         
         const cbLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         cbLabel.setAttribute('x', cbX);
-        cbLabel.setAttribute('y', cbY + 40);
+        cbLabel.setAttribute('y', cbY + 37);
         cbLabel.setAttribute('font-size', '9');
         cbLabel.setAttribute('text-anchor', 'middle');
-        cbLabel.textContent = 'MAIN CB';
+        cbLabel.textContent = 'MAIN SWITCH';
         svg.appendChild(cbLabel);
       }
       
       const voltageText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      voltageText.setAttribute('x', startX + 30);
-      voltageText.setAttribute('y', startY + 20);
+      voltageText.setAttribute('x', 50);
+      voltageText.setAttribute('y', startY + 80);
       voltageText.setAttribute('font-size', '11');
       voltageText.setAttribute('fill', '#666');
       voltageText.textContent = voltage === 230 ? '230V 1Ph' : '400V 3Ph';
@@ -912,11 +1014,86 @@
       // Draw NORMAL LOADS section
       drawBusbarSection(svg, startX, startY, normalLoads, 'MSB', voltage, powerFactor, false);
       
-      // Draw SAFETY SERVICES section if enabled
-      if (hasSafetyServices && safetyLoads.length > 0) {
-        const safetyStartY = startY - 350;
-        drawBusbarSection(svg, startX, safetyStartY, safetyLoads, 'SAFETY SERVICES', voltage, powerFactor, true);
+      // Draw SAFETY SERVICES section if enabled (on same horizontal line)
+      if (hasSafetyServices) {
+        // Draw connection line between busbars
+        const normalBusbarEnd = startX + (normalLoads.length * columnWidth) + 50;
+        const safetyBusbarStart = safetyStartX - 50;
+        const connectionLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        connectionLine.setAttribute('x1', normalBusbarEnd);
+        connectionLine.setAttribute('y1', startY);
+        connectionLine.setAttribute('x2', safetyBusbarStart);
+        connectionLine.setAttribute('y2', startY);
+        connectionLine.setAttribute('stroke', '#0D47A1');
+        connectionLine.setAttribute('stroke-width', '8');
+        connectionLine.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(connectionLine);
+        
+        drawBusbarSection(svg, safetyStartX, startY, normalLoads, 'SAFETY SERVICES', voltage, powerFactor, true);
       }
+      
+      // Generate circuit schedules
+      generateCircuitSchedule(normalLoads, hasSafetyServices);
+    }
+    
+    function generateCircuitSchedule(loads, includeSafety) {
+      const container = document.getElementById('circuitScheduleContainer');
+      const normalSchedule = document.getElementById('normalSchedule');
+      const safetySchedule = document.getElementById('safetySchedule');
+      
+      // Show container
+      container.style.display = 'block';
+      
+      // Generate normal schedule
+      normalSchedule.innerHTML = createScheduleTable(loads, 'MSB');
+      
+      // Generate safety schedule if enabled
+      if (includeSafety) {
+        safetySchedule.innerHTML = createScheduleTable(loads, 'SAFETY SERVICES');
+      } else {
+        safetySchedule.innerHTML = '';
+      }
+    }
+    
+    function createScheduleTable(loads, sectionName) {
+      let totalPower = 0;
+      let totalCurrent = 0;
+      
+      let html = `<div style="margin-bottom: 20px;">`;
+      html += `<h3>${sectionName}</h3>`;
+      html += `<table style="border-collapse: collapse; width: 100%; max-width: 600px; margin: 0 auto; font-size: 12px;">`;
+      html += `<thead><tr style="background: #0D47A1; color: white;">`;
+      html += `<th style="border: 1px solid #ddd; padding: 8px;">Circuit</th>`;
+      html += `<th style="border: 1px solid #ddd; padding: 8px;">Breaker (A)</th>`;
+      html += `<th style="border: 1px solid #ddd; padding: 8px;">Type</th>`;
+      html += `<th style="border: 1px solid #ddd; padding: 8px;">Load (kW)</th>`;
+      html += `<th style="border: 1px solid #ddd; padding: 8px;">Current (A)</th>`;
+      html += `</tr></thead><tbody>`;
+      
+      loads.forEach((load, index) => {
+        const cbSize = selectCBSize(load.current, true);
+        const breakerLabel = load.breakerType === 'air' ? 'MCCB' : 'MCB';
+        totalPower += load.power;
+        totalCurrent += load.current;
+        
+        html += `<tr style="background: ${index % 2 === 0 ? '#f9f9f9' : 'white'};">`;
+        html += `<td style="border: 1px solid #ddd; padding: 8px;">${load.name}</td>`;
+        html += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${cbSize}</td>`;
+        html += `<td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${breakerLabel}</td>`;
+        html += `<td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${load.power.toFixed(1)}</td>`;
+        html += `<td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${load.current.toFixed(1)}</td>`;
+        html += `</tr>`;
+      });
+      
+      // Total row
+      html += `<tr style="background: #e3f2fd; font-weight: bold;">`;
+      html += `<td style="border: 1px solid #ddd; padding: 8px;" colspan="3">TOTAL</td>`;
+      html += `<td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${totalPower.toFixed(1)}</td>`;
+      html += `<td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${totalCurrent.toFixed(1)}</td>`;
+      html += `</tr>`;
+      
+      html += `</tbody></table></div>`;
+      return html;
     }
     
     function drawBusbarSection(svg, startX, busbarY, loads, sectionLabel, voltage, powerFactor, isSafety) {
@@ -926,14 +1103,15 @@
       const busbarStartX = startX - 50;
       const busbarEndX = startX + (loads.length * columnWidth) + 50;
       
-      // Thick busbar line
+      // Thick busbar line with rounded ends (dark blue)
       const busbar = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       busbar.setAttribute('x1', busbarStartX);
       busbar.setAttribute('y1', busbarY);
       busbar.setAttribute('x2', busbarEndX);
       busbar.setAttribute('y2', busbarY);
-      busbar.setAttribute('stroke', '#000');
+      busbar.setAttribute('stroke', '#0D47A1');
       busbar.setAttribute('stroke-width', '8');
+      busbar.setAttribute('stroke-linecap', 'round');
       svg.appendChild(busbar);
       
       // Section label below busbar
@@ -953,22 +1131,21 @@
       loads.forEach((load, index) => {
         const x = startX + (index * columnWidth);
         
-        // Calculate CB size
-        const isMotor = load.type === 'motor';
-        const cbSize = selectCBSize(load.current, isMotor);
+        // Calculate CB size (all loads treated as motors)
+        const cbSize = selectCBSize(load.current, true);
         totalCurrent += load.current;
         totalPower += load.power;
         
         // Vertical line from busbar going UP to CB
-        const cbY = busbarY - 80;
-        drawLine(svg, x, busbarY, x, cbY);
+        const cbY = busbarY - 100;
+        drawLine(svg, x, busbarY, x, cbY + 10);
         
         // Circuit breaker
-        drawCircuitBreakerVertical(svg, x, cbY - 20, cbSize, load.breakerType, isMotor ? '(Motor)' : '');
+        drawCircuitBreakerVertical(svg, x, cbY - 20, cbSize, load.breakerType, '');
         
-        // Vertical line from CB to load
-        const loadY = busbarY - 200;
-        drawLine(svg, x, cbY - 35, x, loadY);
+        // Vertical line from CB to load (goes to bottom of DB)
+        const loadY = busbarY - 380;
+        drawLine(svg, x, cbY - 30, x, loadY - 45);
         
         // Load box or DB representation
         drawLoadVertical(svg, x, loadY - 80, load, load.current);
@@ -986,6 +1163,60 @@
     }
     
     function drawCircuitBreakerVertical(svg, x, y, rating, breakerType, label) {
+      // Use Bluebeam symbols exclusively
+      const symbolMap = {
+        'standard': 'Circuit Breaker',
+        'rcd': 'RCD Circuit Breaker',
+        'air': 'Circuit Breaker'
+      };
+      
+      const symbolName = symbolMap[breakerType] || 'Circuit Breaker';
+      const customSymbol = window.customBluebeamSymbols?.find(s => s.name === symbolName);
+      
+      if (!customSymbol) {
+        console.error(`Bluebeam symbol not found: ${symbolName}`);
+        // Create placeholder
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', x);
+        text.setAttribute('y', y);
+        text.setAttribute('font-size', '10');
+        text.setAttribute('fill', 'red');
+        text.textContent = 'Loading...';
+        g.appendChild(text);
+        svg.appendChild(g);
+        return g;
+      }
+      
+      // Use Bluebeam symbol - center on x position
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('transform', `translate(${x - 30}, ${y - 50})`);
+      g.innerHTML = customSymbol.svg;
+      
+      // Add rating text
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', x + 15);
+      text.setAttribute('y', y - 28);
+      text.setAttribute('font-size', '9');
+      text.setAttribute('font-weight', 'bold');
+      const breakerClass = getBreakerType(rating);
+      text.textContent = `${rating}A`;
+      svg.appendChild(text);
+      
+      const typeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      typeText.setAttribute('x', x + 15);
+      typeText.setAttribute('y', y - 18);
+      typeText.setAttribute('font-size', '7');
+      typeText.setAttribute('fill', '#666');
+      typeText.textContent = breakerClass;
+      svg.appendChild(typeText);
+      
+      svg.appendChild(g);
+      return g;
+    }
+
+    // Remove built-in symbol code - only Bluebeam symbols used
+    function drawCircuitBreakerVertical_OLD(svg, x, y, rating, breakerType, label) {
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       
       if (breakerType === 'rcd') {
@@ -1272,98 +1503,46 @@
     function drawLoadVertical(svg, x, y, load, current) {
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       
-      // Check if it's a distribution board (power > 50kW or name contains DB/MSB/BOARD)
-      const isDB = load.power > 50 || /db|msb|board|distribution/i.test(load.name);
+      // Draw DB symbol (triangle with border)
+      const dbSymbol = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       
-      if (isDB) {
-        // Draw as distribution board - larger rectangle
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', x - 50);
-        rect.setAttribute('y', y);
-        rect.setAttribute('width', 100);
-        rect.setAttribute('height', 60);
-        rect.setAttribute('fill', '#f0f0f0');
-        rect.setAttribute('stroke', '#000');
-        rect.setAttribute('stroke-width', '3');
-        g.appendChild(rect);
-        
-        // DB label
-        const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        nameText.setAttribute('x', x);
-        nameText.setAttribute('y', y + 25);
-        nameText.setAttribute('font-size', '12');
-        nameText.setAttribute('font-weight', 'bold');
-        nameText.setAttribute('text-anchor', 'middle');
-        nameText.textContent = load.name;
-        g.appendChild(nameText);
-        
-        // Power and current
-        const detailText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        detailText.setAttribute('x', x);
-        detailText.setAttribute('y', y + 42);
-        detailText.setAttribute('font-size', '10');
-        detailText.setAttribute('text-anchor', 'middle');
-        detailText.textContent = `${load.power.toFixed(1)}kW`;
-        g.appendChild(detailText);
-        
-        const currentText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        currentText.setAttribute('x', x);
-        currentText.setAttribute('y', y + 54);
-        currentText.setAttribute('font-size', '9');
-        currentText.setAttribute('text-anchor', 'middle');
-        currentText.setAttribute('fill', '#666');
-        currentText.textContent = `${current.toFixed(1)}A`;
-        g.appendChild(currentText);
-      } else {
-        // Regular load - smaller box
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', x - 40);
-        rect.setAttribute('y', y);
-        rect.setAttribute('width', 80);
-        rect.setAttribute('height', 50);
-        rect.setAttribute('fill', loadTypeColors[load.type] || loadTypeColors.other);
-        rect.setAttribute('stroke', '#000');
-        rect.setAttribute('stroke-width', '2');
-        g.appendChild(rect);
-        
-        // Load name
-        const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        nameText.setAttribute('x', x);
-        nameText.setAttribute('y', y + 20);
-        nameText.setAttribute('font-size', '10');
-        nameText.setAttribute('font-weight', 'bold');
-        nameText.setAttribute('text-anchor', 'middle');
-        
-        // Wrap long text
-        if (load.name.length > 12) {
-          const words = load.name.split(' ');
-          const line1 = words.slice(0, Math.ceil(words.length/2)).join(' ');
-          const line2 = words.slice(Math.ceil(words.length/2)).join(' ');
-          nameText.textContent = line1;
-          g.appendChild(nameText);
-          
-          const nameText2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          nameText2.setAttribute('x', x);
-          nameText2.setAttribute('y', y + 30);
-          nameText2.setAttribute('font-size', '10');
-          nameText2.setAttribute('font-weight', 'bold');
-          nameText2.setAttribute('text-anchor', 'middle');
-          nameText2.textContent = line2;
-          g.appendChild(nameText2);
-        } else {
-          nameText.textContent = load.name;
-          g.appendChild(nameText);
-          
-          // Power and current
-          const detailText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          detailText.setAttribute('x', x);
-          detailText.setAttribute('y', y + 35);
-          detailText.setAttribute('font-size', '9');
-          detailText.setAttribute('text-anchor', 'middle');
-          detailText.textContent = `${load.power.toFixed(1)}kW | ${current.toFixed(1)}A`;
-          g.appendChild(detailText);
-        }
-      }
+      // White background rectangle
+      const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bgRect.setAttribute('x', x - 27);
+      bgRect.setAttribute('y', y);
+      bgRect.setAttribute('width', 54);
+      bgRect.setAttribute('height', 35);
+      bgRect.setAttribute('fill', 'white');
+      dbSymbol.appendChild(bgRect);
+      
+      // Triangle (filled black polygon)
+      const triangle = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      triangle.setAttribute('points', `${x - 27},${y + 35} ${x + 27},${y} ${x + 27},${y + 35}`);
+      triangle.setAttribute('fill', 'black');
+      dbSymbol.appendChild(triangle);
+      
+      // Border rectangle
+      const borderRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      borderRect.setAttribute('x', x - 27);
+      borderRect.setAttribute('y', y);
+      borderRect.setAttribute('width', 54);
+      borderRect.setAttribute('height', 35);
+      borderRect.setAttribute('fill', 'none');
+      borderRect.setAttribute('stroke', 'black');
+      borderRect.setAttribute('stroke-width', '3');
+      dbSymbol.appendChild(borderRect);
+      
+      g.appendChild(dbSymbol);
+      
+      // DB label (above the symbol)
+      const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      nameText.setAttribute('x', x);
+      nameText.setAttribute('y', y - 5);
+      nameText.setAttribute('font-size', '11');
+      nameText.setAttribute('font-weight', 'bold');
+      nameText.setAttribute('text-anchor', 'middle');
+      nameText.textContent = load.name;
+      g.appendChild(nameText);
       
       svg.appendChild(g);
       return g;
@@ -1387,66 +1566,193 @@
       const svg = document.getElementById('sldCanvas');
       const svgWidth = parseInt(svg.getAttribute('width'));
       const svgHeight = parseInt(svg.getAttribute('height'));
+      const boardName = document.getElementById('boardName').value || 'Switchboard';
       
-      // A1 size LANDSCAPE: 841mm x 594mm at 300 DPI = 9933 x 7016 pixels
-      const a1Width = 9933;
-      const a1Height = 7016;
+      // A1 size LANDSCAPE: 841mm x 594mm
+      const a1WidthMM = 841;
+      const a1HeightMM = 594;
       
-      // Position diagram slightly left of center
-      const offsetX = (a1Width * 0.4) - (svgWidth / 2);
-      const offsetY = (a1Height / 2) - (svgHeight / 2);
-      
-      const canvas = document.createElement('canvas');
-      canvas.width = a1Width;
-      canvas.height = a1Height;
-      const ctx = canvas.getContext('2d');
+      // Create new SVG for A1 page with proper viewBox for vector editing
+      const a1Svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      a1Svg.setAttribute('width', a1WidthMM + 'mm');
+      a1Svg.setAttribute('height', a1HeightMM + 'mm');
+      a1Svg.setAttribute('viewBox', `0 0 ${a1WidthMM} ${a1HeightMM}`);
+      a1Svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       
       // White background
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, a1Width, a1Height);
+      const background = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      background.setAttribute('width', a1WidthMM);
+      background.setAttribute('height', a1HeightMM);
+      background.setAttribute('fill', 'white');
+      a1Svg.appendChild(background);
       
       // Add border
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 10;
-      ctx.strokeRect(50, 50, a1Width - 100, a1Height - 100);
+      const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      border.setAttribute('x', '5');
+      border.setAttribute('y', '5');
+      border.setAttribute('width', a1WidthMM - 10);
+      border.setAttribute('height', a1HeightMM - 10);
+      border.setAttribute('fill', 'none');
+      border.setAttribute('stroke', '#000');
+      border.setAttribute('stroke-width', '0.5');
+      a1Svg.appendChild(border);
       
-      const serializer = new XMLSerializer();
-      const svgString = serializer.serializeToString(svg);
-      const img = new Image();
+      // Clone and scale the diagram
+      const diagramClone = svg.cloneNode(true);
+      const scale = Math.min((a1WidthMM * 0.8) / svgWidth, (a1HeightMM * 0.8) / svgHeight);
+      const offsetX = (a1WidthMM * 0.4) - (svgWidth * scale / 2);
+      const offsetY = (a1HeightMM - svgHeight * scale) / 2;
       
-      img.onload = function() {
-        ctx.drawImage(img, offsetX, offsetY);
+      const diagramGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      diagramGroup.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${scale})`);
+      
+      // Copy all children from cloned diagram
+      while (diagramClone.firstChild) {
+        diagramGroup.appendChild(diagramClone.firstChild);
+      }
+      a1Svg.appendChild(diagramGroup);
+      
+      // Add title block (vector text for editing)
+      const titleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      titleText.setAttribute('x', a1WidthMM - 150);
+      titleText.setAttribute('y', a1HeightMM - 50);
+      titleText.setAttribute('font-size', '12');
+      titleText.setAttribute('font-weight', 'bold');
+      titleText.setAttribute('font-family', 'Arial');
+      titleText.textContent = boardName;
+      a1Svg.appendChild(titleText);
+      
+      const subtitleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      subtitleText.setAttribute('x', a1WidthMM - 150);
+      subtitleText.setAttribute('y', a1HeightMM - 35);
+      subtitleText.setAttribute('font-size', '8');
+      subtitleText.setAttribute('font-family', 'Arial');
+      subtitleText.textContent = 'Single Line Diagram';
+      a1Svg.appendChild(subtitleText);
+      
+      const dateText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      dateText.setAttribute('x', a1WidthMM - 150);
+      dateText.setAttribute('y', a1HeightMM - 22);
+      dateText.setAttribute('font-size', '8');
+      dateText.setAttribute('font-family', 'Arial');
+      dateText.textContent = new Date().toLocaleDateString();
+      a1Svg.appendChild(dateText);
+      
+      // Export as PDF using html2canvas for reasonable file size
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a1',
+        compress: true
+      });
+      
+      // Render to canvas at 150 DPI (good quality, reasonable file size)
+      const tempDiv = document.createElement('div');
+      tempDiv.style.width = a1WidthMM + 'mm';
+      tempDiv.style.height = a1HeightMM + 'mm';
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.appendChild(a1Svg);
+      document.body.appendChild(tempDiv);
+      
+      html2canvas(a1Svg, {
+        scale: 2, // 150 DPI equivalent
+        backgroundColor: '#ffffff',
+        logging: false
+      }).then(canvas => {
+        document.body.removeChild(tempDiv);
         
-        // Add title block (bottom right)
-        ctx.fillStyle = '#000';
-        ctx.font = 'bold 60px Arial';
-        ctx.fillText(document.getElementById('boardName').value, a1Width - 800, a1Height - 200);
-        ctx.font = '40px Arial';
-        ctx.fillText('Single Line Diagram', a1Width - 800, a1Height - 140);
-        ctx.fillText(new Date().toLocaleDateString(), a1Width - 800, a1Height - 90);
-        
-        // Convert canvas to PDF using jsPDF
-        canvas.toBlob(function(blob) {
-          const imgData = canvas.toDataURL('image/png');
-          
-          // Initialize jsPDF with A1 landscape dimensions
-          const { jsPDF } = window.jspdf;
-          const pdf = new jsPDF({
-            orientation: 'landscape',
-            unit: 'mm',
-            format: 'a1'
-          });
-          
-          // Add image to PDF (A1 = 841mm x 594mm in landscape)
-          pdf.addImage(imgData, 'PNG', 0, 0, 841, 594);
-          
-          // Save PDF
-          const boardName = document.getElementById('boardName').value || 'Switchboard';
-          pdf.save(`${boardName.replace(/\s+/g, '_')}_SLD_A1.pdf`);
-        });
+        const imgData = canvas.toDataURL('image/jpeg', 0.85); // JPEG with 85% quality for smaller size
+        pdf.addImage(imgData, 'JPEG', 0, 0, a1WidthMM, a1HeightMM);
+        pdf.save(`${boardName.replace(/\s+/g, '_')}_SLD_A1.pdf`);
+      });
+    }
+    
+    function exportBluebeamToolset() {
+      // Create Bluebeam Toolset XML format
+      const toolset = {
+        name: "Electrical Symbols",
+        version: "1.0",
+        tools: [
+          {
+            name: "Circuit Breaker",
+            type: "symbol",
+            svg: generateCircuitBreakerSVG()
+          },
+          {
+            name: "RCD Circuit Breaker",
+            type: "symbol",
+            svg: generateRCDCircuitBreakerSVG()
+          },
+          {
+            name: "Isolator Switch",
+            type: "symbol",
+            svg: generateIsolatorSVG()
+          }
+        ]
       };
       
-      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+      // Convert to Bluebeam-compatible XML
+      const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<BluebeamToolset name="Electrical Single Line Symbols" version="1.0">
+  <Tool name="Circuit Breaker" type="Markup">
+    <SVGData><![CDATA[${generateCircuitBreakerSVG()}]]></SVGData>
+  </Tool>
+  <Tool name="RCD Circuit Breaker" type="Markup">
+    <SVGData><![CDATA[${generateRCDCircuitBreakerSVG()}]]></SVGData>
+  </Tool>
+  <Tool name="Isolator Switch" type="Markup">
+    <SVGData><![CDATA[${generateIsolatorSVG()}]]></SVGData>
+  </Tool>
+</BluebeamToolset>`;
+      
+      const blob = new Blob([xml], { type: 'application/xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Electrical_Symbols_Toolset.xml';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    
+    function generateCircuitBreakerSVG() {
+      return `<svg width="50" height="50" xmlns="http://www.w3.org/2000/svg">
+        <line x1="25" y1="5" x2="25" y2="13" stroke="black" stroke-width="1.5"/>
+        <circle cx="25" cy="19" r="6" fill="none" stroke="black" stroke-width="1.5"/>
+        <line x1="25" y1="25" x2="25" y2="29" stroke="black" stroke-width="1.5"/>
+        <line x1="20" y1="31" x2="30" y2="37" stroke="black" stroke-width="1.5"/>
+        <line x1="20" y1="37" x2="30" y2="31" stroke="black" stroke-width="1.5"/>
+        <line x1="25" y1="38" x2="25" y2="42" stroke="black" stroke-width="1.5"/>
+        <circle cx="25" cy="47" r="6" fill="none" stroke="black" stroke-width="1.5"/>
+      </svg>`;
+    }
+    
+    function generateRCDCircuitBreakerSVG() {
+      return `<svg width="50" height="80" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="25" cy="8" r="6" fill="none" stroke="black" stroke-width="1.5"/>
+        <line x1="25" y1="14" x2="25" y2="18" stroke="black" stroke-width="1.5"/>
+        <line x1="20" y1="20" x2="30" y2="26" stroke="black" stroke-width="1.5"/>
+        <line x1="20" y1="26" x2="30" y2="20" stroke="black" stroke-width="1.5"/>
+        <line x1="25" y1="27" x2="25" y2="31" stroke="black" stroke-width="1.5"/>
+        <circle cx="25" cy="37" r="6" fill="none" stroke="black" stroke-width="1.5"/>
+        <line x1="21" y1="33" x2="29" y2="41" stroke="black" stroke-width="1.5"/>
+        <line x1="21" y1="41" x2="29" y2="33" stroke="black" stroke-width="1.5"/>
+        <line x1="25" y1="43" x2="25" y2="47" stroke="black" stroke-width="1.5"/>
+        <line x1="20" y1="49" x2="30" y2="55" stroke="black" stroke-width="1.5"/>
+        <line x1="20" y1="55" x2="30" y2="49" stroke="black" stroke-width="1.5"/>
+        <line x1="25" y1="56" x2="25" y2="60" stroke="black" stroke-width="1.5"/>
+        <circle cx="25" cy="66" r="6" fill="none" stroke="black" stroke-width="1.5"/>
+      </svg>`;
+    }
+    
+    function generateIsolatorSVG() {
+      return `<svg width="40" height="30" xmlns="http://www.w3.org/2000/svg">
+        <line x1="5" y1="15" x2="15" y2="15" stroke="black" stroke-width="2"/>
+        <line x1="15" y1="10" x2="15" y2="20" stroke="black" stroke-width="2"/>
+        <line x1="25" y1="15" x2="35" y2="15" stroke="black" stroke-width="2"/>
+        <line x1="25" y1="10" x2="25" y2="20" stroke="black" stroke-width="2"/>
+      </svg>`;
     }
 
     // Generate example diagram on page load

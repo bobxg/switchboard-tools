@@ -155,11 +155,11 @@
         <button onclick="performSearch()">Search Products</button>
       </div>
 
-      <h3 style="color: #1976d2; margin-top: 30px; margin-bottom: 16px;">Select Suppliers</h3>
+      <h3>Select Suppliers</h3>
       <div style="margin-bottom: 12px;">
         <button class="select-all-btn" onclick="selectAll()">Select All</button>
         <button class="deselect-all-btn" onclick="deselectAll()">Deselect All</button>
-        <span class="supplier-count" id="supplierCount">31 suppliers selected</span>
+        <span class="supplier-count" id="supplierCount">46 suppliers selected</span>
       </div>
 
       <div class="supplier-grid" id="supplierGrid">
@@ -186,37 +186,51 @@
 
   <script>
     const APPROVED_SUPPLIERS = [
-      { name: 'Clipsal by Schneider', domain: 'clipsal.com' },
-      { name: 'HPM Legrand', domain: 'hpm.com.au' },
-      { name: 'Pierlite', domain: 'pierlite.com.au' },
-      { name: 'Thorn Lighting', domain: 'thornlighting.com.au' },
-      { name: 'Brightgreen', domain: 'brightgreen.com' },
-      { name: 'Lumascape', domain: 'lumascape.com.au' },
-      { name: 'Prolux', domain: 'proluxlighting.com.au' },
-      { name: 'Martec', domain: 'martec.com.au' },
-      { name: 'Crompton Lighting', domain: 'cromptonlighting.com.au' },
-      { name: 'Sylvania', domain: 'sylvania-lighting.com.au' },
-      { name: 'Philips Lighting', domain: 'lighting.philips.com.au' },
-      { name: 'Osram', domain: 'osram.com.au' },
-      { name: 'Ligman', domain: 'ligman.com.au' },
-      { name: 'Superlux', domain: 'superlux.com.au' },
-      { name: 'Domus Lighting', domain: 'domuslighting.com.au' },
-      { name: 'NER Lighting', domain: 'nerlighting.com.au' },
-      { name: 'Spartan Lighting', domain: 'spartanlighting.com.au' },
-      { name: 'Clevertronics', domain: 'clevertronics.com.au' },
-      { name: 'Simkar', domain: 'simkar.com.au' },
-      { name: 'Havit Lighting', domain: 'havit.com.au' },
-      { name: 'Lux Lighting', domain: 'luxlighting.com.au' },
-      { name: 'Gerard Lighting', domain: 'gerardlighting.com.au' },
       { name: 'Austube', domain: 'austube.com.au' },
       { name: 'Azoogi', domain: 'azoogi.com.au' },
-      { name: 'Ventair', domain: 'ventair.com.au' },
       { name: 'Beacon Lighting', domain: 'beaconlighting.com.au' },
+      { name: 'Brightgreen', domain: 'brightgreen.com' },
       { name: 'Brilliant Lighting', domain: 'brilliantlighting.com.au' },
+      { name: 'Buckford', domain: 'buckford.com.au' },
+      { name: 'Clevertronics', domain: 'clevertronics.com.au' },
+      { name: 'Clipsal by Schneider', domain: 'clipsal.com' },
+      { name: 'Crompton Lighting', domain: 'cromptonlighting.com.au' },
+      { name: 'Darkon', domain: 'darkon.com.au' },
+      { name: 'Domus Lighting', domain: 'domuslighting.com.au' },
+      { name: 'Est Lighting', domain: 'estlighting.com.au' },
+      { name: 'Gerard Lighting', domain: 'gerardlighting.com.au' },
+      { name: 'Havit Lighting', domain: 'havit.com.au' },
+      { name: 'HPM Legrand', domain: 'hpm.com.au' },
+      { name: 'iGuzzini', domain: 'iguzzini.com' },
+      { name: 'Inlite', domain: 'inlite.com.au' },
+      { name: 'Jade Cross', domain: 'jadecross.com.au' },
+      { name: 'KKDC', domain: 'kkdc.com.au' },
+      { name: 'Koda Lighting', domain: 'kodalighting.com.au' },
+      { name: 'Ligman', domain: 'ligman.com.au' },
+      { name: 'LiTEsource & Controls', domain: 'litesource.com.au' },
+      { name: 'Lucian Light', domain: 'lucianlight.com.au' },
+      { name: 'Lumascape', domain: 'lumascape.com.au' },
       { name: 'Luminos', domain: 'luminos.com.au' },
+      { name: 'Lux Lighting', domain: 'luxlighting.com.au' },
+      { name: 'Martec', domain: 'martec.com.au' },
       { name: 'Mercator', domain: 'mercatorlighting.com.au' },
+      { name: 'mLight', domain: 'mlight.com.au' },
+      { name: 'MLP Lighting', domain: 'mlplighting.com.au' },
+      { name: 'NER Lighting', domain: 'nerlighting.com.au' },
+      { name: 'Osram', domain: 'osram.com.au' },
+      { name: 'Philips Lighting', domain: 'lighting.philips.com.au' },
+      { name: 'Phosforma', domain: 'phosforma.com.au' },
+      { name: 'Pierlite', domain: 'pierlite.com.au' },
+      { name: 'Prolux', domain: 'proluxlighting.com.au' },
+      { name: 'Simkar', domain: 'simkar.com.au' },
+      { name: 'Spartan Lighting', domain: 'spartanlighting.com.au' },
+      { name: 'Superlux', domain: 'superlux.com.au' },
+      { name: 'Sylvania', domain: 'sylvania-lighting.com.au' },
+      { name: 'Thorn Lighting', domain: 'thornlighting.com.au' },
       { name: 'Trend Lighting', domain: 'trendlighting.com.au' },
-      { name: 'Jade Cross', domain: 'jadecross.com.au' }
+      { name: 'Unios', domain: 'unios.com.au' },
+      { name: 'Ventair', domain: 'ventair.com.au' },
+      { name: 'Zumtobel Group', domain: 'zumtobel.com' }
     ];
 
     function generateSupplierCheckboxes() {

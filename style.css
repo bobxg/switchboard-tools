@@ -103,6 +103,27 @@ h1 {
   font-weight: 700;
   letter-spacing: -0.5px;
 }
+h2 {
+  color: #1976d2;
+  font-size: 1.5em;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+h3 {
+  color: #1976d2;
+  font-size: 1.2em;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+h4 {
+  color: #333;
+  font-size: 1.1em;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
 p {
   color: #555;
   font-size: 1.15em;
@@ -150,7 +171,6 @@ p {
 .useful-links h2 { 
   color: #1976d2; 
   margin-bottom: 20px; 
-  font-size: 1.5em; 
   font-weight: 600;
   text-align: left;
 }
@@ -164,6 +184,18 @@ p {
 .useful-links-list li:hover {
   border-color: #1976d2;
   box-shadow: 0 2px 8px rgba(25,118,210,0.1);
+}
+
+/* Text sizing standardization */
+strong {
+  font-weight: 600;
+}
+
+/* Ensure description text is consistent */
+.tool-list span,
+.useful-links-list span {
+  font-size: 1em;
+  line-height: 1.5;
 }
 
 /* --- Switchroom Sizer --- */
