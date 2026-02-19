@@ -242,7 +242,7 @@
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 5px;
       font-size: 13px;
     }
     .legend-symbol {
@@ -306,11 +306,6 @@
       margin-top: 10px;
       font-size: 12px;
     }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
     .legend-color {
       width: 20px;
       height: 20px;
@@ -319,13 +314,14 @@
   </style>
 </head>
 <body>
-  <div class="navbar">
-    <div class="tab"><a href="index.html">Home</a></div>
-    <div class="tab"><a href="switchboard.html">Switchboard Sizer</a></div>
-    <div class="tab"><a href="switchroom.html">Switchroom Sizer</a></div>
-    <div class="tab"><a href="lightingsearch.html">Lighting Search</a></div>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown active">
-      <a href="#" onclick="return false;">TBC</a>
+      <span>TBC</span>
       <div class="dropdown-content">
         <a href="conduit.html">Conduit Sizer</a>
         <a href="cablesizing.html">Cable Sizing</a>
@@ -334,9 +330,11 @@
         <a href="emergencylighting.html">Emergency Lighting</a>
         <a href="inspection.html">Site Inspection</a>
         <a href="sld.html">Single Line Diagram</a>
+        <a href="as3000tips.html">AS3000 Tips</a>
+        <a href="maxdemand.html">Maximum Demand</a>
       </div>
     </div>
-    <div class="tab"><a href="qa.html">Verification</a></div>
+    <a class="tab" href="qa.html">Verification</a>
   </div>
 
   <div class="container">

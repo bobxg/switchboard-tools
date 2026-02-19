@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AS/NZS 3000:2018 Quick Tips - Switchboard Tools</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .tips-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .tips-header {
+      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .tips-header h1 {
+      margin: 0 0 10px 0;
+      font-size: 2.2em;
+    }
+    .tips-header p {
+      margin: 0;
+      font-size: 1.1em;
+      opacity: 0.95;
+    }
+    .search-box {
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 1em;
+      border: 2px solid #1976d2;
+      border-radius: 25px;
+      box-sizing: border-box;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: #1565c0;
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+    }
+    .category-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    .category-btn {
+      padding: 10px 20px;
+      border: 2px solid #1976d2;
+      background: white;
+      color: #1976d2;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.95em;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .category-btn:hover {
+      background: #e3f2fd;
+    }
+    .category-btn.active {
+      background: #1976d2;
+      color: white;
+    }
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+    }
+    .tip-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    .tip-card:hover {
+      border-color: #1976d2;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+    .tip-number {
+      display: inline-block;
+      background: #1976d2;
+      color: white;
+      font-weight: bold;
+      font-size: 0.85em;
+      padding: 4px 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+    .tip-category {
+      display: inline-block;
+      background: #f5f5f5;
+      color: #666;
+      font-size: 0.75em;
+      padding: 4px 10px;
+      border-radius: 10px;
+      margin-left: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .tip-text {
+      line-height: 1.5;
+      color: #333;
+      margin: 10px 0;
+    }
+    .tip-clause {
+      font-size: 0.85em;
+      color: #1976d2;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    .tip-value {
+      font-weight: bold;
+      color: #d32f2f;
+    }
+    #noResults {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+      font-size: 1.2em;
+    }
+    @media (max-width: 768px) {
+      .tips-grid {
+        grid-template-columns: 1fr;
+      }
+      .tips-header h1 {
+        font-size: 1.6em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown">
+      <span>TBC</span>
+      <div class="dropdown-content">
+        <a href="conduit.html">Conduit Sizer</a>
+        <a href="cablesizing.html">Cable Sizing</a>
+        <a href="cableweight.html">Cable Weight</a>
+        <a href="pvsizing.html">PV Sizing</a>
+        <a href="emergencylighting.html">Emergency Lighting</a>
+        <a href="inspection.html">Site Inspection</a>
+        <a href="sld.html">Single Line Diagram</a>
+        <a href="as3000tips.html">AS3000 Tips</a>
+        <a href="maxdemand.html">Maximum Demand</a>
+      </div>
+    </div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+
+  <div class="tips-container">
+    <div class="tips-header">
+      <h1>AS/NZS 3000:2018 Quick Reference Tips</h1>
+      <p>Essential electrical installation requirements at your fingertips</p>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="🔍 Search tips... (e.g., voltage drop, earthing, cable)" />
+    </div>
+
+    <div class="category-filter">
+      <button class="category-btn active" data-category="all">All Tips</button>
+      <button class="category-btn" data-category="voltage">Voltage Drop</button>
+      <button class="category-btn" data-category="cable">Cables</button>
+      <button class="category-btn" data-category="earthing">Earthing</button>
+      <button class="category-btn" data-category="protection">Protection</button>
+      <button class="category-btn" data-category="clearance">Clearances</button>
+      <button class="category-btn" data-category="installation">Installation</button>
+      <button class="category-btn" data-category="circuits">Circuits</button>
+    </div>
+
+    <div id="tipsGrid" class="tips-grid"></div>
+    <div id="noResults">
+      No tips found matching your search.
+    </div>
+  </div>
+
+  <script>
+    const tips = [
+      { num: 1, category: 'voltage', text: 'Maximum voltage drop: <span class="tip-value">5%</span> for combined mains and submains to final subcircuits', clause: 'Clause 3.3.3' },
+      { num: 2, category: 'voltage', text: 'Voltage drop in final subcircuits: <span class="tip-value">5%</span> from origin of installation', clause: 'Clause 3.3.3' },
+      { num: 3, category: 'cable', text: 'Minimum copper cable size for fixed wiring: <span class="tip-value">1.5 mm²</span>', clause: 'Table 3.2' },
+      { num: 4, category: 'cable', text: 'Minimum aluminium cable size for fixed wiring: <span class="tip-value">2.5 mm²</span>', clause: 'Table 3.2' },
+      { num: 5, category: 'earthing', text: 'Main earthing conductor minimum size: <span class="tip-value">4 mm²</span> copper or <span class="tip-value">16 mm²</span> aluminium', clause: 'Table 5.1' },
+      { num: 6, category: 'earthing', text: 'Earthing conductor for circuits ≤25 mm²: must be <span class="tip-value">same size</span> as active conductors', clause: 'Clause 5.4.3.1' },
+      { num: 7, category: 'earthing', text: 'Earthing conductor for circuits >25 mm²: minimum <span class="tip-value">half size</span> of active, min 16 mm²', clause: 'Clause 5.4.3.2' },
+      { num: 8, category: 'protection', text: 'RCD protection <span class="tip-value">30 mA max</span> for socket outlets used by general persons', clause: 'Clause 2.6.2.2' },
+      { num: 9, category: 'protection', text: 'RCD protection required for all socket outlets in domestic installations', clause: 'Clause 2.6.2.2.1' },
+      { num: 10, category: 'protection', text: 'Circuit breaker rating must not exceed <span class="tip-value">cable current capacity</span>', clause: 'Clause 2.5.4' },
+      { num: 11, category: 'clearance', text: 'Minimum clearance around switchboards (front): <span class="tip-value">1000 mm</span>', clause: 'Clause 4.10.1.3' },
+      { num: 12, category: 'clearance', text: 'Minimum working space width at switchboards: <span class="tip-value">600 mm</span> or width of equipment', clause: 'Clause 4.10.1.3' },
+      { num: 13, category: 'clearance', text: 'Minimum headroom for switchboards: <span class="tip-value">2.0 m</span>', clause: 'Clause 4.10.1.4' },
+      { num: 14, category: 'installation', text: 'Cables in thermal insulation must be derated to <span class="tip-value">0.5×</span> current capacity', clause: 'Table 3.4' },
+      { num: 15, category: 'installation', text: 'Cables grouped in air: derating factor <span class="tip-value">0.8</span> for 4-6 cables', clause: 'Table 3.5' },
+      { num: 16, category: 'cable', text: 'Submain cable rating must include <span class="tip-value">all</span> derating factors before comparison with breaker', clause: 'Clause 3.2' },
+      { num: 17, category: 'circuits', text: 'Maximum number of socket outlets per 20A circuit: <span class="tip-value">10</span> sockets', clause: 'Clause 2.5.6.2' },
+      { num: 18, category: 'circuits', text: 'Lighting circuit breaker max: <span class="tip-value">16A</span> for domestic, <span class="tip-value">20A</span> for non-domestic', clause: 'Clause 2.4.3' },
+      { num: 19, category: 'cable', text: 'Minimum burial depth for direct buried cables: <span class="tip-value">500 mm</span> (general), <span class="tip-value">300 mm</span> (restricted access)', clause: 'Table 3.14' },
+      { num: 20, category: 'cable', text: 'Direct buried cables must have <span class="tip-value">warning tape</span> 150 mm above cable', clause: 'Clause 3.9.4.2' },
+      { num: 21, category: 'earthing', text: 'All metal enclosures must be <span class="tip-value">earthed</span> unless double insulated', clause: 'Clause 5.3.1' },
+      { num: 22, category: 'earthing', text: 'Earth electrode resistance: <span class="tip-value">≤10 Ω</span> for MEN systems', clause: 'Clause 5.6.2' },
+      { num: 23, category: 'protection', text: 'Switchboard main switch must be <span class="tip-value">double pole</span> (active and neutral)', clause: 'Clause 2.5.2' },
+      { num: 24, category: 'protection', text: 'Fault current rating of switchboard must meet <span class="tip-value">prospective short-circuit current</span>', clause: 'Clause 4.9' },
+      { num: 25, category: 'installation', text: 'Cables in sun/outdoors: use <span class="tip-value">0.9 derating</span> for temperature rise', clause: 'Table 3.3' },
+      { num: 26, category: 'cable', text: 'TPS cable maximum size: <span class="tip-value">10 mm²</span> copper', clause: 'AS/NZS 5000.1' },
+      { num: 27, category: 'cable', text: 'Submain cables <span class="tip-value">>16 mm²</span> must be single-core or multi-core armoured', clause: 'Clause 3.8.2' },
+      { num: 28, category: 'circuits', text: 'Hot water service must have dedicated circuit with <span class="tip-value">isolation switch</span>', clause: 'Clause 4.6.2' },
+      { num: 29, category: 'circuits', text: 'Air conditioner >2.5 kW requires <span class="tip-value">dedicated circuit</span>', clause: 'Clause 4.6.1' },
+      { num: 30, category: 'protection', text: 'Main switch must be rated ≥<span class="tip-value">main fuse</span> or source capacity', clause: 'Clause 2.5.2.1' },
+      { num: 31, category: 'earthing', text: 'MEN link required at <span class="tip-value">main switchboard only</span>', clause: 'Clause 5.7.2.1' },
+      { num: 32, category: 'earthing', text: 'Supplementary bonding required in bathrooms: <span class="tip-value">min 2.5 mm²</span> copper', clause: 'Clause 5.5.1' },
+      { num: 33, category: 'installation', text: 'Wiring in roof spaces must be <span class="tip-value">protected</span> from foot traffic or mechanical damage', clause: 'Clause 3.9.2.11' },
+      { num: 34, category: 'clearance', text: 'Minimum clearance of overhead cables above ground: <span class="tip-value">5.5 m</span> (vehicle access)', clause: 'Table 3.12' },
+      { num: 35, category: 'clearance', text: 'Overhead cable clearance to buildings: <span class="tip-value">3 m</span> horizontal, <span class="tip-value">2.5 m</span> vertical', clause: 'Clause 3.9.3.6' },
+      { num: 36, category: 'cable', text: 'Flexible cords max length: <span class="tip-value">2 m</span> for portable equipment supply', clause: 'Clause 4.3.4' },
+      { num: 37, category: 'installation', text: 'Cables in conduit fill: <span class="tip-value">40%</span> for >2 cables same size', clause: 'AS 2053' },
+      { num: 38, category: 'protection', text: 'Smoke alarm circuits must be <span class="tip-value">protected separately</span> from lighting circuits', clause: 'Clause 7.8.3' },
+      { num: 39, category: 'circuits', text: 'Bathroom socket must be <span class="tip-value">≥1.2 m</span> from shower/bath and RCD protected', clause: 'Clause 7.6.6' },
+      { num: 40, category: 'installation', text: 'Temporary installations: <span class="tip-value">RCD protection mandatory</span> for all socket outlets', clause: 'Section 6' },
+      { num: 41, category: 'cable', text: 'Ambient temperature for cable sizing: <span class="tip-value">40°C</span> in air, <span class="tip-value">25°C</span> in ground', clause: 'AS/NZS 3008.1.1' },
+      { num: 42, category: 'protection', text: 'Disconnect time for 230V circuits: <span class="tip-value">≤0.4 s</span> via earth fault loop impedance', clause: 'Table 2.2' },
+      { num: 43, category: 'earthing', text: 'Maximum earth loop impedance for 20A circuit: <span class="tip-value">1.15 Ω</span>', clause: 'Table 2.3' },
+      { num: 44, category: 'clearance', text: 'Switchboard door must swing <span class="tip-value">≥90°</span> without obstruction', clause: 'Clause 4.10.1.3' },
+      { num: 45, category: 'installation', text: 'Wiring joints permitted in <span class="tip-value">accessible junction boxes only</span>', clause: 'Clause 3.8.3.1' },
+      { num: 46, category: 'cable', text: 'Neutral conductor must be <span class="tip-value">same size</span> as active for single-phase circuits', clause: 'Clause 3.4.2' },
+      { num: 47, category: 'circuits', text: 'Dedicated circuit for oven/cooktop >10A load required', clause: 'Clause 4.6.1' },
+      { num: 48, category: 'installation', text: 'IP rating for outdoor enclosures: minimum <span class="tip-value">IP54</span>', clause: 'Clause 4.11.1' },
+      { num: 49, category: 'protection', text: 'Surge protection recommended for <span class="tip-value">all installations</span>, mandatory for risk areas', clause: 'Clause 8.1' },
+      { num: 50, category: 'earthing', text: 'Earth stake minimum: <span class="tip-value">1200 mm</span> length × <span class="tip-value">16 mm</span> diameter copper', clause: 'Table 5.3' }
+    ];
+
+    let currentCategory = 'all';
+    let searchTerm = '';
+
+    function renderTips() {
+      const grid = document.getElementById('tipsGrid');
+      const noResults = document.getElementById('noResults');
+      
+      const filtered = tips.filter(tip => {
+        const matchesCategory = currentCategory === 'all' || tip.category === currentCategory;
+        const matchesSearch = searchTerm === '' || 
+          tip.text.toLowerCase().includes(searchTerm) ||
+          tip.clause.toLowerCase().includes(searchTerm) ||
+          tip.category.toLowerCase().includes(searchTerm);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.style.display = 'none';
+        noResults.style.display = 'block';
+        return;
+      }
+
+      grid.style.display = 'grid';
+      noResults.style.display = 'none';
+
+      grid.innerHTML = filtered.map(tip => `
+        <div class="tip-card">
+          <span class="tip-number">#${tip.num}</span>
+          <span class="tip-category">${tip.category}</span>
+          <div class="tip-text">${tip.text}</div>
+          <div class="tip-clause">${tip.clause}</div>
+        </div>
+      `).join('');
+    }
+
+    // Category filter
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCategory = btn.dataset.category;
+        renderTips();
+      });
+    });
+
+    // Search
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchTerm = e.target.value.toLowerCase();
+      renderTips();
+    });
+
+    // Initial render
+    renderTips();
+  </script>
+</body>
+</html>

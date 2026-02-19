@@ -14,7 +14,6 @@
     .calc-section {
       background: #fff;
       border: 2px solid #1976d2;
-      border-radius: 0;
       padding: 24px;
       margin-bottom: 24px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -23,7 +22,6 @@
       color: #1976d2;
       margin-bottom: 18px;
       font-size: 1.6em;
-      font-weight: normal;
     }
     .input-row {
       display: grid;
@@ -44,7 +42,6 @@
     .input-group select {
       padding: 8px 12px;
       border: 1px solid #b7c5dd;
-      border-radius: 0;
       font-size: 1em;
     }
     .input-group small {
@@ -56,7 +53,6 @@
       background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
       color: white;
       padding: 24px;
-      border-radius: 0;
       margin-top: 24px;
     }
     .result-grid {
@@ -69,7 +65,6 @@
       text-align: center;
       padding: 16px;
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 0;
     }
     .result-label {
       font-size: 0.9em;
@@ -85,7 +80,6 @@
       color: white;
       padding: 12px 32px;
       border: none;
-      border-radius: 0;
       font-size: 1.1em;
       cursor: pointer;
       transition: background 0.2s;
@@ -105,7 +99,6 @@
     .chart-container {
       background: white;
       padding: 20px;
-      border-radius: 0;
       margin-top: 24px;
     }
     .chart-canvas {
@@ -138,6 +131,8 @@
         <a href="emergencylighting.html">Emergency Lighting</a>
         <a href="inspection.html">Site Inspection</a>
         <a href="sld.html">Single Line Diagram</a>
+        <a href="as3000tips.html">AS3000 Tips</a>
+        <a href="maxdemand.html">Maximum Demand</a>
       </div>
     </div>
     <a class="tab" href="qa.html">Verification</a>
@@ -205,6 +200,19 @@
         </div>
       </div>
 
+      <div class="input-row">
+        <div class="input-group">
+          <label for="importTariff">Import Tariff (c/kWh)</label>
+          <input type="number" id="importTariff" value="30" min="0" max="60" step="0.5" />
+          <small>Cost of electricity from grid</small>
+        </div>
+        <div class="input-group">
+          <label for="selfConsumptionPercent">Self-Consumption (%)</label>
+          <input type="number" id="selfConsumptionPercent" value="70" min="0" max="100" step="5" />
+          <small>% of solar energy used directly</small>
+        </div>
+      </div>
+
       <button class="calc-button" onclick="calculatePV()">Calculate System Size</button>
 
       <div id="resultBox" style="display:none;">
@@ -230,9 +238,11 @@
           </div>
           <div class="info-box" style="margin-top:20px; background:rgba(255,255,255,0.15); border-left:4px solid white; color:white;">
             <p style="margin:0 0 8px 0;"><strong>Annual Energy Production:</strong> <span id="annualProduction"></span> kWh</p>
-            <p style="margin:0 0 8px 0;"><strong>Self-Consumption (70%):</strong> <span id="selfConsumption"></span> kWh/year</p>
-            <p style="margin:0 0 8px 0;"><strong>Grid Export (30%):</strong> <span id="gridExport"></span> kWh/year</p>
-            <p style="margin:0;"><strong>Estimated Export Earnings:</strong> $<span id="exportEarnings"></span>/year</p>
+            <p style="margin:0 0 8px 0;"><strong>Self-Consumption (<span id="selfConsDisplay"></span>%):</strong> <span id="selfConsumption"></span> kWh/year</p>
+            <p style="margin:0 0 8px 0;"><strong>Grid Export (<span id="exportDisplay"></span>%):</strong> <span id="gridExport"></span> kWh/year</p>
+            <p style="margin:0 0 8px 0;"><strong>Estimated Bill Savings:</strong> $<span id="billSavings"></span>/year</p>
+            <p style="margin:0 0 8px 0;"><strong>Estimated Export Earnings:</strong> $<span id="exportEarnings"></span>/year</p>
+            <p style="margin:0; font-size: 1.1em; font-weight: bold;"><strong>Total Annual Benefit:</strong> $<span id="totalBenefit"></span>/year</p>
           </div>
         </div>
 
@@ -367,6 +377,8 @@
       const efficiency = parseFloat(document.getElementById('systemEfficiency').value) / 100;
       const offsetPercent = parseFloat(document.getElementById('offsetPercent').value) / 100;
       const exportTariff = parseFloat(document.getElementById('exportTariff').value);
+      const importTariff = parseFloat(document.getElementById('importTariff').value);
+      const selfConsumptionPercent = parseFloat(document.getElementById('selfConsumptionPercent').value);
 
       // Calculate required daily generation
       const requiredDailyGen = dailyUsage * offsetPercent;
@@ -393,10 +405,16 @@
         actualDailyGen * mult * daysInMonth[i]
       );
 
-      // Financial calculations (assuming 70% self-consumption, 30% export)
-      const selfConsumptionKWh = yearlyGen * 0.7;
-      const gridExportKWh = yearlyGen * 0.3;
+      // Financial calculations
+      const selfConsRatio = selfConsumptionPercent / 100;
+      const exportRatio = 1 - selfConsRatio;
+      
+      const selfConsumptionKWh = yearlyGen * selfConsRatio;
+      const gridExportKWh = yearlyGen * exportRatio;
+      
+      const billSavings = (selfConsumptionKWh * importTariff / 100).toFixed(0);
       const exportEarnings = (gridExportKWh * exportTariff / 100).toFixed(0);
+      const totalBenefit = (parseFloat(billSavings) + parseFloat(exportEarnings)).toFixed(0);
 
       // Display results
       document.getElementById('systemSize').textContent = actualSystemSizeKW.toFixed(2) + ' kW';
@@ -405,9 +423,13 @@
       document.getElementById('yearlyGen').textContent = (yearlyGen / 1000).toFixed(1) + ' MWh';
       
       document.getElementById('annualProduction').textContent = yearlyGen.toFixed(0);
+      document.getElementById('selfConsDisplay').textContent = selfConsumptionPercent;
+      document.getElementById('exportDisplay').textContent = (exportRatio * 100).toFixed(0);
       document.getElementById('selfConsumption').textContent = selfConsumptionKWh.toFixed(0);
       document.getElementById('gridExport').textContent = gridExportKWh.toFixed(0);
+      document.getElementById('billSavings').textContent = billSavings;
       document.getElementById('exportEarnings').textContent = exportEarnings;
+      document.getElementById('totalBenefit').textContent = totalBenefit;
 
       // Draw monthly generation chart
       drawMonthlyChart(monthlyGeneration);

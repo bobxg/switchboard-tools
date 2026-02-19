@@ -14,7 +14,6 @@
     .calc-section {
       background: #fff;
       border: 2px solid #1976d2;
-      border-radius: 0;
       padding: 24px;
       margin-bottom: 20px;
     }
@@ -59,7 +58,6 @@
       color: #1976d2;
       margin-top: 0;
       margin-bottom: 15px;
-      font-size: 1.3em;
     }
     .result-value {
       font-size: 2em;
@@ -103,6 +101,11 @@
     .reference-table tr:nth-child(even) {
       background: #f9f9f9;
     }
+    .note-text {
+      font-size: 0.9em;
+      color: #555;
+      margin: 8px 0 0 0;
+    }
   </style>
 </head>
 <body>
@@ -122,6 +125,8 @@
         <a href="emergencylighting.html">Emergency Lighting</a>
         <a href="inspection.html">Site Inspection</a>
         <a href="sld.html">Single Line Diagram</a>
+        <a href="as3000tips.html">AS3000 Tips</a>
+        <a href="maxdemand.html">Maximum Demand</a>
       </div>
     </div>
     <a class="tab" href="qa.html">Verification</a>
@@ -143,21 +148,47 @@
 
       <div class="input-row">
         <div class="input-group">
+          <label for="calcMode">Calculation Mode:</label>
+          <select id="calcMode" onchange="toggleMode()">
+            <option value="class">AS/NZS 2293 Classification (Recommended)</option>
+            <option value="lumen">Lumen Output (Approximate)</option>
+          </select>
+        </div>
+        <div class="input-group" id="classInputGroup">
+          <label for="classification">Luminaire Classification:</label>
+          <select id="classification">
+            <option value="D25">D25</option>
+            <option value="D32">D32</option>
+            <option value="D40" selected>D40 (Typical LED)</option>
+            <option value="D50">D50</option>
+            <option value="D63">D63</option>
+            <option value="C25">C25</option>
+            <option value="C32">C32</option>
+            <option value="C40">C40</option>
+            <option value="C50">C50</option>
+            <option value="C63">C63</option>
+          </select>
+        </div>
+        <div class="input-group" id="lumenInputGroup" style="display:none;">
           <label for="lumens">Luminaire Output (lumens):</label>
           <input type="number" id="lumens" value="400" min="50" step="10">
         </div>
+      </div>
+      <p id="modeNotice" class="note-text"></p>
+
+      <div class="input-row">
         <div class="input-group">
           <label for="mountHeight">Mounting Height (m):</label>
-          <input type="number" id="mountHeight" value="2.5" min="1.5" max="6" step="0.1">
+          <input type="number" id="mountHeight" value="2.7" min="2.1" max="6" step="0.1">
+        </div>
+        <div class="input-group" id="widthGroup">
+          <label for="corridorWidth" id="widthLabel">Corridor/Path Width (m):</label>
+          <input type="number" id="corridorWidth" value="2" min="0.5" max="10" step="0.1">
         </div>
       </div>
 
       <div class="input-row">
-        <div class="input-group">
-          <label for="corridorWidth">Corridor/Path Width (m):</label>
-          <input type="number" id="corridorWidth" value="2" min="0.5" max="10" step="0.1">
-        </div>
-        <div class="input-group">
+        <div class="input-group" id="reflectanceGroup" style="display:none;">
           <label for="reflectance">Wall/Ceiling Reflectance:</label>
           <select id="reflectance">
             <option value="0.7">Light (70% - White/Cream)</option>
@@ -290,13 +321,174 @@
 
   <script src="script.js"></script>
   <script>
+    const CLASSIFICATION_SETS = {
+      escape: ['D25', 'D32', 'D40', 'D50', 'D63'],
+      carpark: ['D25', 'D32', 'D40', 'D50', 'D63'],
+      open: ['C25', 'C32', 'C40', 'C50', 'C63']
+    };
+
+    const CLASSIFICATION_DEFAULT = {
+      escape: 'D40',
+      carpark: 'D40',
+      open: 'C40'
+    };
+
+    const MODE_NOTES = {
+      escape: 'Use D-class (corridor) classifications for escape routes per AS/NZS 2293.1 spacing tables.',
+      carpark: 'Covered car parks adopt D-class corridor ratings (AS/NZS 2293.1) for 1 lux along drive aisles.',
+      open: 'Open areas > 60m² require C-class area classifications in accordance with AS/NZS 2293.1.'
+    };
+
+    const HIGH_RISK_NOTE = 'High risk task areas require point-by-point design (AS/NZS 2293.1 Clause 4.5); use the lumen method with manufacturer photometry.';
+
+    // Simplified Spacing Tables (AS/NZS 2293.1)
+    // Max spacing for 1 lux (Escape Route)
+    const SPACING_TABLE = {
+      'D25': { 2.1: 14.2, 2.4: 14.8, 2.7: 15.3, 3.0: 15.7, 3.3: 16.0, 3.6: 16.2, 4.0: 16.4, 4.5: 16.5, 5.0: 16.4, 6.0: 15.8 },
+      'D32': { 2.1: 15.4, 2.4: 16.1, 2.7: 16.7, 3.0: 17.2, 3.3: 17.6, 3.6: 17.9, 4.0: 18.2, 4.5: 18.5, 5.0: 18.6, 6.0: 18.4 },
+      'D40': { 2.1: 16.1, 2.4: 17.0, 2.7: 17.7, 3.0: 18.3, 3.3: 18.9, 3.6: 19.3, 4.0: 19.8, 4.5: 20.2, 5.0: 20.5, 6.0: 20.7 },
+      'D50': { 2.1: 16.7, 2.4: 17.8, 2.7: 18.7, 3.0: 19.4, 3.3: 20.1, 3.6: 20.7, 4.0: 21.3, 4.5: 21.9, 5.0: 22.3, 6.0: 22.9 },
+      'D63': { 2.1: 17.2, 2.4: 18.5, 2.7: 19.6, 3.0: 20.5, 3.3: 21.3, 3.6: 22.0, 4.0: 22.8, 4.5: 23.6, 5.0: 24.2, 6.0: 25.1 },
+      'C25': { 2.1: 8.6, 2.4: 8.8, 2.7: 9.0, 3.0: 9.1, 3.3: 9.2, 3.6: 9.2, 4.0: 9.2, 4.5: 9.1, 5.0: 8.9, 6.0: 8.3 },
+      'C32': { 2.1: 9.4, 2.4: 9.7, 2.7: 9.9, 3.0: 10.1, 3.3: 10.2, 3.6: 10.3, 4.0: 10.4, 4.5: 10.4, 5.0: 10.3, 6.0: 9.9 },
+      'C40': { 2.1: 10.1, 2.4: 10.5, 2.7: 10.8, 3.0: 11.0, 3.3: 11.2, 3.6: 11.4, 4.0: 11.5, 4.5: 11.6, 5.0: 11.6, 6.0: 11.4 },
+      'C50': { 2.1: 10.8, 2.4: 11.2, 2.7: 11.6, 3.0: 11.9, 3.3: 12.2, 3.6: 12.4, 4.0: 12.6, 4.5: 12.8, 5.0: 12.9, 6.0: 12.9 },
+      'C63': { 2.1: 11.4, 2.4: 12.0, 2.7: 12.4, 3.0: 12.8, 3.3: 13.2, 3.6: 13.5, 4.0: 13.8, 4.5: 14.1, 5.0: 14.3, 6.0: 14.5 }
+    };
+
+    function toggleMode() {
+      const mode = document.getElementById('calcMode').value;
+      const classGroup = document.getElementById('classInputGroup');
+      const lumenGroup = document.getElementById('lumenInputGroup');
+      const reflectanceGroup = document.getElementById('reflectanceGroup');
+      const widthGroup = document.getElementById('widthGroup');
+      const areaType = document.getElementById('areaType').value;
+      const calcModeSelect = document.getElementById('calcMode');
+      const classOption = calcModeSelect.querySelector('option[value="class"]');
+      const classificationSupported = Boolean(CLASSIFICATION_SETS[areaType]);
+
+      classOption.disabled = !classificationSupported;
+
+      let activeMode = mode;
+      if (!classificationSupported && mode === 'class') {
+        calcModeSelect.value = 'lumen';
+        activeMode = 'lumen';
+      }
+      
+      if (activeMode === 'class') {
+        classGroup.style.display = 'block';
+        lumenGroup.style.display = 'none';
+        reflectanceGroup.style.display = 'none';
+        widthGroup.style.display = 'none';
+      } else {
+        classGroup.style.display = 'none';
+        lumenGroup.style.display = 'block';
+        reflectanceGroup.style.display = 'block';
+        widthGroup.style.display = 'block';
+      }
+
+      calculateSpacing();
+    }
+
+    function getSpacingFromTable(classification, height) {
+      const data = SPACING_TABLE[classification];
+      if (!data) return null;
+
+      // Find closest heights
+      const heights = Object.keys(data).map(parseFloat).sort((a, b) => a - b);
+      
+      if (height <= heights[0]) return data[heights[0]];
+      if (height >= heights[heights.length - 1]) return data[heights[heights.length - 1]];
+
+      // Interpolate
+      for (let i = 0; i < heights.length - 1; i++) {
+        if (height >= heights[i] && height <= heights[i+1]) {
+          const h1 = heights[i];
+          const h2 = heights[i+1];
+          const s1 = data[h1];
+          const s2 = data[h2];
+          return s1 + (s2 - s1) * (height - h1) / (h2 - h1);
+        }
+      }
+      return 0;
+    }
+
+    function updateClassificationOptions() {
+      const areaType = document.getElementById('areaType').value;
+      const classificationSelect = document.getElementById('classification');
+      const allowed = CLASSIFICATION_SETS[areaType];
+      const options = Array.from(classificationSelect.options);
+
+      if (!allowed) {
+        classificationSelect.disabled = true;
+        options.forEach(option => {
+          option.hidden = false;
+          option.disabled = false;
+        });
+        return;
+      }
+
+      classificationSelect.disabled = false;
+      options.forEach(option => {
+        if (!option.value) return;
+        const showOption = allowed.includes(option.value);
+        option.hidden = !showOption;
+        option.disabled = !showOption;
+      });
+
+      if (!allowed.includes(classificationSelect.value)) {
+        classificationSelect.value = CLASSIFICATION_DEFAULT[areaType] || allowed[0];
+      }
+    }
+
+    function updateModeNotice(areaType) {
+      const notice = document.getElementById('modeNotice');
+      if (!notice) return;
+
+      if (!CLASSIFICATION_SETS[areaType]) {
+        notice.textContent = HIGH_RISK_NOTE;
+        return;
+      }
+
+      notice.textContent = MODE_NOTES[areaType] || '';
+    }
+
+    function updateWidthLabel(areaType) {
+      const label = document.getElementById('widthLabel');
+      if (!label) return;
+
+      switch(areaType) {
+        case 'open':
+          label.textContent = 'Grid Width / Cell Size (m):';
+          break;
+        case 'highrisk':
+          label.textContent = 'Task Width Across Work Plane (m):';
+          break;
+        case 'carpark':
+          label.textContent = 'Drive Aisle Width (m):';
+          break;
+        default:
+          label.textContent = 'Corridor/Path Width (m):';
+      }
+    }
+
+    function handleAreaChange() {
+      const areaType = document.getElementById('areaType').value;
+      updateClassificationOptions();
+      updateModeNotice(areaType);
+      updateWidthLabel(areaType);
+      toggleMode();
+    }
+
     function calculateSpacing() {
       // Get inputs
+      const mode = document.getElementById('calcMode').value;
       const areaType = document.getElementById('areaType').value;
-      const lumens = parseFloat(document.getElementById('lumens').value);
       const mountHeight = parseFloat(document.getElementById('mountHeight').value);
       const corridorWidth = parseFloat(document.getElementById('corridorWidth').value);
-      const reflectance = parseFloat(document.getElementById('reflectance').value);
+      
+      let maxSpacing = 0;
+      let calcMethodText = '';
 
       // Determine required lux based on area type
       let requiredLux;
@@ -320,24 +512,53 @@
           break;
       }
 
-      // Apply reflectance factor (lower reflectance reduces effective lumens)
-      const effectiveLumens = lumens * (0.5 + reflectance * 0.5);
+      if (mode === 'class') {
+        const classification = document.getElementById('classification').value;
+        
+        // Get base spacing for 1 lux
+        let baseSpacing = getSpacingFromTable(classification, mountHeight);
+        
+        // Adjust for other lux levels (Approximate inverse square law relationship for spacing? 
+        // Actually, spacing tables are specific. For 0.5 lux, spacing is wider. For 10 lux, much closer.
+        // This is a limitation of the simplified tool. We will apply a factor.)
+        
+        let luxFactor = 1.0;
+        if (requiredLux === 0.5) luxFactor = 1.25; // Approx wider spacing
+        if (requiredLux === 10.0) luxFactor = 0.35; // Much closer spacing
+        
+        maxSpacing = baseSpacing * luxFactor;
+        
+        calcMethodText = `Based on AS/NZS 2293 Classification ${classification} at ${mountHeight}m height. ` +
+                         `Base spacing for 1 lux: ${baseSpacing.toFixed(1)}m. ` +
+                         `Adjusted for ${requiredLux} lux (${areaName}).`;
 
-      // Calculate spacing using lumen method with corridor geometry
-      // Formula: S = sqrt((L × UF × MF) / (E × W))
-      // Where: L = lumens, UF = utilization factor (~0.5 for corridor), MF = maintenance factor (0.8)
-      // E = required lux, W = corridor width
+      } else {
+        // Lumen Method (Existing)
+        const lumens = parseFloat(document.getElementById('lumens').value);
+        const reflectance = parseFloat(document.getElementById('reflectance').value);
+        
+        // Apply reflectance factor (lower reflectance reduces effective lumens)
+        const effectiveLumens = lumens * (0.5 + reflectance * 0.5);
+
+        // Calculate spacing using lumen method with corridor geometry
+        const utilizationFactor = 0.4 + (reflectance * 0.2); // 0.4-0.6 depending on reflectance
+        const maintenanceFactor = 0.8; // Account for dirt and aging
+        
+        // Simplified spacing calculation
+        maxSpacing = Math.sqrt((effectiveLumens * utilizationFactor * maintenanceFactor) / (requiredLux * corridorWidth));
+        
+        calcMethodText = `Calculated using Lumen Method (Approximate) for ${areaName} (${requiredLux} lux required) with ${lumens}lm luminaire.`;
+      }
       
-      const utilizationFactor = 0.4 + (reflectance * 0.2); // 0.4-0.6 depending on reflectance
-      const maintenanceFactor = 0.8; // Account for dirt and aging
-      
-      // Simplified spacing calculation
-      let maxSpacing = Math.sqrt((effectiveLumens * utilizationFactor * maintenanceFactor) / (requiredLux * corridorWidth));
-      
-      // Apply mounting height constraint (spacing shouldn't exceed 3x mounting height for corridors)
-      const heightLimit = mountHeight * 3;
-      if (maxSpacing > heightLimit) {
-        maxSpacing = heightLimit;
+      // Apply mounting height constraint (spacing shouldn't exceed 4x mounting height generally)
+      // AS/NZS 2293 tables already account for this, but for lumen method we need a cap
+      let heightLimited = false;
+      if (mode === 'lumen') {
+        const heightLimit = mountHeight * 3;
+        if (maxSpacing > heightLimit) {
+          maxSpacing = heightLimit;
+          heightLimited = true;
+        }
       }
 
       // Round to 1 decimal
@@ -358,32 +579,40 @@
       let complianceHTML = '';
       if (maxSpacing < 6) {
         complianceHTML = '<div class="warning-box"><strong>Warning:</strong> Very close spacing required. Consider higher output luminaires.</div>';
-      } else if (maxSpacing > 18) {
+      } else if (maxSpacing > 25) {
         complianceHTML = '<div class="warning-box"><strong>Note:</strong> Wide spacing possible. Verify with photometric data and check for obstructions.</div>';
       } else {
         complianceHTML = '<div class="info-box"><strong>Compliant:</strong> Spacing is within typical range for emergency lighting.</div>';
       }
 
       // Add height warning
-      if (mountHeight > 3.5) {
-        complianceHTML += '<div class="warning-box"><strong>High Mounting:</strong> Height > 3.5m may require increased output or reduced spacing. Verify with photometric calculations.</div>';
+      if (mountHeight > 4.0 && mode === 'lumen') {
+        complianceHTML += '<div class="warning-box"><strong>High Mounting:</strong> Height > 4.0m. Lumen method becomes less accurate. Use manufacturer photometry or AS/NZS 2293 classification tables.</div>';
+      }
+
+      if (heightLimited) {
+        complianceHTML += '<div class="warning-box"><strong>Spacing Limited:</strong> Capped at 3× mounting height per AS/NZS 2293 design guidance to control uniformity.</div>';
       }
 
       document.getElementById('complianceCheck').innerHTML = complianceHTML;
 
       // Calculation method explanation
-      document.getElementById('calcMethod').textContent = 
-        `Calculated for ${areaName} (${requiredLux} lux required) with ${lumens}lm luminaire at ${mountHeight}m height. ` +
-        `Effective lumens: ${effectiveLumens.toFixed(0)}lm (reflectance factor: ${reflectance}). ` +
-        `Utilization factor: ${utilizationFactor.toFixed(2)}, Maintenance factor: ${maintenanceFactor}.`;
+      document.getElementById('calcMethod').textContent = calcMethodText;
 
       // Scroll to results
       document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // Calculate on load with default values
+    document.getElementById('areaType').addEventListener('change', handleAreaChange);
+    document.getElementById('classification').addEventListener('change', calculateSpacing);
+    document.getElementById('lumens').addEventListener('change', calculateSpacing);
+    document.getElementById('mountHeight').addEventListener('change', calculateSpacing);
+    document.getElementById('corridorWidth').addEventListener('change', calculateSpacing);
+    document.getElementById('reflectance').addEventListener('change', calculateSpacing);
+
     window.addEventListener('load', () => {
-      calculateSpacing();
+      handleAreaChange();
     });
   </script>
 </body>

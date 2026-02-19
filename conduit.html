@@ -24,6 +24,8 @@
         <a href="emergencylighting.html">Emergency Lighting</a>
         <a href="inspection.html">Site Inspection</a>
         <a href="sld.html">Single Line Diagram</a>
+        <a href="as3000tips.html">AS3000 Tips</a>
+        <a href="maxdemand.html">Maximum Demand</a>
       </div>
     </div>
     <a class="tab" href="qa.html">Verification</a>
@@ -33,9 +35,16 @@
     <p>
       Enter the number of each cable size to calculate the smallest conduit size required.<br>
       <span style="color:#1976d2; font-size:0.95em;">
-        (Fill factors per AS/NZS 3000 Appendix C: 1 or 2 cables = 31%, 3+ cables = 40%)
+        (Fill factors per AS/NZS 3000 Appendix C: 1 cable = 50%, 2 cables = 33%, 3+ cables = 40%)
       </span>
     </p>
+    <div style="margin-bottom: 20px; text-align: center;">
+      <label for="cableTypeSelect" style="font-weight: bold; margin-right: 10px;">Cable Type:</label>
+      <select id="cableTypeSelect" style="padding: 5px;">
+        <option value="single">Single Core (Thermoplastic)</option>
+        <option value="multicore">Multicore Circular (PVC/PVC)</option>
+      </select>
+    </div>
     <form id="cableForm" autocomplete="off">
       <table style="margin:0 auto 20px auto; border-collapse:collapse; width:100%; max-width:350px; background:#fff; box-shadow:0 2px 8px #eee;">
         <thead>
@@ -53,69 +62,130 @@
   </div>
   <script src="script.js"></script>
   <script>
-    const cableData = [
-      { area: 1.5, diameter: 3.2 },
-      { area: 2.5, diameter: 3.7 },
-      { area: 4, diameter: 4.6 },
-      { area: 6, diameter: 5.2 },
-      { area: 10, diameter: 6.1 },
-      { area: 16, diameter: 7.2 },
-      { area: 25, diameter: 8.7 },
-      { area: 35, diameter: 10.1 },
-      { area: 50, diameter: 11.9 },
-      { area: 70, diameter: 13.3 },
-      { area: 95, diameter: 15.4 },
-      { area: 120, diameter: 16.8 },
-      { area: 150, diameter: 18.8 },
-      { area: 185, diameter: 21.4 },
-      { area: 240, diameter: 23.4 }
+    // Cable diameters (approximate mm)
+    const CABLE_DB = {
+      single: [
+        { area: 1.5, diameter: 3.2 },
+        { area: 2.5, diameter: 3.7 },
+        { area: 4, diameter: 4.6 },
+        { area: 6, diameter: 5.2 },
+        { area: 10, diameter: 6.8 },
+        { area: 16, diameter: 8.5 },
+        { area: 25, diameter: 10.3 },
+        { area: 35, diameter: 11.6 },
+        { area: 50, diameter: 13.5 },
+        { area: 70, diameter: 15.5 },
+        { area: 95, diameter: 17.8 },
+        { area: 120, diameter: 19.5 },
+        { area: 150, diameter: 21.8 },
+        { area: 185, diameter: 24.5 },
+        { area: 240, diameter: 27.5 }
+      ],
+      multicore: [
+        { area: 1.5, diameter: 9.6 },
+        { area: 2.5, diameter: 11.3 },
+        { area: 4, diameter: 13.2 },
+        { area: 6, diameter: 15.1 },
+        { area: 10, diameter: 18.5 },
+        { area: 16, diameter: 21.5 },
+        { area: 25, diameter: 25.5 },
+        { area: 35, diameter: 28.5 },
+        { area: 50, diameter: 33.5 },
+        { area: 70, diameter: 38.5 },
+        { area: 95, diameter: 43.5 },
+        { area: 120, diameter: 48.5 },
+        { area: 150, diameter: 54.0 },
+        { area: 185, diameter: 60.0 },
+        { area: 240, diameter: 68.0 }
+      ]
+    };
+
+    // Conduit Dimensions (Nominal OD : Internal Diameter mm)
+    // Based on Medium Duty Rigid PVC
+    const CONDUIT_DATA = [
+      { od: 20, id: 16.1 },
+      { od: 25, id: 21.2 },
+      { od: 32, id: 28.0 },
+      { od: 40, id: 35.4 },
+      { od: 50, id: 44.2 },
+      { od: 63, id: 56.8 },
+      { od: 80, id: 72.5 }, // Approx
+      { od: 100, id: 93.0 }, // Approx
+      { od: 125, id: 116.0 }, // Approx
+      { od: 150, id: 140.0 } // Approx
     ];
-    const conduitDiameters = [20,25,32,40,50,63,80,100,125,150];
-    const conduitAreas = conduitDiameters.map(d => Math.PI * Math.pow(d/2,2));
+
+    const conduitAreas = CONDUIT_DATA.map(c => ({
+      od: c.od,
+      area: Math.PI * Math.pow(c.id / 2, 2)
+    }));
+
     function diameterToArea(d) {
       return Math.PI * Math.pow(d/2, 2);
     }
+
     function getFillPercentage(numCables) {
       // AS/NZS 3000:2018 Appendix C - Conduit fill factors
-      // 1 or 2 cables: 31% fill
-      // 3 or more cables: 40% fill
-      if (numCables <= 2) return 0.31;
+      if (numCables === 1) return 0.50;
+      if (numCables === 2) return 0.33;
       if (numCables >= 3) return 0.40;
       return 0;
     }
+
     function findSmallestConduit(totalCableArea, numCables) {
       const fill = getFillPercentage(numCables);
-      for (let i=0; i<conduitDiameters.length; ++i) {
-        const allowed = conduitAreas[i] * fill;
+      for (let i=0; i<conduitAreas.length; ++i) {
+        const allowed = conduitAreas[i].area * fill;
         if (totalCableArea <= allowed) {
-          return conduitDiameters[i];
+          return conduitAreas[i].od;
         }
       }
       return null;
     }
+
     function buildCableTable() {
+      const type = document.getElementById('cableTypeSelect').value;
+      const data = CABLE_DB[type];
       const tbody = document.getElementById('cableTableBody');
+      
+      // Store current values if any
+      const currentValues = {};
+      const inputs = tbody.querySelectorAll('input');
+      inputs.forEach(input => {
+        currentValues[input.dataset.area] = input.value;
+      });
+
       tbody.innerHTML = '';
-      cableData.forEach((cable, idx) => {
+      data.forEach((cable, idx) => {
         const tr = document.createElement('tr');
+        const val = currentValues[cable.area] || 0;
         tr.innerHTML = `
           <td>${cable.area}</td>
           <td>
-            <input type="number" min="0" value="0" id="cableCount${idx}" data-idx="${idx}" />
+            <input type="number" min="0" value="${val}" id="cableCount${idx}" data-idx="${idx}" data-area="${cable.area}" />
           </td>
         `;
         tbody.appendChild(tr);
       });
+      setupListeners(); // Re-attach listeners
     }
+
     function updateTotalArea() {
+      const type = document.getElementById('cableTypeSelect').value;
+      const data = CABLE_DB[type];
       let total = 0;
       let numCables = 0;
-      cableData.forEach((cable, idx) => {
-        const count = parseInt(document.getElementById(`cableCount${idx}`).value) || 0;
-        const area = diameterToArea(cable.diameter);
-        total += count * area;
-        numCables += count;
+      
+      data.forEach((cable, idx) => {
+        const el = document.getElementById(`cableCount${idx}`);
+        if (el) {
+          const count = parseInt(el.value) || 0;
+          const area = diameterToArea(cable.diameter);
+          total += count * area;
+          numCables += count;
+        }
       });
+
       let resultText = "Smallest Suitable Conduit: -";
       if (numCables > 0 && total > 0) {
         const result = findSmallestConduit(total, numCables);
@@ -127,13 +197,24 @@
       }
       document.getElementById('conduitResult').innerHTML = resultText;
     }
+
     function setupListeners() {
-      cableData.forEach((cable, idx) => {
-        document.getElementById(`cableCount${idx}`).addEventListener('input', updateTotalArea);
+      const type = document.getElementById('cableTypeSelect').value;
+      const data = CABLE_DB[type];
+      data.forEach((cable, idx) => {
+        const el = document.getElementById(`cableCount${idx}`);
+        if (el) {
+          el.addEventListener('input', updateTotalArea);
+        }
       });
     }
+
+    document.getElementById('cableTypeSelect').addEventListener('change', () => {
+      buildCableTable();
+      updateTotalArea();
+    });
+
     buildCableTable();
-    setupListeners();
     updateTotalArea();
   </script>
 </body>

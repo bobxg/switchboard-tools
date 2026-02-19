@@ -14,7 +14,6 @@
     .calc-section {
       background: #fff;
       border: 2px solid #1976d2;
-      border-radius: 0;
       padding: 24px;
       margin-bottom: 24px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -23,7 +22,6 @@
       color: #1976d2;
       margin-bottom: 18px;
       font-size: 1.6em;
-      font-weight: normal;
     }
     .input-row {
       display: grid;
@@ -44,14 +42,12 @@
     .input-group select {
       padding: 8px 12px;
       border: 1px solid #b7c5dd;
-      border-radius: 0;
       font-size: 1em;
     }
     .result-box {
       background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
       color: white;
       padding: 24px;
-      border-radius: 0;
       margin-top: 24px;
       text-align: center;
     }
@@ -65,7 +61,6 @@
       color: white;
       padding: 12px 32px;
       border: none;
-      border-radius: 0;
       font-size: 1.1em;
       cursor: pointer;
       transition: background 0.2s;
@@ -80,7 +75,6 @@
       border-left: 4px solid #1976d2;
       padding: 16px;
       margin: 16px 0;
-      border-radius: 0;
     }
     @media (max-width: 768px) {
       .input-row {
@@ -106,6 +100,8 @@
         <a href="emergencylighting.html">Emergency Lighting</a>
         <a href="inspection.html">Site Inspection</a>
         <a href="sld.html">Single Line Diagram</a>
+        <a href="as3000tips.html">AS3000 Tips</a>
+        <a href="maxdemand.html">Maximum Demand</a>
       </div>
     </div>
     <a class="tab" href="qa.html">Verification</a>
@@ -205,6 +201,7 @@
   <script src="script.js"></script>
   <script>
     // Simplified cable data (mm² : ampacity)
+    // Based on AS/NZS 3008.1.1
     const CABLE_AMPACITY = {
       cu: {
         1: { 1: 19, 3: 23, 12: 24, 21: 20, 31: 21, 32: 22 },
@@ -223,13 +220,26 @@
         150: { 1: 382, 3: 447, 12: 500, 21: 417, 31: 442, 32: 464 },
         185: { 1: 435, 3: 509, 12: 570, 21: 476, 31: 504, 32: 529 },
         240: { 1: 514, 3: 601, 12: 673, 21: 562, 31: 596, 32: 625 }
+      },
+      al: {
+        16: { 1: 76, 3: 89, 12: 99, 21: 83, 31: 88, 32: 92 },
+        25: { 1: 100, 3: 117, 12: 131, 21: 109, 31: 115, 32: 121 },
+        35: { 1: 122, 3: 144, 12: 160, 21: 133, 31: 141, 32: 148 },
+        50: { 1: 154, 3: 180, 12: 200, 21: 167, 31: 177, 32: 186 },
+        70: { 1: 190, 3: 223, 12: 248, 21: 207, 31: 219, 32: 230 },
+        95: { 1: 227, 3: 265, 12: 296, 21: 247, 31: 261, 32: 275 },
+        120: { 1: 259, 3: 303, 12: 339, 21: 283, 31: 300, 32: 315 },
+        150: { 1: 297, 3: 347, 12: 388, 21: 323, 31: 343, 32: 360 },
+        185: { 1: 337, 3: 395, 12: 442, 21: 369, 31: 391, 32: 410 },
+        240: { 1: 399, 3: 466, 12: 522, 21: 436, 31: 462, 32: 485 }
       }
     };
 
     // Cable resistance (mΩ/m at 75°C)
     const CABLE_RESISTANCE = {
       cu: { 1: 21.9, 1.5: 14.6, 2.5: 8.76, 4: 5.48, 6: 3.65, 10: 2.19, 16: 1.37, 25: 0.876, 
-            35: 0.626, 50: 0.438, 70: 0.313, 95: 0.230, 120: 0.183, 150: 0.146, 185: 0.122, 240: 0.0913 }
+            35: 0.626, 50: 0.438, 70: 0.313, 95: 0.230, 120: 0.183, 150: 0.146, 185: 0.122, 240: 0.0913 },
+      al: { 16: 2.27, 25: 1.45, 35: 1.04, 50: 0.727, 70: 0.519, 95: 0.381, 120: 0.303, 150: 0.242, 185: 0.202, 240: 0.151 }
     };
 
     const STANDARD_SIZES = [1, 1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630];
@@ -281,6 +291,12 @@
       // Find cable size based on ampacity
       let sizeByAmpacity = null;
       const ampData = CABLE_AMPACITY[cableType];
+      
+      if (!ampData) {
+        alert('Data not available for selected cable type.');
+        return;
+      }
+
       for (let size of STANDARD_SIZES) {
         if (ampData[size] && ampData[size][method]) {
           if (ampData[size][method] >= requiredAmpacity) {
@@ -295,7 +311,7 @@
       let sizeByVoltDrop = null;
 
       for (let size of STANDARD_SIZES) {
-        if (CABLE_RESISTANCE[cableType][size]) {
+        if (CABLE_RESISTANCE[cableType] && CABLE_RESISTANCE[cableType][size]) {
           const resistance = CABLE_RESISTANCE[cableType][size] / 1000; // Convert to Ω/m
           let voltDrop;
           if (phases === 3) {

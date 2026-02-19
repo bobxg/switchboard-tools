@@ -197,6 +197,14 @@ strong {
   font-size: 1em;
   line-height: 1.5;
 }
+.tool-desc {
+  color: #666;
+  font-size: 0.9em;
+  display: block;
+}
+.tbc-heading {
+  color: #666;
+}
 
 /* --- Switchroom Sizer --- */
 .equip-list {
