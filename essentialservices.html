@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Essential Services Register - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -49,11 +48,10 @@
     .filter-row label { font-weight: bold; font-size: 0.9em; }
     .filter-row select, .filter-row input { padding: 5px 8px; font-size: 0.9em; }
     @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon, .btn-row, .tabs, .filter-row { display: none !important; } .tab-content { display: block !important; border: none !important; } .register-table input, .register-table select { border: none !important; background: transparent !important; } }
+    @media print { .top-tabs, .calc-button, .btn-row, .tabs, .filter-row { display: none !important; } .tab-content { display: block !important; border: none !important; } .register-table input, .register-table select { border: none !important; background: transparent !important; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -136,7 +134,7 @@
 
     <!-- NCC Requirements Tab -->
     <div class="tab-content" id="tab-ncc">
-      <h3 style="color:#1976d2;">NCC Essential Safety Measures — Electrical Requirements</h3>
+      <h3 style="color:#1976d2;">NCC Essential Safety Measures Ã¢â‚¬â€ Electrical Requirements</h3>
       <table class="register-table">
         <thead>
           <tr><th>NCC Clause</th><th>Essential Safety Measure</th><th>Electrical Requirement</th><th>Inspection Frequency</th></tr>
@@ -151,8 +149,8 @@
           <tr><td>E2.2a</td><td>Stairwell Pressurisation</td><td>Dedicated essential supply, auto-start on fire signal, fire-rated cables</td><td>Monthly, Annual professional</td></tr>
           <tr><td>G3.8</td><td>Lifts (Emergency Recall)</td><td>Fire service recall to lobby, emergency supply for car lighting, intercom power</td><td>Monthly, Annual professional</td></tr>
           <tr><td>EP2.1</td><td>Emergency Warning & Intercom</td><td>EWIS per AS 1670.4, dedicated supply, battery backup, fire-rated wiring</td><td>Monthly, Annual professional</td></tr>
-          <tr><td>—</td><td>Essential Generator Supply</td><td>Auto-start within 10s (NCC), supply to all essential services, per AS/NZS 3010</td><td>Monthly test run, Annual full load</td></tr>
-          <tr><td>—</td><td>Fire Command Panel (FSCP)</td><td>Dedicated supply, fire-rated wiring, battery backup, located at main entry per FIP location</td><td>Monthly, Annual professional</td></tr>
+          <tr><td>Ã¢â‚¬â€</td><td>Essential Generator Supply</td><td>Auto-start within 10s (NCC), supply to all essential services, per AS/NZS 3010</td><td>Monthly test run, Annual full load</td></tr>
+          <tr><td>Ã¢â‚¬â€</td><td>Fire Command Panel (FSCP)</td><td>Dedicated supply, fire-rated wiring, battery backup, located at main entry per FIP location</td><td>Monthly, Annual professional</td></tr>
         </tbody>
       </table>
     </div>
@@ -165,17 +163,17 @@
           <tr><th>Measure</th><th>Applicable Standard</th><th>Weekly</th><th>Monthly</th><th>6-Monthly</th><th>Annual</th><th>5-Yearly</th></tr>
         </thead>
         <tbody>
-          <tr><td>Fire Detection & Alarm</td><td>AS 1851 / AS 1670.1</td><td>—</td><td>Detector sampling test</td><td>Full zone test</td><td>Professional service</td><td>Full system overhaul</td></tr>
-          <tr><td>Sprinkler System</td><td>AS 1851 / AS 2118</td><td>Flow alarm test</td><td>Pump run test</td><td>Valve inspection</td><td>Full system test</td><td>—</td></tr>
-          <tr><td>Emergency Lighting</td><td>AS 2293.2</td><td>—</td><td>1-second discharge test</td><td>90-minute discharge test</td><td>Full compliance audit</td><td>Battery replacement (10yr)</td></tr>
-          <tr><td>Exit Signs</td><td>AS 2293.1 / .2</td><td>—</td><td>Visual check + 1-sec test</td><td>90-minute test</td><td>Full compliance audit</td><td>—</td></tr>
-          <tr><td>Smoke Control</td><td>AS 1668.1</td><td>—</td><td>Manual activation test</td><td>—</td><td>Full commissioning test</td><td>—</td></tr>
-          <tr><td>Fire/Smoke Doors</td><td>AS 1905 / AS 1851</td><td>—</td><td>Visual + operation check</td><td>—</td><td>Professional inspection</td><td>—</td></tr>
-          <tr><td>Generator</td><td>AS/NZS 3010</td><td>—</td><td>30-min test run</td><td>—</td><td>Full load bank test</td><td>Major service</td></tr>
-          <tr><td>UPS</td><td>AS 4044</td><td>—</td><td>Visual + status check</td><td>—</td><td>Battery impedance test</td><td>Battery replacement</td></tr>
-          <tr><td>EWIS / Intercom</td><td>AS 1670.4</td><td>—</td><td>Microphone test</td><td>Zone broadcast test</td><td>Full professional test</td><td>—</td></tr>
-          <tr><td>Lifts (Fire Recall)</td><td>AS 1735</td><td>—</td><td>Recall test</td><td>—</td><td>Professional inspection</td><td>—</td></tr>
-          <tr><td>RCDs</td><td>AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.4" class="clause">cl 2.6.4</a></td><td>—</td><td>—</td><td>Push-button test (non-essential)</td><td>Trip-time test by electrician</td><td>—</td></tr>
+          <tr><td>Fire Detection & Alarm</td><td>AS 1851 / AS 1670.1</td><td>Ã¢â‚¬â€</td><td>Detector sampling test</td><td>Full zone test</td><td>Professional service</td><td>Full system overhaul</td></tr>
+          <tr><td>Sprinkler System</td><td>AS 1851 / AS 2118</td><td>Flow alarm test</td><td>Pump run test</td><td>Valve inspection</td><td>Full system test</td><td>Ã¢â‚¬â€</td></tr>
+          <tr><td>Emergency Lighting</td><td>AS 2293.2</td><td>Ã¢â‚¬â€</td><td>1-second discharge test</td><td>90-minute discharge test</td><td>Full compliance audit</td><td>Battery replacement (10yr)</td></tr>
+          <tr><td>Exit Signs</td><td>AS 2293.1 / .2</td><td>Ã¢â‚¬â€</td><td>Visual check + 1-sec test</td><td>90-minute test</td><td>Full compliance audit</td><td>Ã¢â‚¬â€</td></tr>
+          <tr><td>Smoke Control</td><td>AS 1668.1</td><td>Ã¢â‚¬â€</td><td>Manual activation test</td><td>Ã¢â‚¬â€</td><td>Full commissioning test</td><td>Ã¢â‚¬â€</td></tr>
+          <tr><td>Fire/Smoke Doors</td><td>AS 1905 / AS 1851</td><td>Ã¢â‚¬â€</td><td>Visual + operation check</td><td>Ã¢â‚¬â€</td><td>Professional inspection</td><td>Ã¢â‚¬â€</td></tr>
+          <tr><td>Generator</td><td>AS/NZS 3010</td><td>Ã¢â‚¬â€</td><td>30-min test run</td><td>Ã¢â‚¬â€</td><td>Full load bank test</td><td>Major service</td></tr>
+          <tr><td>UPS</td><td>AS 4044</td><td>Ã¢â‚¬â€</td><td>Visual + status check</td><td>Ã¢â‚¬â€</td><td>Battery impedance test</td><td>Battery replacement</td></tr>
+          <tr><td>EWIS / Intercom</td><td>AS 1670.4</td><td>Ã¢â‚¬â€</td><td>Microphone test</td><td>Zone broadcast test</td><td>Full professional test</td><td>Ã¢â‚¬â€</td></tr>
+          <tr><td>Lifts (Fire Recall)</td><td>AS 1735</td><td>Ã¢â‚¬â€</td><td>Recall test</td><td>Ã¢â‚¬â€</td><td>Professional inspection</td><td>Ã¢â‚¬â€</td></tr>
+          <tr><td>RCDs</td><td>AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.4" class="clause">cl 2.6.4</a></td><td>Ã¢â‚¬â€</td><td>Ã¢â‚¬â€</td><td>Push-button test (non-essential)</td><td>Trip-time test by electrician</td><td>Ã¢â‚¬â€</td></tr>
         </tbody>
       </table>
 
@@ -185,7 +183,7 @@
     </div>
 
     <div class="info-box" style="margin-top:16px;">
-      <strong>Key Standards:</strong> NCC 2022 Vol. 1 (especially Sections E &amp; G) · AS 1851 Maintenance of fire protection systems · AS 2293.2 Emergency lighting maintenance · AS 1670.1 Fire detection · AS 1668.1 Smoke control · AS/NZS 3010 Generating sets · AS 4044 UPS systems · AS 1735 Lifts
+      <strong>Key Standards:</strong> NCC 2022 Vol. 1 (especially Sections E &amp; G) Ã‚Â· AS 1851 Maintenance of fire protection systems Ã‚Â· AS 2293.2 Emergency lighting maintenance Ã‚Â· AS 1670.1 Fire detection Ã‚Â· AS 1668.1 Smoke control Ã‚Â· AS/NZS 3010 Generating sets Ã‚Â· AS 4044 UPS systems Ã‚Â· AS 1735 Lifts
     </div>
   </div>
   <script>
@@ -201,7 +199,7 @@
     }
 
     function getStatus(nextDueStr) {
-      if (!nextDueStr) return { text: '—', cls: '' };
+      if (!nextDueStr) return { text: 'Ã¢â‚¬â€', cls: '' };
       const due = new Date(nextDueStr);
       const today = new Date();
       today.setHours(0,0,0,0);
@@ -226,7 +224,7 @@
         <td><select>${freqSel}</select></td>
         <td><input type="date" value="${d.lastInsp || ''}" onchange="updateDueDate(this)" /></td>
         <td><input type="date" value="${d.nextDue || ''}" onchange="updateStatuses()" /></td>
-        <td class="status-cell">—</td>
+        <td class="status-cell">Ã¢â‚¬â€</td>
         <td><input type="text" value="${d.responsible || ''}" placeholder="Contractor" /></td>
         <td><input type="text" value="${d.notes || ''}" /></td>`;
       document.getElementById('registerBody').appendChild(tr);

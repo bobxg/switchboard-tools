@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>IP/IK Rating Guide - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -31,11 +30,10 @@
     .ref-table tr:nth-child(even) { background: #f8f9fa; }
     .search-input { padding: 10px 14px; border: 2px solid #1976d2; font-size: 1em; width: 100%; margin-bottom: 16px; box-sizing: border-box; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon, .search-input { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    @media print { .top-tabs, .calc-button, .search-input { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -55,11 +53,11 @@
       <div class="input-row three">
         <div class="input-group"><label for="envType">Installation Environment</label>
           <select id="envType" onchange="recommend()">
-            <option value="indoor_dry">Indoor — dry (office, corridor)</option>
-            <option value="indoor_damp">Indoor — damp (bathroom, laundry)</option>
-            <option value="indoor_wet">Indoor — wet (commercial kitchen, pool plant)</option>
-            <option value="outdoor_covered">Outdoor — covered (verandah, awning)</option>
-            <option value="outdoor_exposed">Outdoor — fully exposed</option>
+            <option value="indoor_dry">Indoor Ã¢â‚¬â€ dry (office, corridor)</option>
+            <option value="indoor_damp">Indoor Ã¢â‚¬â€ damp (bathroom, laundry)</option>
+            <option value="indoor_wet">Indoor Ã¢â‚¬â€ wet (commercial kitchen, pool plant)</option>
+            <option value="outdoor_covered">Outdoor Ã¢â‚¬â€ covered (verandah, awning)</option>
+            <option value="outdoor_exposed">Outdoor Ã¢â‚¬â€ fully exposed</option>
             <option value="carpark">Car park (indoor/covered)</option>
             <option value="carpark_open">Car park (open air)</option>
             <option value="plant_room">Plant room (mechanical)</option>
@@ -84,10 +82,10 @@
           </select></div>
         <div class="input-group"><label for="publicAccess">Public Access / Vandalism Risk?</label>
           <select id="publicAccess" onchange="recommend()">
-            <option value="no" selected>No — restricted access</option>
-            <option value="low">Low — staff areas</option>
-            <option value="high">High — public areas</option>
-            <option value="extreme">Extreme — vandal-prone</option>
+            <option value="no" selected>No Ã¢â‚¬â€ restricted access</option>
+            <option value="low">Low Ã¢â‚¬â€ staff areas</option>
+            <option value="high">High Ã¢â‚¬â€ public areas</option>
+            <option value="extreme">Extreme Ã¢â‚¬â€ vandal-prone</option>
           </select></div>
       </div>
     </div>
@@ -102,25 +100,25 @@
           <div style="display:flex;gap:8px;align-items:center;">
             <span style="font-size:1.3em;font-weight:bold;">IP</span>
             <select id="ipFirst" onchange="decodeIP()" style="flex:1;">
-              <option value="0">0 — No protection</option>
-              <option value="1">1 — Objects > 50mm</option>
-              <option value="2">2 — Objects > 12.5mm (fingers)</option>
-              <option value="3">3 — Objects > 2.5mm (tools)</option>
-              <option value="4">4 — Objects > 1mm (wires)</option>
-              <option value="5">5 — Dust-protected</option>
-              <option value="6">6 — Dust-tight</option>
+              <option value="0">0 Ã¢â‚¬â€ No protection</option>
+              <option value="1">1 Ã¢â‚¬â€ Objects > 50mm</option>
+              <option value="2">2 Ã¢â‚¬â€ Objects > 12.5mm (fingers)</option>
+              <option value="3">3 Ã¢â‚¬â€ Objects > 2.5mm (tools)</option>
+              <option value="4">4 Ã¢â‚¬â€ Objects > 1mm (wires)</option>
+              <option value="5">5 Ã¢â‚¬â€ Dust-protected</option>
+              <option value="6">6 Ã¢â‚¬â€ Dust-tight</option>
             </select>
             <select id="ipSecond" onchange="decodeIP()" style="flex:1;">
-              <option value="0">0 — No protection</option>
-              <option value="1">1 — Dripping water (vertical)</option>
-              <option value="2">2 — Dripping water (15° tilt)</option>
-              <option value="3">3 — Spraying water (60°)</option>
-              <option value="4">4 — Splashing water (all directions)</option>
-              <option value="5">5 — Water jets (6.3mm nozzle)</option>
-              <option value="6">6 — Powerful water jets (12.5mm)</option>
-              <option value="7">7 — Temporary immersion (1m, 30min)</option>
-              <option value="8">8 — Continuous immersion</option>
-              <option value="9">9 — High-pressure/steam cleaning</option>
+              <option value="0">0 Ã¢â‚¬â€ No protection</option>
+              <option value="1">1 Ã¢â‚¬â€ Dripping water (vertical)</option>
+              <option value="2">2 Ã¢â‚¬â€ Dripping water (15Ã‚Â° tilt)</option>
+              <option value="3">3 Ã¢â‚¬â€ Spraying water (60Ã‚Â°)</option>
+              <option value="4">4 Ã¢â‚¬â€ Splashing water (all directions)</option>
+              <option value="5">5 Ã¢â‚¬â€ Water jets (6.3mm nozzle)</option>
+              <option value="6">6 Ã¢â‚¬â€ Powerful water jets (12.5mm)</option>
+              <option value="7">7 Ã¢â‚¬â€ Temporary immersion (1m, 30min)</option>
+              <option value="8">8 Ã¢â‚¬â€ Continuous immersion</option>
+              <option value="9">9 Ã¢â‚¬â€ High-pressure/steam cleaning</option>
             </select>
           </div></div>
         <div class="input-group"><label>Decoded Meaning</label><div id="ipDecode" style="padding:12px;background:#f0f4f8;border:1px solid #ddd;min-height:40px;font-size:0.95em;">Select digits above to decode.</div></div>
@@ -128,7 +126,7 @@
     </div>
 
     <div class="calc-section">
-      <h2>IP Rating by Location — Quick Reference</h2>
+      <h2>IP Rating by Location Ã¢â‚¬â€ Quick Reference</h2>
       <input type="text" class="search-input" id="tableSearch" onkeyup="filterTable()" placeholder="Search locations..." />
       <table class="ref-table" id="ipRefTable">
         <thead><tr><th>Location / Application</th><th>Min IP</th><th>Min IK</th><th>Standard / Notes</th></tr></thead>
@@ -143,15 +141,15 @@
           <tr><td>Laundry</td><td>IP44</td><td>IK05</td><td>Splash protection</td></tr>
           <tr><td>Indoor car park (covered)</td><td>IP44</td><td>IK08</td><td>Vehicle impact; hose-down</td></tr>
           <tr><td>Outdoor car park (open)</td><td>IP55</td><td>IK08</td><td>Rain + vehicle impact</td></tr>
-          <tr><td>Outdoor — covered (verandah)</td><td>IP44</td><td>IK07</td><td>Rain splash + wind-driven</td></tr>
-          <tr><td>Outdoor — exposed</td><td>IP55</td><td>IK08</td><td>Direct rain, wind</td></tr>
+          <tr><td>Outdoor Ã¢â‚¬â€ covered (verandah)</td><td>IP44</td><td>IK07</td><td>Rain splash + wind-driven</td></tr>
+          <tr><td>Outdoor Ã¢â‚¬â€ exposed</td><td>IP55</td><td>IK08</td><td>Direct rain, wind</td></tr>
           <tr><td>Rooftop</td><td>IP55</td><td>IK08</td><td>Exposed; UV-rated enclosure</td></tr>
           <tr><td>Plant room (mechanical)</td><td>IP44</td><td>IK08</td><td>Moisture + maintenance tools</td></tr>
           <tr><td>Basement / below grade</td><td>IP44</td><td>IK07</td><td>Moisture; possible flooding</td></tr>
           <tr><td>Swimming pool plant room</td><td>IP55</td><td>IK08</td><td>Chemical environment; hose-down</td></tr>
           <tr><td>Pool area (within 2m of pool)</td><td>IP55</td><td>IK08</td><td>AS/NZS 3000 <a href="as3000viewer.html#cl-6.5">Section 6.5</a></td></tr>
-          <tr><td>Industrial — general</td><td>IP44</td><td>IK08</td><td>Dust + splash</td></tr>
-          <tr><td>Industrial — dusty</td><td>IP55</td><td>IK09</td><td>Significant airborne particles</td></tr>
+          <tr><td>Industrial Ã¢â‚¬â€ general</td><td>IP44</td><td>IK08</td><td>Dust + splash</td></tr>
+          <tr><td>Industrial Ã¢â‚¬â€ dusty</td><td>IP55</td><td>IK09</td><td>Significant airborne particles</td></tr>
           <tr><td>Food processing</td><td>IP66</td><td>IK09</td><td>Hose-down cleaning</td></tr>
           <tr><td>Marine / coastal (< 1km)</td><td>IP56</td><td>IK08</td><td>Salt spray corrosion; SS fixings</td></tr>
           <tr><td>Hazardous area (Zone 1)</td><td>IP65+</td><td>IK08+</td><td>AS/NZS 60079 series; Ex rated</td></tr>
@@ -168,13 +166,13 @@
       <table class="ref-table">
         <thead><tr><th>IK Code</th><th>Impact Energy (Joules)</th><th>Equivalent</th><th>Typical Application</th></tr></thead>
         <tbody>
-          <tr><td>IK00</td><td>No protection</td><td>—</td><td>Protected enclosures only</td></tr>
-          <tr><td>IK01</td><td>0.15 J</td><td>—</td><td>—</td></tr>
-          <tr><td>IK02</td><td>0.2 J</td><td>—</td><td>Domestic light fittings</td></tr>
-          <tr><td>IK03</td><td>0.35 J</td><td>—</td><td>—</td></tr>
-          <tr><td>IK04</td><td>0.5 J</td><td>—</td><td>—</td></tr>
-          <tr><td>IK05</td><td>0.7 J</td><td>—</td><td>Indoor office equipment</td></tr>
-          <tr><td>IK06</td><td>1 J</td><td>—</td><td>Commercial indoor</td></tr>
+          <tr><td>IK00</td><td>No protection</td><td>Ã¢â‚¬â€</td><td>Protected enclosures only</td></tr>
+          <tr><td>IK01</td><td>0.15 J</td><td>Ã¢â‚¬â€</td><td>Ã¢â‚¬â€</td></tr>
+          <tr><td>IK02</td><td>0.2 J</td><td>Ã¢â‚¬â€</td><td>Domestic light fittings</td></tr>
+          <tr><td>IK03</td><td>0.35 J</td><td>Ã¢â‚¬â€</td><td>Ã¢â‚¬â€</td></tr>
+          <tr><td>IK04</td><td>0.5 J</td><td>Ã¢â‚¬â€</td><td>Ã¢â‚¬â€</td></tr>
+          <tr><td>IK05</td><td>0.7 J</td><td>Ã¢â‚¬â€</td><td>Indoor office equipment</td></tr>
+          <tr><td>IK06</td><td>1 J</td><td>Ã¢â‚¬â€</td><td>Commercial indoor</td></tr>
           <tr><td>IK07</td><td>2 J</td><td>500g from 40cm</td><td>Corridors, circulation</td></tr>
           <tr><td>IK08</td><td>5 J</td><td>1.7kg from 30cm</td><td>Car parks, plant rooms</td></tr>
           <tr><td>IK09</td><td>10 J</td><td>5kg from 20cm</td><td>Industrial, construction</td></tr>
@@ -199,7 +197,7 @@
       'industrial': { ip: 'IP44', ik: 'IK08', notes: 'Dust and splash from processes. Increase to IP55 for dusty environments.' },
       'food': { ip: 'IP66', ik: 'IK09', notes: 'Hose-down cleaning mandatory. Stainless steel enclosures preferred.' },
       'marine': { ip: 'IP56', ik: 'IK08', notes: 'Salt spray corrosion. All fixings 316 stainless steel. Marine-grade paint/enclosures.' },
-      'hazardous': { ip: 'IP65+', ik: 'IK08+', notes: 'Hazardous area — MUST comply with AS/NZS 60079 series. Ex-rated equipment only. Consult hazardous area classification.' }
+      'hazardous': { ip: 'IP65+', ik: 'IK08+', notes: 'Hazardous area Ã¢â‚¬â€ MUST comply with AS/NZS 60079 series. Ex-rated equipment only. Consult hazardous area classification.' }
     };
 
     function recommend() {

@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Lux Levels Reference - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -26,11 +25,10 @@
     .badge-ncc { background: #e8f5e9; color: #2e7d32; }
     .count-label { font-size: 0.9em; color: #888; margin-bottom: 8px; }
     @media (max-width: 768px) { .input-row { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .search-box, .topleft-icon { display: none !important; } }
+    @media print { .top-tabs, .search-box { display: none !important; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a>
     <a class="tab" href="switchboard.html">Switchboard Sizer</a>
@@ -62,7 +60,7 @@
     <p>Maintained illuminance (lux) requirements by space type per <strong>AS/NZS 1680.1</strong>, <strong>AS/NZS 1680.2</strong> series, and <strong>NCC Section J6</strong>. Use the search to filter.</p>
 
     <div class="calc-section">
-      <input type="text" class="search-box" id="searchBox" placeholder="Search by space type, building, or task (e.g. 'office', 'hospital', 'corridor')…" oninput="filterTable()" />
+      <input type="text" class="search-box" id="searchBox" placeholder="Search by space type, building, or task (e.g. 'office', 'hospital', 'corridor')Ã¢â‚¬Â¦" oninput="filterTable()" />
       <div class="input-row">
         <div class="input-group">
           <label for="filterCat">Filter by Category</label>
@@ -105,84 +103,84 @@
     const luxData = [
       // Office
       ['Office','General office work','320','19','AS/NZS 1680.2.2 Table 3.2','Desks, open plan'],
-      ['Office','Detailed drafting / CAD','400–500','16','AS/NZS 1680.2.2 Table 3.2','Task lighting may supplement'],
+      ['Office','Detailed drafting / CAD','400Ã¢â‚¬â€œ500','16','AS/NZS 1680.2.2 Table 3.2','Task lighting may supplement'],
       ['Office','Executive office','320','19','AS/NZS 1680.2.2',''],
-      ['Office','Meeting / conference room','240–320','19','AS/NZS 1680.2.2','Dimmable recommended'],
-      ['Office','Reception / lobby','160–240','22','AS/NZS 1680.1 Table 3.1',''],
+      ['Office','Meeting / conference room','240Ã¢â‚¬â€œ320','19','AS/NZS 1680.2.2','Dimmable recommended'],
+      ['Office','Reception / lobby','160Ã¢â‚¬â€œ240','22','AS/NZS 1680.1 Table 3.1',''],
       ['Office','Filing / storage room','160','22','AS/NZS 1680.2.2',''],
       ['Office','Server room','200','22','AS/NZS 1680.2.2','Avoid glare on screens'],
 
       // Retail
-      ['Retail','General sales area','320–500','22','AS/NZS 1680.2.2','Higher for fashion/jewellery'],
+      ['Retail','General sales area','320Ã¢â‚¬â€œ500','22','AS/NZS 1680.2.2','Higher for fashion/jewellery'],
       ['Retail','Supermarket','500','19','AS/NZS 1680.2.2','Vertical illuminance important'],
       ['Retail','Checkout / POS','500','19','AS/NZS 1680.2.2','Task lighting'],
-      ['Retail','Shopping mall circulation','160–240','22','AS/NZS 1680.1',''],
+      ['Retail','Shopping mall circulation','160Ã¢â‚¬â€œ240','22','AS/NZS 1680.1',''],
       ['Retail','Stockroom','160','25','AS/NZS 1680.2.2',''],
 
       // Industrial
       ['Industrial','General manufacturing','320','22','AS/NZS 1680.2.4',''],
-      ['Industrial','Fine assembly / inspection','500–750','16','AS/NZS 1680.2.4 Table 4','Task lighting essential'],
-      ['Industrial','Warehouse — general','160','25','AS/NZS 1680.2.4',''],
-      ['Industrial','Warehouse — picking areas','240','22','AS/NZS 1680.2.4','Vertical illuminance on racking'],
-      ['Industrial','Loading dock','100–160','25','AS/NZS 1680.2.4',''],
-      ['Industrial','Workshop — general','240–320','22','AS/NZS 1680.2.4',''],
-      ['Industrial','Laboratory','400–500','16','AS/NZS 1680.2.4','Colour rendering Ra ≥90'],
-      ['Industrial','Control room','200–300','16','AS/NZS 1680.2.4','Low glare critical for screen viewing'],
+      ['Industrial','Fine assembly / inspection','500Ã¢â‚¬â€œ750','16','AS/NZS 1680.2.4 Table 4','Task lighting essential'],
+      ['Industrial','Warehouse Ã¢â‚¬â€ general','160','25','AS/NZS 1680.2.4',''],
+      ['Industrial','Warehouse Ã¢â‚¬â€ picking areas','240','22','AS/NZS 1680.2.4','Vertical illuminance on racking'],
+      ['Industrial','Loading dock','100Ã¢â‚¬â€œ160','25','AS/NZS 1680.2.4',''],
+      ['Industrial','Workshop Ã¢â‚¬â€ general','240Ã¢â‚¬â€œ320','22','AS/NZS 1680.2.4',''],
+      ['Industrial','Laboratory','400Ã¢â‚¬â€œ500','16','AS/NZS 1680.2.4','Colour rendering Ra Ã¢â€°Â¥90'],
+      ['Industrial','Control room','200Ã¢â‚¬â€œ300','16','AS/NZS 1680.2.4','Low glare critical for screen viewing'],
 
       // Healthcare
-      ['Healthcare','Hospital ward — general','100–200','19','AS/NZS 1680.2.5','Bedhead reading: 300 lux'],
-      ['Healthcare','Examination room','500','16','AS/NZS 1680.2.5','Colour rendering Ra ≥90'],
-      ['Healthcare','Operating theatre','1000–2000','—','AS/NZS 1680.2.5','Luminaire CRI ≥90; task typically 10,000+ lux'],
+      ['Healthcare','Hospital ward Ã¢â‚¬â€ general','100Ã¢â‚¬â€œ200','19','AS/NZS 1680.2.5','Bedhead reading: 300 lux'],
+      ['Healthcare','Examination room','500','16','AS/NZS 1680.2.5','Colour rendering Ra Ã¢â€°Â¥90'],
+      ['Healthcare','Operating theatre','1000Ã¢â‚¬â€œ2000','Ã¢â‚¬â€','AS/NZS 1680.2.5','Luminaire CRI Ã¢â€°Â¥90; task typically 10,000+ lux'],
       ['Healthcare','Nurses station','320','19','AS/NZS 1680.2.5',''],
-      ['Healthcare','Pharmacy / dispensary','500','16','AS/NZS 1680.2.5','Ra ≥90'],
+      ['Healthcare','Pharmacy / dispensary','500','16','AS/NZS 1680.2.5','Ra Ã¢â€°Â¥90'],
       ['Healthcare','Waiting room','200','22','AS/NZS 1680.2.5',''],
       ['Healthcare','Pathology / lab','500','16','AS/NZS 1680.2.5',''],
-      ['Healthcare','Aged care — common area','200–300','19','AS/NZS 1680.2.5','Higher levels for elderly eyes'],
+      ['Healthcare','Aged care Ã¢â‚¬â€ common area','200Ã¢â‚¬â€œ300','19','AS/NZS 1680.2.5','Higher levels for elderly eyes'],
 
       // Education
-      ['Education','Classroom — general','320','19','AS/NZS 1680.2.1 Table 2',''],
+      ['Education','Classroom Ã¢â‚¬â€ general','320','19','AS/NZS 1680.2.1 Table 2',''],
       ['Education','Lecture theatre','320','19','AS/NZS 1680.2.1','Dimmable for AV presentations'],
-      ['Education','Art room / workshop','400–500','16','AS/NZS 1680.2.1','Ra ≥90'],
-      ['Education','Library — reading area','320','19','AS/NZS 1680.2.1',''],
-      ['Education','Library — stack area','160–200','22','AS/NZS 1680.2.1','Vertical illuminance on spines'],
+      ['Education','Art room / workshop','400Ã¢â‚¬â€œ500','16','AS/NZS 1680.2.1','Ra Ã¢â€°Â¥90'],
+      ['Education','Library Ã¢â‚¬â€ reading area','320','19','AS/NZS 1680.2.1',''],
+      ['Education','Library Ã¢â‚¬â€ stack area','160Ã¢â‚¬â€œ200','22','AS/NZS 1680.2.1','Vertical illuminance on spines'],
       ['Education','Administration office','320','19','AS/NZS 1680.2.2',''],
       ['Education','Assembly hall','200','22','AS/NZS 1680.2.1','Dimmable for events'],
-      ['Education','Sports hall','300–500','22','AS 2560 series','Depends on sport/competition level'],
+      ['Education','Sports hall','300Ã¢â‚¬â€œ500','22','AS 2560 series','Depends on sport/competition level'],
 
       // Circulation
-      ['Circulation','Corridor / passageway','80–160','25','AS/NZS 1680.1 Table 3.1','80 lux minimum; 160 for high traffic'],
-      ['Circulation','Stairway','80–160','25','AS/NZS 1680.1','Emergency lighting overlap'],
-      ['Circulation','Lift lobby','160–200','22','AS/NZS 1680.1',''],
+      ['Circulation','Corridor / passageway','80Ã¢â‚¬â€œ160','25','AS/NZS 1680.1 Table 3.1','80 lux minimum; 160 for high traffic'],
+      ['Circulation','Stairway','80Ã¢â‚¬â€œ160','25','AS/NZS 1680.1','Emergency lighting overlap'],
+      ['Circulation','Lift lobby','160Ã¢â‚¬â€œ200','22','AS/NZS 1680.1',''],
       ['Circulation','Toilet / amenities','160','22','AS/NZS 1680.1','Mirror task: 240 lux'],
       ['Circulation','Kitchen (commercial)','500','19','AS/NZS 1680.2.2','Wet-rated luminaires'],
-      ['Circulation','Plant room','100–160','—','AS/NZS 1680.1','Locate at eye level near switchgear'],
+      ['Circulation','Plant room','100Ã¢â‚¬â€œ160','Ã¢â‚¬â€','AS/NZS 1680.1','Locate at eye level near switchgear'],
 
       // Car Park
-      ['Car Park','Covered car park — day','80','—','AS/NZS 1680.2.1, AS 1158.3.1','Check transition zone (ramp entry)'],
-      ['Car Park','Covered car park — night','40','—','AS/NZS 1680.2.1',''],
-      ['Car Park','Entry / exit ramp','200–300','—','AS 1158.3.1','Transition lighting critical'],
-      ['Car Park','Open-air car park','20–40','—','AS/NZS 1158.3.1','Pole-mounted'],
+      ['Car Park','Covered car park Ã¢â‚¬â€ day','80','Ã¢â‚¬â€','AS/NZS 1680.2.1, AS 1158.3.1','Check transition zone (ramp entry)'],
+      ['Car Park','Covered car park Ã¢â‚¬â€ night','40','Ã¢â‚¬â€','AS/NZS 1680.2.1',''],
+      ['Car Park','Entry / exit ramp','200Ã¢â‚¬â€œ300','Ã¢â‚¬â€','AS 1158.3.1','Transition lighting critical'],
+      ['Car Park','Open-air car park','20Ã¢â‚¬â€œ40','Ã¢â‚¬â€','AS/NZS 1158.3.1','Pole-mounted'],
 
       // Residential
-      ['Residential','Living room','160–300','22','AS/NZS 1680.1','Flexible / dimmable'],
-      ['Residential','Kitchen','240–320','22','AS/NZS 1680.1','Task: 500 lux on benchtop'],
-      ['Residential','Bedroom','100–200','22','AS/NZS 1680.1','Reading task: 300 lux'],
-      ['Residential','Bathroom','160–240','22','AS/NZS 1680.1','Mirror task: 300 lux'],
-      ['Residential','Garage','100','—','AS/NZS 1680.1',''],
+      ['Residential','Living room','160Ã¢â‚¬â€œ300','22','AS/NZS 1680.1','Flexible / dimmable'],
+      ['Residential','Kitchen','240Ã¢â‚¬â€œ320','22','AS/NZS 1680.1','Task: 500 lux on benchtop'],
+      ['Residential','Bedroom','100Ã¢â‚¬â€œ200','22','AS/NZS 1680.1','Reading task: 300 lux'],
+      ['Residential','Bathroom','160Ã¢â‚¬â€œ240','22','AS/NZS 1680.1','Mirror task: 300 lux'],
+      ['Residential','Garage','100','Ã¢â‚¬â€','AS/NZS 1680.1',''],
 
       // Outdoor
-      ['Outdoor','Building entrance','100–200','—','AS/NZS 1158','Security + wayfinding'],
-      ['Outdoor','Pedestrian pathways','20–50','—','AS/NZS 1158.3.1',''],
-      ['Outdoor','Security lighting','20–50','—','AS/NZS 1158','Spill light limits per AS 4282'],
-      ['Outdoor','Sports — training','200–300','—','AS 2560 series',''],
-      ['Outdoor','Sports — competition','500+','—','AS 2560 series','TV broadcast: 1000+ lux'],
+      ['Outdoor','Building entrance','100Ã¢â‚¬â€œ200','Ã¢â‚¬â€','AS/NZS 1158','Security + wayfinding'],
+      ['Outdoor','Pedestrian pathways','20Ã¢â‚¬â€œ50','Ã¢â‚¬â€','AS/NZS 1158.3.1',''],
+      ['Outdoor','Security lighting','20Ã¢â‚¬â€œ50','Ã¢â‚¬â€','AS/NZS 1158','Spill light limits per AS 4282'],
+      ['Outdoor','Sports Ã¢â‚¬â€ training','200Ã¢â‚¬â€œ300','Ã¢â‚¬â€','AS 2560 series',''],
+      ['Outdoor','Sports Ã¢â‚¬â€ competition','500+','Ã¢â‚¬â€','AS 2560 series','TV broadcast: 1000+ lux'],
 
       // Hospitality
-      ['Hospitality','Hotel room','100–200','22','AS/NZS 1680.1','Bedside task: 300; dimmable'],
-      ['Hospitality','Hotel lobby','200–300','22','AS/NZS 1680.1','Feature lighting important'],
-      ['Hospitality','Restaurant — fine dining','100–200','19','AS/NZS 1680.1','Candle-lit ambiance; warm CCT'],
-      ['Hospitality','Restaurant — fast food','300–500','22','AS/NZS 1680.1',''],
-      ['Hospitality','Function room','200–300','19','AS/NZS 1680.1','Dimmable essential'],
+      ['Hospitality','Hotel room','100Ã¢â‚¬â€œ200','22','AS/NZS 1680.1','Bedside task: 300; dimmable'],
+      ['Hospitality','Hotel lobby','200Ã¢â‚¬â€œ300','22','AS/NZS 1680.1','Feature lighting important'],
+      ['Hospitality','Restaurant Ã¢â‚¬â€ fine dining','100Ã¢â‚¬â€œ200','19','AS/NZS 1680.1','Candle-lit ambiance; warm CCT'],
+      ['Hospitality','Restaurant Ã¢â‚¬â€ fast food','300Ã¢â‚¬â€œ500','22','AS/NZS 1680.1',''],
+      ['Hospitality','Function room','200Ã¢â‚¬â€œ300','19','AS/NZS 1680.1','Dimmable essential'],
     ];
 
     function buildTable(data) {

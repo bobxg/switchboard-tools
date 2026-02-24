@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>RCD Selector - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -37,11 +36,10 @@
     .tag-recommended { background: #ff9800; color: #fff; }
     .tag-optional { background: #1976d2; color: #fff; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    @media print { .top-tabs, .calc-button { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -62,8 +60,8 @@
           <select id="circuitType">
             <option value="gpo">General Power Outlets (GPOs)</option>
             <option value="lighting">Lighting Circuits</option>
-            <option value="socket_outdoor">Socket outlets — outdoor / wet area</option>
-            <option value="socket_indoor">Socket outlets — indoor general</option>
+            <option value="socket_outdoor">Socket outlets Ã¢â‚¬â€ outdoor / wet area</option>
+            <option value="socket_indoor">Socket outlets Ã¢â‚¬â€ indoor general</option>
             <option value="fixed_appliance">Fixed appliance (oven, cooktop, etc.)</option>
             <option value="hot_water">Electric hot water (resistive)</option>
             <option value="aircon">Air conditioning / heat pump</option>
@@ -102,26 +100,26 @@
     <div class="calc-section">
       <h2>AS/NZS 3000:2018 RCD Requirements Quick Reference</h2>
       <table class="ref-table">
-        <thead><tr><th>Application</th><th>RCD Required?</th><th>Max IΔn (mA)</th><th>AS/NZS 3000 Clause</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Application</th><th>RCD Required?</th><th>Max IÃŽâ€n (mA)</th><th>AS/NZS 3000 Clause</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>All socket outlets ≤ 20 A (residential)</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All final subcircuits in domestic installations</td></tr>
-          <tr><td>All socket outlets ≤ 20 A (commercial)</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All GPO circuits ≤ 20A</td></tr>
-          <tr><td>Lighting final subcircuits (residential)</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.3" class="clause">2.6.3.3</a></td><td>All lighting circuits in domestic</td></tr>
+          <tr><td>All socket outlets Ã¢â€°Â¤ 20 A (residential)</td><td><strong>YES Ã¢â‚¬â€ Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All final subcircuits in domestic installations</td></tr>
+          <tr><td>All socket outlets Ã¢â€°Â¤ 20 A (commercial)</td><td><strong>YES Ã¢â‚¬â€ Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All GPO circuits Ã¢â€°Â¤ 20A</td></tr>
+          <tr><td>Lighting final subcircuits (residential)</td><td><strong>YES Ã¢â‚¬â€ Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.3" class="clause">2.6.3.3</a></td><td>All lighting circuits in domestic</td></tr>
           <tr><td>Socket outlets > 20 A</td><td>No (unless wet area)</td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>Recommended for additional protection</td></tr>
-          <tr><td>Outdoor / exposed circuits</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>Any circuit supplying outdoor equipment</td></tr>
-          <tr><td>Wet areas (bathroom, pool zone)</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.4" class="clause">2.6.3.4</a></td><td>Zone 0-2: mandatory 30 mA</td></tr>
-          <tr><td>Construction sites</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All circuits</td></tr>
-          <tr><td>EV charging (Mode 3)</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a> + AS/NZS 3001</td><td>Type A or B per charger requirements</td></tr>
+          <tr><td>Outdoor / exposed circuits</td><td><strong>YES Ã¢â‚¬â€ Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>Any circuit supplying outdoor equipment</td></tr>
+          <tr><td>Wet areas (bathroom, pool zone)</td><td><strong>YES Ã¢â‚¬â€ Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.4" class="clause">2.6.3.4</a></td><td>Zone 0-2: mandatory 30 mA</td></tr>
+          <tr><td>Construction sites</td><td><strong>YES Ã¢â‚¬â€ Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All circuits</td></tr>
+          <tr><td>EV charging (Mode 3)</td><td><strong>YES Ã¢â‚¬â€ Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a> + AS/NZS 3001</td><td>Type A or B per charger requirements</td></tr>
           <tr><td>VSD/Inverter circuits</td><td>If required by above</td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>Type B/B+ required (DC fault current detection)</td></tr>
-          <tr><td>Medical — Body-protected</td><td><strong>YES — Mandatory</strong></td><td>10</td><td>AS/NZS 3003</td><td>Type A minimum, all patient care areas</td></tr>
-          <tr><td>Fire/Essential services</td><td>Generally exempt</td><td>—</td><td><a href="as3000viewer.html#cl-2.6.3.5" class="clause">2.6.3.5</a></td><td>RCD may cause nuisance trip; dedicated circuits</td></tr>
+          <tr><td>Medical Ã¢â‚¬â€ Body-protected</td><td><strong>YES Ã¢â‚¬â€ Mandatory</strong></td><td>10</td><td>AS/NZS 3003</td><td>Type A minimum, all patient care areas</td></tr>
+          <tr><td>Fire/Essential services</td><td>Generally exempt</td><td>Ã¢â‚¬â€</td><td><a href="as3000viewer.html#cl-2.6.3.5" class="clause">2.6.3.5</a></td><td>RCD may cause nuisance trip; dedicated circuits</td></tr>
         </tbody>
       </table>
       <div class="info-box"><strong>RCD Types per AS/NZS 3190:</strong><br>
         <strong>Type I (AC):</strong> Detects AC residual current only. Being phased out from new installations.<br>
         <strong>Type II (A):</strong> Detects AC and pulsating DC residual current. Standard for most applications.<br>
         <strong>Type III (B/B+):</strong> Detects AC, pulsating DC, and smooth DC. Required for VSD/inverter loads.<br>
-        <strong>IΔn ratings:</strong> 10 mA (medical), 30 mA (personal protection), 100/300 mA (fire protection), 500 mA (equipment protection).</div>
+        <strong>IÃŽâ€n ratings:</strong> 10 mA (medical), 30 mA (personal protection), 100/300 mA (fire protection), 500 mA (equipment protection).</div>
     </div>
   </div>
   <script>
@@ -145,7 +143,7 @@
           sensitivity = 30;
           clause = '2.6.3.2';
           if (rating > 20 && location !== 'residential') { required = false; priority = 'recommended'; notes.push('Socket outlets > 20 A: RCD recommended but not mandatory unless in wet/outdoor area.'); }
-          else { notes.push('All socket outlet circuits ≤ 20 A require 30 mA RCD protection.'); }
+          else { notes.push('All socket outlet circuits Ã¢â€°Â¤ 20 A require 30 mA RCD protection.'); }
           break;
         case 'socket_outdoor':
           required = true; sensitivity = 30; clause = '2.6.3.2';
@@ -197,7 +195,7 @@
           rcdType = 'Type III (B) or Type II (A) per inverter manufacturer';
           clause = 'AS/NZS 5033 + 4777.1';
           required = true; sensitivity = 30;
-          notes.push('Solar inverters may produce DC fault currents. Check inverter datasheet — many have internal RCM (residual current monitoring) allowing Type A external RCD.');
+          notes.push('Solar inverters may produce DC fault currents. Check inverter datasheet Ã¢â‚¬â€ many have internal RCM (residual current monitoring) allowing Type A external RCD.');
           break;
       }
 
@@ -221,7 +219,7 @@
         <div class="result-grid">
           <div class="result-item"><div class="result-label">RCD Required?</div><div class="result-value">${required ? 'YES' : (priority==='recommended' ? 'RECOMMENDED' : 'NOT REQUIRED')}</div></div>
           <div class="result-item"><div class="result-label">RCD Type</div><div class="result-value" style="font-size:1.2em;">${sensitivity > 0 ? rcdType : 'N/A'}</div></div>
-          <div class="result-item"><div class="result-label">Sensitivity (IΔn)</div><div class="result-value">${sensitivity > 0 ? sensitivity + ' mA' : 'N/A'}</div></div>
+          <div class="result-item"><div class="result-label">Sensitivity (IÃŽâ€n)</div><div class="result-value">${sensitivity > 0 ? sensitivity + ' mA' : 'N/A'}</div></div>
           <div class="result-item"><div class="result-label">Reference</div><div class="result-value" style="font-size:1.1em;">AS/NZS 3000 ${clause}</div></div>
         </div></div>`;
 
@@ -233,19 +231,19 @@
 
       // Additional guidance
       html += `<div class="calc-section" style="margin-top:16px;"><h2>Selection Guidance</h2>`;
-      html += `<div class="rcd-card"><h4>Type II (A) — Standard</h4>
+      html += `<div class="rcd-card"><h4>Type II (A) Ã¢â‚¬â€ Standard</h4>
         <span class="tag tag-required">Most common</span>
         <p>Detects AC and pulsating DC residual currents. Suitable for resistive loads, standard motors, lighting, GPOs. This is the default selection for most circuits in AS/NZS 3000.</p></div>`;
-      html += `<div class="rcd-card"><h4>Type III (B/B+) — VSD / DC Fault</h4>
+      html += `<div class="rcd-card"><h4>Type III (B/B+) Ã¢â‚¬â€ VSD / DC Fault</h4>
         <span class="tag tag-recommended">Required for VSD/EV/inverter</span>
         <p>Detects smooth DC residual currents in addition to AC and pulsating DC. Required where variable speed drives, EV chargers, or PV inverters could produce DC fault current. Also called Type B per IEC 62423.</p></div>`;
-      html += `<div class="rcd-card"><h4>30 mA — Personal Protection</h4>
+      html += `<div class="rcd-card"><h4>30 mA Ã¢â‚¬â€ Personal Protection</h4>
         <span class="tag tag-required">Standard</span>
-        <p>Primary sensitivity for additional protection against direct contact. Required for socket outlets ≤ 20 A, residential circuits, wet areas, outdoor, construction sites.</p></div>`;
-      html += `<div class="rcd-card"><h4>10 mA — Body-Protected (Medical)</h4>
+        <p>Primary sensitivity for additional protection against direct contact. Required for socket outlets Ã¢â€°Â¤ 20 A, residential circuits, wet areas, outdoor, construction sites.</p></div>`;
+      html += `<div class="rcd-card"><h4>10 mA Ã¢â‚¬â€ Body-Protected (Medical)</h4>
         <span class="tag tag-required">Medical only</span>
         <p>Enhanced sensitivity for patient care areas per AS/NZS 3003. Limits leakage current to safe levels for direct patient contact.</p></div>`;
-      html += `<div class="rcd-card"><h4>100–300 mA — Fire Protection</h4>
+      html += `<div class="rcd-card"><h4>100Ã¢â‚¬â€œ300 mA Ã¢â‚¬â€ Fire Protection</h4>
         <span class="tag tag-optional">Equipment / fire prevention</span>
         <p>Provides fire protection by detecting larger earth leakage that could cause heating. Not suitable for personal protection. Use time-delayed to discriminate with downstream 30 mA RCDs.</p></div>`;
       html += `</div>`;

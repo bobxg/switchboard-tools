@@ -103,7 +103,6 @@
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -147,7 +146,7 @@
 
       <h3>Main Switch Rating Calculation</h3>
       <div class="formula-box">
-Main Switch Rating = Total Connected Load × Diversity Factor × Safety Factor
+Main Switch Rating = Total Connected Load Ã— Diversity Factor Ã— Safety Factor
 
 Where:
 - Total Connected Load = Sum of all circuit breaker ratings
@@ -176,7 +175,7 @@ Where:
 Busbar Current Capacity = Main Switch Rating
 
 Width Selection:
-- ≤125A: 200mm width (standard)
+- â‰¤125A: 200mm width (standard)
 - >125A-250A: 300mm width
 - >250A-400A: 400mm width  
 - >400A-630A: 600mm width
@@ -202,9 +201,9 @@ Width Selection:
 
       <h3>Current Carrying Capacity</h3>
       <div class="formula-box">
-Required Cable Capacity = Design Current / (Installation Factor × Temperature Factor × Grouping Factor)
+Required Cable Capacity = Design Current / (Installation Factor Ã— Temperature Factor Ã— Grouping Factor)
 
-Design Current = Load Current × 1.25  (AS/NZS 3000 requirement for continuous loads)
+Design Current = Load Current Ã— 1.25  (AS/NZS 3000 requirement for continuous loads)
       </div>
 
       <div class="variable-list">
@@ -221,12 +220,12 @@ Design Current = Load Current × 1.25  (AS/NZS 3000 requirement for continuous l
           <dt>Temperature Factor (Table 27/28 notes)</dt>
           <dd>Ambient temperature correction:
             <ul>
-              <li>25°C: 1.10</li>
-              <li>30°C: 1.05</li>
-              <li>35°C: 1.00 (base)</li>
-              <li>40°C: 0.94</li>
-              <li>45°C: 0.87</li>
-              <li>50°C: 0.79</li>
+              <li>25Â°C: 1.10</li>
+              <li>30Â°C: 1.05</li>
+              <li>35Â°C: 1.00 (base)</li>
+              <li>40Â°C: 0.94</li>
+              <li>45Â°C: 0.87</li>
+              <li>50Â°C: 0.79</li>
             </ul>
           </dd>
           
@@ -245,9 +244,9 @@ Design Current = Load Current × 1.25  (AS/NZS 3000 requirement for continuous l
 
       <h3>Voltage Drop Calculation</h3>
       <div class="formula-box">
-Voltage Drop (V) = (mV/A/m) × Current × Length / 1000
+Voltage Drop (V) = (mV/A/m) Ã— Current Ã— Length / 1000
 
-Voltage Drop (%) = (Voltage Drop / Supply Voltage) × 100
+Voltage Drop (%) = (Voltage Drop / Supply Voltage) Ã— 100
 
 AS/NZS 3000 Limits:
 - Final sub-circuits: 5% maximum
@@ -260,7 +259,7 @@ AS/NZS 3000 Limits:
           <dt>mV/A/m (millivolts per Amp per meter)</dt>
           <dd>From AS/NZS 3000 Table C8. Values depend on:
             <ul>
-              <li>Cable size (mm²)</li>
+              <li>Cable size (mmÂ²)</li>
               <li>Cable material (Copper or Aluminium)</li>
               <li>System type (Single-phase or Three-phase)</li>
               <li>Power factor (typically 0.8-1.0)</li>
@@ -285,12 +284,12 @@ AS/NZS 3000 Limits:
       </ol>
 
       <div class="example-box">
-        <strong>Example:</strong> 32A load, 50m run, 3-phase, 40°C ambient, 3 circuits in conduit<br><br>
+        <strong>Example:</strong> 32A load, 50m run, 3-phase, 40Â°C ambient, 3 circuits in conduit<br><br>
         
-        Derated requirement = 32A / (1.0 × 0.94 × 0.70) = 48.6A<br>
-        Selected: 10mm² copper (52A capacity from Table 27)<br>
-        Voltage drop = 3.8 mV/A/m × 32A × 50m / 1000 = 6.08V<br>
-        VD% = 6.08V / 400V × 100 = 1.52% ✓ Compliant
+        Derated requirement = 32A / (1.0 Ã— 0.94 Ã— 0.70) = 48.6A<br>
+        Selected: 10mmÂ² copper (52A capacity from Table 27)<br>
+        Voltage drop = 3.8 mV/A/m Ã— 32A Ã— 50m / 1000 = 6.08V<br>
+        VD% = 6.08V / 400V Ã— 100 = 1.52% âœ“ Compliant
       </div>
     </div>
 
@@ -308,7 +307,7 @@ AS/NZS 3000 Limits:
 
       <h3>Single-Phase Voltage Drop</h3>
       <div class="formula-box">
-VD (V) = 2 × I × L × R / 1000
+VD (V) = 2 Ã— I Ã— L Ã— R / 1000
 
 Where:
 - VD = Voltage drop (volts)
@@ -320,25 +319,25 @@ Where:
 
       <h3>Three-Phase Voltage Drop</h3>
       <div class="formula-box">
-VD (V) = √3 × I × L × R / 1000
+VD (V) = âˆš3 Ã— I Ã— L Ã— R / 1000
 
 Where:
-- √3 ≈ 1.732 (accounts for three-phase geometry)
+- âˆš3 â‰ˆ 1.732 (accounts for three-phase geometry)
 - Other variables same as single-phase
       </div>
 
       <div class="variable-list">
         <dl>
           <dt>Resistance Values (R) - AS/NZS 3000 Table C8</dt>
-          <dd>Values in mV/A/m for copper cables at 75°C, PF=0.8:
+          <dd>Values in mV/A/m for copper cables at 75Â°C, PF=0.8:
             <ul>
-              <li>1.5mm²: 25 mV/A/m (1-phase), 22 mV/A/m (3-phase)</li>
-              <li>2.5mm²: 15 mV/A/m (1-phase), 13 mV/A/m (3-phase)</li>
-              <li>4mm²: 9.5 mV/A/m (1-phase), 8.2 mV/A/m (3-phase)</li>
-              <li>6mm²: 6.4 mV/A/m (1-phase), 5.5 mV/A/m (3-phase)</li>
-              <li>10mm²: 3.8 mV/A/m (1-phase), 3.3 mV/A/m (3-phase)</li>
-              <li>16mm²: 2.4 mV/A/m (1-phase), 2.1 mV/A/m (3-phase)</li>
-              <li>25mm²: 1.5 mV/A/m (1-phase), 1.3 mV/A/m (3-phase)</li>
+              <li>1.5mmÂ²: 25 mV/A/m (1-phase), 22 mV/A/m (3-phase)</li>
+              <li>2.5mmÂ²: 15 mV/A/m (1-phase), 13 mV/A/m (3-phase)</li>
+              <li>4mmÂ²: 9.5 mV/A/m (1-phase), 8.2 mV/A/m (3-phase)</li>
+              <li>6mmÂ²: 6.4 mV/A/m (1-phase), 5.5 mV/A/m (3-phase)</li>
+              <li>10mmÂ²: 3.8 mV/A/m (1-phase), 3.3 mV/A/m (3-phase)</li>
+              <li>16mmÂ²: 2.4 mV/A/m (1-phase), 2.1 mV/A/m (3-phase)</li>
+              <li>25mmÂ²: 1.5 mV/A/m (1-phase), 1.3 mV/A/m (3-phase)</li>
             </ul>
           </dd>
           
@@ -382,22 +381,22 @@ AS/NZS 3000 Limits:
           <dt>Cable Cross-Sectional Area</dt>
           <dd>Overall diameter including insulation and sheath:
             <ul>
-              <li>1.5mm² TPS: ~6.5mm diameter → 33.2mm² CSA</li>
-              <li>2.5mm² TPS: ~7.5mm diameter → 44.2mm² CSA</li>
-              <li>4mm² TPS: ~8.5mm diameter → 56.7mm² CSA</li>
-              <li>6mm² TPS: ~10mm diameter → 78.5mm² CSA</li>
-              <li>Single core PVC: Calculate from (conductor + 2×insulation thickness)²×π/4</li>
+              <li>1.5mmÂ² TPS: ~6.5mm diameter â†’ 33.2mmÂ² CSA</li>
+              <li>2.5mmÂ² TPS: ~7.5mm diameter â†’ 44.2mmÂ² CSA</li>
+              <li>4mmÂ² TPS: ~8.5mm diameter â†’ 56.7mmÂ² CSA</li>
+              <li>6mmÂ² TPS: ~10mm diameter â†’ 78.5mmÂ² CSA</li>
+              <li>Single core PVC: Calculate from (conductor + 2Ã—insulation thickness)Â²Ã—Ï€/4</li>
             </ul>
           </dd>
           
           <dt>Conduit Internal Area</dt>
           <dd>Based on nominal bore size (internal diameter):
             <ul>
-              <li>20mm: 314mm² internal area</li>
-              <li>25mm: 491mm² internal area</li>
-              <li>32mm: 804mm² internal area</li>
-              <li>40mm: 1257mm² internal area</li>
-              <li>50mm: 1963mm² internal area</li>
+              <li>20mm: 314mmÂ² internal area</li>
+              <li>25mm: 491mmÂ² internal area</li>
+              <li>32mm: 804mmÂ² internal area</li>
+              <li>40mm: 1257mmÂ² internal area</li>
+              <li>50mm: 1963mmÂ² internal area</li>
             </ul>
           </dd>
         </dl>
@@ -408,16 +407,16 @@ AS/NZS 3000 Limits:
         <li>Count total number of cables to be installed</li>
         <li>Determine fill limit (31% for 1-2 cables, 40% for 3+ cables)</li>
         <li>Calculate total cable CSA (sum of all individual cable CSAs)</li>
-        <li>Select smallest conduit where: Internal Area × Fill Limit ≥ Total Cable CSA</li>
+        <li>Select smallest conduit where: Internal Area Ã— Fill Limit â‰¥ Total Cable CSA</li>
       </ol>
 
       <div class="example-box">
-        <strong>Example:</strong> 5 × 2.5mm² TPS cables (44.2mm² each)<br><br>
+        <strong>Example:</strong> 5 Ã— 2.5mmÂ² TPS cables (44.2mmÂ² each)<br><br>
         
-        Total cable CSA = 5 × 44.2mm² = 221mm²<br>
+        Total cable CSA = 5 Ã— 44.2mmÂ² = 221mmÂ²<br>
         Fill limit = 40% (more than 2 cables)<br>
-        Required conduit area = 221mm² / 0.40 = 552.5mm²<br>
-        Selected: 32mm conduit (804mm² internal area) ✓
+        Required conduit area = 221mmÂ² / 0.40 = 552.5mmÂ²<br>
+        Selected: 32mm conduit (804mmÂ² internal area) âœ“
       </div>
     </div>
 
@@ -429,15 +428,15 @@ AS/NZS 3000 Limits:
         <strong>References:</strong>
         <ul>
           <li>Manufacturer specifications and datasheets</li>
-          <li>Material density calculations (Copper: 8.96 g/cm³, PVC: 1.4 g/cm³)</li>
+          <li>Material density calculations (Copper: 8.96 g/cmÂ³, PVC: 1.4 g/cmÂ³)</li>
         </ul>
       </div>
 
       <h3>Weight Calculation Method</h3>
       <div class="formula-box">
-Cable Weight (kg/m) = (Conductor Weight + Insulation Weight + Sheath Weight) × Number of Cores
+Cable Weight (kg/m) = (Conductor Weight + Insulation Weight + Sheath Weight) Ã— Number of Cores
 
-Conductor Weight = CSA (mm²) × Length (m) × Copper Density (8.96 g/cm³) / 1000
+Conductor Weight = CSA (mmÂ²) Ã— Length (m) Ã— Copper Density (8.96 g/cmÂ³) / 1000
 
 Where CSA is the copper conductor cross-sectional area
       </div>
@@ -448,24 +447,24 @@ Where CSA is the copper conductor cross-sectional area
           <dt>Single Core PVC 0.6/1kV Copper</dt>
           <dd>
             <ul>
-              <li>1.5mm²: 0.028 kg/m</li>
-              <li>2.5mm²: 0.041 kg/m</li>
-              <li>4mm²: 0.059 kg/m</li>
-              <li>6mm²: 0.082 kg/m</li>
-              <li>10mm²: 0.133 kg/m</li>
-              <li>16mm²: 0.206 kg/m</li>
-              <li>25mm²: 0.318 kg/m</li>
-              <li>35mm²: 0.437 kg/m</li>
+              <li>1.5mmÂ²: 0.028 kg/m</li>
+              <li>2.5mmÂ²: 0.041 kg/m</li>
+              <li>4mmÂ²: 0.059 kg/m</li>
+              <li>6mmÂ²: 0.082 kg/m</li>
+              <li>10mmÂ²: 0.133 kg/m</li>
+              <li>16mmÂ²: 0.206 kg/m</li>
+              <li>25mmÂ²: 0.318 kg/m</li>
+              <li>35mmÂ²: 0.437 kg/m</li>
             </ul>
           </dd>
 
           <dt>TPS (Twin & Earth) Copper</dt>
           <dd>
             <ul>
-              <li>1.5mm² TPS: 0.11 kg/m (2×1.5mm² + 1mm² earth)</li>
-              <li>2.5mm² TPS: 0.17 kg/m (2×2.5mm² + 1.5mm² earth)</li>
-              <li>4mm² TPS: 0.26 kg/m (2×4mm² + 2.5mm² earth)</li>
-              <li>6mm² TPS: 0.37 kg/m (2×6mm² + 2.5mm² earth)</li>
+              <li>1.5mmÂ² TPS: 0.11 kg/m (2Ã—1.5mmÂ² + 1mmÂ² earth)</li>
+              <li>2.5mmÂ² TPS: 0.17 kg/m (2Ã—2.5mmÂ² + 1.5mmÂ² earth)</li>
+              <li>4mmÂ² TPS: 0.26 kg/m (2Ã—4mmÂ² + 2.5mmÂ² earth)</li>
+              <li>6mmÂ² TPS: 0.37 kg/m (2Ã—6mmÂ² + 2.5mmÂ² earth)</li>
             </ul>
           </dd>
         </dl>
@@ -473,10 +472,10 @@ Where CSA is the copper conductor cross-sectional area
 
       <h3>Cable Drum Load Calculation</h3>
       <div class="formula-box">
-Total Weight = Cable Weight per Meter × Drum Length + Drum Weight
+Total Weight = Cable Weight per Meter Ã— Drum Length + Drum Weight
 
 Typical drum weights:
-- Small drums (≤200m): 5-10 kg
+- Small drums (â‰¤200m): 5-10 kg
 - Medium drums (200-500m): 10-20 kg
 - Large drums (500-1000m): 20-40 kg
       </div>
@@ -496,7 +495,7 @@ Typical drum weights:
 
       <h3>Minimum Room Dimensions</h3>
       <div class="formula-box">
-Width = Equipment Width + 2 × Side Clearance (min 600mm each side)
+Width = Equipment Width + 2 Ã— Side Clearance (min 600mm each side)
 Depth = Equipment Depth + Front Access (min 1000mm) + Rear Clearance (min 600mm)
 Height = Equipment Height + Top Clearance (min 200mm) + Floor Mounting (min 150mm)
       </div>
@@ -543,9 +542,9 @@ Height = Equipment Height + Top Clearance (min 200mm) + Floor Mounting (min 150m
 
       <h3>Ventilation Requirements</h3>
       <div class="formula-box">
-Heat Dissipation (kW) = Switchboard Rating (kVA) × 0.02 to 0.03
+Heat Dissipation (kW) = Switchboard Rating (kVA) Ã— 0.02 to 0.03
 
-Ventilation Area (m²) = Heat Dissipation (kW) / (Air Flow Rate × Temperature Rise)
+Ventilation Area (mÂ²) = Heat Dissipation (kW) / (Air Flow Rate Ã— Temperature Rise)
 
 Typical values:
 - Natural ventilation: 0.5-1 m/s air flow
@@ -556,10 +555,10 @@ Typical values:
       <div class="example-box">
         <strong>Example:</strong> 630A main switch, 800mm wide switchboard<br><br>
         
-        Width = 800mm + 2×600mm = 2000mm (2.0m)<br>
+        Width = 800mm + 2Ã—600mm = 2000mm (2.0m)<br>
         Depth = 400mm (typical) + 1000mm + 600mm = 2000mm (2.0m)<br>
         Height = 2200mm + 200mm = 2400mm minimum ceiling<br>
-        Room size: 2.0m × 2.0m × 2.4m high
+        Room size: 2.0m Ã— 2.0m Ã— 2.4m high
       </div>
     </div>
 
@@ -577,7 +576,7 @@ Typical values:
 
       <h3>Spacing Calculation (Lumen Method)</h3>
       <div class="formula-box">
-Maximum Spacing (m) = √[(Lumens × UF × MF) / (Required Lux × Width)]
+Maximum Spacing (m) = âˆš[(Lumens Ã— UF Ã— MF) / (Required Lux Ã— Width)]
 
 Where:
 - Lumens = Luminaire output (from manufacturer data)
@@ -610,7 +609,7 @@ Where:
           <dd>
             <ul>
               <li>Escape routes: 1.0 lux (horizontal)</li>
-              <li>Open areas > 60m²: 0.5 lux</li>
+              <li>Open areas > 60mÂ²: 0.5 lux</li>
               <li>High risk task areas: 10 lux</li>
               <li>Covered car parks: 1.0 lux</li>
             </ul>
@@ -620,7 +619,7 @@ Where:
 
       <h3>Mounting Height Constraint</h3>
       <div class="formula-box">
-Maximum Spacing ≤ 3 × Mounting Height
+Maximum Spacing â‰¤ 3 Ã— Mounting Height
 
 This prevents excessive spacing that would create dark spots even if
 average illuminance is adequate. Based on photometric distribution patterns.
@@ -630,9 +629,9 @@ average illuminance is adequate. Based on photometric distribution patterns.
         <strong>Example:</strong> 400 lumen LED, 2.5m high, 2m wide corridor, medium reflectance<br><br>
         
         UF = 0.45, MF = 0.8, Required = 1.0 lux<br>
-        Spacing = √[(400 × 0.45 × 0.8) / (1.0 × 2)] = √[57.6] = 7.6m<br>
-        Height constraint = 3 × 2.5m = 7.5m<br>
-        Final spacing: 7.5m (limited by height) ✓
+        Spacing = âˆš[(400 Ã— 0.45 Ã— 0.8) / (1.0 Ã— 2)] = âˆš[57.6] = 7.6m<br>
+        Height constraint = 3 Ã— 2.5m = 7.5m<br>
+        Final spacing: 7.5m (limited by height) âœ“
       </div>
     </div>
 
@@ -651,7 +650,7 @@ average illuminance is adequate. Based on photometric distribution patterns.
 
       <h3>Array Sizing Calculation</h3>
       <div class="formula-box">
-System Size (kW) = Daily Energy Use (kWh) / (Peak Sun Hours × System Efficiency)
+System Size (kW) = Daily Energy Use (kWh) / (Peak Sun Hours Ã— System Efficiency)
 
 Where:
 - Daily Energy Use = Average daily consumption (kWh/day)
@@ -665,12 +664,12 @@ Number of Panels = System Size (W) / Panel Wattage (W)
 
 Round up to nearest whole number
 
-Example: 6500W system ÷ 400W panels = 16.25 → 17 panels
+Example: 6500W system Ã· 400W panels = 16.25 â†’ 17 panels
       </div>
 
       <h3>Inverter Sizing</h3>
       <div class="formula-box">
-Inverter Size = Array Size × (0.8 to 1.0)
+Inverter Size = Array Size Ã— (0.8 to 1.0)
 
 Ratio considerations:
 - 0.8-0.85: For hot climates or north-facing
@@ -709,10 +708,10 @@ Ratio considerations:
 Panels per String = Inverter MPPT Voltage / Panel Vmp
 
 Verify:
-- Min Voltage: Panels × Vmp(min) ≥ Inverter MPPT Min
-- Max Voltage: Panels × Voc(max) ≤ Inverter Max Voltage
+- Min Voltage: Panels Ã— Vmp(min) â‰¥ Inverter MPPT Min
+- Max Voltage: Panels Ã— Voc(max) â‰¤ Inverter Max Voltage
 
-Where Voc(max) = Voc × Temperature Coefficient × Lowest Temp
+Where Voc(max) = Voc Ã— Temperature Coefficient Ã— Lowest Temp
       </div>
 
       <div class="example-box">
@@ -720,10 +719,10 @@ Where Voc(max) = Voc × Temperature Coefficient × Lowest Temp
         
         Peak sun hours = 4.5h<br>
         System efficiency = 0.78<br>
-        System size = 30 / (4.5 × 0.78) = 8.55 kW<br>
-        Using 400W panels: 8550 / 400 = 21.4 → 22 panels<br>
-        Final system: 22 × 400W = 8.8kW array<br>
-        Inverter: 8.8kW × 0.9 = 7.9kW → 8kW inverter ✓
+        System size = 30 / (4.5 Ã— 0.78) = 8.55 kW<br>
+        Using 400W panels: 8550 / 400 = 21.4 â†’ 22 panels<br>
+        Final system: 22 Ã— 400W = 8.8kW array<br>
+        Inverter: 8.8kW Ã— 0.9 = 7.9kW â†’ 8kW inverter âœ“
       </div>
     </div>
 

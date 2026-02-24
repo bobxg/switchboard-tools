@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Loop Impedance Calculator - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -33,13 +32,12 @@
     .ref-table tr:nth-child(even) { background: #f8f9fa; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
     @media print {
-      .top-tabs, .calc-button, .topleft-icon { display: none !important; }
+      .top-tabs, .calc-button { display: none !important; }
       .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a>
     <a class="tab" href="switchboard.html">Switchboard Sizer</a>
@@ -103,7 +101,7 @@
 
   <div class="main-content">
     <h1>Earth Fault Loop Impedance Calculator</h1>
-    <p>Verify that earth fault loop impedance (Zs) satisfies automatic disconnection times per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.6.2">cl. 2.6.2–2.6.3</a></strong> and Tables 8.1/8.2.</p>
+    <p>Verify that earth fault loop impedance (Zs) satisfies automatic disconnection times per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.6.2">cl. 2.6.2Ã¢â‚¬â€œ2.6.3</a></strong> and Tables 8.1/8.2.</p>
 
     <div class="calc-section">
       <h2>Circuit Parameters</h2>
@@ -151,9 +149,9 @@
       </div>
       <div class="input-row three">
         <div class="input-group">
-          <label for="supplyZe">External Loop Impedance Ze (Ω)</label>
+          <label for="supplyZe">External Loop Impedance Ze (ÃŽÂ©)</label>
           <input type="number" id="supplyZe" value="0.35" min="0" step="0.01" />
-          <span style="font-size:0.8em;color:#888;">Typically 0.35 Ω for TN-C-S, 0.80 Ω for TN-S (from distributor)</span>
+          <span style="font-size:0.8em;color:#888;">Typically 0.35 ÃŽÂ© for TN-C-S, 0.80 ÃŽÂ© for TN-S (from distributor)</span>
         </div>
         <div class="input-group">
           <label for="supplyVoltage">Nominal Voltage (V)</label>
@@ -176,7 +174,7 @@
       <h2>Cable Data</h2>
       <div class="input-row three">
         <div class="input-group">
-          <label for="activeSize">Active Conductor Size (mm²)</label>
+          <label for="activeSize">Active Conductor Size (mmÃ‚Â²)</label>
           <select id="activeSize">
             <option value="1.5">1.5</option>
             <option value="2.5" selected>2.5</option>
@@ -196,7 +194,7 @@
           </select>
         </div>
         <div class="input-group">
-          <label for="earthSize">Earth Conductor Size (mm²)</label>
+          <label for="earthSize">Earth Conductor Size (mmÃ‚Â²)</label>
           <select id="earthSize">
             <option value="1.5">1.5</option>
             <option value="2.5" selected>2.5</option>
@@ -228,8 +226,8 @@
         <div class="input-group">
           <label for="cableTemp">Operating Temperature</label>
           <select id="cableTemp">
-            <option value="75" selected>75°C (XLPE / normal)</option>
-            <option value="45">45°C (PVC at half load)</option>
+            <option value="75" selected>75Ã‚Â°C (XLPE / normal)</option>
+            <option value="45">45Ã‚Â°C (PVC at half load)</option>
           </select>
         </div>
       </div>
@@ -243,20 +241,20 @@
           <h3>Earth Fault Loop Impedance</h3>
           <div class="result-grid">
             <div class="result-item">
-              <div class="result-label">Calculated Zs (Ω)</div>
-              <div class="result-value" id="calcZs">—</div>
+              <div class="result-label">Calculated Zs (ÃŽÂ©)</div>
+              <div class="result-value" id="calcZs">Ã¢â‚¬â€</div>
             </div>
             <div class="result-item">
-              <div class="result-label">Maximum Permitted Zs (Ω)</div>
-              <div class="result-value" id="maxZs">—</div>
+              <div class="result-label">Maximum Permitted Zs (ÃŽÂ©)</div>
+              <div class="result-value" id="maxZs">Ã¢â‚¬â€</div>
             </div>
             <div class="result-item">
               <div class="result-label">Prospective Fault Current (A)</div>
-              <div class="result-value" id="faultI">—</div>
+              <div class="result-value" id="faultI">Ã¢â‚¬â€</div>
             </div>
             <div class="result-item">
               <div class="result-label">Max Cable Length for Compliance (m)</div>
-              <div class="result-value" id="maxLength">—</div>
+              <div class="result-value" id="maxLength">Ã¢â‚¬â€</div>
             </div>
           </div>
         </div>
@@ -264,9 +262,9 @@
       </div>
 
       <div class="calc-section">
-        <h2>Reference — Maximum Zs Values (AS/NZS 3000 Table 8.1 / 8.2 Extract)</h2>
+        <h2>Reference Ã¢â‚¬â€ Maximum Zs Values (AS/NZS 3000 Table 8.1 / 8.2 Extract)</h2>
         <div class="info-box">
-          Values below are maximum earth fault loop impedance (Ω) at the most remote point. 80% rule applied for design (to account for temperature rise during fault).
+          Values below are maximum earth fault loop impedance (ÃŽÂ©) at the most remote point. 80% rule applied for design (to account for temperature rise during fault).
         </div>
         <div id="refTableContainer"></div>
       </div>
@@ -274,15 +272,15 @@
   </div>
 
   <script>
-    // Conductor resistance (mΩ/m) at 75°C — copper, per AS/NZS 3008.1.1
+    // Conductor resistance (mÃŽÂ©/m) at 75Ã‚Â°C Ã¢â‚¬â€ copper, per AS/NZS 3008.1.1
     const condR75 = {
       '1.5': 14.50, '2.5': 8.70, '4': 5.43, '6': 3.62, '10': 2.17,
       '16': 1.36, '25': 0.868, '35': 0.628, '50': 0.464, '70': 0.321,
       '95': 0.236, '120': 0.188, '150': 0.153, '185': 0.123, '240': 0.0943
     };
 
-    // Maximum Zs tables (Ω) — derived from AS/NZS 3000 Tables 8.1 & 8.2 at 230V
-    // MCB trip multipliers: B=5×In, C=10×In, D=20×In for instantaneous
+    // Maximum Zs tables (ÃŽÂ©) Ã¢â‚¬â€ derived from AS/NZS 3000 Tables 8.1 & 8.2 at 230V
+    // MCB trip multipliers: B=5Ãƒâ€”In, C=10Ãƒâ€”In, D=20Ãƒâ€”In for instantaneous
     // For 0.4s: MCB magnetic trip; for 5s: MCB thermal characteristic
     function getMaxZs(deviceType, rating, circuitType) {
       const In = parseFloat(rating);
@@ -295,7 +293,7 @@
       } else if (deviceType === 'mcb_d') {
         tripI = circuitType === 'final' ? 20 * In : 20 * In;
       } else if (deviceType === 'hrc') {
-        // HRC fuse — approximate from time-current curves
+        // HRC fuse Ã¢â‚¬â€ approximate from time-current curves
         const hrcMult = circuitType === 'final' ? { 6:4.5, 10:4.0, 16:3.5, 20:3.3, 25:3.2, 32:3.0, 40:2.8, 50:2.6, 63:2.5, 80:2.4, 100:2.3, 125:2.2, 160:2.1, 200:2.0, 250:1.9 }
           : { 6:2.5, 10:2.3, 16:2.1, 20:2.0, 25:2.0, 32:1.9, 40:1.8, 50:1.7, 63:1.6, 80:1.5, 100:1.5, 125:1.4, 160:1.3, 200:1.3, 250:1.2 };
         tripI = (hrcMult[In] || 2.5) * In;
@@ -324,9 +322,9 @@
       if (material === 'al') { Ra *= 1.6; Re *= 1.6; }
       if (temp === 45) { Ra *= 0.85; Re *= 0.85; } // approximate temp correction
 
-      // Cable loop impedance R1 + R2 (mΩ/m) — active + earth
-      const loopR = Ra + Re; // mΩ/m
-      const cableZ = (loopR * length) / 1000; // Ω
+      // Cable loop impedance R1 + R2 (mÃŽÂ©/m) Ã¢â‚¬â€ active + earth
+      const loopR = Ra + Re; // mÃŽÂ©/m
+      const cableZ = (loopR * length) / 1000; // ÃŽÂ©
 
       const Zs = Ze + cableZ;
       const maxZs = getMaxZs(deviceType, rating, circuitType);
@@ -341,11 +339,11 @@
 
       const verdict = document.getElementById('verdict');
       if (Zs <= designZs) {
-        verdict.innerHTML = `<div class="pass-box">✓ PASS — Calculated Zs (${Zs.toFixed(3)} Ω) ≤ 80% of maximum (${designZs.toFixed(3)} Ω). Automatic disconnection compliance achieved per AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.3">cl. 2.6.3</a>.</div>`;
+        verdict.innerHTML = `<div class="pass-box">Ã¢Å“â€œ PASS Ã¢â‚¬â€ Calculated Zs (${Zs.toFixed(3)} ÃŽÂ©) Ã¢â€°Â¤ 80% of maximum (${designZs.toFixed(3)} ÃŽÂ©). Automatic disconnection compliance achieved per AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.3">cl. 2.6.3</a>.</div>`;
       } else if (Zs <= maxZs) {
-        verdict.innerHTML = `<div class="warn-box">⚠ MARGINAL — Calculated Zs (${Zs.toFixed(3)} Ω) exceeds 80% design limit (${designZs.toFixed(3)} Ω) but within absolute maximum (${maxZs.toFixed(3)} Ω). Consider increasing earth conductor size, shorter run, or adding RCD protection.</div>`;
+        verdict.innerHTML = `<div class="warn-box">Ã¢Å¡Â  MARGINAL Ã¢â‚¬â€ Calculated Zs (${Zs.toFixed(3)} ÃŽÂ©) exceeds 80% design limit (${designZs.toFixed(3)} ÃŽÂ©) but within absolute maximum (${maxZs.toFixed(3)} ÃŽÂ©). Consider increasing earth conductor size, shorter run, or adding RCD protection.</div>`;
       } else {
-        verdict.innerHTML = `<div class="fail-box">✕ FAIL — Calculated Zs (${Zs.toFixed(3)} Ω) exceeds maximum (${maxZs.toFixed(3)} Ω). Automatic disconnection NOT achieved. Remedies: increase conductor size, reduce cable length, add RCD, or use alternative earthing arrangement.</div>`;
+        verdict.innerHTML = `<div class="fail-box">Ã¢Å“â€¢ FAIL Ã¢â‚¬â€ Calculated Zs (${Zs.toFixed(3)} ÃŽÂ©) exceeds maximum (${maxZs.toFixed(3)} ÃŽÂ©). Automatic disconnection NOT achieved. Remedies: increase conductor size, reduce cable length, add RCD, or use alternative earthing arrangement.</div>`;
       }
 
       // Build reference table
@@ -360,12 +358,12 @@
       const timeLabel = circuitType === 'final' ? '0.4s' : '5s';
       let html = `<table class="ref-table"><thead><tr><th>Rating (A)</th>`;
       ratings.forEach(r => { html += `<th>${r}</th>`; });
-      html += `</tr></thead><tbody><tr><td><strong>${deviceLabel} — Max Zs (Ω) at ${timeLabel}</strong></td>`;
+      html += `</tr></thead><tbody><tr><td><strong>${deviceLabel} Ã¢â‚¬â€ Max Zs (ÃŽÂ©) at ${timeLabel}</strong></td>`;
       ratings.forEach(r => {
         const z = getMaxZs(deviceType, r, circuitType);
         html += `<td>${z.toFixed(2)}</td>`;
       });
-      html += `</tr><tr><td><strong>80% Design Value (Ω)</strong></td>`;
+      html += `</tr><tr><td><strong>80% Design Value (ÃŽÂ©)</strong></td>`;
       ratings.forEach(r => {
         const z = getMaxZs(deviceType, r, circuitType) * 0.8;
         html += `<td>${z.toFixed(2)}</td>`;
@@ -374,7 +372,7 @@
       container.innerHTML = html;
     }
 
-    function updateDeviceRatings() { /* ratings are common — no change needed */ }
+    function updateDeviceRatings() { /* ratings are common Ã¢â‚¬â€ no change needed */ }
   </script>
 </body>
 </html>

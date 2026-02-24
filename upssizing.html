@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>UPS Sizing - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -25,11 +24,10 @@
     .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
     .calc-button:hover { background: #1565c0; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    @media print { .top-tabs, .calc-button { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown active"><span>Power Systems</span><div class="dropdown-content">
@@ -63,7 +61,7 @@
         </div>
       </div>
       <div class="input-row three">
-        <div class="input-group"><label for="ambTemp">Battery Room Temperature (°C)</label><input type="number" id="ambTemp" value="25" min="10" max="40" step="1" /></div>
+        <div class="input-group"><label for="ambTemp">Battery Room Temperature (Ã‚Â°C)</label><input type="number" id="ambTemp" value="25" min="10" max="40" step="1" /></div>
         <div class="input-group"><label for="ageingFactor">Battery Ageing Factor</label><input type="number" id="ageingFactor" value="0.8" min="0.5" max="1.0" step="0.05" /><span style="font-size:0.8em;color:#888;">0.8 typical for end-of-life capacity</span></div>
         <div class="input-group"><label for="rechargeHrs">Target Recharge Time (hours)</label><input type="number" id="rechargeHrs" value="8" min="1" step="1" /></div>
       </div>
@@ -73,12 +71,12 @@
       <div class="result-box">
         <h3>UPS Sizing Results</h3>
         <div class="result-grid">
-          <div class="result-item"><div class="result-label">Design Load (kVA)</div><div class="result-value" id="resKVA">—</div></div>
-          <div class="result-item"><div class="result-label">UPS Module Rating (kVA)</div><div class="result-value" id="resUPS">—</div></div>
-          <div class="result-item"><div class="result-label">Battery Capacity (Ah @ 480VDC)</div><div class="result-value" id="resAH">—</div></div>
-          <div class="result-item"><div class="result-label">Number of Battery Strings</div><div class="result-value" id="resStrings">—</div></div>
-          <div class="result-item"><div class="result-label">Indicative Battery Weight (kg)</div><div class="result-value" id="resWeight">—</div></div>
-          <div class="result-item"><div class="result-label">Recharge Current (A)</div><div class="result-value" id="resRecharge">—</div></div>
+          <div class="result-item"><div class="result-label">Design Load (kVA)</div><div class="result-value" id="resKVA">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">UPS Module Rating (kVA)</div><div class="result-value" id="resUPS">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Battery Capacity (Ah @ 480VDC)</div><div class="result-value" id="resAH">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Number of Battery Strings</div><div class="result-value" id="resStrings">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Indicative Battery Weight (kg)</div><div class="result-value" id="resWeight">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Recharge Current (A)</div><div class="result-value" id="resRecharge">Ã¢â‚¬â€</div></div>
         </div>
       </div>
       <div id="notes" class="info-box" style="margin-top:16px;"></div>
@@ -105,10 +103,10 @@
       if (config === 1) {
         upsKVA = designKVA;
       } else if (config === 2) {
-        // N+1: each module = designKVA, need N+1 modules; practical: single module ≥ designKVA
+        // N+1: each module = designKVA, need N+1 modules; practical: single module Ã¢â€°Â¥ designKVA
         upsKVA = designKVA;
       } else {
-        upsKVA = designKVA; // 2N: two independent UPS each ≥ design
+        upsKVA = designKVA; // 2N: two independent UPS each Ã¢â€°Â¥ design
       }
       let selectedUPS = upsKVA;
       for (const s of stdUPS) { if (s >= upsKVA) { selectedUPS = s; break; } }
@@ -127,7 +125,7 @@
         tempFactor = Math.max(0.7, Math.min(1.1, tempFactor));
       }
 
-      // Required Ah = (DC current × time in hours) / (ageing × temp factor × depth of discharge)
+      // Required Ah = (DC current Ãƒâ€” time in hours) / (ageing Ãƒâ€” temp factor Ãƒâ€” depth of discharge)
       const dod = battType === 'lion' ? 0.85 : 0.80; // depth of discharge
       const hours = mins / 60;
       const requiredAh = (dcCurrent * hours) / (ageing * tempFactor * dod);
@@ -154,11 +152,11 @@
       const configLabel = {1:'Single (N)', 2:'N+1 Parallel Redundant', 3:'2N Fully Redundant'}[config];
       document.getElementById('notes').innerHTML = `
         <strong>Design Summary:</strong><br>
-        • Critical load: ${kw} kW + ${(growth*100).toFixed(0)}% growth = ${designKW.toFixed(1)} kW / ${designKVA.toFixed(0)} kVA<br>
-        • Configuration: ${configLabel} ${config >= 2 ? '— total installed: ' + (config === 2 ? '2 × ' + selectedUPS + ' kVA modules' : '2 × ' + selectedUPS + ' kVA independent UPS') : ''}<br>
-        • Battery: ${battType.toUpperCase()} — ${requiredAh.toFixed(0)} Ah at ${dcV} VDC, ${numStrings} string(s), ${mins} min autonomy<br>
-        • Estimated battery weight: ${weight.toFixed(0)} kg — verify floor loading capacity<br>
-        • Recharge time: ${rechargeHrs} hours at ${rechargeCurrent.toFixed(1)} A<br>
+        Ã¢â‚¬Â¢ Critical load: ${kw} kW + ${(growth*100).toFixed(0)}% growth = ${designKW.toFixed(1)} kW / ${designKVA.toFixed(0)} kVA<br>
+        Ã¢â‚¬Â¢ Configuration: ${configLabel} ${config >= 2 ? 'Ã¢â‚¬â€ total installed: ' + (config === 2 ? '2 Ãƒâ€” ' + selectedUPS + ' kVA modules' : '2 Ãƒâ€” ' + selectedUPS + ' kVA independent UPS') : ''}<br>
+        Ã¢â‚¬Â¢ Battery: ${battType.toUpperCase()} Ã¢â‚¬â€ ${requiredAh.toFixed(0)} Ah at ${dcV} VDC, ${numStrings} string(s), ${mins} min autonomy<br>
+        Ã¢â‚¬Â¢ Estimated battery weight: ${weight.toFixed(0)} kg Ã¢â‚¬â€ verify floor loading capacity<br>
+        Ã¢â‚¬Â¢ Recharge time: ${rechargeHrs} hours at ${rechargeCurrent.toFixed(1)} A<br>
         <em>Refer to AS 4044:2019 for detailed UPS installation requirements. Battery room ventilation per AS 2676.</em>
       `;
       document.getElementById('resultSection').style.display = 'block';

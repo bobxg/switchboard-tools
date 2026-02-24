@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Transformer Sizing - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -32,11 +31,10 @@
     .ref-table th { background: #1976d2; color: white; }
     .ref-table tr:nth-child(even) { background: #f8f9fa; }
     @media (max-width: 768px) { .input-row, .input-row.three, .input-row.four { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    @media print { .top-tabs, .calc-button { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown active"><span>Power Systems</span><div class="dropdown-content">
@@ -53,7 +51,7 @@
 
     <div class="calc-section">
       <h2>Load & Transformer Parameters</h2>
-      <div class="info-box"><strong>AS 2374.1:</strong> Power transformers — General. Standard kVA ratings: 100, 160, 200, 250, 315, 400, 500, 630, 750, 800, 1000, 1250, 1500, 1600, 2000, 2500 kVA.</div>
+      <div class="info-box"><strong>AS 2374.1:</strong> Power transformers Ã¢â‚¬â€ General. Standard kVA ratings: 100, 160, 200, 250, 315, 400, 500, 630, 750, 800, 1000, 1250, 1500, 1600, 2000, 2500 kVA.</div>
 
       <div class="input-row three">
         <div class="input-group"><label for="totalLoadKVA">Total Connected Load (kVA)</label><input type="number" id="totalLoadKVA" value="450" min="1" /></div>
@@ -67,8 +65,8 @@
       </div>
       <div class="input-row three">
         <div class="input-group"><label for="loadPF">Load Power Factor</label><input type="number" id="loadPF" value="0.9" min="0.7" max="1" step="0.01" /></div>
-        <div class="input-group"><label for="ambientTemp">Ambient Temperature (°C)</label><input type="number" id="ambientTemp" value="40" min="20" max="55" /></div>
-        <div class="input-group"><label for="txImpedance">Impedance (%Zk) — leave 0 for auto</label><input type="number" id="txImpedance" value="0" min="0" max="15" step="0.1" /></div>
+        <div class="input-group"><label for="ambientTemp">Ambient Temperature (Ã‚Â°C)</label><input type="number" id="ambientTemp" value="40" min="20" max="55" /></div>
+        <div class="input-group"><label for="txImpedance">Impedance (%Zk) Ã¢â‚¬â€ leave 0 for auto</label><input type="number" id="txImpedance" value="0" min="0" max="15" step="0.1" /></div>
       </div>
       <button class="calc-button" onclick="calculate()">Size Transformer</button>
     </div>
@@ -77,21 +75,21 @@
       <div class="result-box">
         <h3>Transformer Selection</h3>
         <div class="result-grid">
-          <div class="result-item"><div class="result-label">Design Load (kVA)</div><div class="result-value" id="resDesign">—</div></div>
-          <div class="result-item"><div class="result-label">Selected TX Rating</div><div class="result-value" id="resTX">—</div></div>
-          <div class="result-item"><div class="result-label">Loading (%)</div><div class="result-value" id="resLoading">—</div></div>
-          <div class="result-item"><div class="result-label">%Zk (Impedance)</div><div class="result-value" id="resZ">—</div></div>
-          <div class="result-item"><div class="result-label">Prospective Fault (kA)</div><div class="result-value" id="resFault">—</div></div>
-          <div class="result-item"><div class="result-label">Secondary FLC (A)</div><div class="result-value" id="resFLC">—</div></div>
+          <div class="result-item"><div class="result-label">Design Load (kVA)</div><div class="result-value" id="resDesign">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Selected TX Rating</div><div class="result-value" id="resTX">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Loading (%)</div><div class="result-value" id="resLoading">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">%Zk (Impedance)</div><div class="result-value" id="resZ">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Prospective Fault (kA)</div><div class="result-value" id="resFault">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Secondary FLC (A)</div><div class="result-value" id="resFLC">Ã¢â‚¬â€</div></div>
         </div>
       </div>
       <div class="calc-section" style="margin-top:24px;">
         <h2>Estimated Losses & Efficiency</h2>
         <div class="result-grid" style="color:#333;">
-          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">No-Load Loss (W)</div><div class="result-value small" id="resNLL" style="color:#333;">—</div></div>
-          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">Load Loss at 100% (W)</div><div class="result-value small" id="resLL" style="color:#333;">—</div></div>
-          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">Total Losses at Design Load (W)</div><div class="result-value small" id="resTotalLoss" style="color:#333;">—</div></div>
-          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">Efficiency (%)</div><div class="result-value small" id="resEff" style="color:#333;">—</div></div>
+          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">No-Load Loss (W)</div><div class="result-value small" id="resNLL" style="color:#333;">Ã¢â‚¬â€</div></div>
+          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">Load Loss at 100% (W)</div><div class="result-value small" id="resLL" style="color:#333;">Ã¢â‚¬â€</div></div>
+          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">Total Losses at Design Load (W)</div><div class="result-value small" id="resTotalLoss" style="color:#333;">Ã¢â‚¬â€</div></div>
+          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">Efficiency (%)</div><div class="result-value small" id="resEff" style="color:#333;">Ã¢â‚¬â€</div></div>
         </div>
       </div>
       <div id="recommendations"></div>
@@ -146,10 +144,10 @@
 
       const designLoad = totalLoad * df * (1 + growth);
 
-      // Temperature derating: dry type derated above 40°C
+      // Temperature derating: dry type derated above 40Ã‚Â°C
       let tempDerate = 1.0;
       if (txType !== 'onan' && ambTemp > 40) {
-        tempDerate = 1 - (ambTemp - 40) * 0.01; // ~1% per °C above 40
+        tempDerate = 1 - (ambTemp - 40) * 0.01; // ~1% per Ã‚Â°C above 40
       } else if (txType === 'onan' && ambTemp > 40) {
         tempDerate = 1 - (ambTemp - 40) * 0.007;
       }
@@ -189,16 +187,16 @@
       // Recommendations
       let rec = '';
       if (loading > 100) {
-        rec += `<div class="warn-box"><strong>⚠ Overloaded:</strong> Design load exceeds selected TX rating after derating. Consider next size up (${stdRatings[stdRatings.indexOf(selectedKVA)+1] || 'parallel TX'} kVA) or reduce load.</div>`;
+        rec += `<div class="warn-box"><strong>Ã¢Å¡Â  Overloaded:</strong> Design load exceeds selected TX rating after derating. Consider next size up (${stdRatings[stdRatings.indexOf(selectedKVA)+1] || 'parallel TX'} kVA) or reduce load.</div>`;
       } else if (loading > 85) {
         rec += `<div class="warn-box"><strong>Caution:</strong> Loading > 85%. Limited capacity for future growth. Consider ${stdRatings[stdRatings.indexOf(selectedKVA)+1] || selectedKVA} kVA.</div>`;
       } else if (loading < 40) {
         rec += `<div class="info-box"><strong>Note:</strong> TX loading < 40%. Consider down-sizing to reduce no-load losses, or verify growth projection warrants this capacity.</div>`;
       } else {
-        rec += `<div class="pass-box"><strong>✓ Suitable selection.</strong> Loading is within recommended 60–80% range.</div>`;
+        rec += `<div class="pass-box"><strong>Ã¢Å“â€œ Suitable selection.</strong> Loading is within recommended 60Ã¢â‚¬â€œ80% range.</div>`;
       }
       if (ambTemp > 40) {
-        rec += `<div class="warn-box"><strong>Temperature Derating Applied:</strong> Ambient ${ambTemp}°C exceeds reference 40°C. Effective TX capacity derated to ${(selectedKVA * tempDerate).toFixed(0)} kVA.</div>`;
+        rec += `<div class="warn-box"><strong>Temperature Derating Applied:</strong> Ambient ${ambTemp}Ã‚Â°C exceeds reference 40Ã‚Â°C. Effective TX capacity derated to ${(selectedKVA * tempDerate).toFixed(0)} kVA.</div>`;
       }
       if (ifault / 1000 > 50) {
         rec += `<div class="warn-box"><strong>High Fault Level:</strong> Prospective fault current ${(ifault/1000).toFixed(1)} kA exceeds 50 kA. Ensure switchgear rated accordingly per AS/NZS 61439.</div>`;

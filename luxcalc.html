@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Lux Calculator - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -25,11 +24,10 @@
     .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
     .calc-button:hover { background: #1565c0; }
     @media (max-width: 768px) { .input-row, .input-row.three, .input-row.four { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    @media print { .top-tabs, .calc-button { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a>
     <a class="tab" href="switchboard.html">Switchboard Sizer</a>
@@ -81,27 +79,27 @@
         <div class="input-group">
           <label for="refCeiling">Ceiling Reflectance (%)</label>
           <select id="refCeiling">
-            <option value="0.80">80% — White</option>
-            <option value="0.70" selected>70% — Light</option>
-            <option value="0.50">50% — Medium</option>
-            <option value="0.30">30% — Dark</option>
+            <option value="0.80">80% Ã¢â‚¬â€ White</option>
+            <option value="0.70" selected>70% Ã¢â‚¬â€ Light</option>
+            <option value="0.50">50% Ã¢â‚¬â€ Medium</option>
+            <option value="0.30">30% Ã¢â‚¬â€ Dark</option>
           </select>
         </div>
         <div class="input-group">
           <label for="refWall">Wall Reflectance (%)</label>
           <select id="refWall">
-            <option value="0.70">70% — White walls</option>
-            <option value="0.50" selected>50% — Light walls</option>
-            <option value="0.30">30% — Medium walls</option>
-            <option value="0.10">10% — Dark walls</option>
+            <option value="0.70">70% Ã¢â‚¬â€ White walls</option>
+            <option value="0.50" selected>50% Ã¢â‚¬â€ Light walls</option>
+            <option value="0.30">30% Ã¢â‚¬â€ Medium walls</option>
+            <option value="0.10">10% Ã¢â‚¬â€ Dark walls</option>
           </select>
         </div>
         <div class="input-group">
           <label for="refFloor">Floor Reflectance (%)</label>
           <select id="refFloor">
-            <option value="0.30">30% — Light floor</option>
-            <option value="0.20" selected>20% — Medium floor</option>
-            <option value="0.10">10% — Dark floor</option>
+            <option value="0.30">30% Ã¢â‚¬â€ Light floor</option>
+            <option value="0.20" selected>20% Ã¢â‚¬â€ Medium floor</option>
+            <option value="0.10">10% Ã¢â‚¬â€ Dark floor</option>
           </select>
         </div>
       </div>
@@ -113,14 +111,14 @@
         <div class="input-group">
           <label for="targetLux">Target Maintained Illuminance (lux)</label>
           <select id="targetLux">
-            <option value="80">80 — Corridors, stairs</option>
-            <option value="160">160 — Foyers, lobbies</option>
-            <option value="240">240 — General retail</option>
-            <option value="320" selected>320 — General office</option>
-            <option value="400">400 — Detailed office work</option>
-            <option value="500">500 — Fine work / laboratories</option>
-            <option value="600">600 — Detailed inspection</option>
-            <option value="custom">Custom…</option>
+            <option value="80">80 Ã¢â‚¬â€ Corridors, stairs</option>
+            <option value="160">160 Ã¢â‚¬â€ Foyers, lobbies</option>
+            <option value="240">240 Ã¢â‚¬â€ General retail</option>
+            <option value="320" selected>320 Ã¢â‚¬â€ General office</option>
+            <option value="400">400 Ã¢â‚¬â€ Detailed office work</option>
+            <option value="500">500 Ã¢â‚¬â€ Fine work / laboratories</option>
+            <option value="600">600 Ã¢â‚¬â€ Detailed inspection</option>
+            <option value="custom">CustomÃ¢â‚¬Â¦</option>
           </select>
         </div>
         <div class="input-group">
@@ -146,7 +144,7 @@
         <div class="input-group">
           <label for="maxSHR">Max Spacing-to-Height Ratio (SHR)</label>
           <input type="number" id="maxSHR" value="1.5" min="0.5" max="3.0" step="0.1" />
-          <span style="font-size:0.8em;color:#888;">From luminaire datasheet; typically 1.2–1.5</span>
+          <span style="font-size:0.8em;color:#888;">From luminaire datasheet; typically 1.2Ã¢â‚¬â€œ1.5</span>
         </div>
       </div>
       <button class="calc-button" onclick="calculate()">Calculate</button>
@@ -158,35 +156,35 @@
         <div class="result-grid">
           <div class="result-item">
             <div class="result-label">Room Index (k)</div>
-            <div class="result-value" id="resRI">—</div>
+            <div class="result-value" id="resRI">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Utilisation Factor (UF)</div>
-            <div class="result-value" id="resUF">—</div>
+            <div class="result-value" id="resUF">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Number of Luminaires</div>
-            <div class="result-value" id="resNum">—</div>
+            <div class="result-value" id="resNum">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Achieved Lux</div>
-            <div class="result-value" id="resLux">—</div>
+            <div class="result-value" id="resLux">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Total Power (W)</div>
-            <div class="result-value" id="resTotalW">—</div>
+            <div class="result-value" id="resTotalW">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
-            <div class="result-label">W/m²</div>
-            <div class="result-value" id="resWm2">—</div>
+            <div class="result-label">W/mÃ‚Â²</div>
+            <div class="result-value" id="resWm2">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">lm/W (system)</div>
-            <div class="result-value" id="resEff">—</div>
+            <div class="result-value" id="resEff">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Max Spacing (m)</div>
-            <div class="result-value" id="resSpacing">—</div>
+            <div class="result-value" id="resSpacing">Ã¢â‚¬â€</div>
           </div>
         </div>
       </div>
@@ -198,7 +196,7 @@
     // Simplified UF lookup based on room index and reflectances
     // Real UF tables vary by luminaire type; this uses generic recessed LED troffer
     function getUF(k, rc, rw, rf) {
-      // Approximate UF formula: UF = 0.45 + 0.35×(1 - e^(-k)) + 0.1×rc + 0.08×rw + 0.02×rf
+      // Approximate UF formula: UF = 0.45 + 0.35Ãƒâ€”(1 - e^(-k)) + 0.1Ãƒâ€”rc + 0.08Ãƒâ€”rw + 0.02Ãƒâ€”rf
       const base = 0.30 + 0.40 * (1 - Math.exp(-0.8 * k));
       const reflContrib = 0.12 * rc + 0.10 * rw + 0.03 * rf;
       return Math.min(0.95, Math.max(0.25, base + reflContrib));
@@ -219,11 +217,11 @@
       const maxSHR = parseFloat(document.getElementById('maxSHR').value);
       const area = L * W;
 
-      // Room Index (k) = L×W / (H × (L+W))
+      // Room Index (k) = LÃƒâ€”W / (H Ãƒâ€” (L+W))
       const k = (L * W) / (H * (L + W));
       const UF = getUF(k, rc, rw, rf);
 
-      // Number of luminaires: N = (E × A) / (n × UF × MF)
+      // Number of luminaires: N = (E Ãƒâ€” A) / (n Ãƒâ€” UF Ãƒâ€” MF)
       const Ncalc = (targetLux * area) / (lumens * UF * MF);
       const N = Math.ceil(Ncalc);
 
@@ -252,10 +250,10 @@
 
       const finalN = Math.max(N, gridN);
       document.getElementById('layoutNote').innerHTML = `
-        <strong>Layout Suggestion:</strong> ${cols} columns × ${rows} rows = ${gridN} luminaires. 
-        Spacing: ${gridSpacingL.toFixed(2)} m (L) × ${gridSpacingW.toFixed(2)} m (W). 
+        <strong>Layout Suggestion:</strong> ${cols} columns Ãƒâ€” ${rows} rows = ${gridN} luminaires. 
+        Spacing: ${gridSpacingL.toFixed(2)} m (L) Ãƒâ€” ${gridSpacingW.toFixed(2)} m (W). 
         Max spacing for SHR ${maxSHR}: ${maxSpacing.toFixed(2)} m.<br>
-        <strong>NCC Section J6 check:</strong> ${((finalN*watts)/area).toFixed(1)} W/m² — compare against NCC illumination power density limits for the space type.
+        <strong>NCC Section J6 check:</strong> ${((finalN*watts)/area).toFixed(1)} W/mÃ‚Â² Ã¢â‚¬â€ compare against NCC illumination power density limits for the space type.
         <br><em>Refer to AS/NZS 1680.1 cl. 3.2 for maintained illuminance requirements.</em>
       `;
       document.getElementById('resultSection').style.display = 'block';

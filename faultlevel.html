@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Fault Level Calculator - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -38,14 +37,13 @@
     .fail { color: #c62828; font-weight: bold; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
     @media print {
-      .top-tabs, .calc-button, .add-row-btn, .remove-btn, .topleft-icon { display: none !important; }
+      .top-tabs, .calc-button, .add-row-btn, .remove-btn { display: none !important; }
       .calc-section { box-shadow: none; border: 1px solid #ccc; }
       .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a>
     <a class="tab" href="switchboard.html">Switchboard Sizer</a>
@@ -109,7 +107,7 @@
 
   <div class="main-content">
     <h1>Fault Level Calculator</h1>
-    <p>Calculate prospective fault currents from supply transformer through to downstream sub-circuits per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.5.4">cl. 2.5.4–2.5.5</a></strong> and <strong>IEC 60909</strong> simplified method.</p>
+    <p>Calculate prospective fault currents from supply transformer through to downstream sub-circuits per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.5.4">cl. 2.5.4Ã¢â‚¬â€œ2.5.5</a></strong> and <strong>IEC 60909</strong> simplified method.</p>
 
     <div class="calc-section">
       <h2>Supply / Transformer Data</h2>
@@ -129,7 +127,7 @@
             <option value="1500">1500 kVA</option>
             <option value="2000">2000 kVA</option>
             <option value="2500">2500 kVA</option>
-            <option value="custom">Custom…</option>
+            <option value="custom">CustomÃ¢â‚¬Â¦</option>
           </select>
         </div>
         <div class="input-group">
@@ -161,7 +159,7 @@
         <div class="input-group">
           <label for="upstreamFault">Upstream Fault Level (MVA)</label>
           <input type="number" id="upstreamFault" value="150" min="10" step="1" />
-          <span style="font-size:0.8em;color:#888;">HV network — use 150 MVA if unknown</span>
+          <span style="font-size:0.8em;color:#888;">HV network Ã¢â‚¬â€ use 150 MVA if unknown</span>
         </div>
       </div>
 
@@ -170,19 +168,19 @@
         <div class="result-grid">
           <div class="result-item">
             <div class="result-label">3-Phase Fault (kA sym)</div>
-            <div class="result-value" id="txFault3ph">—</div>
+            <div class="result-value" id="txFault3ph">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">1-Phase-to-Earth Fault (kA)</div>
-            <div class="result-value" id="txFault1ph">—</div>
+            <div class="result-value" id="txFault1ph">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">TX Full Load Current (A)</div>
-            <div class="result-value" id="txFLC">—</div>
+            <div class="result-value" id="txFLC">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
-            <div class="result-label">TX Secondary Z (mΩ)</div>
-            <div class="result-value" id="txZmOhm">—</div>
+            <div class="result-label">TX Secondary Z (mÃŽÂ©)</div>
+            <div class="result-value" id="txZmOhm">Ã¢â‚¬â€</div>
           </div>
         </div>
       </div>
@@ -192,18 +190,18 @@
       <h2>Downstream Cable Nodes</h2>
       <div class="info-box">
         Add cable segments from the transformer secondary (MSB) to downstream distribution boards. The tool calculates cumulative impedance and prospective fault current at each node.
-        Cable impedance data per <strong>AS/NZS 3008.1.1</strong> Tables 30–42.
+        Cable impedance data per <strong>AS/NZS 3008.1.1</strong> Tables 30Ã¢â‚¬â€œ42.
       </div>
       <table class="node-table" id="nodeTable">
         <thead>
           <tr>
             <th>Node Label</th>
             <th>Cable Type</th>
-            <th>Size (mm²)</th>
+            <th>Size (mmÃ‚Â²)</th>
             <th>Length (m)</th>
             <th>Cores / Config</th>
-            <th>Ipsc 3φ (kA)</th>
-            <th>Ipsc 1φ (kA)</th>
+            <th>Ipsc 3Ãâ€  (kA)</th>
+            <th>Ipsc 1Ãâ€  (kA)</th>
             <th></th>
           </tr>
         </thead>
@@ -220,23 +218,23 @@
         <thead>
           <tr>
             <th>Node</th>
-            <th>Cumulative Z (mΩ)</th>
-            <th>Ipsc 3φ (kA sym)</th>
-            <th>Ipsc 1φ–E (kA)</th>
+            <th>Cumulative Z (mÃŽÂ©)</th>
+            <th>Ipsc 3Ãâ€  (kA sym)</th>
+            <th>Ipsc 1Ãâ€ Ã¢â‚¬â€œE (kA)</th>
             <th>Device kA Rating Check</th>
           </tr>
         </thead>
         <tbody id="summaryBody"></tbody>
       </table>
       <div class="warn-box">
-        <strong>Important:</strong> This is a simplified impedance method calculation. For complex networks, motor infeed contribution, or where arc-flash assessment is required, a full IEC 60909 study using specialist software is recommended. Peak (Ip) values can be estimated using a factor of 1.5–2.0 × Isc (sym) depending on X/R ratio.
+        <strong>Important:</strong> This is a simplified impedance method calculation. For complex networks, motor infeed contribution, or where arc-flash assessment is required, a full IEC 60909 study using specialist software is recommended. Peak (Ip) values can be estimated using a factor of 1.5Ã¢â‚¬â€œ2.0 Ãƒâ€” Isc (sym) depending on X/R ratio.
       </div>
     </div>
   </div>
 
   <script>
-    // Cable impedance data (mΩ/m per conductor) — simplified from AS/NZS 3008.1.1 Tables
-    // Format: { size: [R at 75°C (mΩ/m), X (mΩ/m)] } for Cu XLPE/PVC single-core
+    // Cable impedance data (mÃŽÂ©/m per conductor) Ã¢â‚¬â€ simplified from AS/NZS 3008.1.1 Tables
+    // Format: { size: [R at 75Ã‚Â°C (mÃŽÂ©/m), X (mÃŽÂ©/m)] } for Cu XLPE/PVC single-core
     const cableData = {
       '1.5':   [14.50, 0.110],
       '2.5':   [8.70,  0.105],
@@ -267,16 +265,16 @@
       const tbody = document.getElementById('nodeBody');
       const tr = document.createElement('tr');
       tr.id = 'node-' + nodeCount;
-      const sizeOpts = cableSizes.map(s => `<option value="${s}" ${s==='95'?'selected':''}>${s} mm²</option>`).join('');
+      const sizeOpts = cableSizes.map(s => `<option value="${s}" ${s==='95'?'selected':''}>${s} mmÃ‚Â²</option>`).join('');
       tr.innerHTML = `
         <td><input type="text" value="DB-${nodeCount}" /></td>
         <td><select><option value="cu_xlpe" selected>Cu XLPE</option><option value="cu_pvc">Cu PVC</option><option value="al_xlpe">Al XLPE</option></select></td>
         <td><select>${sizeOpts}</select></td>
         <td><input type="number" value="30" min="1" step="1" /></td>
         <td><select><option value="1" selected>Single per phase</option><option value="2">2 parallel</option><option value="3">3 parallel</option><option value="4">4 parallel</option></select></td>
-        <td class="fault3ph" style="font-weight:bold;">—</td>
-        <td class="fault1ph" style="font-weight:bold;">—</td>
-        <td><button class="remove-btn" onclick="this.closest('tr').remove()">✕</button></td>
+        <td class="fault3ph" style="font-weight:bold;">Ã¢â‚¬â€</td>
+        <td class="fault1ph" style="font-weight:bold;">Ã¢â‚¬â€</td>
+        <td><button class="remove-btn" onclick="this.closest('tr').remove()">Ã¢Å“â€¢</button></td>
       `;
       tbody.appendChild(tr);
     }
@@ -295,19 +293,19 @@
 
       const vLN = phases === 3 ? vLL / Math.sqrt(3) : vLL;
 
-      // TX impedance (mΩ) referred to secondary
-      const txZ = (zPct / 100) * (vLL * vLL) / (kva) ; // Ω
-      const txZmOhm = txZ * 1000; // mΩ
+      // TX impedance (mÃŽÂ©) referred to secondary
+      const txZ = (zPct / 100) * (vLL * vLL) / (kva) ; // ÃŽÂ©
+      const txZmOhm = txZ * 1000; // mÃŽÂ©
 
       // Upstream (HV network) impedance referred to secondary
-      const upZ = (vLL * vLL) / (upMVA * 1000) * 1000; // mΩ
+      const upZ = (vLL * vLL) / (upMVA * 1000) * 1000; // mÃŽÂ©
 
       // Total source impedance
       const sourceZ = txZmOhm + upZ;
 
-      // 3-phase fault at TX secondary: I = V / (√3 × Z)
+      // 3-phase fault at TX secondary: I = V / (Ã¢Ë†Å¡3 Ãƒâ€” Z)
       const txI3ph = (vLL * 1000) / (Math.sqrt(3) * sourceZ);
-      // 1-phase fault (simplified): I ≈ V_LN / (Z_source × 2/3) — conservative
+      // 1-phase fault (simplified): I Ã¢â€°Ë† V_LN / (Z_source Ãƒâ€” 2/3) Ã¢â‚¬â€ conservative
       const txI1ph = (vLN * 1000) / (sourceZ * 0.667 + sourceZ * 0.5);
 
       const flc = phases === 3 ? (kva * 1000) / (Math.sqrt(3) * vLL) : (kva * 1000) / vLL;
@@ -325,7 +323,7 @@
 
       // Add TX secondary row
       let sr = document.createElement('tr');
-      sr.innerHTML = `<td><strong>TX Secondary / MSB</strong></td><td>${sourceZ.toFixed(2)}</td><td><strong>${(txI3ph/1000).toFixed(2)}</strong></td><td><strong>${(txI1ph/1000).toFixed(2)}</strong></td><td>—</td>`;
+      sr.innerHTML = `<td><strong>TX Secondary / MSB</strong></td><td>${sourceZ.toFixed(2)}</td><td><strong>${(txI3ph/1000).toFixed(2)}</strong></td><td><strong>${(txI1ph/1000).toFixed(2)}</strong></td><td>Ã¢â‚¬â€</td>`;
       summaryBody.appendChild(sr);
 
       let cumZ = sourceZ;
@@ -338,12 +336,12 @@
         const parallel = parseInt(cells[4].querySelector('select').value) || 1;
 
         let [r, x] = cableData[size] || [1, 0.1];
-        // Adjust for Al (1.6× resistance) or PVC temperature
+        // Adjust for Al (1.6Ãƒâ€” resistance) or PVC temperature
         if (cableType === 'al_xlpe') r *= 1.6;
         if (cableType === 'cu_pvc') r *= 1.1;
 
         // Impedance for this segment (both active + neutral return)
-        const segR = (r * length * 2) / parallel; // mΩ — go + return
+        const segR = (r * length * 2) / parallel; // mÃŽÂ© Ã¢â‚¬â€ go + return
         const segX = (x * length * 2) / parallel;
         const segZ = Math.sqrt(segR * segR + segX * segX);
 
@@ -361,7 +359,7 @@
           <td>${cumZ.toFixed(2)}</td>
           <td><strong>${(i3ph/1000).toFixed(2)}</strong></td>
           <td><strong>${(i1ph/1000).toFixed(2)}</strong></td>
-          <td><span class="${(i3ph/1000) > 25 ? 'fail' : 'pass'}">${(i3ph/1000) > 25 ? '⚠ >25kA — verify device rating' : '✓ ≤25kA typical rating OK'}</span></td>
+          <td><span class="${(i3ph/1000) > 25 ? 'fail' : 'pass'}">${(i3ph/1000) > 25 ? 'Ã¢Å¡Â  >25kA Ã¢â‚¬â€ verify device rating' : 'Ã¢Å“â€œ Ã¢â€°Â¤25kA typical rating OK'}</span></td>
         `;
         summaryBody.appendChild(tr);
       });

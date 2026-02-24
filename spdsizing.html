@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>SPD Sizing - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -35,11 +34,10 @@
     .zone-card h4 { margin: 0 0 8px 0; color: #1976d2; }
     .zone-card.active { border-color: #2e7d32; background: #e8f5e9; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } .zone-diagram { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    @media print { .top-tabs, .calc-button { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -56,7 +54,7 @@
 
     <div class="calc-section">
       <h2>Installation Risk Assessment</h2>
-      <div class="info-box"><strong>AS/NZS 1768:2021:</strong> Lightning protection — General principles. Requires risk assessment to determine if SPD protection is needed and what class is appropriate.</div>
+      <div class="info-box"><strong>AS/NZS 1768:2021:</strong> Lightning protection Ã¢â‚¬â€ General principles. Requires risk assessment to determine if SPD protection is needed and what class is appropriate.</div>
       <div class="input-row three">
         <div class="input-group"><label for="buildingType">Building Type</label>
           <select id="buildingType">
@@ -74,7 +72,7 @@
           <select id="supplyType">
             <option value="underground">Underground supply</option>
             <option value="overhead" selected>Overhead supply</option>
-            <option value="overhead_exposed">Overhead — exposed/rural</option>
+            <option value="overhead_exposed">Overhead Ã¢â‚¬â€ exposed/rural</option>
           </select></div>
       </div>
       <div class="input-row three">
@@ -93,9 +91,9 @@
     <div class="calc-section">
       <h2>SPD Zone Protection Concept</h2>
       <div class="zone-diagram">
-        <div class="zone-card"><h4>Zone 0 → 1</h4><p><strong>Type 1 (Class I)</strong><br>At MSB / main switchboard<br>Iimp ≥ 12.5 kA (10/350 µs)<br>Handles direct lightning current</p></div>
-        <div class="zone-card"><h4>Zone 1 → 2</h4><p><strong>Type 2 (Class II)</strong><br>At sub-distribution boards<br>In ≥ 20 kA (8/20 µs)<br>Handles indirect surges</p></div>
-        <div class="zone-card"><h4>Zone 2 → 3</h4><p><strong>Type 3 (Class III)</strong><br>At point of use / GPO<br>Imax ≥ 10 kA (8/20 µs)<br>Fine protection for sensitive equipment</p></div>
+        <div class="zone-card"><h4>Zone 0 Ã¢â€ â€™ 1</h4><p><strong>Type 1 (Class I)</strong><br>At MSB / main switchboard<br>Iimp Ã¢â€°Â¥ 12.5 kA (10/350 Ã‚Âµs)<br>Handles direct lightning current</p></div>
+        <div class="zone-card"><h4>Zone 1 Ã¢â€ â€™ 2</h4><p><strong>Type 2 (Class II)</strong><br>At sub-distribution boards<br>In Ã¢â€°Â¥ 20 kA (8/20 Ã‚Âµs)<br>Handles indirect surges</p></div>
+        <div class="zone-card"><h4>Zone 2 Ã¢â€ â€™ 3</h4><p><strong>Type 3 (Class III)</strong><br>At point of use / GPO<br>Imax Ã¢â€°Â¥ 10 kA (8/20 Ã‚Âµs)<br>Fine protection for sensitive equipment</p></div>
       </div>
       <div class="info-box"><strong>Coordination:</strong> SPDs at different zones must be coordinated. Minimum 10m cable between Type 1 and Type 2 SPDs, or use coordinated SPD sets. Many manufacturers offer combined Type 1+2 devices.</div>
     </div>
@@ -106,11 +104,11 @@
         <thead><tr><th>Parameter</th><th>Type 1 (Class I)</th><th>Type 2 (Class II)</th><th>Type 3 (Class III)</th></tr></thead>
         <tbody>
           <tr><td>Location</td><td>MSB / MEN point</td><td>Sub-distribution boards</td><td>Point of use</td></tr>
-          <tr><td>Lightning Current (Iimp)</td><td>≥ 12.5 kA per pole (10/350µs)</td><td>N/A</td><td>N/A</td></tr>
-          <tr><td>Discharge Current (In)</td><td>—</td><td>≥ 20 kA (8/20µs)</td><td>—</td></tr>
-          <tr><td>Max Discharge (Imax)</td><td>—</td><td>≥ 40 kA (8/20µs)</td><td>≥ 10 kA (8/20µs)</td></tr>
-          <tr><td>Voltage Protection (Up)</td><td>≤ 4 kV</td><td>≤ 2.5 kV</td><td>≤ 1.5 kV</td></tr>
-          <tr><td>Uc (Max continuous V)</td><td colspan="3">≥ 275 V (L-N) for 230V systems, ≥ 440V (L-L) for 400V systems</td></tr>
+          <tr><td>Lightning Current (Iimp)</td><td>Ã¢â€°Â¥ 12.5 kA per pole (10/350Ã‚Âµs)</td><td>N/A</td><td>N/A</td></tr>
+          <tr><td>Discharge Current (In)</td><td>Ã¢â‚¬â€</td><td>Ã¢â€°Â¥ 20 kA (8/20Ã‚Âµs)</td><td>Ã¢â‚¬â€</td></tr>
+          <tr><td>Max Discharge (Imax)</td><td>Ã¢â‚¬â€</td><td>Ã¢â€°Â¥ 40 kA (8/20Ã‚Âµs)</td><td>Ã¢â€°Â¥ 10 kA (8/20Ã‚Âµs)</td></tr>
+          <tr><td>Voltage Protection (Up)</td><td>Ã¢â€°Â¤ 4 kV</td><td>Ã¢â€°Â¤ 2.5 kV</td><td>Ã¢â€°Â¤ 1.5 kV</td></tr>
+          <tr><td>Uc (Max continuous V)</td><td colspan="3">Ã¢â€°Â¥ 275 V (L-N) for 230V systems, Ã¢â€°Â¥ 440V (L-L) for 400V systems</td></tr>
           <tr><td>Backup Protection</td><td>Fuse/MCB per manufacturer</td><td>Fuse/MCB per manufacturer</td><td>Upstream OCPD</td></tr>
           <tr><td>Status Indication</td><td>Required (green/red)</td><td>Required</td><td>Recommended</td></tr>
           <tr><td>Standard</td><td>AS/NZS 1768, IEC 61643-11</td><td>AS/NZS 1768, IEC 61643-11</td><td>IEC 61643-11</td></tr>
@@ -162,7 +160,7 @@
       if (riskScore >= 12) {
         riskLevel = 'VERY HIGH';
         type1 = true; type2 = true; type3 = true;
-        recommendations.push('Install Type 1 SPD at MSB with Iimp ≥ 25 kA per pole.');
+        recommendations.push('Install Type 1 SPD at MSB with Iimp Ã¢â€°Â¥ 25 kA per pole.');
         recommendations.push('Install Type 2 SPDs at ALL sub-distribution boards.');
         recommendations.push('Install Type 3 SPDs at sensitive equipment locations.');
       } else if (riskScore >= 8) {
@@ -204,16 +202,16 @@
 
       // Zoned diagram with active zones
       html += `<div class="calc-section" style="margin-top:16px;"><h2>Required Protection Zones</h2><div class="zone-diagram">
-        <div class="zone-card ${type1?'active':''}"><h4>Type 1 ${type1?'✓ REQUIRED':'— Not required'}</h4><p>${type1?'Install at MSB. Iimp ≥ 12.5 kA (10/350µs). Up ≤ 4 kV.':'Low risk — Type 1 not needed for this installation.'}</p></div>
-        <div class="zone-card ${type2?'active':''}"><h4>Type 2 ${type2?'✓ REQUIRED':'— Not required'}</h4><p>${type2?'Install at sub-DBs. In ≥ 20 kA (8/20µs). Up ≤ 2.5 kV.':'Not required based on risk assessment.'}</p></div>
-        <div class="zone-card ${type3?'active':''}"><h4>Type 3 ${type3?'✓ REQUIRED':'— Optional'}</h4><p>${type3?'Install at sensitive equipment. Imax ≥ 10 kA. Up ≤ 1.5 kV.':'Optional — no critical sensitive loads identified.'}</p></div>
+        <div class="zone-card ${type1?'active':''}"><h4>Type 1 ${type1?'Ã¢Å“â€œ REQUIRED':'Ã¢â‚¬â€ Not required'}</h4><p>${type1?'Install at MSB. Iimp Ã¢â€°Â¥ 12.5 kA (10/350Ã‚Âµs). Up Ã¢â€°Â¤ 4 kV.':'Low risk Ã¢â‚¬â€ Type 1 not needed for this installation.'}</p></div>
+        <div class="zone-card ${type2?'active':''}"><h4>Type 2 ${type2?'Ã¢Å“â€œ REQUIRED':'Ã¢â‚¬â€ Not required'}</h4><p>${type2?'Install at sub-DBs. In Ã¢â€°Â¥ 20 kA (8/20Ã‚Âµs). Up Ã¢â€°Â¤ 2.5 kV.':'Not required based on risk assessment.'}</p></div>
+        <div class="zone-card ${type3?'active':''}"><h4>Type 3 ${type3?'Ã¢Å“â€œ REQUIRED':'Ã¢â‚¬â€ Optional'}</h4><p>${type3?'Install at sensitive equipment. Imax Ã¢â€°Â¥ 10 kA. Up Ã¢â€°Â¤ 1.5 kV.':'Optional Ã¢â‚¬â€ no critical sensitive loads identified.'}</p></div>
       </div></div>`;
 
       // Recommendations
       const boxClass = riskScore >= 8 ? 'warn-box' : 'info-box';
       html += `<div class="${boxClass}"><strong>Recommendations:</strong><ul>`;
       recommendations.forEach(r => html += `<li>${r}</li>`);
-      html += `</ul><p><em>Ensure SPD Uc ≥ 275V for 230V L-N systems. Use SPD backup fuses as specified by manufacturer (typically 125A gG for Type 1, 63-125A for Type 2). All SPDs must have remote status indication to BMS where fitted.</em></p></div>`;
+      html += `</ul><p><em>Ensure SPD Uc Ã¢â€°Â¥ 275V for 230V L-N systems. Use SPD backup fuses as specified by manufacturer (typically 125A gG for Type 1, 63-125A for Type 2). All SPDs must have remote status indication to BMS where fitted.</em></p></div>`;
 
       document.getElementById('resultSection').innerHTML = html;
       document.getElementById('resultSection').style.display = 'block';

@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Generator Sizing - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -34,11 +33,10 @@
     .remove-btn { background: #c62828; color: white; border: none; padding: 4px 10px; cursor: pointer; font-size: 0.85em; }
     .step-chart { width: 100%; max-height: 300px; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .calc-button, .add-row-btn, .remove-btn, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    @media print { .top-tabs, .calc-button, .add-row-btn, .remove-btn { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a>
     <a class="tab" href="switchboard.html">Switchboard Sizer</a>
@@ -72,7 +70,7 @@
     <div class="calc-section">
       <h2>Site Conditions &amp; Derating</h2>
       <div class="info-box">
-        <strong>AS/NZS 3010:2017 cl. 4.4:</strong> Generator output shall be derated for altitude above 1000m and ambient temperature above 40°C. Standard ratings are at sea level, 40°C ambient.
+        <strong>AS/NZS 3010:2017 cl. 4.4:</strong> Generator output shall be derated for altitude above 1000m and ambient temperature above 40Ã‚Â°C. Standard ratings are at sea level, 40Ã‚Â°C ambient.
       </div>
       <div class="input-row three">
         <div class="input-group">
@@ -80,7 +78,7 @@
           <input type="number" id="altitude" value="0" min="0" step="100" />
         </div>
         <div class="input-group">
-          <label for="ambientTemp">Max Ambient Temperature (°C)</label>
+          <label for="ambientTemp">Max Ambient Temperature (Ã‚Â°C)</label>
           <input type="number" id="ambientTemp" value="40" min="0" max="55" step="1" />
         </div>
         <div class="input-group">
@@ -114,7 +112,7 @@
     <div class="calc-section">
       <h2>Load Steps</h2>
       <div class="info-box">
-        Add loads in the sequence they will be connected after generator start. Motor starting kVA is the transient demand during DOL start (typically 6–8× FLC). Group loads into steps that switch on simultaneously.
+        Add loads in the sequence they will be connected after generator start. Motor starting kVA is the transient demand during DOL start (typically 6Ã¢â‚¬â€œ8Ãƒâ€” FLC). Group loads into steps that switch on simultaneously.
       </div>
       <table class="load-table" id="loadTable">
         <thead>
@@ -141,27 +139,27 @@
         <div class="result-grid">
           <div class="result-item">
             <div class="result-label">Total Running Load (kW)</div>
-            <div class="result-value" id="resTotalKW">—</div>
+            <div class="result-value" id="resTotalKW">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Total Running (kVA)</div>
-            <div class="result-value" id="resTotalKVA">—</div>
+            <div class="result-value" id="resTotalKVA">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Peak Step kVA</div>
-            <div class="result-value" id="resPeakStep">—</div>
+            <div class="result-value" id="resPeakStep">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Minimum Gen. kVA (derated)</div>
-            <div class="result-value" id="resMinKVA">—</div>
+            <div class="result-value" id="resMinKVA">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Recommended Size (kVA)</div>
-            <div class="result-value" id="resRecKVA">—</div>
+            <div class="result-value" id="resRecKVA">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Indicative Fuel Tank (L)</div>
-            <div class="result-value" id="resFuel">—</div>
+            <div class="result-value" id="resFuel">Ã¢â‚¬â€</div>
           </div>
         </div>
       </div>
@@ -197,16 +195,16 @@
         <td><input type="text" value="Step ${stepCount}" /></td>
         <td><select>
           <option value="static">Static (lighting, heaters)</option>
-          <option value="motor_dol">Motor — DOL Start</option>
-          <option value="motor_sd">Motor — Star-Delta</option>
-          <option value="motor_vsd">Motor — VSD</option>
+          <option value="motor_dol">Motor Ã¢â‚¬â€ DOL Start</option>
+          <option value="motor_sd">Motor Ã¢â‚¬â€ Star-Delta</option>
+          <option value="motor_vsd">Motor Ã¢â‚¬â€ VSD</option>
           <option value="ups">UPS / IT Load</option>
         </select></td>
         <td><input type="number" value="50" min="0" step="1" /></td>
         <td><input type="number" value="0.85" min="0.5" max="1.0" step="0.05" /></td>
         <td><input type="number" value="0" min="0" step="1" /><span style="font-size:0.75em;color:#888;">0 = auto</span></td>
         <td><select><option value="yes">Essential</option><option value="no">Non-essential</option></select></td>
-        <td><button class="remove-btn" onclick="this.closest('tr').remove()">✕</button></td>
+        <td><button class="remove-btn" onclick="this.closest('tr').remove()">Ã¢Å“â€¢</button></td>
       `;
       tbody.appendChild(tr);
     }
@@ -215,9 +213,9 @@
       if (manualKVA > 0) return manualKVA;
       const runKVA = kW / pf;
       switch (type) {
-        case 'motor_dol': return runKVA * 6.5; // DOL: ~6-8× FLC
-        case 'motor_sd': return runKVA * 2.5; // Star-delta: ~2-3× FLC
-        case 'motor_vsd': return runKVA * 1.2; // VSD: ~1.0-1.5× FLC
+        case 'motor_dol': return runKVA * 6.5; // DOL: ~6-8Ãƒâ€” FLC
+        case 'motor_sd': return runKVA * 2.5; // Star-delta: ~2-3Ãƒâ€” FLC
+        case 'motor_vsd': return runKVA * 1.2; // VSD: ~1.0-1.5Ãƒâ€” FLC
         case 'ups': return runKVA * 1.5; // UPS inrush
         default: return runKVA; // Static: no inrush
       }
@@ -234,7 +232,7 @@
       let altDerate = 1.0;
       if (altitude > 1000) altDerate = 1 - (altitude - 1000) * 0.035 / 1000; // ~3.5% per 1000m above 1000m
       let tempDerate = 1.0;
-      if (temp > 40) tempDerate = 1 - (temp - 40) * 0.02; // ~2% per °C above 40°C
+      if (temp > 40) tempDerate = 1 - (temp - 40) * 0.02; // ~2% per Ã‚Â°C above 40Ã‚Â°C
       const totalDerate = altDerate * tempDerate;
 
       const rows = document.getElementById('loadBody').querySelectorAll('tr');
@@ -259,7 +257,7 @@
         const stepKVA = cumKVA - runKVA + startKVA; // existing running + this step starting
         if (stepKVA > peakStepKVA) peakStepKVA = stepKVA;
 
-        // Voltage dip estimate: Vdip ≈ (startKVA / genKVA) × 100%
+        // Voltage dip estimate: Vdip Ã¢â€°Ë† (startKVA / genKVA) Ãƒâ€” 100%
         // We'll calculate after we know gen size
         allSteps.push({ desc, kw, runKVA, startKVA, cumKW, cumKVA, stepKVA });
       });
@@ -302,8 +300,8 @@
 
       document.getElementById('dipNote').innerHTML = `
         <strong>Voltage Dip Assessment:</strong> Maximum step voltage dip estimated at <strong>${maxDip.toFixed(1)}%</strong> of generator rated kVA.
-        ${maxDip > 30 ? '⚠ Exceeds 30% — consider increasing generator size or staggering load steps.' : maxDip > 20 ? '⚠ Marginal (20–30%) — verify with manufacturer data.' : '✓ Within acceptable limits (<20%).'}<br>
-        <strong>AS/NZS 3010 cl. 3.8:</strong> Frequency dip should not exceed ±5% and voltage dip should recover within acceptable limits.
+        ${maxDip > 30 ? 'Ã¢Å¡Â  Exceeds 30% Ã¢â‚¬â€ consider increasing generator size or staggering load steps.' : maxDip > 20 ? 'Ã¢Å¡Â  Marginal (20Ã¢â‚¬â€œ30%) Ã¢â‚¬â€ verify with manufacturer data.' : 'Ã¢Å“â€œ Within acceptable limits (<20%).'}<br>
+        <strong>AS/NZS 3010 cl. 3.8:</strong> Frequency dip should not exceed Ã‚Â±5% and voltage dip should recover within acceptable limits.
         ${totalDerate < 1 ? '<br><strong>Derating applied:</strong> ' + ((1-totalDerate)*100).toFixed(1) + '% (altitude + temperature).' : ''}
       `;
 

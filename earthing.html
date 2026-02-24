@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Earthing Calculator - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -30,13 +29,12 @@
     .ref-table tr:nth-child(even) { background: #f8f9fa; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
     @media print {
-      .top-tabs, .calc-button, .topleft-icon { display: none !important; }
+      .top-tabs, .calc-button { display: none !important; }
       .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a>
     <a class="tab" href="switchboard.html">Switchboard Sizer</a>
@@ -105,17 +103,17 @@
     <div class="calc-section">
       <h2>Soil &amp; Site Data</h2>
       <div class="info-box">
-        <strong>AS/NZS 3000 <a href="as3000viewer.html#cl-5.6.2">cl. 5.6.2</a>:</strong> The earthing system shall provide an impedance low enough for protective devices to operate within required disconnection times. Soil resistivity is the key variable — values range from 10 Ω·m (wet clay) to 10,000 Ω·m (dry rock).
+        <strong>AS/NZS 3000 <a href="as3000viewer.html#cl-5.6.2">cl. 5.6.2</a>:</strong> The earthing system shall provide an impedance low enough for protective devices to operate within required disconnection times. Soil resistivity is the key variable Ã¢â‚¬â€ values range from 10 ÃŽÂ©Ã‚Â·m (wet clay) to 10,000 ÃŽÂ©Ã‚Â·m (dry rock).
       </div>
       <div class="input-row three">
         <div class="input-group">
-          <label for="soilRes">Soil Resistivity ρ (Ω·m)</label>
+          <label for="soilRes">Soil Resistivity ÃÂ (ÃŽÂ©Ã‚Â·m)</label>
           <input type="number" id="soilRes" value="100" min="1" step="1" />
         </div>
         <div class="input-group">
           <label for="soilType">Soil Type (guide)</label>
           <select id="soilType" onchange="setSoilRes()">
-            <option value="">— Select to auto-fill —</option>
+            <option value="">Ã¢â‚¬â€ Select to auto-fill Ã¢â‚¬â€</option>
             <option value="10">Wet clay / marshy ground (~10)</option>
             <option value="30">Loam / garden soil (~30)</option>
             <option value="100">Clay (~100)</option>
@@ -126,9 +124,9 @@
           </select>
         </div>
         <div class="input-group">
-          <label for="targetR">Target Earth Resistance (Ω)</label>
+          <label for="targetR">Target Earth Resistance (ÃŽÂ©)</label>
           <input type="number" id="targetR" value="1" min="0.1" step="0.1" />
-          <span style="font-size:0.8em;color:#888;">AS/NZS 3000 recommends ≤1 Ω for MEN; distributors may require lower</span>
+          <span style="font-size:0.8em;color:#888;">AS/NZS 3000 recommends Ã¢â€°Â¤1 ÃŽÂ© for MEN; distributors may require lower</span>
         </div>
       </div>
     </div>
@@ -176,16 +174,16 @@
           <div class="input-group">
             <label for="rodDia">Rod Diameter (mm)</label>
             <select id="rodDia">
-              <option value="12.7">12.7 (½")</option>
-              <option value="15.9" selected>15.9 (⅝")</option>
-              <option value="19.1">19.1 (¾")</option>
+              <option value="12.7">12.7 (Ã‚Â½")</option>
+              <option value="15.9" selected>15.9 (Ã¢â€¦Â")</option>
+              <option value="19.1">19.1 (Ã‚Â¾")</option>
               <option value="25.4">25.4 (1")</option>
             </select>
           </div>
           <div class="input-group">
             <label for="rodSpacing">Spacing Between Rods (m)</label>
             <input type="number" id="rodSpacing" value="3" min="1" step="0.5" />
-            <span style="font-size:0.8em;color:#888;">Recommended ≥ rod length for full benefit</span>
+            <span style="font-size:0.8em;color:#888;">Recommended Ã¢â€°Â¥ rod length for full benefit</span>
           </div>
         </div>
       </div>
@@ -227,7 +225,7 @@
       <div id="plateInputs" style="display:none;">
         <div class="input-row three">
           <div class="input-group">
-            <label for="plateArea">Plate Area (m²)</label>
+            <label for="plateArea">Plate Area (mÃ‚Â²)</label>
             <input type="number" id="plateArea" value="1" min="0.1" step="0.1" />
           </div>
           <div class="input-group">
@@ -245,37 +243,37 @@
         <h3>Estimated Earth Resistance</h3>
         <div class="result-grid">
           <div class="result-item">
-            <div class="result-label">Single Electrode R (Ω)</div>
-            <div class="result-value" id="singleR">—</div>
+            <div class="result-label">Single Electrode R (ÃŽÂ©)</div>
+            <div class="result-value" id="singleR">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
-            <div class="result-label">Combined System R (Ω)</div>
-            <div class="result-value" id="combinedR">—</div>
+            <div class="result-label">Combined System R (ÃŽÂ©)</div>
+            <div class="result-value" id="combinedR">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
-            <div class="result-label">Target R (Ω)</div>
-            <div class="result-value" id="targetRval">—</div>
+            <div class="result-label">Target R (ÃŽÂ©)</div>
+            <div class="result-value" id="targetRval">Ã¢â‚¬â€</div>
           </div>
           <div class="result-item">
             <div class="result-label">Status</div>
-            <div class="result-value" id="status">—</div>
+            <div class="result-value" id="status">Ã¢â‚¬â€</div>
           </div>
         </div>
       </div>
       <div id="recommendation" class="info-box" style="margin-top:16px;"></div>
 
       <div class="calc-section" style="margin-top:24px;">
-        <h2>Quick Reference — Typical Soil Resistivity (Ω·m)</h2>
+        <h2>Quick Reference Ã¢â‚¬â€ Typical Soil Resistivity (ÃŽÂ©Ã‚Â·m)</h2>
         <table class="ref-table">
-          <thead><tr><th>Soil Type</th><th>Typical Range (Ω·m)</th><th>Design Value</th></tr></thead>
+          <thead><tr><th>Soil Type</th><th>Typical Range (ÃŽÂ©Ã‚Â·m)</th><th>Design Value</th></tr></thead>
           <tbody>
-            <tr><td>Marshy ground</td><td>2 – 50</td><td>10</td></tr>
-            <tr><td>Loam / garden soil</td><td>5 – 50</td><td>30</td></tr>
-            <tr><td>Clay</td><td>20 – 200</td><td>100</td></tr>
-            <tr><td>Sandy clay</td><td>50 – 500</td><td>200</td></tr>
-            <tr><td>Sand</td><td>200 – 2000</td><td>500</td></tr>
-            <tr><td>Gravel</td><td>300 – 5000</td><td>1000</td></tr>
-            <tr><td>Rock / dry sand</td><td>1000 – 10000</td><td>3000</td></tr>
+            <tr><td>Marshy ground</td><td>2 Ã¢â‚¬â€œ 50</td><td>10</td></tr>
+            <tr><td>Loam / garden soil</td><td>5 Ã¢â‚¬â€œ 50</td><td>30</td></tr>
+            <tr><td>Clay</td><td>20 Ã¢â‚¬â€œ 200</td><td>100</td></tr>
+            <tr><td>Sandy clay</td><td>50 Ã¢â‚¬â€œ 500</td><td>200</td></tr>
+            <tr><td>Sand</td><td>200 Ã¢â‚¬â€œ 2000</td><td>500</td></tr>
+            <tr><td>Gravel</td><td>300 Ã¢â‚¬â€œ 5000</td><td>1000</td></tr>
+            <tr><td>Rock / dry sand</td><td>1000 Ã¢â‚¬â€œ 10000</td><td>3000</td></tr>
           </tbody>
         </table>
       </div>
@@ -309,14 +307,14 @@
         const n = parseInt(document.getElementById('numElectrodes').value);
         const s = parseFloat(document.getElementById('rodSpacing').value);
 
-        // R = (ρ / 2πL) × ln(4L/d)  — single vertical rod formula
+        // R = (ÃÂ / 2Ãâ‚¬L) Ãƒâ€” ln(4L/d)  Ã¢â‚¬â€ single vertical rod formula
         singleR = (rho / (2 * Math.PI * L)) * Math.log(4 * L / d);
 
         // Parallel rods with utilisation factor
         if (n === 1) {
           combinedR = singleR;
         } else {
-          // Schwarz-based utilisation: η ≈ 1 - (0.5 × ln(n) × L / (n × s))
+          // Schwarz-based utilisation: ÃŽÂ· Ã¢â€°Ë† 1 - (0.5 Ãƒâ€” ln(n) Ãƒâ€” L / (n Ãƒâ€” s))
           const eta = Math.min(1, 1 / (1 + (n - 1) * 0.5 * (L / s > 1 ? L / s * 0.3 : 0.15)));
           combinedR = singleR / (n * eta);
           // Simplified: parallel reduction with coupling factor
@@ -327,7 +325,7 @@
         const L = parseFloat(document.getElementById('stripLength').value);
         const w = parseFloat(document.getElementById('stripWidth').value) / 1000;
         const d = parseFloat(document.getElementById('stripDepth').value);
-        // R = (ρ / πL) × ln(2L² / (w×d))
+        // R = (ÃÂ / Ãâ‚¬L) Ãƒâ€” ln(2LÃ‚Â² / (wÃƒâ€”d))
         singleR = (rho / (Math.PI * L)) * Math.log((2 * L * L) / (w * d));
         combinedR = singleR;
       } else if (type === 'grid') {
@@ -336,13 +334,13 @@
         const sp = parseFloat(document.getElementById('gridSpacing').value);
         const A = gL * gW;
         const totalConductor = (Math.floor(gW / sp) + 1) * gL + (Math.floor(gL / sp) + 1) * gW;
-        // Laurent-Niemann: R ≈ ρ/(4√A) + ρ/L_total
+        // Laurent-Niemann: R Ã¢â€°Ë† ÃÂ/(4Ã¢Ë†Å¡A) + ÃÂ/L_total
         singleR = rho / (4 * Math.sqrt(A)) + rho / totalConductor;
         combinedR = singleR;
       } else if (type === 'plate') {
         const Ap = parseFloat(document.getElementById('plateArea').value);
         const dp = parseFloat(document.getElementById('plateDepth').value);
-        // R = ρ / (4 × √(A/π)) — circular plate approximation
+        // R = ÃÂ / (4 Ãƒâ€” Ã¢Ë†Å¡(A/Ãâ‚¬)) Ã¢â‚¬â€ circular plate approximation
         const eqR = Math.sqrt(Ap / Math.PI);
         singleR = rho / (4 * eqR);
         combinedR = singleR;
@@ -353,25 +351,25 @@
       document.getElementById('targetRval').textContent = target.toFixed(1);
 
       const pass = combinedR <= target;
-      document.getElementById('status').textContent = pass ? '✓ OK' : '✕ Too High';
+      document.getElementById('status').textContent = pass ? 'Ã¢Å“â€œ OK' : 'Ã¢Å“â€¢ Too High';
       document.getElementById('status').style.color = pass ? '#a5d6a7' : '#ef9a9a';
 
       // Recommendation
       const rec = document.getElementById('recommendation');
       if (pass) {
-        rec.innerHTML = `<strong>✓ Result:</strong> Estimated earth resistance of <strong>${combinedR.toFixed(2)} Ω</strong> meets the target of <strong>${target.toFixed(1)} Ω</strong>. Confirm with field measurements per AS/NZS 3017 (fall-of-potential test).`;
+        rec.innerHTML = `<strong>Ã¢Å“â€œ Result:</strong> Estimated earth resistance of <strong>${combinedR.toFixed(2)} ÃŽÂ©</strong> meets the target of <strong>${target.toFixed(1)} ÃŽÂ©</strong>. Confirm with field measurements per AS/NZS 3017 (fall-of-potential test).`;
         rec.className = 'info-box';
         rec.style.borderLeftColor = '#2e7d32';
         rec.style.background = '#e8f5e9';
       } else {
-        let advice = `<strong>✕ Result:</strong> Estimated earth resistance of <strong>${combinedR.toFixed(2)} Ω</strong> exceeds target of <strong>${target.toFixed(1)} Ω</strong>.<br><strong>Options:</strong><ul>`;
+        let advice = `<strong>Ã¢Å“â€¢ Result:</strong> Estimated earth resistance of <strong>${combinedR.toFixed(2)} ÃŽÂ©</strong> exceeds target of <strong>${target.toFixed(1)} ÃŽÂ©</strong>.<br><strong>Options:</strong><ul>`;
         if (type === 'rod') {
           const neededN = Math.ceil(singleR / target * 1.3);
-          advice += `<li>Increase to approximately <strong>${neededN} rods</strong> (with spacing ≥ rod length)</li>`;
-          advice += `<li>Use longer rods (3.0–6.0 m) to reach lower-resistivity layers</li>`;
+          advice += `<li>Increase to approximately <strong>${neededN} rods</strong> (with spacing Ã¢â€°Â¥ rod length)</li>`;
+          advice += `<li>Use longer rods (3.0Ã¢â‚¬â€œ6.0 m) to reach lower-resistivity layers</li>`;
         }
         advice += `<li>Augment with horizontal strip/ring earth</li>`;
-        advice += `<li>Use soil treatment (bentonite / Marconite) to reduce local ρ</li>`;
+        advice += `<li>Use soil treatment (bentonite / Marconite) to reduce local ÃÂ</li>`;
         advice += `<li>Combine rod + grid configuration</li></ul>`;
         rec.innerHTML = advice;
         rec.className = 'warn-box';

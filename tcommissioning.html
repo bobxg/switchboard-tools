@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Testing & Commissioning Checklists - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -30,11 +29,10 @@
     .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; }
     .ref-table th { background: #1976d2; color: white; text-align: center; }
     .ref-table tr:nth-child(even) { background: #f8f9fa; }
-    @media print { .top-tabs, .calc-button, .topleft-icon, .tabs { display: none !important; } .tab-content { display: block !important; border: none; page-break-before: always; } .checklist input[type="checkbox"] { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    @media print { .top-tabs, .calc-button, .tabs { display: none !important; } .tab-content { display: block !important; border: none; page-break-before: always; } .checklist input[type="checkbox"] { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -63,15 +61,15 @@
       <div class="progress-text" id="prog_preEnerg">0 / 20 complete</div>
       <div class="progress-bar"><div class="progress-fill" id="bar_preEnerg" style="width:0%;"></div></div>
       <ul class="checklist" data-group="preEnerg">
-        <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> Visual inspection of all connections — tight, correct polarity, correct phase identification</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> Visual inspection of all connections Ã¢â‚¬â€ tight, correct polarity, correct phase identification</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> Cable sizes match design drawings and schedules</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> All cable terminations torqued to manufacturer specifications</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> Cable glands, saddles, and supports installed correctly</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.2" class="clause">cl 8.3.2</a> Earth continuity verified — MEN link, earth bar connections, electrode</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.2" class="clause">cl 8.3.2</a> Earth continuity verified Ã¢â‚¬â€ MEN link, earth bar connections, electrode</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> Switchboard internal wiring complete and dressed neatly</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> All blanking plates, covers, and safety barriers in place</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> Switchboard labelling complete — circuit IDs, danger signs, nameplates</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> IP rating achieved — no unprotected openings, unused knockouts sealed</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> Switchboard labelling complete Ã¢â‚¬â€ circuit IDs, danger signs, nameplates</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> IP rating achieved Ã¢â‚¬â€ no unprotected openings, unused knockouts sealed</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> No foreign objects inside switchboard (swarf, cable off-cuts, tools)</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-5.3" class="clause">cl 5.3</a> Switchroom access clear, door signage installed, fire extinguisher present</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.2" class="clause">cl 8.3.2</a> Insulation resistance tests completed and recorded</label></li>
@@ -79,7 +77,7 @@
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.2" class="clause">cl 8.3.2</a> Polarity test completed on all circuits</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-2.6" class="clause">cl 2.6</a> RCD devices installed and tested per specification</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.3.1" class="clause">cl 8.3.1</a> All circuit breaker ratings match design schedules</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-7.5" class="clause">cl 7.5</a> Fire-rated cables — installation and fixings verified per AS/NZS 3013</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-7.5" class="clause">cl 7.5</a> Fire-rated cables Ã¢â‚¬â€ installation and fixings verified per AS/NZS 3013</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.2" class="clause">cl 8.2</a> Energisation permit obtained / safe work method statement (SWMS)</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.2" class="clause">cl 8.2</a> Distributor supply connection confirmed / meter installed</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.4" class="clause">cl 8.4</a> Certificate of Compliance (CoC) / ESM documentation prepared</label></li>
@@ -88,19 +86,19 @@
     </div>
 
     <div id="testing" class="tab-content">
-      <h2>Electrical Testing — AS/NZS 3017</h2>
-      <div class="info-box"><strong>AS/NZS 3017:2022</strong> Electrical installations — Verification and inspection guidelines. Mandatory tests before energisation.</div>
+      <h2>Electrical Testing Ã¢â‚¬â€ AS/NZS 3017</h2>
+      <div class="info-box"><strong>AS/NZS 3017:2022</strong> Electrical installations Ã¢â‚¬â€ Verification and inspection guidelines. Mandatory tests before energisation.</div>
       <div class="progress-text" id="prog_testing">0 / 12 complete</div>
       <div class="progress-bar"><div class="progress-fill" id="bar_testing" style="width:0%;"></div></div>
       <ul class="checklist" data-group="testing">
-        <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.1" class="clause">cl 8.3.2.1</a> <strong>Continuity of earthing:</strong> Earth continuity test on all protective conductors, main earth, equipotential bonding. ≤ 1Ω.</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.2" class="clause">cl 8.3.2.2</a> <strong>Insulation resistance:</strong> Test L-N, L-E, N-E at 500V DC. Minimum 1 MΩ per circuit. Record readings.</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.1" class="clause">cl 8.3.2.1</a> <strong>Continuity of earthing:</strong> Earth continuity test on all protective conductors, main earth, equipotential bonding. Ã¢â€°Â¤ 1ÃŽÂ©.</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.2" class="clause">cl 8.3.2.2</a> <strong>Insulation resistance:</strong> Test L-N, L-E, N-E at 500V DC. Minimum 1 MÃŽÂ© per circuit. Record readings.</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.3" class="clause">cl 8.3.2.3</a> <strong>Polarity:</strong> Verify correct polarity at all points: switchboard, socket outlets, fixed connections. Active on correct terminal.</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.5" class="clause">cl 8.3.2.5</a> <strong>Earth fault loop impedance (Zs):</strong> Measure Zs at furthest point of each circuit. Verify disconnection time per <a href="as3000viewer.html#cl-2.6.2" class="clause">cl 2.6.2</a>.</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.6" class="clause">cl 8.3.2.6</a> <strong>RCD trip test:</strong> Test each RCD at rated IΔn. Trip time ≤ 300ms (30mA type) / ≤ 40ms (10mA type). Test button operation.</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.4" class="clause">cl 8.3.2.4</a> <strong>Earth electrode resistance:</strong> Test resistance of earth electrode. Typically ≤ 10Ω for a single installation. Fall-of-potential method.</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.6" class="clause">cl 8.3.2.6</a> <strong>RCD trip test:</strong> Test each RCD at rated IÃŽâ€n. Trip time Ã¢â€°Â¤ 300ms (30mA type) / Ã¢â€°Â¤ 40ms (10mA type). Test button operation.</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.4" class="clause">cl 8.3.2.4</a> <strong>Earth electrode resistance:</strong> Test resistance of earth electrode. Typically Ã¢â€°Â¤ 10ÃŽÂ© for a single installation. Fall-of-potential method.</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2" class="clause">cl 8.3.2</a> <strong>Phase rotation:</strong> Verify correct phase sequence (L1-L2-L3) at MSB and all 3-phase sub-boards.</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2" class="clause">cl 8.3.2</a> <strong>Voltage readings:</strong> Record L-N, L-L, and N-E voltages at MSB. Verify within ±6% of nominal.</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2" class="clause">cl 8.3.2</a> <strong>Voltage readings:</strong> Record L-N, L-L, and N-E voltages at MSB. Verify within Ã‚Â±6% of nominal.</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2" class="clause">cl 8.3.2</a> <strong>Current readings:</strong> Record phase currents at MSB under load. Verify balance within 10%. Verify neutral current.</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2.7" class="clause">cl 8.3.2.7</a> <strong>Prospective fault current:</strong> Measure or verify Ipsc at MSB. Confirm switchgear fault rating adequate.</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('testing')"><a href="as3000viewer.html#cl-8.3.2" class="clause">cl 8.3.2</a> <strong>Circuit identification:</strong> Verify each circuit breaker labels match actual connected circuit. Buzzout test.</label></li>
@@ -112,14 +110,14 @@
         <table class="ref-table">
           <thead><tr><th>Test</th><th>Instrument</th><th>Pass Criteria</th><th>Clause</th></tr></thead>
           <tbody>
-            <tr><td>Insulation resistance</td><td>500V DC insulation tester</td><td>≥ 1 MΩ per circuit</td><td>8.3.2.2</td></tr>
-            <tr><td>Earth continuity</td><td>Low-resistance ohmmeter</td><td>≤ 1 Ω end-to-end</td><td>8.3.2.1</td></tr>
-            <tr><td>Earth electrode</td><td>Earth resistance tester</td><td>≤ 10 Ω (single installation)</td><td>8.3.2.4</td></tr>
-            <tr><td>RCD trip (30mA)</td><td>RCD tester</td><td>Trip ≤ 300 ms at IΔn; ≤ 40 ms at 5×IΔn</td><td>8.3.2.6</td></tr>
-            <tr><td>RCD trip (10mA)</td><td>RCD tester</td><td>Trip ≤ 40 ms at IΔn</td><td>8.3.2.6</td></tr>
-            <tr><td>Loop impedance Zs</td><td>Loop impedance tester</td><td>Zs ≤ Zs(max) per Table 8.1</td><td>8.3.2.5</td></tr>
-            <tr><td>Prospective fault</td><td>Loop tester or calculated</td><td>≤ switchgear fault rating</td><td>8.3.2.7</td></tr>
-            <tr><td>Voltage</td><td>Multimeter (CAT III)</td><td>230V ±6% (216–244V) L-N</td><td>—</td></tr>
+            <tr><td>Insulation resistance</td><td>500V DC insulation tester</td><td>Ã¢â€°Â¥ 1 MÃŽÂ© per circuit</td><td>8.3.2.2</td></tr>
+            <tr><td>Earth continuity</td><td>Low-resistance ohmmeter</td><td>Ã¢â€°Â¤ 1 ÃŽÂ© end-to-end</td><td>8.3.2.1</td></tr>
+            <tr><td>Earth electrode</td><td>Earth resistance tester</td><td>Ã¢â€°Â¤ 10 ÃŽÂ© (single installation)</td><td>8.3.2.4</td></tr>
+            <tr><td>RCD trip (30mA)</td><td>RCD tester</td><td>Trip Ã¢â€°Â¤ 300 ms at IÃŽâ€n; Ã¢â€°Â¤ 40 ms at 5Ãƒâ€”IÃŽâ€n</td><td>8.3.2.6</td></tr>
+            <tr><td>RCD trip (10mA)</td><td>RCD tester</td><td>Trip Ã¢â€°Â¤ 40 ms at IÃŽâ€n</td><td>8.3.2.6</td></tr>
+            <tr><td>Loop impedance Zs</td><td>Loop impedance tester</td><td>Zs Ã¢â€°Â¤ Zs(max) per Table 8.1</td><td>8.3.2.5</td></tr>
+            <tr><td>Prospective fault</td><td>Loop tester or calculated</td><td>Ã¢â€°Â¤ switchgear fault rating</td><td>8.3.2.7</td></tr>
+            <tr><td>Voltage</td><td>Multimeter (CAT III)</td><td>230V Ã‚Â±6% (216Ã¢â‚¬â€œ244V) L-N</td><td>Ã¢â‚¬â€</td></tr>
           </tbody>
         </table>
       </div>
@@ -131,34 +129,34 @@
       <div class="progress-bar"><div class="progress-fill" id="bar_switchboard" style="width:0%;"></div></div>
       <ul class="checklist" data-group="switchboard">
         <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Factory test certificates</strong> received and reviewed (type-tested assembly per AS/NZS 61439)</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Switchboard nameplate</strong> — rated voltage, current, fault rating, IP rating, manufacturer details</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Busbar torque check</strong> — all busbar joints torqued to specification and witness marked</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Thermal imaging</strong> — infrared scan after 1 hr under load. No hot spots > 10°C above ambient differential</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>CB trip settings</strong> — all adjustable circuit breaker trip units set per coordination study</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Metering verification</strong> — CT ratios correct, meter reads correctly, phase assignment verified</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Interlock testing</strong> — mechanical and electrical interlocks function correctly</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>SPD status</strong> — SPD indicators show green/healthy. Backup fuses intact</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>BMS integration</strong> — all monitored points confirmed on BMS (status, alarms, metering)</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>As-built drawings</strong> — switchboard single-line diagram and schedule updated as-built</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Switchboard nameplate</strong> Ã¢â‚¬â€ rated voltage, current, fault rating, IP rating, manufacturer details</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Busbar torque check</strong> Ã¢â‚¬â€ all busbar joints torqued to specification and witness marked</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Thermal imaging</strong> Ã¢â‚¬â€ infrared scan after 1 hr under load. No hot spots > 10Ã‚Â°C above ambient differential</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>CB trip settings</strong> Ã¢â‚¬â€ all adjustable circuit breaker trip units set per coordination study</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Metering verification</strong> Ã¢â‚¬â€ CT ratios correct, meter reads correctly, phase assignment verified</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>Interlock testing</strong> Ã¢â‚¬â€ mechanical and electrical interlocks function correctly</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>SPD status</strong> Ã¢â‚¬â€ SPD indicators show green/healthy. Backup fuses intact</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>BMS integration</strong> Ã¢â‚¬â€ all monitored points confirmed on BMS (status, alarms, metering)</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('switchboard')"><strong>As-built drawings</strong> Ã¢â‚¬â€ switchboard single-line diagram and schedule updated as-built</label></li>
       </ul>
       <button class="calc-button" onclick="window.print()">Print Checklist</button>
     </div>
 
     <div id="generator" class="tab-content">
-      <h2>Generator Commissioning — AS/NZS 3010</h2>
+      <h2>Generator Commissioning Ã¢â‚¬â€ AS/NZS 3010</h2>
       <div class="progress-text" id="prog_generator">0 / 12 complete</div>
       <div class="progress-bar"><div class="progress-fill" id="bar_generator" style="width:0%;"></div></div>
       <ul class="checklist" data-group="generator">
         <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Mechanical inspection:</strong> Fuel lines, exhaust, cooling, vibration mounts, base tank</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Fuel system:</strong> Day tank filled, main tank level, auto transfer from bulk, fuel polishing</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Battery check:</strong> Starter batteries charged, electrolyte level, charger operational</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>ATS operation:</strong> Simulate mains failure — ATS transfers to generator within design time</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>ATS retransfer:</strong> Restore mains — ATS retransfers after cooldown delay (typically 5 min)</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Voltage & frequency:</strong> 415V ±2%, 50 Hz ±0.5% steady state under load</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>ATS operation:</strong> Simulate mains failure Ã¢â‚¬â€ ATS transfers to generator within design time</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>ATS retransfer:</strong> Restore mains Ã¢â‚¬â€ ATS retransfers after cooldown delay (typically 5 min)</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Voltage & frequency:</strong> 415V Ã‚Â±2%, 50 Hz Ã‚Â±0.5% steady state under load</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Step loading:</strong> Apply loads in steps per AS/NZS 3010. Verify voltage dip < 15% per step</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Full load run:</strong> 2-hour run at full rated load. Record voltage, current, frequency, fuel consumption</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Earth fault protection:</strong> Generator earth protection scheme verified per AS/NZS 3010</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Remote monitoring:</strong> BMS alarms — gen running, gen fault, low fuel, ATS position</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Remote monitoring:</strong> BMS alarms Ã¢â‚¬â€ gen running, gen fault, low fuel, ATS position</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Exhaust emissions:</strong> Verify exhaust doesn't affect air intakes or occupied areas</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('generator')"><strong>Documentation:</strong> Operating manual, maintenance schedule, emergency procedures on site</label></li>
       </ul>
@@ -172,11 +170,11 @@
       <ul class="checklist" data-group="lighting">
         <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Lux level survey:</strong> Measure and record lux levels in representative areas. Compare to AS/NZS 1680 requirements.</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Lighting control:</strong> Verify dimming, switching, occupancy sensors, daylight sensors operate correctly</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Emergency lighting — duration test:</strong> Full discharge test for rated duration (90 min per AS/NZS 2293.2)</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Emergency lighting — lux levels:</strong> Measure emergency lux levels on escape routes (≥ 1 lux per AS/NZS 2293.1)</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Emergency lighting Ã¢â‚¬â€ duration test:</strong> Full discharge test for rated duration (90 min per AS/NZS 2293.2)</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Emergency lighting Ã¢â‚¬â€ lux levels:</strong> Measure emergency lux levels on escape routes (Ã¢â€°Â¥ 1 lux per AS/NZS 2293.1)</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Exit signs:</strong> All exit signs illuminated, correct direction, visible from required distance</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Emergency lighting log:</strong> Emergency luminaire register created with location, type, battery, test date</label></li>
-        <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Lighting power density:</strong> Verify compliance with NCC Section J6 (max W/m²) for applicable areas</label></li>
+        <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Lighting power density:</strong> Verify compliance with NCC Section J6 (max W/mÃ‚Â²) for applicable areas</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>External lighting:</strong> Verify no light spill to neighbouring properties per AS 4282 (control of obtrusive effects)</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>DALI/KNX addressing:</strong> All luminaires correctly addressed and assigned to groups/scenes</label></li>
         <li><label><input type="checkbox" onchange="updateProgress('lighting')"><strong>Central monitoring:</strong> Emergency lighting test system (if fitted) reports all luminaires healthy</label></li>

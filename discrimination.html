@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Discrimination Check - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -37,13 +36,12 @@
     .ref-table tr:nth-child(even) { background: #f8f9fa; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
     @media print {
-      .top-tabs, .calc-button, .topleft-icon { display: none !important; }
+      .top-tabs, .calc-button { display: none !important; }
       .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a>
     <a class="tab" href="switchboard.html">Switchboard Sizer</a>
@@ -102,16 +100,16 @@
             <input type="number" id="upRating" value="250" min="1" />
           </div>
           <div class="input-group">
-            <label for="upSetting">Trip Setting / Ir (×In)</label>
+            <label for="upSetting">Trip Setting / Ir (Ãƒâ€”In)</label>
             <input type="number" id="upSetting" value="1.0" min="0.4" max="1.0" step="0.05" />
-            <span style="font-size:0.8em;color:#888;">MCBs: 1.0; MCCBs: adjustable 0.4–1.0</span>
+            <span style="font-size:0.8em;color:#888;">MCBs: 1.0; MCCBs: adjustable 0.4Ã¢â‚¬â€œ1.0</span>
           </div>
         </div>
         <div class="input-row">
           <div class="input-group">
-            <label for="upInstant">Instantaneous Setting (×In)</label>
+            <label for="upInstant">Instantaneous Setting (Ãƒâ€”In)</label>
             <input type="number" id="upInstant" value="10" min="1" max="50" step="0.5" />
-            <span style="font-size:0.8em;color:#888;">MCB-B: 3–5, MCB-C: 5–10, MCB-D: 10–20, MCCB: adjustable</span>
+            <span style="font-size:0.8em;color:#888;">MCB-B: 3Ã¢â‚¬â€œ5, MCB-C: 5Ã¢â‚¬â€œ10, MCB-D: 10Ã¢â‚¬â€œ20, MCCB: adjustable</span>
           </div>
           <div class="input-group">
             <label for="upKA">Breaking Capacity (kA)</label>
@@ -122,9 +120,9 @@
 
       <div class="cascade-visual">
         <div class="cascade-block" id="upBlock">Upstream<br><span id="upLabel">MCCB 250A</span></div>
-        <div class="cascade-arrow">→</div>
+        <div class="cascade-arrow">Ã¢â€ â€™</div>
         <div class="cascade-block" style="background:#555;" id="cableBlock">Cable</div>
-        <div class="cascade-arrow">→</div>
+        <div class="cascade-arrow">Ã¢â€ â€™</div>
         <div class="cascade-block" style="background:#2e7d32;" id="dnBlock">Downstream<br><span id="dnLabel">MCB-C 32A</span></div>
       </div>
 
@@ -146,7 +144,7 @@
             <input type="number" id="dnRating" value="32" min="1" />
           </div>
           <div class="input-group">
-            <label for="dnInstant">Instantaneous Setting (×In)</label>
+            <label for="dnInstant">Instantaneous Setting (Ãƒâ€”In)</label>
             <input type="number" id="dnInstant" value="10" min="1" max="50" step="0.5" />
           </div>
         </div>
@@ -160,7 +158,7 @@
         </div>
         <div class="input-group">
           <label>&nbsp;</label>
-          <a href="faultlevel.html" style="color:#1976d2; font-size:0.95em;">→ Open Fault Level Calculator</a>
+          <a href="faultlevel.html" style="color:#1976d2; font-size:0.95em;">Ã¢â€ â€™ Open Fault Level Calculator</a>
         </div>
       </div>
 
@@ -178,15 +176,15 @@
         <table class="ref-table">
           <thead><tr><th>Combination</th><th>Rule for Full Discrimination</th><th>Notes</th></tr></thead>
           <tbody>
-            <tr><td>MCB upstream / MCB downstream</td><td>Upstream ≥ 1.6× downstream rating AND different curve type preferred</td><td>Difficult to achieve full discrimination with same curve type</td></tr>
+            <tr><td>MCB upstream / MCB downstream</td><td>Upstream Ã¢â€°Â¥ 1.6Ãƒâ€” downstream rating AND different curve type preferred</td><td>Difficult to achieve full discrimination with same curve type</td></tr>
             <tr><td>MCCB upstream / MCB downstream</td><td>MCCB instantaneous > MCB instantaneous trip current</td><td>Best with adjustable MCCB short-time delay (STD)</td></tr>
-            <tr><td>Fuse upstream / MCB downstream</td><td>Fuse I²t let-through > MCB total I²t at fault level</td><td>Generally good discrimination with HRC fuses</td></tr>
+            <tr><td>Fuse upstream / MCB downstream</td><td>Fuse IÃ‚Â²t let-through > MCB total IÃ‚Â²t at fault level</td><td>Generally good discrimination with HRC fuses</td></tr>
             <tr><td>MCCB upstream / MCCB downstream</td><td>Upstream Ir > downstream Ir; upstream STD > downstream</td><td>Use zone-selective interlocking (ZSI) where available</td></tr>
-            <tr><td>Fuse / Fuse (same type)</td><td>Upstream ≥ 1.6× downstream rating</td><td>Excellent inherent discrimination</td></tr>
+            <tr><td>Fuse / Fuse (same type)</td><td>Upstream Ã¢â€°Â¥ 1.6Ãƒâ€” downstream rating</td><td>Excellent inherent discrimination</td></tr>
           </tbody>
         </table>
         <div class="warn-box">
-          <strong>Limitation:</strong> This tool provides a simplified rule-of-thumb assessment. Full discrimination verification requires comparison of manufacturer time-current curves and I²t let-through energy data. Consult device manufacturer coordination tables for confirmed discrimination limits.
+          <strong>Limitation:</strong> This tool provides a simplified rule-of-thumb assessment. Full discrimination verification requires comparison of manufacturer time-current curves and IÃ‚Â²t let-through energy data. Consult device manufacturer coordination tables for confirmed discrimination limits.
         </div>
       </div>
     </div>
@@ -231,56 +229,56 @@
       const ratingRatio = upRating / dnRating;
       if (ratingRatio >= 2.0) {
         overloadOK = true;
-        notes.push(`✓ Rating ratio ${ratingRatio.toFixed(1)}:1 (≥2:1) — overload discrimination likely OK.`);
+        notes.push(`Ã¢Å“â€œ Rating ratio ${ratingRatio.toFixed(1)}:1 (Ã¢â€°Â¥2:1) Ã¢â‚¬â€ overload discrimination likely OK.`);
       } else if (ratingRatio >= 1.6) {
         overloadOK = true;
-        notes.push(`⚠ Rating ratio ${ratingRatio.toFixed(1)}:1 (≥1.6:1 but <2:1) — overload discrimination marginal. Verify with curves.`);
+        notes.push(`Ã¢Å¡Â  Rating ratio ${ratingRatio.toFixed(1)}:1 (Ã¢â€°Â¥1.6:1 but <2:1) Ã¢â‚¬â€ overload discrimination marginal. Verify with curves.`);
       } else {
         overloadOK = false;
-        notes.push(`✕ Rating ratio ${ratingRatio.toFixed(1)}:1 (<1.6:1) — overload discrimination unlikely.`);
+        notes.push(`Ã¢Å“â€¢ Rating ratio ${ratingRatio.toFixed(1)}:1 (<1.6:1) Ã¢â‚¬â€ overload discrimination unlikely.`);
       }
 
       // 2. Short-circuit discrimination
       const faultA = faultLevel * 1000;
       if (upTrip.low > dnTrip.high) {
         scOK = true;
-        notes.push(`✓ Upstream instantaneous trip (${upTrip.low.toFixed(0)} A) > downstream instantaneous trip (${dnTrip.high.toFixed(0)} A) — short-circuit discrimination likely up to this level.`);
+        notes.push(`Ã¢Å“â€œ Upstream instantaneous trip (${upTrip.low.toFixed(0)} A) > downstream instantaneous trip (${dnTrip.high.toFixed(0)} A) Ã¢â‚¬â€ short-circuit discrimination likely up to this level.`);
       } else {
         scOK = false;
-        notes.push(`✕ Upstream instantaneous trip (${upTrip.low.toFixed(0)} A) overlaps with downstream instantaneous trip (${dnTrip.high.toFixed(0)} A) — short-circuit discrimination NOT achieved at this fault level.`);
+        notes.push(`Ã¢Å“â€¢ Upstream instantaneous trip (${upTrip.low.toFixed(0)} A) overlaps with downstream instantaneous trip (${dnTrip.high.toFixed(0)} A) Ã¢â‚¬â€ short-circuit discrimination NOT achieved at this fault level.`);
       }
 
       // Fuse combination check
       if ((upType === 'hrc' || upType === 'nh_fuse') && (dnType === 'hrc' || dnType === 'nh_fuse')) {
         if (ratingRatio >= 1.6) {
           scOK = true;
-          notes.push(`✓ Fuse-fuse combination with ≥1.6:1 ratio — inherently good discrimination.`);
+          notes.push(`Ã¢Å“â€œ Fuse-fuse combination with Ã¢â€°Â¥1.6:1 ratio Ã¢â‚¬â€ inherently good discrimination.`);
         }
       }
       if ((upType === 'hrc' || upType === 'nh_fuse') && dnType.startsWith('mcb')) {
-        notes.push(`ℹ Fuse upstream / MCB downstream: Generally provides good discrimination due to fuse I²t characteristics.`);
+        notes.push(`Ã¢â€žÂ¹ Fuse upstream / MCB downstream: Generally provides good discrimination due to fuse IÃ‚Â²t characteristics.`);
         scOK = true;
       }
 
       // MCCB with short-time delay
       if (upType === 'mccb') {
-        notes.push(`ℹ MCCB upstream: Consider enabling Short-Time Delay (STD) on the upstream MCCB to improve discrimination. Zone Selective Interlocking (ZSI) can further enhance selectivity.`);
+        notes.push(`Ã¢â€žÂ¹ MCCB upstream: Consider enabling Short-Time Delay (STD) on the upstream MCCB to improve discrimination. Zone Selective Interlocking (ZSI) can further enhance selectivity.`);
       }
 
       // Backup protection note
       if (!scOK && faultA > dnTrip.high) {
-        notes.push(`ℹ If full discrimination is not achievable, backup protection (cascading) per AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.5.3">cl. 2.5.5.3</a> may be acceptable — both devices operate for high-level faults.`);
+        notes.push(`Ã¢â€žÂ¹ If full discrimination is not achievable, backup protection (cascading) per AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.5.3">cl. 2.5.5.3</a> may be acceptable Ã¢â‚¬â€ both devices operate for high-level faults.`);
       }
 
       // Breaking capacity check
       if (faultLevel > upKA) {
-        notes.push(`⚠ CRITICAL: Prospective fault current (${faultLevel} kA) exceeds upstream device breaking capacity (${upKA} kA). Device is NOT RATED for this fault level.`);
+        notes.push(`Ã¢Å¡Â  CRITICAL: Prospective fault current (${faultLevel} kA) exceeds upstream device breaking capacity (${upKA} kA). Device is NOT RATED for this fault level.`);
       }
 
       const overall = overloadOK && scOK;
       let html = `<div class="${overall ? 'pass-box' : 'fail-box'}">
-        <strong>${overall ? '✓ DISCRIMINATION LIKELY ACHIEVED' : '✕ DISCRIMINATION NOT FULLY ACHIEVED'}</strong>
-        — ${upType.toUpperCase()} ${upRating}A → ${dnType.toUpperCase()} ${dnRating}A at ${faultLevel} kA prospective fault
+        <strong>${overall ? 'Ã¢Å“â€œ DISCRIMINATION LIKELY ACHIEVED' : 'Ã¢Å“â€¢ DISCRIMINATION NOT FULLY ACHIEVED'}</strong>
+        Ã¢â‚¬â€ ${upType.toUpperCase()} ${upRating}A Ã¢â€ â€™ ${dnType.toUpperCase()} ${dnRating}A at ${faultLevel} kA prospective fault
       </div>`;
       html += '<div class="info-box"><ul>';
       notes.forEach(n => { html += `<li>${n}</li>`; });

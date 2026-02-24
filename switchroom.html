@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Switchroom Sizer - Switchboard Tools</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
@@ -185,7 +184,6 @@
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab active" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -327,7 +325,7 @@
         <div class="equipment-item">
           <div class="equipment-item-info">
             <strong>${eq.type}</strong><br>
-            <small>${eq.width}W × ${eq.depth}D × ${eq.height}H mm</small>
+            <small>${eq.width}W Ã— ${eq.depth}D Ã— ${eq.height}H mm</small>
           </div>
           <button class="remove-btn" onclick="removeEquipment(${eq.id})">Remove</button>
         </div>
@@ -473,7 +471,7 @@
         eqDiv.style.height = eqDepthPx + 'px';
         eqDiv.style.left = ((eq.x / 1000) * SCALE) + 'px';
         eqDiv.style.top = ((eq.y / 1000) * SCALE) + 'px';
-        eqDiv.innerHTML = `${eq.type}<br>${eq.width}×${eq.depth}mm`;
+        eqDiv.innerHTML = `${eq.type}<br>${eq.width}Ã—${eq.depth}mm`;
         
         roomBox.appendChild(eqDiv);
 
@@ -518,7 +516,7 @@
         eqDiv.style.height = eqDepthPx + 'px';
         eqDiv.style.left = ((eq.x / 1000) * SCALE) + 'px';
         eqDiv.style.top = ((eq.y / 1000) * SCALE) + 'px';
-        eqDiv.innerHTML = `${eq.type}<br>${eq.width}×${eq.depth}mm`;
+        eqDiv.innerHTML = `${eq.type}<br>${eq.width}Ã—${eq.depth}mm`;
         
         roomBox.appendChild(eqDiv);
 
@@ -562,7 +560,7 @@
         eqDiv.style.height = eqDepthPx + 'px';
         eqDiv.style.left = ((eq.x / 1000) * SCALE) + 'px';
         eqDiv.style.top = (((eq.y) / 1000) * SCALE) + 'px';
-        eqDiv.innerHTML = `${eq.type}<br>${eq.width}×${eq.depth}mm`;
+        eqDiv.innerHTML = `${eq.type}<br>${eq.width}Ã—${eq.depth}mm`;
         
         roomBox.appendChild(eqDiv);
 
@@ -597,7 +595,7 @@
         <strong>Room Dimensions:</strong><br>
         Width: ${(dimensions.width / 1000).toFixed(2)}m (${dimensions.width}mm)<br>
         Depth: ${(dimensions.depth / 1000).toFixed(2)}m (${dimensions.depth}mm)<br>
-        Area: ${totalArea.toFixed(2)}m²<br>
+        Area: ${totalArea.toFixed(2)}mÂ²<br>
         <strong>Layout:</strong> ${layoutType}<br>
         <em style="color:#666;font-size:0.9em;">Includes AS/NZS 3000 required clearances</em>
       `;

@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Cable Schedule Builder - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -30,11 +29,10 @@
     .schedule-table tr:hover { background: #e3f0fc; }
     .btn-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
     @media (max-width: 768px) { .input-row.six { grid-template-columns: 1fr 1fr 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon, .btn-row, .input-row { display: none !important; } .schedule-table input, .schedule-table select { border: none !important; background: transparent !important; } }
+    @media print { .top-tabs, .calc-button, .btn-row, .input-row { display: none !important; } .schedule-table input, .schedule-table select { border: none !important; background: transparent !important; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -67,8 +65,8 @@
             <th>From (Board)</th>
             <th>To (Equipment)</th>
             <th>Cable Type</th>
-            <th>Cores × Size</th>
-            <th>Earth (mm²)</th>
+            <th>Cores Ãƒâ€” Size</th>
+            <th>Earth (mmÃ‚Â²)</th>
             <th>Length (m)</th>
             <th>Route / Containment</th>
             <th>Circuit #</th>
@@ -82,10 +80,10 @@
 
     <div class="info-box" style="margin-top:24px;">
       <strong>Cable Types (common abbreviations):</strong><br>
-      <strong>V-90:</strong> PVC/PVC 90°C — general wiring per AS/NZS 5000.1<br>
-      <strong>X-90:</strong> XLPE/PVC 90°C — higher CCC, suitable for sub-mains per AS/NZS 5000.1<br>
-      <strong>X-HF:</strong> XLPE halogen-free — required in some buildings<br>
-      <strong>MICC:</strong> Mineral insulated — fire-rated circuits<br>
+      <strong>V-90:</strong> PVC/PVC 90Ã‚Â°C Ã¢â‚¬â€ general wiring per AS/NZS 5000.1<br>
+      <strong>X-90:</strong> XLPE/PVC 90Ã‚Â°C Ã¢â‚¬â€ higher CCC, suitable for sub-mains per AS/NZS 5000.1<br>
+      <strong>X-HF:</strong> XLPE halogen-free Ã¢â‚¬â€ required in some buildings<br>
+      <strong>MICC:</strong> Mineral insulated Ã¢â‚¬â€ fire-rated circuits<br>
       <strong>2C+E, 3C+E, 4C+E:</strong> Core count + earth (e.g., 4C+E for 3-phase + neutral + earth)<br>
       <strong>Fire rated:</strong> Append "(FR)" for AS/NZS 3013 fire-rated circuits
     </div>
@@ -94,7 +92,7 @@
     let rowCount = 0;
 
     const cableTypes = ['V-90', 'X-90', 'X-HF', 'MICC', 'TPS', 'SDI', 'Other'];
-    const coreOptions = ['2C+E 1.5mm²', '2C+E 2.5mm²', '2C+E 4mm²', '2C+E 6mm²', '3C+E 2.5mm²', '3C+E 4mm²', '3C+E 6mm²', '4C+E 2.5mm²', '4C+E 4mm²', '4C+E 6mm²', '4C+E 10mm²', '4C+E 16mm²', '4C+E 25mm²', '4C+E 35mm²', '4C+E 50mm²', '4C+E 70mm²', '4C+E 95mm²', '4C+E 120mm²', '4C+E 150mm²', '4C+E 185mm²', '4C+E 240mm²', '4C+E 300mm²', '2×(4C+E 240mm²)', '3×(4C+E 240mm²)', 'Custom'];
+    const coreOptions = ['2C+E 1.5mmÃ‚Â²', '2C+E 2.5mmÃ‚Â²', '2C+E 4mmÃ‚Â²', '2C+E 6mmÃ‚Â²', '3C+E 2.5mmÃ‚Â²', '3C+E 4mmÃ‚Â²', '3C+E 6mmÃ‚Â²', '4C+E 2.5mmÃ‚Â²', '4C+E 4mmÃ‚Â²', '4C+E 6mmÃ‚Â²', '4C+E 10mmÃ‚Â²', '4C+E 16mmÃ‚Â²', '4C+E 25mmÃ‚Â²', '4C+E 35mmÃ‚Â²', '4C+E 50mmÃ‚Â²', '4C+E 70mmÃ‚Â²', '4C+E 95mmÃ‚Â²', '4C+E 120mmÃ‚Â²', '4C+E 150mmÃ‚Â²', '4C+E 185mmÃ‚Â²', '4C+E 240mmÃ‚Â²', '4C+E 300mmÃ‚Â²', '2Ãƒâ€”(4C+E 240mmÃ‚Â²)', '3Ãƒâ€”(4C+E 240mmÃ‚Â²)', 'Custom'];
 
     function makeSelect(options, defaultVal) {
       return `<select>${options.map(o => `<option${o===defaultVal?' selected':''}>${o}</option>`).join('')}</select>`;
@@ -110,10 +108,10 @@
         <td><input type="text" value="${d.from || ''}" placeholder="MSB" /></td>
         <td><input type="text" value="${d.to || ''}" placeholder="DB-L01" /></td>
         <td>${makeSelect(cableTypes, d.type || 'X-90')}</td>
-        <td>${makeSelect(coreOptions, d.cores || '4C+E 16mm²')}</td>
+        <td>${makeSelect(coreOptions, d.cores || '4C+E 16mmÃ‚Â²')}</td>
         <td><input type="text" value="${d.earth || '16'}" style="width:40px;" /></td>
         <td><input type="number" value="${d.length || ''}" style="width:50px;" /></td>
-        <td><input type="text" value="${d.route || ''}" placeholder="CT1 → Riser" /></td>
+        <td><input type="text" value="${d.route || ''}" placeholder="CT1 Ã¢â€ â€™ Riser" /></td>
         <td><input type="text" value="${d.circuit || ''}" style="width:50px;" /></td>
         <td><input type="text" value="${d.vd || ''}" style="width:40px;" /></td>
         <td><input type="text" value="${d.notes || ''}" /></td>`;
@@ -137,7 +135,7 @@
     }
 
     function exportCSV() {
-      const headers = ['#', 'Cable Tag', 'From', 'To', 'Cable Type', 'Cores × Size', 'Earth (mm²)', 'Length (m)', 'Route', 'Circuit #', 'VD (%)', 'Notes'];
+      const headers = ['#', 'Cable Tag', 'From', 'To', 'Cable Type', 'Cores Ãƒâ€” Size', 'Earth (mmÃ‚Â²)', 'Length (m)', 'Route', 'Circuit #', 'VD (%)', 'Notes'];
       const rows = document.querySelectorAll('#scheduleBody tr');
       let csv = headers.join(',') + '\n';
       rows.forEach((row, i) => {

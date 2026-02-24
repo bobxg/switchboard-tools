@@ -337,7 +337,6 @@
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -361,9 +360,9 @@
 
       <div id="pdfViewer" class="pdf-viewer">
         <div class="page-nav">
-          <button class="btn" id="prevPage">← Previous</button>
+          <button class="btn" id="prevPage">â† Previous</button>
           <span class="page-info">Page <span id="pageNum">1</span> of <span id="pageCount">1</span></span>
-          <button class="btn" id="nextPage">Next →</button>
+          <button class="btn" id="nextPage">Next â†’</button>
           <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
             <button class="btn" id="zoomOut">Zoom Out</button>
             <span class="page-info"><span id="zoomLevel">100</span>%</span>
@@ -388,9 +387,9 @@
       <div id="summaryStats" style="display: none; margin-bottom: 15px; padding: 12px; background: #e3f2fd; border: 1px solid #90caf9; border-radius: 4px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.85em;">
           <div><strong>Total:</strong> <span id="statTotal">0</span></div>
-          <div><strong>🔴 Open:</strong> <span id="statOpen">0</span></div>
-          <div><strong>🟡 Progress:</strong> <span id="statProgress">0</span></div>
-          <div><strong>🟢 Resolved:</strong> <span id="statResolved">0</span></div>
+          <div><strong>ðŸ”´ Open:</strong> <span id="statOpen">0</span></div>
+          <div><strong>ðŸŸ¡ Progress:</strong> <span id="statProgress">0</span></div>
+          <div><strong>ðŸŸ¢ Resolved:</strong> <span id="statResolved">0</span></div>
         </div>
       </div>
       
@@ -419,7 +418,7 @@
       
       <div class="controls">
         <div style="position: relative; display: inline-block;">
-          <button class="btn btn-success" id="exportReport">Export Report ▼</button>
+          <button class="btn btn-success" id="exportReport">Export Report â–¼</button>
           <div id="exportMenu" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ccc; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; min-width: 150px; margin-top: 4px;">
             <button class="btn" id="exportPDF" style="width: 100%; text-align: left; border: none; border-radius: 0; background: white; color: #333;">Export as PDF</button>
             <button class="btn" id="exportWord" style="width: 100%; text-align: left; border: none; border-radius: 0; background: white; color: #333;">Export as Word</button>
@@ -444,20 +443,20 @@
       
       <label for="defectCategory">Category:</label>
       <select id="defectCategory" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; font-size: 1em;">
-        <option value="electrical">⚡ Electrical</option>
-        <option value="plumbing">🚰 Plumbing</option>
-        <option value="structural">🏗️ Structural</option>
-        <option value="hvac">❄️ HVAC</option>
-        <option value="safety">⚠️ Safety</option>
-        <option value="other">📋 Other</option>
+        <option value="electrical">âš¡ Electrical</option>
+        <option value="plumbing">ðŸš° Plumbing</option>
+        <option value="structural">ðŸ—ï¸ Structural</option>
+        <option value="hvac">â„ï¸ HVAC</option>
+        <option value="safety">âš ï¸ Safety</option>
+        <option value="other">ðŸ“‹ Other</option>
       </select>
       
       <label for="defectStatus">Status:</label>
       <select id="defectStatus" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; font-size: 1em;">
-        <option value="open">🔴 Open</option>
-        <option value="in-progress">🟡 In Progress</option>
-        <option value="resolved">🟢 Resolved</option>
-        <option value="verified">🔵 Verified</option>
+        <option value="open">ðŸ”´ Open</option>
+        <option value="in-progress">ðŸŸ¡ In Progress</option>
+        <option value="resolved">ðŸŸ¢ Resolved</option>
+        <option value="verified">ðŸ”µ Verified</option>
       </select>
       
       <label for="defectAssignee">Assigned To (optional):</label>

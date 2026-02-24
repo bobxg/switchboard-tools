@@ -115,7 +115,6 @@
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -373,7 +372,7 @@
       const requiredDailyGen = dailyUsage * offsetPercent;
 
       // Calculate required system size (kW)
-      // Daily generation = System Size (kW) × Peak Sun Hours × Efficiency
+      // Daily generation = System Size (kW) Ã— Peak Sun Hours Ã— Efficiency
       const systemSizeKW = requiredDailyGen / (peakSunHours * efficiency);
 
       // Calculate number of panels

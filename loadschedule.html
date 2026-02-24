@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Load Schedule Builder - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -36,11 +35,10 @@
     .summary-item .value { font-size: 1.5em; font-weight: bold; color: #1976d2; }
     .summary-item .label { font-size: 0.85em; color: #666; }
     @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon, .btn-row { display: none !important; } .schedule-table input, .schedule-table select { border: none !important; background: transparent !important; } }
+    @media print { .top-tabs, .calc-button, .btn-row { display: none !important; } .schedule-table input, .schedule-table select { border: none !important; background: transparent !important; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -105,7 +103,7 @@
           <tr class="totals-row">
             <td colspan="6" style="text-align:right;">TOTALS:</td>
             <td id="totalVA">0</td>
-            <td>—</td>
+            <td>Ã¢â‚¬â€</td>
             <td id="totalDemand">0</td>
             <td id="totalCurrent">0</td>
             <td colspan="2"></td>
@@ -123,12 +121,12 @@
 
     <div class="info-box" style="margin-top:24px;">
       <strong>Diversity Factor Guide (AS/NZS 3000 Appendix C):</strong><br>
-      <strong>Lighting:</strong> 90-100% — continuous loads, minimal diversity<br>
-      <strong>Socket Outlets (GPO):</strong> 50-80% — depends on quantity and usage<br>
-      <strong>HVAC:</strong> 80-100% — high utilisation plant<br>
-      <strong>Lifts:</strong> 60-80% — intermittent duty<br>
-      <strong>Small Power:</strong> 30-50% — general appliances, low coincidence<br>
-      <strong>Motors (Direct):</strong> 100% — starting and running considered<br>
+      <strong>Lighting:</strong> 90-100% Ã¢â‚¬â€ continuous loads, minimal diversity<br>
+      <strong>Socket Outlets (GPO):</strong> 50-80% Ã¢â‚¬â€ depends on quantity and usage<br>
+      <strong>HVAC:</strong> 80-100% Ã¢â‚¬â€ high utilisation plant<br>
+      <strong>Lifts:</strong> 60-80% Ã¢â‚¬â€ intermittent duty<br>
+      <strong>Small Power:</strong> 30-50% Ã¢â‚¬â€ general appliances, low coincidence<br>
+      <strong>Motors (Direct):</strong> 100% Ã¢â‚¬â€ starting and running considered<br>
       <strong>Spare Capacity:</strong> Typically include 20-30% spare for future loads
     </div>
 

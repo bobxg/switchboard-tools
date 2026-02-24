@@ -314,7 +314,6 @@
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -328,7 +327,7 @@
 
   <div class="container">
     <h1>Single Line Diagram Generator</h1>
-    <p>Generate AS/NZS compliant single line diagrams. Breakers automatically sized: MCB (≤100A), MCCB (100-800A), ACB (>800A)</p>
+    <p>Generate AS/NZS compliant single line diagrams. Breakers automatically sized: MCB (â‰¤100A), MCCB (100-800A), ACB (>800A)</p>
 
     <div class="input-section">
       <h3>Main Switch Configuration</h3>
@@ -387,7 +386,7 @@
                 <option value="air">MCCB</option>
               </select>
             </td>
-            <td><button class="remove-row-btn" onclick="removeRow(this)">✕</button></td>
+            <td><button class="remove-row-btn" onclick="removeRow(this)">âœ•</button></td>
           </tr>
         </tbody>
       </table>
@@ -592,7 +591,7 @@
             <option value="air">MCCB</option>
           </select>
         </td>
-        <td><button class="remove-row-btn" onclick="removeRow(this)">✕</button></td>
+        <td><button class="remove-row-btn" onclick="removeRow(this)">âœ•</button></td>
       `;
       tbody.appendChild(newRow);
     }

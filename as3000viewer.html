@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>AS/NZS 3000 Viewer - OMNI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
@@ -150,7 +149,6 @@
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a>
     <a class="tab" href="switchboard.html">Switchboard Sizer</a>
@@ -188,7 +186,7 @@
   </div>
 
 <script>
-/* ===== AS/NZS 3000 Viewer — TOC & Navigation ===== */
+/* ===== AS/NZS 3000 Viewer â€” TOC & Navigation ===== */
 (function () {
   'use strict';
 
@@ -354,7 +352,7 @@
         }
       }
     } catch (err) {
-      statusMsg.textContent = 'Document loaded (cross-origin — use Go to clause).';
+      statusMsg.textContent = 'Document loaded (cross-origin â€” use Go to clause).';
       console.warn('Cannot access iframe:', err);
     }
   });
@@ -364,9 +362,9 @@
     var doc = iframe.contentDocument || iframe.contentWindow.document;
     var items = doc.querySelectorAll('li[data-list-text]');
     var count = 0;
-    // We only want body content — skip the first occurrences that are in the TOC.
+    // We only want body content â€” skip the first occurrences that are in the TOC.
     // Strategy: the body clauses have <p> children with class containing "s17" or "s16"
-    // or they have <a name="bookmark..."> children. We'll just tag all of them —
+    // or they have <a name="bookmark..."> children. We'll just tag all of them â€”
     // the last occurrence wins for duplicate clause numbers (body comes after TOC).
     var seen = {};
     // First pass: collect all, last occurrence wins
@@ -402,7 +400,7 @@
     var el = doc.getElementById('cl-' + clause);
 
     if (!el) {
-      // Try searching via data-list-text attribute (body content — last match)
+      // Try searching via data-list-text attribute (body content â€” last match)
       var all = doc.querySelectorAll('li[data-list-text="' + clause + '"]');
       if (all.length > 0) {
         el = all[all.length - 1]; // last one = body content

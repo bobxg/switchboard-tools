@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Design Certificate Generator - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -32,11 +31,10 @@
     .cert-preview .signature { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
     .cert-preview .sig-line { border-top: 1px solid #333; padding-top: 4px; margin-top: 40px; font-size: 0.9em; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon, .calc-section { display: none !important; } .cert-preview { border: none; padding: 20px; margin: 0; } }
+    @media print { .top-tabs, .calc-button, .calc-section { display: none !important; } .cert-preview { border: none; padding: 20px; margin: 0; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -84,18 +82,18 @@
       <div class="input-group" style="margin-bottom:16px;"><label for="scopeDesc">Description of Electrical Works</label><textarea id="scopeDesc" rows="3" placeholder="Brief description of the electrical design scope..."></textarea></div>
       <div class="input-group" style="margin-bottom:16px;"><label>Standards Compliance (check all applicable)</label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
-          <label><input type="checkbox" class="std-check" checked value="AS/NZS 3000:2018 — Wiring Rules" /> AS/NZS 3000:2018 — Wiring Rules</label>
-          <label><input type="checkbox" class="std-check" checked value="AS/NZS 3008.1.1 — Cable selection" /> AS/NZS 3008.1.1 — Cable selection</label>
-          <label><input type="checkbox" class="std-check" value="AS/NZS 3010 — Generator installations" /> AS/NZS 3010 — Generator installations</label>
-          <label><input type="checkbox" class="std-check" checked value="AS/NZS 61439 — Switchgear assemblies" /> AS/NZS 61439 — Switchgear assemblies</label>
-          <label><input type="checkbox" class="std-check" value="AS 1670.1 — Fire detection systems" /> AS 1670.1 — Fire detection systems</label>
-          <label><input type="checkbox" class="std-check" checked value="AS/NZS 1680 — Interior lighting" /> AS/NZS 1680 — Interior lighting</label>
-          <label><input type="checkbox" class="std-check" checked value="AS/NZS 2293 — Emergency lighting" /> AS/NZS 2293 — Emergency lighting</label>
-          <label><input type="checkbox" class="std-check" value="AS/NZS 5033 — PV installations" /> AS/NZS 5033 — PV installations</label>
-          <label><input type="checkbox" class="std-check" checked value="NCC 2022 — National Construction Code" /> NCC 2022 — National Construction Code</label>
-          <label><input type="checkbox" class="std-check" value="AS/NZS 3003 — Medical installations" /> AS/NZS 3003 — Electrical installations in patient areas</label>
-          <label><input type="checkbox" class="std-check" value="AS 1668.1 — Smoke control" /> AS 1668.1 — Fire and smoke control</label>
-          <label><input type="checkbox" class="std-check" value="AS/NZS 1768 — Lightning protection" /> AS/NZS 1768 — Lightning protection</label>
+          <label><input type="checkbox" class="std-check" checked value="AS/NZS 3000:2018 Ã¢â‚¬â€ Wiring Rules" /> AS/NZS 3000:2018 Ã¢â‚¬â€ Wiring Rules</label>
+          <label><input type="checkbox" class="std-check" checked value="AS/NZS 3008.1.1 Ã¢â‚¬â€ Cable selection" /> AS/NZS 3008.1.1 Ã¢â‚¬â€ Cable selection</label>
+          <label><input type="checkbox" class="std-check" value="AS/NZS 3010 Ã¢â‚¬â€ Generator installations" /> AS/NZS 3010 Ã¢â‚¬â€ Generator installations</label>
+          <label><input type="checkbox" class="std-check" checked value="AS/NZS 61439 Ã¢â‚¬â€ Switchgear assemblies" /> AS/NZS 61439 Ã¢â‚¬â€ Switchgear assemblies</label>
+          <label><input type="checkbox" class="std-check" value="AS 1670.1 Ã¢â‚¬â€ Fire detection systems" /> AS 1670.1 Ã¢â‚¬â€ Fire detection systems</label>
+          <label><input type="checkbox" class="std-check" checked value="AS/NZS 1680 Ã¢â‚¬â€ Interior lighting" /> AS/NZS 1680 Ã¢â‚¬â€ Interior lighting</label>
+          <label><input type="checkbox" class="std-check" checked value="AS/NZS 2293 Ã¢â‚¬â€ Emergency lighting" /> AS/NZS 2293 Ã¢â‚¬â€ Emergency lighting</label>
+          <label><input type="checkbox" class="std-check" value="AS/NZS 5033 Ã¢â‚¬â€ PV installations" /> AS/NZS 5033 Ã¢â‚¬â€ PV installations</label>
+          <label><input type="checkbox" class="std-check" checked value="NCC 2022 Ã¢â‚¬â€ National Construction Code" /> NCC 2022 Ã¢â‚¬â€ National Construction Code</label>
+          <label><input type="checkbox" class="std-check" value="AS/NZS 3003 Ã¢â‚¬â€ Medical installations" /> AS/NZS 3003 Ã¢â‚¬â€ Electrical installations in patient areas</label>
+          <label><input type="checkbox" class="std-check" value="AS 1668.1 Ã¢â‚¬â€ Smoke control" /> AS 1668.1 Ã¢â‚¬â€ Fire and smoke control</label>
+          <label><input type="checkbox" class="std-check" value="AS/NZS 1768 Ã¢â‚¬â€ Lightning protection" /> AS/NZS 1768 Ã¢â‚¬â€ Lightning protection</label>
         </div>
       </div>
       <div class="input-group"><label for="assumptions">Key Design Assumptions & Exclusions</label><textarea id="assumptions" rows="3" placeholder="e.g., Max demand based on AS/NZS 3000 Appendix C. Excludes fire detection (by others). Supply capacity confirmed with distributor..."></textarea></div>

@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>CT Sizing - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -30,11 +29,10 @@
     .ref-table th { background: #1976d2; color: white; }
     .ref-table tr:nth-child(even) { background: #f8f9fa; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    @media print { .top-tabs, .calc-button { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown active"><span>Power Systems</span><div class="dropdown-content">
@@ -51,7 +49,7 @@
 
     <div class="calc-section">
       <h2>Metering CT Parameters</h2>
-      <div class="info-box"><strong>AS 1284.1:</strong> Electricity metering — Requirements for pattern approval of metering installations. NMI (National Measurement Institute) approved CTs required for revenue metering (>100A installations).</div>
+      <div class="info-box"><strong>AS 1284.1:</strong> Electricity metering Ã¢â‚¬â€ Requirements for pattern approval of metering installations. NMI (National Measurement Institute) approved CTs required for revenue metering (>100A installations).</div>
       <div class="input-row three">
         <div class="input-group"><label for="supplyA">Circuit/Incomer Rating (A)</label><input type="number" id="supplyA" value="400" min="10" /></div>
         <div class="input-group"><label for="expectedLoad">Expected Max Load (%)</label><input type="number" id="expectedLoad" value="80" min="10" max="100" /></div>
@@ -65,11 +63,11 @@
       <div class="input-row three">
         <div class="input-group"><label for="meterBurden">Meter Burden (VA)</label><input type="number" id="meterBurden" value="5" min="1" max="30" step="0.5" /><small style="color:#666;">Typical: 2.5-5 VA (electronic), 10-15 VA (electromechanical)</small></div>
         <div class="input-group"><label for="cableLength">CT to Meter Cable Length (m)</label><input type="number" id="cableLength" value="15" min="1" max="200" /></div>
-        <div class="input-group"><label for="cableSize">CT Secondary Cable (mm²)</label>
+        <div class="input-group"><label for="cableSize">CT Secondary Cable (mmÃ‚Â²)</label>
           <select id="cableSize">
-            <option value="2.5" selected>2.5 mm²</option>
-            <option value="4">4 mm²</option>
-            <option value="6">6 mm²</option>
+            <option value="2.5" selected>2.5 mmÃ‚Â²</option>
+            <option value="4">4 mmÃ‚Â²</option>
+            <option value="6">6 mmÃ‚Â²</option>
           </select></div>
       </div>
       <button class="calc-button" onclick="calculate()">Size CT</button>
@@ -79,12 +77,12 @@
       <div class="result-box">
         <h3>CT Selection</h3>
         <div class="result-grid">
-          <div class="result-item"><div class="result-label">CT Ratio</div><div class="result-value" id="resRatio">—</div></div>
-          <div class="result-item"><div class="result-label">Accuracy Class</div><div class="result-value" id="resClass">—</div></div>
-          <div class="result-item"><div class="result-label">Min CT Burden (VA)</div><div class="result-value" id="resBurden">—</div></div>
-          <div class="result-item"><div class="result-label">Cable Burden (VA)</div><div class="result-value" id="resCableBurden">—</div></div>
-          <div class="result-item"><div class="result-label">Total Burden (VA)</div><div class="result-value" id="resTotalBurden">—</div></div>
-          <div class="result-item"><div class="result-label">CT at Design Load</div><div class="result-value" id="resLoadPct">—</div></div>
+          <div class="result-item"><div class="result-label">CT Ratio</div><div class="result-value" id="resRatio">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Accuracy Class</div><div class="result-value" id="resClass">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Min CT Burden (VA)</div><div class="result-value" id="resBurden">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Cable Burden (VA)</div><div class="result-value" id="resCableBurden">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Total Burden (VA)</div><div class="result-value" id="resTotalBurden">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">CT at Design Load</div><div class="result-value" id="resLoadPct">Ã¢â‚¬â€</div></div>
         </div>
       </div>
       <div id="notes"></div>
@@ -120,12 +118,12 @@
       <table class="ref-table">
         <thead><tr><th>Class</th><th>Accuracy at Rated</th><th>Accuracy at 10%</th><th>Application</th><th>Standard</th></tr></thead>
         <tbody>
-          <tr><td><strong>Class 0.2s</strong></td><td>±0.2%</td><td>±0.75%</td><td>Revenue metering (NMI) — high accuracy</td><td>AS 60044-1</td></tr>
-          <tr><td><strong>Class 0.5s</strong></td><td>±0.5%</td><td>±1.5%</td><td>Revenue metering (NMI) — standard</td><td>AS 60044-1</td></tr>
-          <tr><td><strong>Class 0.5</strong></td><td>±0.5%</td><td>±1.5%</td><td>Sub-metering / check meters</td><td>AS 60044-1</td></tr>
-          <tr><td><strong>Class 1</strong></td><td>±1.0%</td><td>±3.0%</td><td>BMS monitoring, general metering</td><td>AS 60044-1</td></tr>
-          <tr><td><strong>Class 3</strong></td><td>±3.0%</td><td>—</td><td>Indication only</td><td>AS 60044-1</td></tr>
-          <tr><td><strong>5P / 10P</strong></td><td>±1% / ±3%</td><td>—</td><td>Protection CTs (5% / 10% composite error at ALF × In)</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>Class 0.2s</strong></td><td>Ã‚Â±0.2%</td><td>Ã‚Â±0.75%</td><td>Revenue metering (NMI) Ã¢â‚¬â€ high accuracy</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>Class 0.5s</strong></td><td>Ã‚Â±0.5%</td><td>Ã‚Â±1.5%</td><td>Revenue metering (NMI) Ã¢â‚¬â€ standard</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>Class 0.5</strong></td><td>Ã‚Â±0.5%</td><td>Ã‚Â±1.5%</td><td>Sub-metering / check meters</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>Class 1</strong></td><td>Ã‚Â±1.0%</td><td>Ã‚Â±3.0%</td><td>BMS monitoring, general metering</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>Class 3</strong></td><td>Ã‚Â±3.0%</td><td>Ã¢â‚¬â€</td><td>Indication only</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>5P / 10P</strong></td><td>Ã‚Â±1% / Ã‚Â±3%</td><td>Ã¢â‚¬â€</td><td>Protection CTs (5% / 10% composite error at ALF Ãƒâ€” In)</td><td>AS 60044-1</td></tr>
         </tbody>
       </table>
       <div class="warn-box"><strong>NMI Revenue Metering (>100A supply):</strong> Must use <strong>Class 0.5s or better</strong> CTs that are NMI-approved (pattern approved). CT ratio must be selected so current at typical load is between 10% and 120% of CT primary rating. The distributor (e.g., Ausgrid, Citipower, Energex) will specify exact CT requirements.</div>
@@ -144,7 +142,7 @@
 
       const expectedA = supplyA * loadPct;
 
-      // Select CT ratio — primary should be ≥ supply rating, and expected load should be ≥ 10% of primary
+      // Select CT ratio Ã¢â‚¬â€ primary should be Ã¢â€°Â¥ supply rating, and expected load should be Ã¢â€°Â¥ 10% of primary
       let selectedPrimary = stdPrimaries[stdPrimaries.length - 1];
       for (const p of stdPrimaries) {
         if (p >= supplyA && (expectedA / p) >= 0.1) {
@@ -171,10 +169,10 @@
       else if (meteringType === 'submeter') accClass = 'Class 0.5';
       else accClass = '5P20';
 
-      // Cable burden: P = I²R, R = ρL/A (both ways), ρ copper = 0.0178 Ω·mm²/m
+      // Cable burden: P = IÃ‚Â²R, R = ÃÂL/A (both ways), ÃÂ copper = 0.0178 ÃŽÂ©Ã‚Â·mmÃ‚Â²/m
       // Secondary current at rated = 5A
       const cableR = 2 * cableLen * 0.0178 / cableSize; // both ways
-      const cableBurden = 5 * 5 * cableR; // I²R at 5A secondary
+      const cableBurden = 5 * 5 * cableR; // IÃ‚Â²R at 5A secondary
       const totalBurden = meterBurden + cableBurden;
 
       // Typical CT burden ratings: 5, 10, 15, 20, 30 VA
@@ -194,34 +192,34 @@
 
       let notes = '';
       if (loadOnCT < 10) {
-        notes += `<div class="fail-box"><strong>⚠ Low CT loading:</strong> Expected load is only ${loadOnCT.toFixed(0)}% of CT primary. Accuracy degrades below 10% loading. Consider a lower CT ratio.</div>`;
+        notes += `<div class="fail-box"><strong>Ã¢Å¡Â  Low CT loading:</strong> Expected load is only ${loadOnCT.toFixed(0)}% of CT primary. Accuracy degrades below 10% loading. Consider a lower CT ratio.</div>`;
       } else if (loadOnCT > 120) {
-        notes += `<div class="fail-box"><strong>⚠ CT overloaded:</strong> Expected load exceeds 120% of CT primary. Select higher ratio or verify load calculation.</div>`;
+        notes += `<div class="fail-box"><strong>Ã¢Å¡Â  CT overloaded:</strong> Expected load exceeds 120% of CT primary. Select higher ratio or verify load calculation.</div>`;
       } else {
-        notes += `<div class="pass-box"><strong>✓ CT loading satisfactory.</strong> Expected ${loadOnCT.toFixed(0)}% of rated — within optimal 10-120% operating range.</div>`;
+        notes += `<div class="pass-box"><strong>Ã¢Å“â€œ CT loading satisfactory.</strong> Expected ${loadOnCT.toFixed(0)}% of rated Ã¢â‚¬â€ within optimal 10-120% operating range.</div>`;
       }
 
       if (totalBurden > minCTBurden) {
         notes += `<div class="warn-box"><strong>Burden Warning:</strong> Total connected burden (${totalBurden.toFixed(1)} VA) exceeds CT rated burden (${minCTBurden} VA). Increase CT burden rating or use larger secondary cable to reduce cable burden.</div>`;
       } else {
-        notes += `<div class="info-box"><strong>Burden OK:</strong> Total burden ${totalBurden.toFixed(1)} VA ≤ CT rated burden ${minCTBurden} VA. Margin: ${(minCTBurden - totalBurden).toFixed(1)} VA.</div>`;
+        notes += `<div class="info-box"><strong>Burden OK:</strong> Total burden ${totalBurden.toFixed(1)} VA Ã¢â€°Â¤ CT rated burden ${minCTBurden} VA. Margin: ${(minCTBurden - totalBurden).toFixed(1)} VA.</div>`;
       }
 
       if (meteringType === 'revenue') {
         notes += `<div class="warn-box"><strong>NMI Revenue Metering Requirements:</strong>
           <ul>
             <li>CTs must be NMI pattern-approved (check distributor approved CT list)</li>
-            <li>CT ratio ${ratio} — verify with distributor (e.g., Ausgrid, Citipower, Energex, SA Power Networks)</li>
+            <li>CT ratio ${ratio} Ã¢â‚¬â€ verify with distributor (e.g., Ausgrid, Citipower, Energex, SA Power Networks)</li>
             <li>Class 0.5s minimum. Some distributors require Class 0.2s for large sites (&gt;1 MVA)</li>
             <li>CT secondary circuit must NOT pass through any isolating device</li>
             <li>CT terminal box must be sealable by the meter provider</li>
-            <li>Use 2.5 mm² minimum for CT secondary cables; 4 mm² for long runs (&gt;20m)</li>
+            <li>Use 2.5 mmÃ‚Â² minimum for CT secondary cables; 4 mmÃ‚Â² for long runs (&gt;20m)</li>
             <li>Short-circuit facility (CT shorting blocks) must be provided at CT and meter ends</li>
           </ul></div>`;
       }
 
       if (cableBurden > 3) {
-        notes += `<div class="warn-box"><strong>High cable burden:</strong> ${cableBurden.toFixed(1)} VA. Consider increasing cable size from ${cableSize} mm² to ${cableSize < 4 ? '4' : '6'} mm² to reduce burden to ${(5*5*2*cableLen*0.0178/(cableSize < 4 ? 4 : 6)).toFixed(1)} VA.</div>`;
+        notes += `<div class="warn-box"><strong>High cable burden:</strong> ${cableBurden.toFixed(1)} VA. Consider increasing cable size from ${cableSize} mmÃ‚Â² to ${cableSize < 4 ? '4' : '6'} mmÃ‚Â² to reduce burden to ${(5*5*2*cableLen*0.0178/(cableSize < 4 ? 4 : 6)).toFixed(1)} VA.</div>`;
       }
 
       document.getElementById('notes').innerHTML = notes;

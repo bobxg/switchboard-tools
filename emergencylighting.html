@@ -109,7 +109,6 @@
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
@@ -129,7 +128,7 @@
         <label for="areaType">Area Classification:</label>
         <select id="areaType">
           <option value="escape">Escape Routes / Corridors (1.0 lux required)</option>
-          <option value="open">Open Areas > 60m² (0.5 lux required)</option>
+          <option value="open">Open Areas > 60mÂ² (0.5 lux required)</option>
           <option value="highrisk">High Risk Task Areas (10 lux required)</option>
           <option value="carpark">Covered Car Parks (1.0 lux required)</option>
         </select>
@@ -274,7 +273,7 @@
             <td>90 minutes</td>
           </tr>
           <tr>
-            <td>Open Areas > 60m²</td>
+            <td>Open Areas > 60mÂ²</td>
             <td>0.5 lux minimum</td>
             <td>90 minutes</td>
           </tr>
@@ -325,7 +324,7 @@
     const MODE_NOTES = {
       escape: 'Use D-class (corridor) classifications for escape routes per AS/NZS 2293.1 spacing tables.',
       carpark: 'Covered car parks adopt D-class corridor ratings (AS/NZS 2293.1) for 1 lux along drive aisles.',
-      open: 'Open areas > 60m² require C-class area classifications in accordance with AS/NZS 2293.1.'
+      open: 'Open areas > 60mÂ² require C-class area classifications in accordance with AS/NZS 2293.1.'
     };
 
     const HIGH_RISK_NOTE = 'High risk task areas require point-by-point design (AS/NZS 2293.1 Clause 4.5); use the lumen method with manufacturer photometry.';
@@ -489,7 +488,7 @@
           break;
         case 'open':
           requiredLux = 0.5;
-          areaName = 'Open Areas > 60m²';
+          areaName = 'Open Areas > 60mÂ²';
           break;
         case 'highrisk':
           requiredLux = 10.0;
@@ -580,7 +579,7 @@
       }
 
       if (heightLimited) {
-        complianceHTML += '<div class="warning-box"><strong>Spacing Limited:</strong> Capped at 3× mounting height per AS/NZS 2293 design guidance to control uniformity.</div>';
+        complianceHTML += '<div class="warning-box"><strong>Spacing Limited:</strong> Capped at 3Ã— mounting height per AS/NZS 2293 design guidance to control uniformity.</div>';
       }
 
       document.getElementById('complianceCheck').innerHTML = complianceHTML;

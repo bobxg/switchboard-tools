@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Maximum Demand Calculator - Switchboard Tools</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -56,7 +55,7 @@
     .demand-breakdown .total-row td { font-weight: 700; font-size: 1.05em; border-top: 2px solid #1976d2; padding-top: 10px; }
     @media print {
       .top-tabs, .sub-tabs, .add-row-btn, .remove-btn, .reset-btn,
-      .calc-button, .export-section, .topleft-icon { display: none !important; }
+      .calc-button, .export-section { display: none !important; }
       .tab-panel { display: block !important; page-break-inside: avoid; }
       .calc-section { box-shadow: none; border: 1px solid #ccc; }
       .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -70,7 +69,6 @@
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
     <div class="tab has-dropdown active"><span>Power Systems</span><div class="dropdown-content">
@@ -87,19 +85,19 @@
     <p>Calculate maximum demand per <strong>AS/NZS 3000:2018 Appendix C</strong>. Select the applicable method below.</p>
 
     <div class="sub-tabs">
-      <button class="sub-tab active" data-tab="c1">Table C1 — Domestic</button>
-      <button class="sub-tab" data-tab="c2">Table C2 — Non-Domestic</button>
-      <button class="sub-tab" data-tab="c3">Table C3 — VA/m²</button>
+      <button class="sub-tab active" data-tab="c1">Table C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Domestic</button>
+      <button class="sub-tab" data-tab="c2">Table C2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Non-Domestic</button>
+      <button class="sub-tab" data-tab="c3">Table C3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â VA/mÃƒâ€šÃ‚Â²</button>
       <button class="sub-tab" data-tab="c5">Summary / Export</button>
     </div>
 
     <!-- ================================================================
-         TABLE C1 — DOMESTIC (SINGLE & MULTIPLE DWELLINGS)
+         TABLE C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â DOMESTIC (SINGLE & MULTIPLE DWELLINGS)
          AS/NZS 3000:2018 Table C1
          ================================================================ -->
     <div id="panel-c1" class="tab-panel active">
       <div class="calc-section">
-        <h2>Table C1 — Domestic Maximum Demand</h2>
+        <h2>Table C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Domestic Maximum Demand</h2>
         <div class="info-box">
           <strong>AS/NZS 3000:2018 Table C1:</strong> Maximum demand for single and multiple domestic electrical installations.<br>
           All calculations are in <strong>amperes per phase</strong>. Enter the loads connected to the <strong>heaviest loaded phase</strong> for multi-phase supplies.<br>
@@ -111,7 +109,7 @@
             <label for="c1Mode">Installation Type</label>
             <select id="c1Mode" onchange="c1ToggleMode()">
               <option value="single">Single Dwelling (Column 2)</option>
-              <option value="multi">Block of Living Units (Columns 3–5)</option>
+              <option value="multi">Block of Living Units (Columns 3ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“5)</option>
             </select>
           </div>
           <div class="input-group">
@@ -127,13 +125,13 @@
           </div>
         </div>
 
-        <!-- ━━━ SINGLE DWELLING (Column 2) ━━━ -->
+        <!-- ÃƒÂ¢Ã¢â‚¬ÂÃ‚ÂÃƒÂ¢Ã¢â‚¬ÂÃ‚ÂÃƒÂ¢Ã¢â‚¬ÂÃ‚Â SINGLE DWELLING (Column 2) ÃƒÂ¢Ã¢â‚¬ÂÃ‚ÂÃƒÂ¢Ã¢â‚¬ÂÃ‚ÂÃƒÂ¢Ã¢â‚¬ÂÃ‚Â -->
         <div id="c1SinglePanel">
           <div class="diversity-ref">
-            <strong>Table C1 Column 2 — Single Dwelling per Phase:</strong><br>
+            <strong>Table C1 Column 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Single Dwelling per Phase:</strong><br>
             (a)(i) Lighting: 3 A for first 20 points + 2 A per additional 20 (or part) &nbsp;|&nbsp;
             (a)(ii) Outdoor &gt;1000 W: 75% connected load &nbsp;|&nbsp;
-            (b)(i) Socket-outlets ≤10 A: 10 A for first 20 points + 5 A per additional 20 (or part) &nbsp;|&nbsp;
+            (b)(i) Socket-outlets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A: 10 A for first 20 points + 5 A per additional 20 (or part) &nbsp;|&nbsp;
             (b)(ii) 15 A SO: +10 A &nbsp;|&nbsp;
             (b)(iii) 20 A SO: +15 A &nbsp;|&nbsp;
             (c) Cooking/laundry &gt;10 A: 50% connected load &nbsp;|&nbsp;
@@ -152,7 +150,7 @@
             <tbody>
               <tr class="group-header"><td colspan="4">(a) Lighting</td></tr>
               <tr>
-                <td class="row-label">(a)(i) Lighting points <span class="note-text">(incl. track @2pts/m, exhaust fans ≤150 W as 1pt)</span></td>
+                <td class="row-label">(a)(i) Lighting points <span class="note-text">(incl. track @2pts/m, exhaust fans ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤150 W as 1pt)</span></td>
                 <td><input type="number" id="c1sLightPts" min="0" value="0" oninput="c1Calc()"> <span class="note-text">points</span></td>
                 <td class="row-amps" id="c1sLightA">0.0</td>
                 <td class="row-note">3A (1-20) + 2A / 20</td>
@@ -166,7 +164,7 @@
 
               <tr class="group-header"><td colspan="4">(b) Socket-Outlets</td></tr>
               <tr>
-                <td class="row-label">(b)(i) Socket-outlets ≤10 A <span class="note-text">(incl. perm. connected ≤10 A as points)</span></td>
+                <td class="row-label">(b)(i) Socket-outlets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A <span class="note-text">(incl. perm. connected ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A as points)</span></td>
                 <td><input type="number" id="c1sSocketPts" min="0" value="0" oninput="c1Calc()"> <span class="note-text">points</span></td>
                 <td class="row-amps" id="c1sSocketA">0.0</td>
                 <td class="row-note">10A (1-20) + 5A / 20</td>
@@ -238,9 +236,9 @@
                 <td class="row-note">Full-load current</td>
               </tr>
 
-              <tr class="group-header"><td colspan="4">(m) Other Appliances — by Assessment</td></tr>
+              <tr class="group-header"><td colspan="4">(m) Other Appliances ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â by Assessment</td></tr>
               <tr>
-                <td class="row-label">(m) Other equipment <span class="note-text">(kilns, welders, X-ray etc.) — enter assessed demand</span></td>
+                <td class="row-label">(m) Other equipment <span class="note-text">(kilns, welders, X-ray etc.) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â enter assessed demand</span></td>
                 <td><input type="number" id="c1sOther" min="0" step="0.1" value="0" oninput="c1Calc()"> <span class="note-text">A</span></td>
                 <td class="row-amps" id="c1sOtherA">0.0</td>
                 <td class="row-note">Assessment</td>
@@ -251,7 +249,7 @@
           </table>
 
           <div class="result-box" id="c1sResult">
-            <h3>Single Dwelling — Maximum Demand (Table C1 Col. 2)</h3>
+            <h3>Single Dwelling ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Maximum Demand (Table C1 Col. 2)</h3>
             <div class="result-grid">
               <div class="result-item">
                 <div class="result-label">Maximum Demand (per phase)</div>
@@ -263,25 +261,25 @@
               </div>
               <div class="result-item">
                 <div class="result-label">Suggested Main Switch</div>
-                <div class="result-value" id="c1sMainSwitch">—</div>
+                <div class="result-value" id="c1sMainSwitch">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</div>
               </div>
             </div>
           </div>
 
           <div class="diversity-ref" style="margin-top:16px;">
-            <strong>Table C5 — Cooking Subcircuit:</strong>
+            <strong>Table C5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Cooking Subcircuit:</strong>
             For a single domestic cooking appliance final subcircuit:<br>
-            ≤5000 W → 16 A &nbsp;|&nbsp; 5001–8000 W → 20 A &nbsp;|&nbsp; 8001–10 000 W → 25 A &nbsp;|&nbsp;
-            10 001–13 000 W → 32 A &nbsp;|&nbsp; &gt;13 000 W → 40 A
+            ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤5000 W ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 16 A &nbsp;|&nbsp; 5001ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“8000 W ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 20 A &nbsp;|&nbsp; 8001ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“10 000 W ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 25 A &nbsp;|&nbsp;
+            10 001ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“13 000 W ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 32 A &nbsp;|&nbsp; &gt;13 000 W ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 40 A
           </div>
         </div>
 
-        <!-- ━━━ MULTIPLE DWELLINGS / BLOCK OF LIVING UNITS (Columns 3–5) ━━━ -->
+        <!-- ÃƒÂ¢Ã¢â‚¬ÂÃ‚ÂÃƒÂ¢Ã¢â‚¬ÂÃ‚ÂÃƒÂ¢Ã¢â‚¬ÂÃ‚Â MULTIPLE DWELLINGS / BLOCK OF LIVING UNITS (Columns 3ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“5) ÃƒÂ¢Ã¢â‚¬ÂÃ‚ÂÃƒÂ¢Ã¢â‚¬ÂÃ‚ÂÃƒÂ¢Ã¢â‚¬ÂÃ‚Â -->
         <div id="c1MultiPanel" style="display:none;">
           <div class="diversity-ref">
-            <strong>Table C1 Columns 3–5 — Blocks of Living Units:</strong><br>
+            <strong>Table C1 Columns 3ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Blocks of Living Units:</strong><br>
             Column is selected based on <strong>units per phase</strong>:
-            2–5 → Col 3 &nbsp;|&nbsp; 6–20 → Col 4 &nbsp;|&nbsp; 21+ → Col 5.<br>
+            2ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“5 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Col 3 &nbsp;|&nbsp; 6ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“20 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Col 4 &nbsp;|&nbsp; 21+ ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Col 5.<br>
             For load groups where not all units have the same equipment (e.g. cooking), the column is determined by the number of <em>equipped</em> units per phase.
           </div>
 
@@ -299,7 +297,7 @@
             </div>
             <div class="input-group">
               <label>Units per Phase (heaviest)</label>
-              <div id="c1mUPP" style="padding:8px 12px;font-weight:700;color:#1976d2;font-size:1.1em;">4 → Col 3</div>
+              <div id="c1mUPP" style="padding:8px 12px;font-weight:700;color:#1976d2;font-size:1.1em;">4 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Col 3</div>
             </div>
           </div>
 
@@ -311,27 +309,27 @@
             <tbody>
               <tr class="group-header"><td colspan="4">(a)(i) Lighting</td></tr>
               <tr>
-                <td class="row-label">Lighting — all units</td>
+                <td class="row-label">Lighting ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â all units</td>
                 <td><span class="note-text">Automatic per column</span></td>
                 <td class="row-amps" id="c1mLightA">0.0</td>
-                <td class="row-note" id="c1mLightF">—</td>
+                <td class="row-note" id="c1mLightF">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td>
               </tr>
-              <tr class="group-header"><td colspan="4">(b)(i) Socket-Outlets ≤10 A</td></tr>
+              <tr class="group-header"><td colspan="4">(b)(i) Socket-Outlets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A</td></tr>
               <tr>
-                <td class="row-label">Socket-outlets — all units</td>
+                <td class="row-label">Socket-outlets ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â all units</td>
                 <td><span class="note-text">Automatic per column</span></td>
                 <td class="row-amps" id="c1mSockA">0.0</td>
-                <td class="row-note" id="c1mSockF">—</td>
+                <td class="row-note" id="c1mSockF">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td>
               </tr>
               <tr class="group-header"><td colspan="4">(c) Cooking / Laundry (&gt;10 A)</td></tr>
               <tr>
                 <td class="row-label">Units with cooking appliances</td>
                 <td><input type="number" id="c1mCookUnits" min="0" value="0" oninput="c1Calc()"> <span class="note-text">units</span></td>
                 <td class="row-amps" id="c1mCookA">0.0</td>
-                <td class="row-note" id="c1mCookF">—</td>
+                <td class="row-note" id="c1mCookF">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td>
               </tr>
               <tr>
-                <td class="row-label" style="padding-left:30px;font-size:0.9em;">Cooking load per unit (W) — for Col 2 only</td>
+                <td class="row-label" style="padding-left:30px;font-size:0.9em;">Cooking load per unit (W) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â for Col 2 only</td>
                 <td><input type="number" id="c1mCookW" min="0" value="8000" oninput="c1Calc()"> <span class="note-text">W</span></td>
                 <td></td><td></td>
               </tr>
@@ -340,7 +338,7 @@
                 <td class="row-label">HVAC/sauna load per unit (W) <span class="note-text">(greater of heating or cooling)</span></td>
                 <td><input type="number" id="c1mHVACPerUnit" min="0" value="0" oninput="c1Calc()"> <span class="note-text">W</span></td>
                 <td class="row-amps" id="c1mHVACA">0.0</td>
-                <td class="row-note">75% × n × load / V</td>
+                <td class="row-note">75% ÃƒÆ’Ã¢â‚¬â€ n ÃƒÆ’Ã¢â‚¬â€ load / V</td>
               </tr>
               <tr class="group-header"><td colspan="4">(e)(f) Water Heaters</td></tr>
               <tr>
@@ -353,7 +351,7 @@
                   </select>
                 </td>
                 <td class="row-amps" id="c1mWaterA">0.0</td>
-                <td class="row-note" id="c1mWaterF">—</td>
+                <td class="row-note" id="c1mWaterF">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td>
               </tr>
               <tr class="total-row"><td colspan="2"><strong>Total Individual Units Loading (per phase)</strong></td><td class="row-amps" id="c1mUnitTotal">0.0 A</td><td></td></tr>
             </tbody>
@@ -361,7 +359,7 @@
 
           <h3 style="margin-top:24px;color:#1976d2;">Communal / Common Area Loading</h3>
           <div class="info-box" style="margin-bottom:12px;">
-            Communal loads per Table C1 load groups (h)–(l). Enter loads on the <strong>heaviest loaded phase</strong>.
+            Communal loads per Table C1 load groups (h)ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“(l). Enter loads on the <strong>heaviest loaded phase</strong>.
           </div>
           <table class="load-table demand-breakdown" id="c1mCommonTable">
             <thead>
@@ -401,7 +399,7 @@
                 <td class="row-amps" id="c1mComEVA">0.0</td>
                 <td class="row-note" id="c1mComEVF">100% load</td>
               </tr>
-              <tr class="group-header"><td colspan="4">(k) Lifts — per C2.4.1, Table C2</td></tr>
+              <tr class="group-header"><td colspan="4">(k) Lifts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â per C2.4.1, Table C2</td></tr>
               <tr>
                 <td class="row-label">Largest lift motor (nameplate current per phase)</td>
                 <td><input type="number" id="c1mLift1" min="0" step="0.1" value="0" oninput="c1Calc()"> <span class="note-text">A</span></td>
@@ -416,7 +414,7 @@
                 <td class="row-label">All remaining lift motors (total)</td>
                 <td><input type="number" id="c1mLift3" min="0" step="0.1" value="0" oninput="c1Calc()"> <span class="note-text">A</span></td>
               </tr>
-              <tr class="group-header"><td colspan="4">(l) Motors — per C2.4.1, Table C2</td></tr>
+              <tr class="group-header"><td colspan="4">(l) Motors ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â per C2.4.1, Table C2</td></tr>
               <tr>
                 <td class="row-label">Largest motor (nameplate current per phase)</td>
                 <td><input type="number" id="c1mMotor1" min="0" step="0.1" value="0" oninput="c1Calc()"> <span class="note-text">A</span></td>
@@ -432,7 +430,7 @@
           </table>
 
           <div class="result-box" id="c1mResult">
-            <h3>Multiple Dwelling — Maximum Demand (Table C1)</h3>
+            <h3>Multiple Dwelling ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Maximum Demand (Table C1)</h3>
             <div class="result-grid">
               <div class="result-item">
                 <div class="result-label">Individual Units (per phase)</div>
@@ -452,11 +450,11 @@
               </div>
               <div class="result-item">
                 <div class="result-label">Column Used</div>
-                <div class="result-value" id="c1mResCol">—</div>
+                <div class="result-value" id="c1mResCol">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</div>
               </div>
               <div class="result-item">
                 <div class="result-label">Suggested Main Switch</div>
-                <div class="result-value" id="c1mResSwitch">—</div>
+                <div class="result-value" id="c1mResSwitch">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</div>
               </div>
             </div>
           </div>
@@ -465,12 +463,12 @@
     </div>
 
     <!-- ================================================================
-         TABLE C2 — NON-DOMESTIC INSTALLATIONS
+         TABLE C2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â NON-DOMESTIC INSTALLATIONS
          AS/NZS 3000:2018 Table C2
          ================================================================ -->
     <div id="panel-c2" class="tab-panel">
       <div class="calc-section">
-        <h2>Table C2 — Non-Domestic Maximum Demand</h2>
+        <h2>Table C2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Non-Domestic Maximum Demand</h2>
         <div class="info-box">
           <strong>AS/NZS 3000:2018 Table C2:</strong> Maximum demand for non-domestic electrical installations.<br>
           <strong>Column 2</strong>: Residential institutions, hotels, boarding houses, hospitals, accommodation houses, motels.<br>
@@ -502,8 +500,8 @@
         <div class="diversity-ref" id="c2RefBox">
           <strong>Table C2 Column 3 (Commercial):</strong><br>
           (a) Lighting: 100% connected load &nbsp;|&nbsp;
-          (b)(i) Sockets ≤10 A: 1000 W first + 750 W/ea additional &nbsp;|&nbsp;
-          (b)(ii) Sockets ≤10 A (with perm H/C): 1000 W first + 100 W/ea &nbsp;|&nbsp;
+          (b)(i) Sockets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A: 1000 W first + 750 W/ea additional &nbsp;|&nbsp;
+          (b)(ii) Sockets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A (with perm H/C): 1000 W first + 100 W/ea &nbsp;|&nbsp;
           (b)(iii) Sockets &gt;10 A: Highest full + 75% remainder &nbsp;|&nbsp;
           (c) Cooking/heating/cooling: Highest full + 75% remainder &nbsp;|&nbsp;
           (d) Motors: Highest full + 75% 2nd highest + 50% remainder &nbsp;|&nbsp;
@@ -525,7 +523,7 @@
               <td class="row-note" id="c2LightF">100%</td>
             </tr>
 
-            <tr class="group-header"><td colspan="4">(b) Socket-Outlets ≤10 A</td></tr>
+            <tr class="group-header"><td colspan="4">(b) Socket-Outlets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A</td></tr>
             <tr>
               <td class="row-label">(b)(i) Outlets in non-permanently heated/cooled areas</td>
               <td><input type="number" id="c2Sock10" min="0" value="0" oninput="c2Calc()"> <span class="note-text">outlets</span></td>
@@ -553,7 +551,7 @@
 
             <tr class="group-header"><td colspan="4">(c) Cooking, Heating, Cooling Appliances</td></tr>
             <tr>
-              <td class="row-label">(c)(i) Highest rated appliance <span class="note-text">(cooking, heating, cooling incl. instant WH — not motors/lifts)</span></td>
+              <td class="row-label">(c)(i) Highest rated appliance <span class="note-text">(cooking, heating, cooling incl. instant WH ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â not motors/lifts)</span></td>
               <td><input type="number" id="c2AppHi" min="0" value="0" oninput="c2Calc()"> <span class="note-text">W</span></td>
               <td class="row-amps" id="c2AppDemand" rowspan="2" style="vertical-align:middle;">0.0 A</td>
               <td class="row-note" id="c2AppF" rowspan="2">Full + 75% rem.</td>
@@ -563,7 +561,7 @@
               <td><input type="number" id="c2AppRem" min="0" value="0" oninput="c2Calc()"> <span class="note-text">W</span></td>
             </tr>
             <tr>
-              <td class="row-label">(c)(ii) EV charging — highest rated</td>
+              <td class="row-label">(c)(ii) EV charging ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â highest rated</td>
               <td><input type="number" id="c2EVHi" min="0" value="0" oninput="c2Calc()"> <span class="note-text">W</span></td>
               <td class="row-amps" id="c2EVDemand" rowspan="2" style="vertical-align:middle;">0.0 A</td>
               <td class="row-note" rowspan="2">Full + 75% rem.</td>
@@ -578,7 +576,7 @@
               <td class="row-label">Largest motor (nameplate current, per phase)</td>
               <td><input type="number" id="c2Motor1" min="0" step="0.1" value="0" oninput="c2Calc()"> <span class="note-text">A</span></td>
               <td class="row-amps" id="c2MotorDemand" rowspan="3" style="vertical-align:middle;">0.0 A</td>
-              <td class="row-note" id="c2MotorF" rowspan="3">—</td>
+              <td class="row-note" id="c2MotorF" rowspan="3">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td>
             </tr>
             <tr>
               <td class="row-label">2nd largest motor <span class="note-text">(for Commercial col only)</span></td>
@@ -607,17 +605,17 @@
 
             <tr class="group-header"><td colspan="4">(f) Fuel Dispensing Units</td></tr>
             <tr>
-              <td class="row-label">Fuel dispensing motor — first motor (full load current)</td>
+              <td class="row-label">Fuel dispensing motor ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â first motor (full load current)</td>
               <td><input type="number" id="c2FuelMotor1" min="0" step="0.1" value="0" oninput="c2Calc()"> <span class="note-text">A</span></td>
               <td class="row-amps" id="c2FuelA" rowspan="4" style="vertical-align:middle;">0.0 A</td>
               <td class="row-note" id="c2FuelF" rowspan="4">Motors: 100% + 50% + 25%, lighting full</td>
             </tr>
             <tr>
-              <td class="row-label">Fuel dispensing motor — second motor</td>
+              <td class="row-label">Fuel dispensing motor ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â second motor</td>
               <td><input type="number" id="c2FuelMotor2" min="0" step="0.1" value="0" oninput="c2Calc()"> <span class="note-text">A</span></td>
             </tr>
             <tr>
-              <td class="row-label">Fuel dispensing motors — additional motors (total)</td>
+              <td class="row-label">Fuel dispensing motors ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â additional motors (total)</td>
               <td><input type="number" id="c2FuelMotor3" min="0" step="0.1" value="0" oninput="c2Calc()"> <span class="note-text">A</span></td>
             </tr>
             <tr>
@@ -649,7 +647,7 @@
               <td class="row-note">50% of largest</td>
             </tr>
 
-            <tr class="group-header"><td colspan="4">(j) Other Equipment — by Assessment</td></tr>
+            <tr class="group-header"><td colspan="4">(j) Other Equipment ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â by Assessment</td></tr>
             <tr>
               <td class="row-label">Other equipment (assessed demand)</td>
               <td><input type="number" id="c2Other" min="0" step="0.1" value="0" oninput="c2Calc()"> <span class="note-text">A</span></td>
@@ -674,7 +672,7 @@
             </div>
             <div class="result-item">
               <div class="result-label">Suggested Main Switch</div>
-              <div class="result-value" id="c2MainSwitch">—</div>
+              <div class="result-value" id="c2MainSwitch">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</div>
             </div>
           </div>
         </div>
@@ -682,42 +680,42 @@
     </div>
 
     <!-- ================================================================
-         TABLE C3 — ENERGY DEMAND METHOD (VA/m²)
+         TABLE C3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ENERGY DEMAND METHOD (VA/mÃƒâ€šÃ‚Â²)
          AS/NZS 3000:2018 Table C3
          ================================================================ -->
     <div id="panel-c3" class="tab-panel">
       <div class="calc-section">
-        <h2>Table C3 — Energy Demand Method (VA/m²)</h2>
+        <h2>Table C3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Energy Demand Method (VA/mÃƒâ€šÃ‚Â²)</h2>
         <div class="info-box">
-          <strong>AS/NZS 3000:2018 Table C3:</strong> Alternative energy demand method for non-domestic installations using VA/m² load densities based on building occupancy type.
+          <strong>AS/NZS 3000:2018 Table C3:</strong> Alternative energy demand method for non-domestic installations using VA/mÃƒâ€šÃ‚Â² load densities based on building occupancy type.
         </div>
 
         <div class="input-row">
           <div class="input-group">
             <label for="c3Building">Building / Occupancy Type</label>
             <select id="c3Building" onchange="c3Calc()">
-              <option value="office_lp">Offices — Light &amp; Power</option>
-              <option value="office_cool">Offices — A/C Cooling</option>
-              <option value="office_rev">Offices — A/C Reverse Cycle</option>
-              <option value="office_zone">Offices — A/C Zonal Reheat</option>
-              <option value="office_vav">Offices — A/C Variable Volume</option>
-              <option value="carpark_open">Carpark — Open Air</option>
-              <option value="carpark_ev_open">Carpark — Open Air EV Charging</option>
-              <option value="carpark_base">Carpark — Basement</option>
-              <option value="carpark_ev_base">Carpark — Basement EV Charging</option>
-              <option value="retail_lp">Retail Shops — Light &amp; Power</option>
-              <option value="retail_ac">Retail Shops — Airconditioning</option>
-              <option value="warehouse_lp">Warehouses — Light &amp; Power</option>
-              <option value="warehouse_vent">Warehouses — Ventilation</option>
-              <option value="industrial_lp">Light Industrial — Light &amp; Power</option>
-              <option value="industrial_vent">Light Industrial — Ventilation</option>
-              <option value="industrial_ac">Light Industrial — Airconditioning</option>
-              <option value="tavern">Taverns / Licensed Clubs — Total</option>
-              <option value="theatre">Theatres — Total</option>
+              <option value="office_lp">Offices ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Light &amp; Power</option>
+              <option value="office_cool">Offices ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â A/C Cooling</option>
+              <option value="office_rev">Offices ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â A/C Reverse Cycle</option>
+              <option value="office_zone">Offices ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â A/C Zonal Reheat</option>
+              <option value="office_vav">Offices ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â A/C Variable Volume</option>
+              <option value="carpark_open">Carpark ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Open Air</option>
+              <option value="carpark_ev_open">Carpark ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Open Air EV Charging</option>
+              <option value="carpark_base">Carpark ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Basement</option>
+              <option value="carpark_ev_base">Carpark ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Basement EV Charging</option>
+              <option value="retail_lp">Retail Shops ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Light &amp; Power</option>
+              <option value="retail_ac">Retail Shops ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Airconditioning</option>
+              <option value="warehouse_lp">Warehouses ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Light &amp; Power</option>
+              <option value="warehouse_vent">Warehouses ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ventilation</option>
+              <option value="industrial_lp">Light Industrial ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Light &amp; Power</option>
+              <option value="industrial_vent">Light Industrial ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ventilation</option>
+              <option value="industrial_ac">Light Industrial ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Airconditioning</option>
+              <option value="tavern">Taverns / Licensed Clubs ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Total</option>
+              <option value="theatre">Theatres ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Total</option>
             </select>
           </div>
           <div class="input-group">
-            <label for="c3Area">Floor Area (m²)</label>
+            <label for="c3Area">Floor Area (mÃƒâ€šÃ‚Â²)</label>
             <input type="number" id="c3Area" min="0" value="0" oninput="c3Calc()">
           </div>
         </div>
@@ -736,13 +734,13 @@
           </div>
           <div class="input-group">
             <label for="c3Density">Override Density (0 = use table)</label>
-            <input type="number" id="c3Density" min="0" step="1" value="0" oninput="c3Calc()"> <span class="note-text">VA/m²</span>
+            <input type="number" id="c3Density" min="0" step="1" value="0" oninput="c3Calc()"> <span class="note-text">VA/mÃƒâ€šÃ‚Â²</span>
           </div>
         </div>
 
         <div class="diversity-ref" id="c3RefBox">
           <strong>Table C3 Values:</strong><br>
-          <span id="c3RangeText">—</span>
+          <span id="c3RangeText">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</span>
         </div>
 
         <div class="result-box" id="c3Result">
@@ -750,7 +748,7 @@
           <div class="result-grid">
             <div class="result-item">
               <div class="result-label">Load Density</div>
-              <div class="result-value" id="c3ResDensity">0 VA/m²</div>
+              <div class="result-value" id="c3ResDensity">0 VA/mÃƒâ€šÃ‚Â²</div>
             </div>
             <div class="result-item">
               <div class="result-label">Total Demand</div>
@@ -770,7 +768,7 @@
             </div>
             <div class="result-item">
               <div class="result-label">Suggested Main Switch</div>
-              <div class="result-value" id="c3ResSwitch">—</div>
+              <div class="result-value" id="c3ResSwitch">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</div>
             </div>
           </div>
         </div>
@@ -788,47 +786,47 @@
         </div>
 
         <div class="summary-card" id="summaryC1s">
-          <h3>Table C1 — Domestic (Single Dwelling)</h3>
+          <h3>Table C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Domestic (Single Dwelling)</h3>
           <table class="summary-table">
-            <tr><th>Lighting (a)</th><td id="sumC1sLight">—</td></tr>
-            <tr><th>Socket Outlets (b)</th><td id="sumC1sSock">—</td></tr>
-            <tr><th>Cooking/Laundry (c)</th><td id="sumC1sCook">—</td></tr>
-            <tr><th>HVAC/Saunas (d)</th><td id="sumC1sHVAC">—</td></tr>
-            <tr><th>Water Heaters (e)(f)</th><td id="sumC1sWater">—</td></tr>
-            <tr><th>Spa/Pool (g)</th><td id="sumC1sSpa">—</td></tr>
-            <tr><th>EV Charging (j)(iv)</th><td id="sumC1sEV">—</td></tr>
-            <tr><th>Other (m)</th><td id="sumC1sOther">—</td></tr>
-            <tr><th class="summary-total">Maximum Demand (per phase)</th><td class="summary-total" id="sumC1sTotal">—</td></tr>
-            <tr><th>Suggested Main Switch</th><td id="sumC1sSwitch">—</td></tr>
+            <tr><th>Lighting (a)</th><td id="sumC1sLight">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Socket Outlets (b)</th><td id="sumC1sSock">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Cooking/Laundry (c)</th><td id="sumC1sCook">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>HVAC/Saunas (d)</th><td id="sumC1sHVAC">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Water Heaters (e)(f)</th><td id="sumC1sWater">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Spa/Pool (g)</th><td id="sumC1sSpa">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>EV Charging (j)(iv)</th><td id="sumC1sEV">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Other (m)</th><td id="sumC1sOther">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th class="summary-total">Maximum Demand (per phase)</th><td class="summary-total" id="sumC1sTotal">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Suggested Main Switch</th><td id="sumC1sSwitch">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
           </table>
         </div>
 
         <div class="summary-card" id="summaryC1m">
-          <h3>Table C1 — Domestic (Multiple Dwellings)</h3>
+          <h3>Table C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Domestic (Multiple Dwellings)</h3>
           <table class="summary-table">
-            <tr><th>Units / Phase / Column</th><td id="sumC1mInfo">—</td></tr>
-            <tr><th>Individual Units (per phase)</th><td id="sumC1mUnits">—</td></tr>
-            <tr><th>Communal (per phase)</th><td id="sumC1mCom">—</td></tr>
-            <tr><th class="summary-total">Total Max Demand (per phase)</th><td class="summary-total" id="sumC1mTotal">—</td></tr>
-            <tr><th>Suggested Main Switch</th><td id="sumC1mSwitch">—</td></tr>
+            <tr><th>Units / Phase / Column</th><td id="sumC1mInfo">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Individual Units (per phase)</th><td id="sumC1mUnits">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Communal (per phase)</th><td id="sumC1mCom">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th class="summary-total">Total Max Demand (per phase)</th><td class="summary-total" id="sumC1mTotal">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Suggested Main Switch</th><td id="sumC1mSwitch">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
           </table>
         </div>
 
         <div class="summary-card" id="summaryC2">
-          <h3>Table C2 — Non-Domestic</h3>
+          <h3>Table C2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Non-Domestic</h3>
           <table class="summary-table">
-            <tr><th>Type</th><td id="sumC2Type">—</td></tr>
-            <tr><th class="summary-total">Maximum Demand (per phase)</th><td class="summary-total" id="sumC2Total">—</td></tr>
-            <tr><th>Suggested Main Switch</th><td id="sumC2Switch">—</td></tr>
+            <tr><th>Type</th><td id="sumC2Type">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th class="summary-total">Maximum Demand (per phase)</th><td class="summary-total" id="sumC2Total">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Suggested Main Switch</th><td id="sumC2Switch">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
           </table>
         </div>
 
         <div class="summary-card" id="summaryC3">
-          <h3>Table C3 — Energy Demand Method</h3>
+          <h3>Table C3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Energy Demand Method</h3>
           <table class="summary-table">
-            <tr><th>Building Type / Density</th><td id="sumC3Info">—</td></tr>
-            <tr><th class="summary-total">Total Demand</th><td class="summary-total" id="sumC3Total">—</td></tr>
-            <tr><th>Current (per phase)</th><td id="sumC3Current">—</td></tr>
+            <tr><th>Building Type / Density</th><td id="sumC3Info">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th class="summary-total">Total Demand</th><td class="summary-total" id="sumC3Total">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
+            <tr><th>Current (per phase)</th><td id="sumC3Current">ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td></tr>
           </table>
         </div>
 
@@ -861,14 +859,14 @@
             </div>
             <div class="input-group">
               <label for="projNotes">Notes</label>
-              <input type="text" id="projNotes" placeholder="e.g. Preliminary design — for approval">
+              <input type="text" id="projNotes" placeholder="e.g. Preliminary design ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â for approval">
             </div>
           </div>
           <h3>Export Options</h3>
-          <button class="export-btn" onclick="printClientReport()" style="background:#0d47a1;">📄 Client Report (Print)</button>
-          <button class="export-btn" onclick="window.print()">🖨️ Print Full Page</button>
-          <button class="export-btn" onclick="exportCSV()" style="background:#1565c0;">📊 Export CSV</button>
-          <button class="export-btn" onclick="copyToClipboard()" style="background:#7b1fa2;">📋 Copy to Clipboard</button>
+          <button class="export-btn" onclick="printClientReport()" style="background:#0d47a1;">ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Å¾ Client Report (Print)</button>
+          <button class="export-btn" onclick="window.print()">ÃƒÂ°Ã…Â¸Ã¢â‚¬â€œÃ‚Â¨ÃƒÂ¯Ã‚Â¸Ã‚Â Print Full Page</button>
+          <button class="export-btn" onclick="exportCSV()" style="background:#1565c0;">ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â  Export CSV</button>
+          <button class="export-btn" onclick="copyToClipboard()" style="background:#7b1fa2;">ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â¹ Copy to Clipboard</button>
         </div>
       </div>
     </div>
@@ -876,7 +874,7 @@
 
   <script src="script.js"></script>
   <script>
-    /* ── Sub-tab switching ── */
+    /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Sub-tab switching ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
     document.querySelectorAll('.sub-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
@@ -887,7 +885,7 @@
       });
     });
 
-    /* ── Shared utilities ── */
+    /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Shared utilities ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
     function suggestMainSwitch(amps) {
       const std = [16,20,25,32,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3200,4000];
       for (const s of std) { if (amps <= s) return s; }
@@ -895,10 +893,10 @@
     }
     function roundA(a) { return parseFloat(a.toFixed(1)); }
 
-    /* ═══════════════════════════════════════════════════
-       TABLE C1 — DOMESTIC (SINGLE & MULTIPLE)
+    /* ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â
+       TABLE C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â DOMESTIC (SINGLE & MULTIPLE)
        AS/NZS 3000:2018 Table C1
-       ═══════════════════════════════════════════════════ */
+       ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â */
     function c1ToggleMode() {
       const mode = document.getElementById('c1Mode').value;
       document.getElementById('c1SinglePanel').style.display = mode === 'single' ? 'block' : 'none';
@@ -913,7 +911,7 @@
       else c1MultiCalc();
     }
 
-    /* ── Table C1 Column 2 — Single Dwelling ── */
+    /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Table C1 Column 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Single Dwelling ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
     function c1SingleCalc() {
       const V = parseFloat(document.getElementById('c1Voltage').value) || 230;
 
@@ -930,7 +928,7 @@
       const outdoorA = outdoorW > 1000 ? roundA(outdoorW * 0.75 / V) : 0;
       const totalLightA = roundA(lightA + outdoorA);
 
-      // (b)(i) Socket-outlets ≤10 A: 10 A for 1-20 points + 5 A per additional 20 or part
+      // (b)(i) Socket-outlets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A: 10 A for 1-20 points + 5 A per additional 20 or part
       const sPts = parseInt(document.getElementById('c1sSocketPts').value) || 0;
       let sockA = 0;
       if (sPts > 0) {
@@ -998,7 +996,7 @@
       document.getElementById('c1sMainSwitch').textContent = suggestMainSwitch(totalA) + ' A';
     }
 
-    /* ── Table C1 Columns 3–5 — Multiple Dwellings ── */
+    /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Table C1 Columns 3ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Multiple Dwellings ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
     function c1MultiCalc() {
       const V = parseFloat(document.getElementById('c1Voltage').value) || 230;
       const totalUnits = parseInt(document.getElementById('c1mUnits').value) || 1;
@@ -1012,7 +1010,7 @@
       else if (n <= 20) col = 4;
       else col = 5;
 
-      document.getElementById('c1mUPP').textContent = n + ' → Col ' + col;
+      document.getElementById('c1mUPP').textContent = n + ' ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Col ' + col;
 
       // === Individual unit loading ===
 
@@ -1022,8 +1020,8 @@
       switch (col) {
         case 2: lightA = 3; lightF = '3 A (single)'; break;
         case 3: lightA = 6; lightF = '6 A (flat)'; break;
-        case 4: lightA = 5 + 0.25 * n; lightF = '5 + 0.25×' + n; break;
-        case 5: lightA = 0.5 * n; lightF = '0.5×' + n; break;
+        case 4: lightA = 5 + 0.25 * n; lightF = '5 + 0.25ÃƒÆ’Ã¢â‚¬â€' + n; break;
+        case 5: lightA = 0.5 * n; lightF = '0.5ÃƒÆ’Ã¢â‚¬â€' + n; break;
       }
       lightA = roundA(lightA);
       document.getElementById('c1mLightA').textContent = lightA.toFixed(1);
@@ -1034,15 +1032,15 @@
       let sockF = '';
       switch (col) {
         case 2: sockA = 10; sockF = '10 A (single)'; break;
-        case 3: sockA = 10 + 5 * n; sockF = '10 + 5×' + n; break;
-        case 4: sockA = 15 + 3.75 * n; sockF = '15 + 3.75×' + n; break;
-        case 5: sockA = 50 + 1.9 * n; sockF = '50 + 1.9×' + n; break;
+        case 3: sockA = 10 + 5 * n; sockF = '10 + 5ÃƒÆ’Ã¢â‚¬â€' + n; break;
+        case 4: sockA = 15 + 3.75 * n; sockF = '15 + 3.75ÃƒÆ’Ã¢â‚¬â€' + n; break;
+        case 5: sockA = 50 + 1.9 * n; sockF = '50 + 1.9ÃƒÆ’Ã¢â‚¬â€' + n; break;
       }
       sockA = roundA(sockA);
       document.getElementById('c1mSockA').textContent = sockA.toFixed(1);
       document.getElementById('c1mSockF').textContent = sockF;
 
-      // (c) Cooking — units with cooking per phase
+      // (c) Cooking ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â units with cooking per phase
       const cookUnitsTotal = parseInt(document.getElementById('c1mCookUnits').value) || 0;
       const cookPerPhase = Math.ceil(cookUnitsTotal / phases);
       let cookCol;
@@ -1065,18 +1063,18 @@
           break;
         case 4:
           cookA = 2.8 * cookPerPhase;
-          cookF = cookPerPhase + ' units/ph (Col 4): 2.8×' + cookPerPhase;
+          cookF = cookPerPhase + ' units/ph (Col 4): 2.8ÃƒÆ’Ã¢â‚¬â€' + cookPerPhase;
           break;
         case 5:
           cookA = 2.8 * cookPerPhase;
-          cookF = cookPerPhase + ' units/ph (Col 5): 2.8×' + cookPerPhase;
+          cookF = cookPerPhase + ' units/ph (Col 5): 2.8ÃƒÆ’Ã¢â‚¬â€' + cookPerPhase;
           break;
       }
       cookA = roundA(cookA);
       document.getElementById('c1mCookA').textContent = cookA.toFixed(1);
       document.getElementById('c1mCookF').textContent = cookF;
 
-      // (d) HVAC: 75% connected load per unit × n / V
+      // (d) HVAC: 75% connected load per unit ÃƒÆ’Ã¢â‚¬â€ n / V
       const hvacPerUnit = parseFloat(document.getElementById('c1mHVACPerUnit').value) || 0;
       const hvacA = roundA(hvacPerUnit * n * 0.75 / V);
       document.getElementById('c1mHVACA').textContent = hvacA.toFixed(1);
@@ -1088,15 +1086,15 @@
       if (waterType !== 'none') {
         switch (col) {
           case 2:
-            waterF = 'Single unit — enter in single dwelling mode';
+            waterF = 'Single unit ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â enter in single dwelling mode';
             break;
           case 3:
             waterA = 6 * n;
-            waterF = '6×' + n + ' (' + waterType + ')';
+            waterF = '6ÃƒÆ’Ã¢â‚¬â€' + n + ' (' + waterType + ')';
             break;
           case 4: case 5:
             waterA = 100 + 0.8 * n;
-            waterF = '100 + 0.8×' + n + ' (' + waterType + ')';
+            waterF = '100 + 0.8ÃƒÆ’Ã¢â‚¬â€' + n + ' (' + waterType + ')';
             break;
         }
       }
@@ -1142,14 +1140,14 @@
       document.getElementById('c1mComEVA').textContent = comEVA.toFixed(1);
       document.getElementById('c1mComEVF').textContent = (evFactor * 100) + '% load (Col ' + col + ')';
 
-      // (k) Lifts — 125% + 75% + 50%
+      // (k) Lifts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 125% + 75% + 50%
       const lift1 = parseFloat(document.getElementById('c1mLift1').value) || 0;
       const lift2 = parseFloat(document.getElementById('c1mLift2').value) || 0;
       const lift3 = parseFloat(document.getElementById('c1mLift3').value) || 0;
       const liftA = roundA(lift1 * 1.25 + lift2 * 0.75 + lift3 * 0.5);
       document.getElementById('c1mLiftA').textContent = liftA.toFixed(1);
 
-      // (l) Motors — full load + 50% remainder
+      // (l) Motors ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â full load + 50% remainder
       const motor1 = parseFloat(document.getElementById('c1mMotor1').value) || 0;
       const motor2 = parseFloat(document.getElementById('c1mMotor2').value) || 0;
       const motorA = roundA(motor1 + motor2 * 0.5);
@@ -1172,10 +1170,10 @@
     // Initialize
     c1SingleCalc();
 
-    /* ═══════════════════════════════════════════════════
-       TABLE C2 — NON-DOMESTIC
+    /* ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â
+       TABLE C2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â NON-DOMESTIC
        AS/NZS 3000:2018 Table C2
-       ═══════════════════════════════════════════════════ */
+       ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â */
     function c2Calc() {
       const type = document.getElementById('c2Type').value; // 'residential' or 'commercial'
       const supply = document.getElementById('c2Supply').value; // '1' or '3'
@@ -1186,7 +1184,7 @@
         vInput.value = 230;
         vInput.disabled = true;
         vNote.textContent = 'For three-phase, per-phase conversion uses 230 V';
-        powerLabel.textContent = 'Approx. Power (3φ total)';
+        powerLabel.textContent = 'Approx. Power (3ÃƒÂÃ¢â‚¬Â  total)';
       } else {
         vInput.disabled = false;
         vNote.textContent = 'Used for single-phase load conversion';
@@ -1199,8 +1197,8 @@
       if (isRes) {
         document.getElementById('c2RefBox').innerHTML = '<strong>Table C2 Column 2 (Residential Institutions):</strong><br>' +
           '(a) Lighting: 75% connected load &nbsp;|&nbsp;' +
-          '(b)(i) Sockets ≤10 A: 1000 W first + 400 W/ea additional &nbsp;|&nbsp;' +
-          '(b)(ii) Sockets ≤10 A (with perm H/C): 1000 W first + 100 W/ea &nbsp;|&nbsp;' +
+          '(b)(i) Sockets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A: 1000 W first + 400 W/ea additional &nbsp;|&nbsp;' +
+          '(b)(ii) Sockets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A (with perm H/C): 1000 W first + 100 W/ea &nbsp;|&nbsp;' +
           '(b)(iii) Sockets &gt;10 A: Highest full + 50% remainder &nbsp;|&nbsp;' +
           '(c) Cooking/heating/cooling: Highest full + 50% remainder &nbsp;|&nbsp;' +
           '(d) Motors: Highest full + 50% remainder &nbsp;|&nbsp;' +
@@ -1211,8 +1209,8 @@
       } else {
         document.getElementById('c2RefBox').innerHTML = '<strong>Table C2 Column 3 (Commercial):</strong><br>' +
           '(a) Lighting: 100% connected load &nbsp;|&nbsp;' +
-          '(b)(i) Sockets ≤10 A: 1000 W first + 750 W/ea additional &nbsp;|&nbsp;' +
-          '(b)(ii) Sockets ≤10 A (with perm H/C): 1000 W first + 100 W/ea &nbsp;|&nbsp;' +
+          '(b)(i) Sockets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A: 1000 W first + 750 W/ea additional &nbsp;|&nbsp;' +
+          '(b)(ii) Sockets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A (with perm H/C): 1000 W first + 100 W/ea &nbsp;|&nbsp;' +
           '(b)(iii) Sockets &gt;10 A: Highest full + 75% remainder &nbsp;|&nbsp;' +
           '(c) Cooking/heating/cooling: Highest full + 75% remainder &nbsp;|&nbsp;' +
           '(d) Motors: Highest full + 75% 2nd highest + 50% remainder &nbsp;|&nbsp;' +
@@ -1229,7 +1227,7 @@
       document.getElementById('c2LightA').textContent = lightA.toFixed(1) + ' A';
       document.getElementById('c2LightF').textContent = isRes ? '75%' : '100%';
 
-      // (b)(i) Socket-outlets ≤10 A — non-heated/cooled areas
+      // (b)(i) Socket-outlets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â non-heated/cooled areas
       const sock10 = parseInt(document.getElementById('c2Sock10').value) || 0;
       const sock10Rate = isRes ? 400 : 750;
       let sock10W = 0;
@@ -1238,7 +1236,7 @@
       document.getElementById('c2Sock10A').textContent = sock10W + ' W';
       document.getElementById('c2Sock10F').textContent = '1000 + ' + sock10Rate + '/ea';
 
-      // (b)(ii) Socket-outlets ≤10 A — permanently heated/cooled areas
+      // (b)(ii) Socket-outlets ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤10 A ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â permanently heated/cooled areas
       const sock10HC = parseInt(document.getElementById('c2Sock10HC').value) || 0;
       let sock10HCW = 0;
       if (sock10HC > 0) sock10HCW = 1000 + (sock10HC - 1) * 100;
@@ -1263,7 +1261,7 @@
       document.getElementById('c2AppDemand').textContent = appA.toFixed(1) + ' A';
       document.getElementById('c2AppF').textContent = 'Full + ' + (appFactor * 100) + '% rem.';
 
-      // (c)(ii) EV charging — both columns use highest full + 75% remainder
+      // (c)(ii) EV charging ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â both columns use highest full + 75% remainder
       const evHiW = parseFloat(document.getElementById('c2EVHi').value) || 0;
       const evRemW = parseFloat(document.getElementById('c2EVRem').value) || 0;
       const evA = roundA((evHiW + evRemW * 0.75) / V);
@@ -1335,29 +1333,29 @@
     // Initialize
     c2Calc();
 
-    /* ═══════════════════════════════════════════════════
-       TABLE C3 — ENERGY DEMAND METHOD (VA/m²)
+    /* ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â
+       TABLE C3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ENERGY DEMAND METHOD (VA/mÃƒâ€šÃ‚Â²)
        AS/NZS 3000:2018 Table C3
-       ═══════════════════════════════════════════════════ */
+       ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â */
     const C3_DATA = {
-      'office_lp':       { min: 40, max: 60, avg: 50, label: 'Offices — Light & Power' },
-      'office_cool':     { min: 30, max: 40, avg: 35, label: 'Offices — A/C Cooling' },
-      'office_rev':      { min: 20, max: 30, avg: 25, label: 'Offices — A/C Reverse Cycle' },
-      'office_zone':     { min: 40, max: 60, avg: 50, label: 'Offices — A/C Zonal Reheat' },
-      'office_vav':      { min: 20, max: 20, avg: 20, label: 'Offices — A/C Variable Volume' },
-      'carpark_open':    { min: 0,  max: 10, avg: 5,  label: 'Carpark — Open Air' },
-      'carpark_ev_open': { min: 5,  max: 15, avg: 10, label: 'Carpark — Open Air EV Charging' },
-      'carpark_base':    { min: 10, max: 20, avg: 15, label: 'Carpark — Basement' },
-      'carpark_ev_base': { min: 10, max: 30, avg: 20, label: 'Carpark — Basement EV Charging' },
-      'retail_lp':       { min: 40, max: 100,avg: 70, label: 'Retail Shops — Light & Power' },
-      'retail_ac':       { min: 20, max: 40, avg: 30, label: 'Retail Shops — Airconditioning' },
-      'warehouse_lp':    { min: 5,  max: 15, avg: 10, label: 'Warehouses — Light & Power' },
-      'warehouse_vent':  { min: 5,  max: 5,  avg: 5,  label: 'Warehouses — Ventilation' },
-      'industrial_lp':   { min: 10, max: 20, avg: 15, label: 'Light Industrial — Light & Power' },
-      'industrial_vent': { min: 10, max: 20, avg: 15, label: 'Light Industrial — Ventilation' },
-      'industrial_ac':   { min: 30, max: 50, avg: 40, label: 'Light Industrial — Airconditioning' },
-      'tavern':          { min: 60, max: 100,avg: 80, label: 'Taverns / Licensed Clubs — Total' },
-      'theatre':         { min: 80, max: 120,avg: 100,label: 'Theatres — Total' }
+      'office_lp':       { min: 40, max: 60, avg: 50, label: 'Offices ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Light & Power' },
+      'office_cool':     { min: 30, max: 40, avg: 35, label: 'Offices ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â A/C Cooling' },
+      'office_rev':      { min: 20, max: 30, avg: 25, label: 'Offices ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â A/C Reverse Cycle' },
+      'office_zone':     { min: 40, max: 60, avg: 50, label: 'Offices ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â A/C Zonal Reheat' },
+      'office_vav':      { min: 20, max: 20, avg: 20, label: 'Offices ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â A/C Variable Volume' },
+      'carpark_open':    { min: 0,  max: 10, avg: 5,  label: 'Carpark ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Open Air' },
+      'carpark_ev_open': { min: 5,  max: 15, avg: 10, label: 'Carpark ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Open Air EV Charging' },
+      'carpark_base':    { min: 10, max: 20, avg: 15, label: 'Carpark ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Basement' },
+      'carpark_ev_base': { min: 10, max: 30, avg: 20, label: 'Carpark ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Basement EV Charging' },
+      'retail_lp':       { min: 40, max: 100,avg: 70, label: 'Retail Shops ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Light & Power' },
+      'retail_ac':       { min: 20, max: 40, avg: 30, label: 'Retail Shops ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Airconditioning' },
+      'warehouse_lp':    { min: 5,  max: 15, avg: 10, label: 'Warehouses ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Light & Power' },
+      'warehouse_vent':  { min: 5,  max: 5,  avg: 5,  label: 'Warehouses ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ventilation' },
+      'industrial_lp':   { min: 10, max: 20, avg: 15, label: 'Light Industrial ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Light & Power' },
+      'industrial_vent': { min: 10, max: 20, avg: 15, label: 'Light Industrial ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ventilation' },
+      'industrial_ac':   { min: 30, max: 50, avg: 40, label: 'Light Industrial ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Airconditioning' },
+      'tavern':          { min: 60, max: 100,avg: 80, label: 'Taverns / Licensed Clubs ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Total' },
+      'theatre':         { min: 80, max: 120,avg: 100,label: 'Theatres ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Total' }
     };
 
     function c3Calc() {
@@ -1371,7 +1369,7 @@
       const density = overrideDensity > 0 ? overrideDensity : data.avg;
 
       document.getElementById('c3RangeText').textContent =
-        data.label + ': Range ' + data.min + '–' + data.max + ' VA/m², Average ' + data.avg + ' VA/m²';
+        data.label + ': Range ' + data.min + 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“' + data.max + ' VA/mÃƒâ€šÃ‚Â², Average ' + data.avg + ' VA/mÃƒâ€šÃ‚Â²';
 
       const totalVA = density * area;
       const totalKVA = totalVA / 1000;
@@ -1379,7 +1377,7 @@
       const voltage = supply === '3' ? 400 : 230;
       const current = supply === '3' ? totalVA / (Math.sqrt(3) * voltage) : totalVA / voltage;
 
-      document.getElementById('c3ResDensity').textContent = density + ' VA/m²';
+      document.getElementById('c3ResDensity').textContent = density + ' VA/mÃƒâ€šÃ‚Â²';
       document.getElementById('c3ResVA').textContent = Math.round(totalVA).toLocaleString() + ' VA';
       document.getElementById('c3ReskW').textContent = totalKW.toFixed(1) + ' kW';
       document.getElementById('c3ReskVA').textContent = totalKVA.toFixed(1) + ' kVA';
@@ -1389,9 +1387,9 @@
 
     c3Calc();
 
-    /* ═══════════════════════════════════════════════════
+    /* ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â
        SUMMARY / EXPORT
-       ═══════════════════════════════════════════════════ */
+       ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â */
     function updateSummary() {
       // C1 Single
       const c1sTotal = document.getElementById('c1sTotalA').textContent;
@@ -1435,10 +1433,10 @@
     function printClientReport() {
       updateSummary();
       const projName = document.getElementById('projName').value || 'Untitled Project';
-      const projNumber = document.getElementById('projNumber').value || '—';
-      const projClient = document.getElementById('projClient').value || '—';
-      const projEngineer = document.getElementById('projEngineer').value || '—';
-      const projRevision = document.getElementById('projRevision').value || '—';
+      const projNumber = document.getElementById('projNumber').value || 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â';
+      const projClient = document.getElementById('projClient').value || 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â';
+      const projEngineer = document.getElementById('projEngineer').value || 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â';
+      const projRevision = document.getElementById('projRevision').value || 'ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â';
       const projNotes = document.getElementById('projNotes').value || '';
       const today = new Date().toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
 
@@ -1451,7 +1449,7 @@
       let sections = '';
 
       if (c1sA > 0) {
-        sections += '<div class="rpt-section"><h3>Table C1 — Domestic (Single Dwelling)</h3>' +
+        sections += '<div class="rpt-section"><h3>Table C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Domestic (Single Dwelling)</h3>' +
           '<table><thead><tr><th>Load Group</th><th class="r">Demand (A)</th></tr></thead><tbody>';
         const groups = [
           ['(a) Lighting', document.getElementById('sumC1sLight').textContent],
@@ -1470,7 +1468,7 @@
       }
 
       if (c1mA > 0) {
-        sections += '<div class="rpt-section"><h3>Table C1 — Domestic (Multiple Dwellings)</h3>';
+        sections += '<div class="rpt-section"><h3>Table C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Domestic (Multiple Dwellings)</h3>';
         sections += '<table><thead><tr><th>Parameter</th><th class="r">Value</th></tr></thead><tbody>';
         sections += '<tr><td>Configuration</td><td class="r">' + document.getElementById('c1mUPP').textContent + '</td></tr>';
         sections += '<tr><td>Individual Units (per phase)</td><td class="r">' + document.getElementById('c1mUnitTotal').textContent + '</td></tr>';
@@ -1482,17 +1480,17 @@
 
       if (c2A > 0) {
         const c2Type = document.getElementById('c2Type').selectedOptions[0].text;
-        sections += '<div class="rpt-section"><h3>Table C2 — Non-Domestic (' + c2Type + ')</h3>';
+        sections += '<div class="rpt-section"><h3>Table C2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Non-Domestic (' + c2Type + ')</h3>';
         sections += '<table><tfoot><tr class="total-row"><td>Maximum Demand (per phase)</td><td class="r">' + c2A.toFixed(1) + ' A</td></tr></tfoot></table>';
         sections += '<div class="rpt-results"><span>Power: <strong>' + document.getElementById('c2PowerkW').textContent + '</strong></span>';
         sections += '<span>Main Switch: <strong>' + document.getElementById('c2MainSwitch').textContent + '</strong></span></div></div>';
       }
 
       if (c3VA > 0) {
-        sections += '<div class="rpt-section"><h3>Table C3 — Energy Demand Method</h3>';
+        sections += '<div class="rpt-section"><h3>Table C3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Energy Demand Method</h3>';
         sections += '<table><tbody>';
         sections += '<tr><td>Building Type</td><td class="r">' + C3_DATA[document.getElementById('c3Building').value].label + '</td></tr>';
-        sections += '<tr><td>Floor Area</td><td class="r">' + document.getElementById('c3Area').value + ' m²</td></tr>';
+        sections += '<tr><td>Floor Area</td><td class="r">' + document.getElementById('c3Area').value + ' mÃƒâ€šÃ‚Â²</td></tr>';
         sections += '<tr><td>Load Density</td><td class="r">' + document.getElementById('c3ResDensity').textContent + '</td></tr>';
         sections += '</tbody><tfoot><tr class="total-row"><td>Total Demand</td><td class="r">' + document.getElementById('c3ReskVA').textContent + '</td></tr></tfoot></table>';
         sections += '<div class="rpt-results"><span>Current: <strong>' + document.getElementById('c3ResCurrent').textContent + '</strong></span>';
@@ -1501,7 +1499,7 @@
 
       if (!sections) { alert('No calculations to print. Please enter load data in at least one tab.'); return; }
 
-      const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Maximum Demand Report — ' + projName + '</title>' +
+      const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Maximum Demand Report ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ' + projName + '</title>' +
         '<style>@page{size:A4;margin:15mm 18mm;}*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,Helvetica,sans-serif;font-size:9.5pt;color:#222;line-height:1.4;}' +
         '.header{border-bottom:3px solid #1565c0;padding-bottom:10px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-end;}' +
         '.header-left h1{font-size:15pt;color:#1565c0;margin-bottom:2px;}.header-left p{font-size:8pt;color:#666;}' +
@@ -1518,13 +1516,13 @@
         (projNotes ? '.notes{background:#fffbe6;border:1px solid #ffc107;padding:6px 10px;margin-bottom:12px;font-size:8.5pt;}' : '') +
         '</style></head><body>' +
         '<div class="header"><div class="header-left"><h1>Maximum Demand Calculation</h1><p>Per AS/NZS 3000:2018 Appendix C</p></div>' +
-        '<div class="header-right"><div class="brand">ADP Consulting</div><div class="brand-sub">an Ayesa Company</div><br>Date: ' + today + '<br>Rev: ' + projRevision + '</div></div>' +
+        '<div class="header-right">Date: ' + today + '<br>Rev: ' + projRevision + '</div></div>' +
         '<table class="proj-table"><tr><td class="lbl">Project</td><td>' + projName + '</td><td class="lbl">Job No.</td><td>' + projNumber + '</td></tr>' +
         '<tr><td class="lbl">Client</td><td>' + projClient + '</td><td class="lbl">Prepared By</td><td>' + projEngineer + '</td></tr></table>' +
         (projNotes ? '<div class="notes"><strong>Notes:</strong> ' + projNotes + '</div>' : '') +
         sections +
-        '<div class="disclaimer">This document has been prepared in accordance with AS/NZS 3000:2018 Wiring Rules, Appendix C — Estimation of Maximum Demand. All diversity factors applied per the relevant tables. Values should be verified by a qualified electrical engineer prior to construction.</div>' +
-        '<div class="footer"><span>ADP Consulting, an Ayesa Company</span><span>' + projName + ' — ' + projNumber + ' — Rev ' + projRevision + ' — ' + today + '</span></div>' +
+        '<div class="disclaimer">This document has been prepared in accordance with AS/NZS 3000:2018 Wiring Rules, Appendix C ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Estimation of Maximum Demand. All diversity factors applied per the relevant tables. Values should be verified by a qualified electrical engineer prior to construction.</div>' +
+        '<div class="footer"><span>' + projName + ' ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ' + projNumber + ' ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Rev ' + projRevision + ' ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ' + today + '</span></div>' +
         '<script>window.onload=function(){window.print();}<\/script></body></html>';
 
       const win = window.open('', '_blank');
@@ -1535,9 +1533,9 @@
     function exportCSV() {
       updateSummary();
       const ts = new Date().toISOString().slice(0,19).replace(/[T:]/g, '-');
-      let csv = 'Maximum Demand Calculation — AS/NZS 3000:2018,' + new Date().toLocaleDateString() + '\n\n';
+      let csv = 'Maximum Demand Calculation ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â AS/NZS 3000:2018,' + new Date().toLocaleDateString() + '\n\n';
 
-      csv += 'Table C1 — Domestic (Single Dwelling)\n';
+      csv += 'Table C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Domestic (Single Dwelling)\n';
       csv += 'Load Group,Demand (A)\n';
       csv += 'Lighting (a),' + document.getElementById('sumC1sLight').textContent + '\n';
       csv += 'Socket-Outlets (b),' + document.getElementById('sumC1sSock').textContent + '\n';
@@ -1549,17 +1547,17 @@
       csv += 'Other (m),' + document.getElementById('c1sOtherA').textContent + '\n';
       csv += 'TOTAL,' + document.getElementById('c1sTotalA').textContent + '\n\n';
 
-      csv += 'Table C1 — Multiple Dwellings\n';
+      csv += 'Table C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Multiple Dwellings\n';
       csv += 'Column,' + document.getElementById('c1mUPP').textContent + '\n';
       csv += 'Units per phase,' + document.getElementById('c1mUnitTotal').textContent + '\n';
       csv += 'Communal,' + document.getElementById('c1mComTotal').textContent + '\n';
       csv += 'TOTAL,' + (document.getElementById('c1mResTotal').textContent) + '\n\n';
 
-      csv += 'Table C2 — Non-Domestic\n';
+      csv += 'Table C2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Non-Domestic\n';
       csv += 'Type,' + document.getElementById('c2Type').selectedOptions[0].text + '\n';
       csv += 'TOTAL,' + document.getElementById('c2TotalA').textContent + '\n\n';
 
-      csv += 'Table C3 — Energy Demand\n';
+      csv += 'Table C3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Energy Demand\n';
       csv += 'Demand,' + document.getElementById('c3ReskVA').textContent + '\n';
       csv += 'Current,' + document.getElementById('c3ResCurrent').textContent + '\n\n';
 
@@ -1574,30 +1572,30 @@
 
     function copyToClipboard() {
       updateSummary();
-      let text = '═══ MAXIMUM DEMAND — AS/NZS 3000:2018 ═══\n';
+      let text = 'ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â MAXIMUM DEMAND ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â AS/NZS 3000:2018 ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â\n';
       text += 'Date: ' + new Date().toLocaleDateString() + '\n\n';
 
-      text += '── Table C1 — Domestic (Single) ──\n';
+      text += 'ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Table C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Domestic (Single) ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬\n';
       text += 'Maximum Demand: ' + document.getElementById('c1sTotalA').textContent + '\n';
       text += 'Main Switch:    ' + document.getElementById('c1sMainSwitch').textContent + '\n\n';
 
-      text += '── Table C1 — Multiple Dwellings ──\n';
+      text += 'ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Table C1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Multiple Dwellings ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬\n';
       text += 'Column:         ' + document.getElementById('c1mUPP').textContent + '\n';
       text += 'Total Demand:   ' + document.getElementById('c1mResTotal').textContent + '\n';
       text += 'Main Switch:    ' + document.getElementById('c1mResSwitch').textContent + '\n\n';
 
-      text += '── Table C2 — Non-Domestic ──\n';
+      text += 'ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Table C2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Non-Domestic ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬\n';
       text += 'Total Demand:   ' + document.getElementById('c2TotalA').textContent + '\n';
       text += 'Main Switch:    ' + document.getElementById('c2MainSwitch').textContent + '\n\n';
 
-      text += '── Table C3 — Energy Demand ──\n';
+      text += 'ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Table C3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Energy Demand ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬\n';
       text += 'Demand:         ' + document.getElementById('c3ReskVA').textContent + '\n';
       text += 'Current:        ' + document.getElementById('c3ResCurrent').textContent + '\n\n';
 
       navigator.clipboard.writeText(text).then(() => {
         const btn = document.querySelector('.export-btn[onclick="copyToClipboard()"]');
         const orig = btn.textContent;
-        btn.textContent = '✓ Copied!';
+        btn.textContent = 'ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Copied!';
         setTimeout(() => btn.textContent = orig, 2000);
       });
     }

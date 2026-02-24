@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="icon.png" />
   <title>Diversity Factors - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -43,13 +42,12 @@
     .load-table input { width: 80px; padding: 6px 8px; border: 1px solid #b7c5dd; font-size: 0.95em; text-align: right; }
     @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
     @media print {
-      .top-tabs, .calc-button, .sub-tabs, .topleft-icon { display: none !important; }
+      .top-tabs, .calc-button, .sub-tabs { display: none !important; }
       .tab-panel { display: block !important; }
     }
   </style>
 </head>
 <body>
-  <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
     <a class="tab" href="index.html">Home</a>
     <a class="tab" href="switchboard.html">Switchboard Sizer</a>
@@ -114,7 +112,7 @@
 
   <div class="main-content">
     <h1>Diversity Factor Calculator</h1>
-    <p>Interactive diversity factor lookup and calculator per <strong>AS/NZS 3000:2018 Appendix C</strong> (Tables C1–C9). Select a building type to view applicable factors and calculate diversified demand.</p>
+    <p>Interactive diversity factor lookup and calculator per <strong>AS/NZS 3000:2018 Appendix C</strong> (Tables C1Ã¢â‚¬â€œC9). Select a building type to view applicable factors and calculate diversified demand.</p>
 
     <div class="sub-tabs">
       <button class="sub-tab active" onclick="showTab('lookup')">Factor Lookup</button>
@@ -129,14 +127,14 @@
           <div class="input-group">
             <label for="buildingType">Building / Installation Type</label>
             <select id="buildingType" onchange="showFactors()">
-              <option value="domestic_single">Domestic — Single Dwelling (Table C1 Col 2)</option>
-              <option value="domestic_multi">Domestic — Block of Units (Table C1 Cols 3–5)</option>
-              <option value="commercial">Commercial — Offices, Retail (Table C2)</option>
+              <option value="domestic_single">Domestic Ã¢â‚¬â€ Single Dwelling (Table C1 Col 2)</option>
+              <option value="domestic_multi">Domestic Ã¢â‚¬â€ Block of Units (Table C1 Cols 3Ã¢â‚¬â€œ5)</option>
+              <option value="commercial">Commercial Ã¢â‚¬â€ Offices, Retail (Table C2)</option>
               <option value="industrial">Industrial / Warehouse (Table C2)</option>
               <option value="hospital">Hospital / Aged Care</option>
               <option value="school">School / Education</option>
               <option value="hotel">Hotel / Accommodation</option>
-              <option value="va_method">VA per m² Method (Table C3)</option>
+              <option value="va_method">VA per mÃ‚Â² Method (Table C3)</option>
             </select>
           </div>
           <div class="input-group">
@@ -158,7 +156,7 @@
           <div class="input-group">
             <label for="calcType">Calculation Type</label>
             <select id="calcType" onchange="updateCalcForm()">
-              <option value="multi_dwelling">Multiple Dwelling Units (Table C1 Cols 3–5)</option>
+              <option value="multi_dwelling">Multiple Dwelling Units (Table C1 Cols 3Ã¢â‚¬â€œ5)</option>
               <option value="mixed_load">Mixed Load with Manual Diversity</option>
             </select>
           </div>
@@ -191,34 +189,34 @@
 
     <div id="panel-ref" class="tab-panel">
       <div class="calc-section">
-        <h2>AS/NZS 3000 Appendix C — Diversity Factor Reference</h2>
+        <h2>AS/NZS 3000 Appendix C Ã¢â‚¬â€ Diversity Factor Reference</h2>
 
-        <h3>Table C1 — Multiple Dwelling Diversity (Columns 3–5)</h3>
+        <h3>Table C1 Ã¢â‚¬â€ Multiple Dwelling Diversity (Columns 3Ã¢â‚¬â€œ5)</h3>
         <div class="diversity-ref">
-          <strong>AS/NZS 3000:2018 Table C1 Columns 3–5:</strong> Demand per unit decreases as the number of units increases due to statistical diversity.
+          <strong>AS/NZS 3000:2018 Table C1 Columns 3Ã¢â‚¬â€œ5:</strong> Demand per unit decreases as the number of units increases due to statistical diversity.
         </div>
         <table class="ref-table">
           <thead><tr><th>No. of Units</th><th>Column 3 Factor</th><th>Column 4 Factor</th><th>Column 5 Factor</th></tr></thead>
           <tbody id="c1RefBody"></tbody>
         </table>
 
-        <h3>Table C3 — VA per m² by Occupancy Type</h3>
+        <h3>Table C3 Ã¢â‚¬â€ VA per mÃ‚Â² by Occupancy Type</h3>
         <table class="ref-table">
-          <thead><tr><th>Occupancy Type</th><th>VA/m² (Lighting)</th><th>VA/m² (Power)</th><th>Diversity</th><th>Standard Ref</th></tr></thead>
+          <thead><tr><th>Occupancy Type</th><th>VA/mÃ‚Â² (Lighting)</th><th>VA/mÃ‚Â² (Power)</th><th>Diversity</th><th>Standard Ref</th></tr></thead>
           <tbody>
-            <tr><td>Office — General</td><td>25–30</td><td>15–25</td><td>0.7–0.8</td><td>Table C3</td></tr>
-            <tr><td>Office — High Density IT</td><td>25–30</td><td>40–60</td><td>0.6–0.7</td><td>Table C3</td></tr>
-            <tr><td>Retail — Shopping Centre</td><td>25–35</td><td>10–20</td><td>0.8–0.9</td><td>Table C3</td></tr>
-            <tr><td>Warehouse</td><td>10–15</td><td>5–10</td><td>0.6–0.7</td><td>Table C3</td></tr>
-            <tr><td>Hospital — General</td><td>20–30</td><td>30–50</td><td>0.5–0.7</td><td>Table C3</td></tr>
-            <tr><td>School</td><td>20–25</td><td>10–15</td><td>0.6–0.8</td><td>Table C3</td></tr>
-            <tr><td>Hotel / Motel</td><td>15–25</td><td>10–20</td><td>0.5–0.6</td><td>Table C3</td></tr>
-            <tr><td>Car Park</td><td>5–10</td><td>3–5</td><td>0.8–1.0</td><td>Table C3</td></tr>
-            <tr><td>Apartment Common Areas</td><td>10–15</td><td>5–10</td><td>0.7–0.9</td><td>Table C3</td></tr>
+            <tr><td>Office Ã¢â‚¬â€ General</td><td>25Ã¢â‚¬â€œ30</td><td>15Ã¢â‚¬â€œ25</td><td>0.7Ã¢â‚¬â€œ0.8</td><td>Table C3</td></tr>
+            <tr><td>Office Ã¢â‚¬â€ High Density IT</td><td>25Ã¢â‚¬â€œ30</td><td>40Ã¢â‚¬â€œ60</td><td>0.6Ã¢â‚¬â€œ0.7</td><td>Table C3</td></tr>
+            <tr><td>Retail Ã¢â‚¬â€ Shopping Centre</td><td>25Ã¢â‚¬â€œ35</td><td>10Ã¢â‚¬â€œ20</td><td>0.8Ã¢â‚¬â€œ0.9</td><td>Table C3</td></tr>
+            <tr><td>Warehouse</td><td>10Ã¢â‚¬â€œ15</td><td>5Ã¢â‚¬â€œ10</td><td>0.6Ã¢â‚¬â€œ0.7</td><td>Table C3</td></tr>
+            <tr><td>Hospital Ã¢â‚¬â€ General</td><td>20Ã¢â‚¬â€œ30</td><td>30Ã¢â‚¬â€œ50</td><td>0.5Ã¢â‚¬â€œ0.7</td><td>Table C3</td></tr>
+            <tr><td>School</td><td>20Ã¢â‚¬â€œ25</td><td>10Ã¢â‚¬â€œ15</td><td>0.6Ã¢â‚¬â€œ0.8</td><td>Table C3</td></tr>
+            <tr><td>Hotel / Motel</td><td>15Ã¢â‚¬â€œ25</td><td>10Ã¢â‚¬â€œ20</td><td>0.5Ã¢â‚¬â€œ0.6</td><td>Table C3</td></tr>
+            <tr><td>Car Park</td><td>5Ã¢â‚¬â€œ10</td><td>3Ã¢â‚¬â€œ5</td><td>0.8Ã¢â‚¬â€œ1.0</td><td>Table C3</td></tr>
+            <tr><td>Apartment Common Areas</td><td>10Ã¢â‚¬â€œ15</td><td>5Ã¢â‚¬â€œ10</td><td>0.7Ã¢â‚¬â€œ0.9</td><td>Table C3</td></tr>
           </tbody>
         </table>
 
-        <h3>Table C7/C8 — Motor Diversity</h3>
+        <h3>Table C7/C8 Ã¢â‚¬â€ Motor Diversity</h3>
         <table class="ref-table">
           <thead><tr><th>No. of Motors</th><th>Diversity Factor</th></tr></thead>
           <tbody>
@@ -227,9 +225,9 @@
             <tr><td>3</td><td>0.85</td></tr>
             <tr><td>4</td><td>0.80</td></tr>
             <tr><td>5</td><td>0.78</td></tr>
-            <tr><td>6–10</td><td>0.70</td></tr>
-            <tr><td>11–20</td><td>0.65</td></tr>
-            <tr><td>21–50</td><td>0.60</td></tr>
+            <tr><td>6Ã¢â‚¬â€œ10</td><td>0.70</td></tr>
+            <tr><td>11Ã¢â‚¬â€œ20</td><td>0.65</td></tr>
+            <tr><td>21Ã¢â‚¬â€œ50</td><td>0.60</td></tr>
             <tr><td>&gt;50</td><td>0.55</td></tr>
           </tbody>
         </table>
@@ -278,17 +276,17 @@
       let html = '';
 
       if (type === 'domestic_single') {
-        html = `<div class="diversity-ref"><strong>Table C1 Column 2 — Single Dwelling:</strong> No diversity applied to individual dwelling. Full connected load is assessed per the table rules (lighting points, socket-outlets, cooking, etc.).</div>
+        html = `<div class="diversity-ref"><strong>Table C1 Column 2 Ã¢â‚¬â€ Single Dwelling:</strong> No diversity applied to individual dwelling. Full connected load is assessed per the table rules (lighting points, socket-outlets, cooking, etc.).</div>
         <table class="ref-table"><thead><tr><th>Load Type</th><th>Rule</th><th>Typical Diversity</th></tr></thead><tbody>
         <tr><td>Lighting (a)(i)</td><td>3 A first 20 points + 2 A per additional 20</td><td>~50%</td></tr>
-        <tr><td>Socket-outlets ≤10 A (b)(i)</td><td>10 A first 20 + 5 A per additional 20</td><td>~30–40%</td></tr>
+        <tr><td>Socket-outlets Ã¢â€°Â¤10 A (b)(i)</td><td>10 A first 20 + 5 A per additional 20</td><td>~30Ã¢â‚¬â€œ40%</td></tr>
         <tr><td>15 A socket-outlet (b)(ii)</td><td>+10 A each</td><td>100%</td></tr>
         <tr><td>Cooking >10 A (c)</td><td>50% connected load</td><td>50%</td></tr>
         <tr><td>A/C, water heater (d)(e)</td><td>100% largest + 50% rest within group (75%)</td><td>75%</td></tr>
         <tr><td>Permanently connected (f)</td><td>100% largest + 75% remainder</td><td>75%</td></tr>
         </tbody></table>`;
       } else if (type === 'domestic_multi') {
-        html = `<div class="diversity-ref"><strong>Table C1 Columns 3–5:</strong> For blocks of living units, diversity is applied to the total demand across all units. Factors decrease as the number of units increases.</div>`;
+        html = `<div class="diversity-ref"><strong>Table C1 Columns 3Ã¢â‚¬â€œ5:</strong> For blocks of living units, diversity is applied to the total demand across all units. Factors decrease as the number of units increases.</div>`;
         html += `<table class="ref-table"><thead><tr><th>No. of Units</th><th>Col 3 (Light+SO)</th><th>Col 4 (Cooking)</th><th>Col 5 (HW/AC)</th></tr></thead><tbody>`;
         [1,2,3,5,10,15,20,30,50,100].forEach(n => {
           const f = getDwellingFactor(n);
@@ -296,21 +294,21 @@
         });
         html += `</tbody></table>`;
       } else if (type === 'va_method') {
-        html = `<div class="diversity-ref"><strong>Table C3 — VA/m² Method:</strong> Used for commercial/industrial buildings where load is estimated from floor area. Apply appropriate diversity factor to the total connected load.</div>
-        <table class="ref-table"><thead><tr><th>Building Type</th><th>Lighting VA/m²</th><th>Power VA/m²</th><th>Diversity</th></tr></thead><tbody>
-        <tr><td>Office</td><td>25–30</td><td>15–25</td><td>0.7–0.8</td></tr>
-        <tr><td>Retail</td><td>25–35</td><td>10–20</td><td>0.8–0.9</td></tr>
-        <tr><td>Warehouse</td><td>10–15</td><td>5–10</td><td>0.6–0.7</td></tr>
-        <tr><td>Hospital</td><td>20–30</td><td>30–50</td><td>0.5–0.7</td></tr>
-        <tr><td>School</td><td>20–25</td><td>10–15</td><td>0.6–0.8</td></tr>
+        html = `<div class="diversity-ref"><strong>Table C3 Ã¢â‚¬â€ VA/mÃ‚Â² Method:</strong> Used for commercial/industrial buildings where load is estimated from floor area. Apply appropriate diversity factor to the total connected load.</div>
+        <table class="ref-table"><thead><tr><th>Building Type</th><th>Lighting VA/mÃ‚Â²</th><th>Power VA/mÃ‚Â²</th><th>Diversity</th></tr></thead><tbody>
+        <tr><td>Office</td><td>25Ã¢â‚¬â€œ30</td><td>15Ã¢â‚¬â€œ25</td><td>0.7Ã¢â‚¬â€œ0.8</td></tr>
+        <tr><td>Retail</td><td>25Ã¢â‚¬â€œ35</td><td>10Ã¢â‚¬â€œ20</td><td>0.8Ã¢â‚¬â€œ0.9</td></tr>
+        <tr><td>Warehouse</td><td>10Ã¢â‚¬â€œ15</td><td>5Ã¢â‚¬â€œ10</td><td>0.6Ã¢â‚¬â€œ0.7</td></tr>
+        <tr><td>Hospital</td><td>20Ã¢â‚¬â€œ30</td><td>30Ã¢â‚¬â€œ50</td><td>0.5Ã¢â‚¬â€œ0.7</td></tr>
+        <tr><td>School</td><td>20Ã¢â‚¬â€œ25</td><td>10Ã¢â‚¬â€œ15</td><td>0.6Ã¢â‚¬â€œ0.8</td></tr>
         </tbody></table>`;
       } else {
         const typeData = {
-          commercial: { name: 'Commercial (Office/Retail)', df: '0.7–0.8', notes: 'Apply to total connected load. Exclude HVAC (use mechanical engineer data). Table C2/C3.' },
-          industrial: { name: 'Industrial / Warehouse', df: '0.5–0.7', notes: 'Motor diversity per Table C7/C8. Exclude process loads assessed separately.' },
-          hospital: { name: 'Hospital / Aged Care', df: '0.5–0.7', notes: 'Higher base load. Essential services at 100%. Non-essential areas diversified.' },
-          school: { name: 'School / Education', df: '0.6–0.8', notes: 'Seasonal variation. Apply to lighting and GPO loads.' },
-          hotel: { name: 'Hotel / Accommodation', df: '0.5–0.6', notes: 'Per-room demand typically 3–5 kVA. Apply dwelling-style diversity for room count.' }
+          commercial: { name: 'Commercial (Office/Retail)', df: '0.7Ã¢â‚¬â€œ0.8', notes: 'Apply to total connected load. Exclude HVAC (use mechanical engineer data). Table C2/C3.' },
+          industrial: { name: 'Industrial / Warehouse', df: '0.5Ã¢â‚¬â€œ0.7', notes: 'Motor diversity per Table C7/C8. Exclude process loads assessed separately.' },
+          hospital: { name: 'Hospital / Aged Care', df: '0.5Ã¢â‚¬â€œ0.7', notes: 'Higher base load. Essential services at 100%. Non-essential areas diversified.' },
+          school: { name: 'School / Education', df: '0.6Ã¢â‚¬â€œ0.8', notes: 'Seasonal variation. Apply to lighting and GPO loads.' },
+          hotel: { name: 'Hotel / Accommodation', df: '0.5Ã¢â‚¬â€œ0.6', notes: 'Per-room demand typically 3Ã¢â‚¬â€œ5 kVA. Apply dwelling-style diversity for room count.' }
         };
         const d = typeData[type];
         html = `<div class="diversity-ref"><strong>${d.name}:</strong> Typical diversity factor range: <strong>${d.df}</strong>. ${d.notes}</div>`;
@@ -333,7 +331,7 @@
       div.style.display = 'block';
       div.innerHTML = `
         <div class="result-box">
-          <h3>Diversified Maximum Demand — ${n} Dwelling Units</h3>
+          <h3>Diversified Maximum Demand Ã¢â‚¬â€ ${n} Dwelling Units</h3>
           <div class="result-grid">
             <div class="result-item">
               <div class="result-label">Undiversified Total (A)</div>
@@ -354,7 +352,7 @@
           </div>
         </div>
         <div class="info-box" style="margin-top:16px;">
-          <strong>Breakdown:</strong> ${n} units × ${loadPerUnit} A × ${avgFactor.toFixed(3)} = ${(diversifiedUnit * n).toFixed(0)} A (units) + ${commonArea} A (common) + ${centralHW} A (central services) = <strong>${totalDiversified.toFixed(0)} A per phase</strong>.
+          <strong>Breakdown:</strong> ${n} units Ãƒâ€” ${loadPerUnit} A Ãƒâ€” ${avgFactor.toFixed(3)} = ${(diversifiedUnit * n).toFixed(0)} A (units) + ${commonArea} A (common) + ${centralHW} A (central services) = <strong>${totalDiversified.toFixed(0)} A per phase</strong>.
           <br>Factors used: Col 3 = ${f[0].toFixed(3)}, Col 4 = ${f[1].toFixed(3)}, Col 5 = ${f[2].toFixed(3)} per AS/NZS 3000 Table C1.
         </div>
       `;
