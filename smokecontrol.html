@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Smoke Control Electrical - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; }
+    .result-box { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 24px; margin-top: 24px; }
+    .result-box h3 { margin-top: 0; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-top: 16px; }
+    .result-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .result-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; }
+    .result-value { font-size: 1.5em; font-weight: bold; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .pass-box { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 16px; margin: 16px 0; }
+    .fail-box { background: #ffebee; border-left: 4px solid #c62828; padding: 16px; margin: 16px 0; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; }
+    .ref-table th { background: #1976d2; color: white; text-align: center; }
+    .ref-table tr:nth-child(even) { background: #f8f9fa; }
+    .checklist { list-style: none; padding: 0; }
+    .checklist li { padding: 10px 12px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; gap: 10px; }
+    .checklist li:before { content: '☐'; color: #1976d2; font-size: 1.2em; flex-shrink: 0; }
+    @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown active"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>Smoke Control — Electrical Requirements</h1>
+    <p>Electrical design requirements for smoke exhaust and stairwell pressurisation systems per <strong>AS 1668.1:2015</strong>, <strong>NCC Spec E2.2b</strong>, and <strong>AS/NZS 3000</strong>.</p>
+
+    <div class="calc-section">
+      <h2>Smoke System Power Estimator</h2>
+      <div class="info-box"><strong>AS 1668.1:2015 cl. 5.7:</strong> Power supply to smoke control systems shall be from an essential services supply (generator backed). Cables shall be fire-rated to maintain circuit integrity for the required duration.</div>
+      <div class="input-row three">
+        <div class="input-group"><label for="systemType">System Type</label>
+          <select id="systemType">
+            <option value="exhaust">Smoke Exhaust System</option>
+            <option value="pressurisation">Stairwell Pressurisation</option>
+            <option value="car_park">Car Park Exhaust (CO/smoke)</option>
+            <option value="atrium">Atrium Smoke Exhaust</option>
+          </select></div>
+        <div class="input-group"><label for="numFans">Number of Fans</label><input type="number" id="numFans" value="2" min="1" max="20" /></div>
+        <div class="input-group"><label for="fanKW">Fan Motor Rating (kW each)</label><input type="number" id="fanKW" value="15" min="0.5" step="0.5" /></div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group"><label for="numDampers">Motorised Dampers (qty)</label><input type="number" id="numDampers" value="8" min="0" max="100" /></div>
+        <div class="input-group"><label for="startType">Motor Starting</label>
+          <select id="startType">
+            <option value="dol">DOL (Direct On-Line)</option>
+            <option value="sd">Star-Delta</option>
+            <option value="vsd">VSD</option>
+          </select></div>
+        <div class="input-group"><label for="fireRating">Required Fire Rating (min)</label>
+          <select id="fireRating">
+            <option value="120" selected>120 min (2 hr) — standard</option>
+            <option value="60">60 min (1 hr)</option>
+            <option value="90">90 min (1.5 hr)</option>
+            <option value="240">240 min (4 hr)</option>
+          </select></div>
+      </div>
+      <button class="calc-button" onclick="calculate()">Estimate Requirements</button>
+    </div>
+
+    <div id="resultSection" style="display:none;">
+      <div class="result-box">
+        <h3>Electrical Requirements Summary</h3>
+        <div class="result-grid">
+          <div class="result-item"><div class="result-label">Total Fan Load</div><div class="result-value" id="resFanKW">—</div></div>
+          <div class="result-item"><div class="result-label">Starting Current (est.)</div><div class="result-value" id="resStartA">—</div></div>
+          <div class="result-item"><div class="result-label">Running Current (est.)</div><div class="result-value" id="resRunA">—</div></div>
+          <div class="result-item"><div class="result-label">Cable Fire Rating</div><div class="result-value" id="resFireCable">—</div></div>
+        </div>
+      </div>
+      <div id="requirements"></div>
+    </div>
+
+    <div class="calc-section">
+      <h2>Electrical Design Checklist — Smoke Control</h2>
+      <ul class="checklist">
+        <li><strong>Dedicated essential supply:</strong> Smoke control systems must be supplied from the essential services switchboard with generator backup per AS 1668.1 cl. 5.7 and NCC Spec E2.2b.</li>
+        <li><strong>Fire-rated cables:</strong> All cables supplying smoke control equipment must maintain circuit integrity for the required fire-resistance period. Use AS/NZS 3013 compliant cables (mineral insulated, or fire-rated with appropriate installation method).</li>
+        <li><strong>Cable installation:</strong> Fire-rated cables must be installed per AS/NZS 3013 requirements — separated from non-fire-rated cables, supported at prescribed intervals with fire-rated fixings.</li>
+        <li><strong>Dedicated circuits:</strong> Each smoke exhaust fan should have a dedicated circuit from the essential services switchboard. No other loads on smoke control circuits.</li>
+        <li><strong>Motor starters:</strong> DOL starting is common for smoke exhaust fans (simple, reliable). If DOL starting causes unacceptable voltage dip, use star-delta or soft starter. VSD NOT recommended unless specifically required by the fire engineer (failure mode concerns).</li>
+        <li><strong>Damper actuators:</strong> Spring-return fail-safe damper actuators preferred. If motorised: supply from essential services with fire-rated cable. Typical actuator: 24 VAC from local transformer on fire-rated supply.</li>
+        <li><strong>FIP interface:</strong> Smoke control must interface with the Fire Indicator Panel (FIP) per AS 1670.1. Fan run status and fault signals must be monitored by the FIP. Start signal from FIP via volt-free contacts.</li>
+        <li><strong>Manual override:</strong> Accessible manual override panel must be provided adjacent to the FIP (or as agreed with fire brigade). Override switches for each fan and damper group.</li>
+        <li><strong>Labelling:</strong> All switchgear, cables, and equipment associated with smoke control must be clearly labelled "ESSENTIAL SERVICE — SMOKE CONTROL" per AS/NZS 3000 <a href="as3000viewer.html#cl-7.5" class="clause">cl. 7.5</a>.</li>
+        <li><strong>Testing facilities:</strong> Provisions for periodic testing of smoke control systems per AS 1851. Test switches, run indicators, and fault indicators.</li>
+        <li><strong>Car park exhaust:</strong> CO/NO₂ monitoring per AS 1668.2. Jet fans or ducted exhaust. Essential supply for fire mode operation.</li>
+        <li><strong>Generator loading:</strong> Include smoke control fan loads in generator sizing with appropriate starting current allowance.</li>
+      </ul>
+    </div>
+
+    <div class="calc-section">
+      <h2>Cable Fire Rating Reference</h2>
+      <table class="ref-table">
+        <thead><tr><th>Standard</th><th>Test</th><th>Duration</th><th>Application</th></tr></thead>
+        <tbody>
+          <tr><td>AS/NZS 3013</td><td>Circuit integrity under fire conditions</td><td>As specified (60/120/240 min)</td><td>Primary standard for fire-rated electrical circuits in Australia</td></tr>
+          <tr><td>AS/NZS 5000.1 (Table E1)</td><td>Fire performance of cables</td><td>Various</td><td>Cable construction requirements</td></tr>
+          <tr><td>AS 1530.3</td><td>Simultaneous determination of ignitability, flame propagation, heat release, smoke release</td><td>—</td><td>Fire hazard properties of materials</td></tr>
+          <tr><td>IEC 60331</td><td>Fire resistance (circuit integrity)</td><td>Various</td><td>International cable fire test standard</td></tr>
+        </tbody>
+      </table>
+      <div class="warn-box"><strong>Cable Types for Fire Rating:</strong>
+        <ul>
+          <li><strong>Mineral insulated (MICC):</strong> Best performance. Inherently fire-rated. Expensive, difficult to install/terminate.</li>
+          <li><strong>Fire-rated polymeric:</strong> Silicone-insulated or ceramic-forming cables tested to AS/NZS 3013. More practical installation.</li>
+          <li><strong>Protected wiring system:</strong> Standard cables in fire-rated enclosure (e.g., fire-rated conduit/trunking) per AS/NZS 3013 Appendix G. Alternative approach.</li>
+        </ul>
+        All fire-rated cable installations require fire-rated support/fixing systems tested to the same duration.
+      </div>
+    </div>
+  </div>
+  <script>
+    function calculate() {
+      const numFans = parseInt(document.getElementById('numFans').value);
+      const fanKW = parseFloat(document.getElementById('fanKW').value);
+      const numDampers = parseInt(document.getElementById('numDampers').value);
+      const startType = document.getElementById('startType').value;
+      const fireRating = parseInt(document.getElementById('fireRating').value);
+      const sysType = document.getElementById('systemType').value;
+
+      const totalFanKW = numFans * fanKW;
+      const damperLoad = numDampers * 0.05; // ~50W per damper actuator
+
+      // Motor running current (3-phase 415V)
+      const pf = 0.85;
+      const eff = 0.9;
+      const runA_perFan = (fanKW * 1000) / (415 * Math.sqrt(3) * pf * eff);
+      const totalRunA = runA_perFan * numFans;
+
+      // Starting current multiplier
+      let startMult = 6; // DOL
+      if (startType === 'sd') startMult = 2.5;
+      if (startType === 'vsd') startMult = 1.5;
+      const startA = runA_perFan * startMult;
+
+      // Fire rating
+      const cableRating = `AS/NZS 3013\n${fireRating} min`;
+
+      document.getElementById('resFanKW').textContent = totalFanKW.toFixed(1) + ' kW';
+      document.getElementById('resStartA').textContent = startA.toFixed(0) + ' A';
+      document.getElementById('resRunA').textContent = totalRunA.toFixed(0) + ' A';
+      document.getElementById('resFireCable').textContent = fireRating + ' min';
+
+      let req = '';
+      // System-specific notes
+      if (sysType === 'exhaust') {
+        req += `<div class="info-box"><strong>Smoke Exhaust System:</strong> ${numFans} × ${fanKW} kW fans = ${totalFanKW} kW total. Each fan on dedicated essential circuit with fire-rated cable (${fireRating} min AS/NZS 3013). ${numDampers} motorised dampers on fire-rated supply (~${(damperLoad*1000).toFixed(0)} W total).</div>`;
+      } else if (sysType === 'pressurisation') {
+        req += `<div class="info-box"><strong>Stairwell Pressurisation:</strong> ${numFans} × ${fanKW} kW fans. Dedicated essential supply. Fire-rated cables. System must maintain 50 Pa differential pressure with ONE door open per AS 1668.1.</div>`;
+      } else if (sysType === 'car_park') {
+        req += `<div class="info-box"><strong>Car Park Exhaust:</strong> ${numFans} × ${fanKW} kW fans. Normal mode: CO/NO₂ ventilation per AS 1668.2. Fire mode: smoke exhaust via essential supply. CO sensors on essential power.</div>`;
+      } else if (sysType === 'atrium') {
+        req += `<div class="info-box"><strong>Atrium Smoke Exhaust:</strong> ${numFans} × ${fanKW} kW fans. Typically high-level exhaust with make-up air at low level. Fire-engineered solution — confirm design with fire engineer.</div>`;
+      }
+
+      if (startType === 'dol') {
+        req += `<div class="warn-box"><strong>DOL Starting:</strong> Starting current ~${startA.toFixed(0)} A per fan (${startMult}× FLC). Verify generator can handle step-loading: include in generator sizing with ${(startA * 415 * 1.732 / 1000).toFixed(0)} kVA starting demand per fan. Sequential starting recommended for multiple fans.</div>`;
+      }
+      if (startType === 'vsd') {
+        req += `<div class="warn-box"><strong>VSD on Smoke Control:</strong> VSDs are generally NOT recommended for life-safety smoke control systems due to single point of failure concern. Confirm with fire engineer and authority. If used, must be essential supply with fire-rated cable to motor AND VSD.</div>`;
+      }
+
+      req += `<div class="pass-box"><strong>Generator Sizing Note:</strong> Include total smoke control load of ${totalFanKW.toFixed(1)} kW (${totalRunA.toFixed(0)} A running) in essential services generator capacity. Allow for step-loading of fans with ${startType.toUpperCase()} starting.</div>`;
+
+      document.getElementById('requirements').innerHTML = req;
+      document.getElementById('resultSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Fault Level Calculator - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calculator-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; }
+    .result-box { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 24px; margin-top: 24px; }
+    .result-box h3 { margin-top: 0; margin-bottom: 12px; font-size: 1.3em; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 16px; }
+    .result-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .result-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; }
+    .result-value { font-size: 1.8em; font-weight: bold; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; transition: background 0.2s; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .node-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .node-table th, .node-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    .node-table th { background: #1976d2; color: white; font-weight: bold; }
+    .node-table tr:nth-child(even) { background: #f8f9fa; }
+    .node-table input, .node-table select { width: 100%; padding: 6px 8px; border: 1px solid #b7c5dd; font-size: 0.95em; box-sizing: border-box; }
+    .add-row-btn { background: #2e7d32; color: white; border: none; padding: 8px 20px; font-size: 0.95em; cursor: pointer; margin-top: 8px; }
+    .add-row-btn:hover { background: #1b5e20; }
+    .remove-btn { background: #c62828; color: white; border: none; padding: 4px 12px; cursor: pointer; font-size: 0.85em; }
+    .remove-btn:hover { background: #b71c1c; }
+    .pass { color: #2e7d32; font-weight: bold; }
+    .fail { color: #c62828; font-weight: bold; }
+    @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
+    @media print {
+      .top-tabs, .calc-button, .add-row-btn, .remove-btn, .topleft-icon { display: none !important; }
+      .calc-section { box-shadow: none; border: 1px solid #ccc; }
+      .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active">
+      <span>Power Systems</span>
+      <div class="dropdown-content">
+        <a href="cablesizing.html">Cable Sizing</a>
+        <a href="cableweight.html">Cable Weight</a>
+        <a href="maxdemand.html">Maximum Demand</a>
+        <a href="diversity.html">Diversity Factors</a>
+        <a href="faultlevel.html">Fault Level</a>
+        <a href="loopimpedance.html">Loop Impedance</a>
+        <a href="discrimination.html">Discrimination Check</a>
+        <a href="txsizing.html">Transformer Sizing</a>
+        <a href="gensizing.html">Generator Sizing</a>
+        <a href="upssizing.html">UPS Sizing</a>
+        <a href="pfcsizing.html">PFC Sizing</a>
+        <a href="harmonics.html">Harmonics Analysis</a>
+        <a href="busbarsizing.html">Busbar Sizing</a>
+        <a href="ctsizing.html">CT Sizing</a>
+        <a href="earthing.html">Earthing Calculator</a>
+      </div>
+    </div>
+    <div class="tab has-dropdown">
+      <span>Protection</span>
+      <div class="dropdown-content">
+        <a href="rcdselect.html">RCD Selector</a>
+        <a href="spdsizing.html">SPD Sizing</a>
+        <a href="iprating.html">IP/IK Rating Guide</a>
+        <a href="conduit.html">Conduit Sizer</a>
+        <a href="pvsizing.html">PV Sizing</a>
+      </div>
+    </div>
+    <div class="tab has-dropdown">
+      <span>Lighting & Fire</span>
+      <div class="dropdown-content">
+        <a href="luxcalc.html">Lux Calculator</a>
+        <a href="luxlevels.html">Lux Levels Reference</a>
+        <a href="emergencylighting.html">Emergency Lighting</a>
+        <a href="fireinterface.html">Fire Interface Matrix</a>
+        <a href="smokecontrol.html">Smoke Control</a>
+        <a href="essentialservices.html">Essential Services</a>
+      </div>
+    </div>
+    <div class="tab has-dropdown">
+      <span>Documentation</span>
+      <div class="dropdown-content">
+        <a href="loadschedule.html">Load Schedule</a>
+        <a href="cableschedule.html">Cable Schedule</a>
+        <a href="designcert.html">Design Certificate</a>
+        <a href="tcommissioning.html">T&C Checklists</a>
+        <a href="inspection.html">Site Inspection</a>
+        <a href="sld.html">Single Line Diagram</a>
+        <a href="as3000tips.html">AS3000 Tips</a>
+      </div>
+    </div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+
+  <div class="main-content">
+    <h1>Fault Level Calculator</h1>
+    <p>Calculate prospective fault currents from supply transformer through to downstream sub-circuits per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.5.4">cl. 2.5.4–2.5.5</a></strong> and <strong>IEC 60909</strong> simplified method.</p>
+
+    <div class="calc-section">
+      <h2>Supply / Transformer Data</h2>
+      <div class="info-box">
+        <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.5.4">cl. 2.5.4</a>:</strong> Protective devices shall have a rated short-circuit capacity not less than the prospective fault current at the point of installation.
+      </div>
+      <div class="input-row three">
+        <div class="input-group">
+          <label for="txKVA">Transformer Rating (kVA)</label>
+          <select id="txKVA">
+            <option value="100">100 kVA</option>
+            <option value="200">200 kVA</option>
+            <option value="315">315 kVA</option>
+            <option value="500" selected>500 kVA</option>
+            <option value="750">750 kVA</option>
+            <option value="1000">1000 kVA</option>
+            <option value="1500">1500 kVA</option>
+            <option value="2000">2000 kVA</option>
+            <option value="2500">2500 kVA</option>
+            <option value="custom">Custom…</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="txKVAcustom">Custom kVA (if selected)</label>
+          <input type="number" id="txKVAcustom" value="500" min="10" step="1" />
+        </div>
+        <div class="input-group">
+          <label for="txImpedance">TX Impedance (%Z)</label>
+          <input type="number" id="txImpedance" value="5" min="1" max="15" step="0.1" />
+        </div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group">
+          <label for="supplyVoltage">Secondary Voltage (V L-L)</label>
+          <select id="supplyVoltage">
+            <option value="400" selected>400 V</option>
+            <option value="415">415 V</option>
+            <option value="433">433 V</option>
+            <option value="230">230 V (1-phase)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="supplyPhases">Supply Phases</label>
+          <select id="supplyPhases">
+            <option value="3" selected>Three Phase</option>
+            <option value="1">Single Phase</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="upstreamFault">Upstream Fault Level (MVA)</label>
+          <input type="number" id="upstreamFault" value="150" min="10" step="1" />
+          <span style="font-size:0.8em;color:#888;">HV network — use 150 MVA if unknown</span>
+        </div>
+      </div>
+
+      <div id="txResult" class="result-box" style="display:none;">
+        <h3>Transformer Secondary Fault Level</h3>
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="result-label">3-Phase Fault (kA sym)</div>
+            <div class="result-value" id="txFault3ph">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">1-Phase-to-Earth Fault (kA)</div>
+            <div class="result-value" id="txFault1ph">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">TX Full Load Current (A)</div>
+            <div class="result-value" id="txFLC">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">TX Secondary Z (mΩ)</div>
+            <div class="result-value" id="txZmOhm">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-section">
+      <h2>Downstream Cable Nodes</h2>
+      <div class="info-box">
+        Add cable segments from the transformer secondary (MSB) to downstream distribution boards. The tool calculates cumulative impedance and prospective fault current at each node.
+        Cable impedance data per <strong>AS/NZS 3008.1.1</strong> Tables 30–42.
+      </div>
+      <table class="node-table" id="nodeTable">
+        <thead>
+          <tr>
+            <th>Node Label</th>
+            <th>Cable Type</th>
+            <th>Size (mm²)</th>
+            <th>Length (m)</th>
+            <th>Cores / Config</th>
+            <th>Ipsc 3φ (kA)</th>
+            <th>Ipsc 1φ (kA)</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="nodeBody">
+        </tbody>
+      </table>
+      <button class="add-row-btn" onclick="addNode()">+ Add Cable Node</button>
+      <button class="calc-button" onclick="calculate()" style="margin-top:16px;">Calculate Fault Levels</button>
+    </div>
+
+    <div class="calc-section" id="summarySection" style="display:none;">
+      <h2>Fault Level Summary</h2>
+      <table class="node-table" id="summaryTable">
+        <thead>
+          <tr>
+            <th>Node</th>
+            <th>Cumulative Z (mΩ)</th>
+            <th>Ipsc 3φ (kA sym)</th>
+            <th>Ipsc 1φ–E (kA)</th>
+            <th>Device kA Rating Check</th>
+          </tr>
+        </thead>
+        <tbody id="summaryBody"></tbody>
+      </table>
+      <div class="warn-box">
+        <strong>Important:</strong> This is a simplified impedance method calculation. For complex networks, motor infeed contribution, or where arc-flash assessment is required, a full IEC 60909 study using specialist software is recommended. Peak (Ip) values can be estimated using a factor of 1.5–2.0 × Isc (sym) depending on X/R ratio.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Cable impedance data (mΩ/m per conductor) — simplified from AS/NZS 3008.1.1 Tables
+    // Format: { size: [R at 75°C (mΩ/m), X (mΩ/m)] } for Cu XLPE/PVC single-core
+    const cableData = {
+      '1.5':   [14.50, 0.110],
+      '2.5':   [8.70,  0.105],
+      '4':     [5.43,  0.100],
+      '6':     [3.62,  0.095],
+      '10':    [2.17,  0.090],
+      '16':    [1.36,  0.085],
+      '25':    [0.868, 0.082],
+      '35':    [0.628, 0.080],
+      '50':    [0.464, 0.078],
+      '70':    [0.321, 0.075],
+      '95':    [0.236, 0.073],
+      '120':   [0.188, 0.072],
+      '150':   [0.153, 0.071],
+      '185':   [0.123, 0.070],
+      '240':   [0.0943,0.069],
+      '300':   [0.0767,0.068],
+      '400':   [0.0601,0.067],
+      '500':   [0.0483,0.066],
+      '630':   [0.0391,0.065]
+    };
+
+    const cableSizes = Object.keys(cableData);
+    let nodeCount = 0;
+
+    function addNode() {
+      nodeCount++;
+      const tbody = document.getElementById('nodeBody');
+      const tr = document.createElement('tr');
+      tr.id = 'node-' + nodeCount;
+      const sizeOpts = cableSizes.map(s => `<option value="${s}" ${s==='95'?'selected':''}>${s} mm²</option>`).join('');
+      tr.innerHTML = `
+        <td><input type="text" value="DB-${nodeCount}" /></td>
+        <td><select><option value="cu_xlpe" selected>Cu XLPE</option><option value="cu_pvc">Cu PVC</option><option value="al_xlpe">Al XLPE</option></select></td>
+        <td><select>${sizeOpts}</select></td>
+        <td><input type="number" value="30" min="1" step="1" /></td>
+        <td><select><option value="1" selected>Single per phase</option><option value="2">2 parallel</option><option value="3">3 parallel</option><option value="4">4 parallel</option></select></td>
+        <td class="fault3ph" style="font-weight:bold;">—</td>
+        <td class="fault1ph" style="font-weight:bold;">—</td>
+        <td><button class="remove-btn" onclick="this.closest('tr').remove()">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function getTxKVA() {
+      const sel = document.getElementById('txKVA').value;
+      return sel === 'custom' ? parseFloat(document.getElementById('txKVAcustom').value) : parseFloat(sel);
+    }
+
+    function calculate() {
+      const kva = getTxKVA();
+      const zPct = parseFloat(document.getElementById('txImpedance').value);
+      const vLL = parseFloat(document.getElementById('supplyVoltage').value);
+      const phases = parseInt(document.getElementById('supplyPhases').value);
+      const upMVA = parseFloat(document.getElementById('upstreamFault').value);
+
+      const vLN = phases === 3 ? vLL / Math.sqrt(3) : vLL;
+
+      // TX impedance (mΩ) referred to secondary
+      const txZ = (zPct / 100) * (vLL * vLL) / (kva) ; // Ω
+      const txZmOhm = txZ * 1000; // mΩ
+
+      // Upstream (HV network) impedance referred to secondary
+      const upZ = (vLL * vLL) / (upMVA * 1000) * 1000; // mΩ
+
+      // Total source impedance
+      const sourceZ = txZmOhm + upZ;
+
+      // 3-phase fault at TX secondary: I = V / (√3 × Z)
+      const txI3ph = (vLL * 1000) / (Math.sqrt(3) * sourceZ);
+      // 1-phase fault (simplified): I ≈ V_LN / (Z_source × 2/3) — conservative
+      const txI1ph = (vLN * 1000) / (sourceZ * 0.667 + sourceZ * 0.5);
+
+      const flc = phases === 3 ? (kva * 1000) / (Math.sqrt(3) * vLL) : (kva * 1000) / vLL;
+
+      document.getElementById('txFault3ph').textContent = (txI3ph / 1000).toFixed(2);
+      document.getElementById('txFault1ph').textContent = (txI1ph / 1000).toFixed(2);
+      document.getElementById('txFLC').textContent = flc.toFixed(1);
+      document.getElementById('txZmOhm').textContent = sourceZ.toFixed(2);
+      document.getElementById('txResult').style.display = 'block';
+
+      // Calculate downstream nodes
+      const rows = document.getElementById('nodeBody').querySelectorAll('tr');
+      const summaryBody = document.getElementById('summaryBody');
+      summaryBody.innerHTML = '';
+
+      // Add TX secondary row
+      let sr = document.createElement('tr');
+      sr.innerHTML = `<td><strong>TX Secondary / MSB</strong></td><td>${sourceZ.toFixed(2)}</td><td><strong>${(txI3ph/1000).toFixed(2)}</strong></td><td><strong>${(txI1ph/1000).toFixed(2)}</strong></td><td>—</td>`;
+      summaryBody.appendChild(sr);
+
+      let cumZ = sourceZ;
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const label = cells[0].querySelector('input').value;
+        const cableType = cells[1].querySelector('select').value;
+        const size = cells[2].querySelector('select').value;
+        const length = parseFloat(cells[3].querySelector('input').value) || 0;
+        const parallel = parseInt(cells[4].querySelector('select').value) || 1;
+
+        let [r, x] = cableData[size] || [1, 0.1];
+        // Adjust for Al (1.6× resistance) or PVC temperature
+        if (cableType === 'al_xlpe') r *= 1.6;
+        if (cableType === 'cu_pvc') r *= 1.1;
+
+        // Impedance for this segment (both active + neutral return)
+        const segR = (r * length * 2) / parallel; // mΩ — go + return
+        const segX = (x * length * 2) / parallel;
+        const segZ = Math.sqrt(segR * segR + segX * segX);
+
+        cumZ += segZ;
+
+        const i3ph = (vLL * 1000) / (Math.sqrt(3) * cumZ);
+        const i1ph = (vLN * 1000) / (cumZ * 0.667 + cumZ * 0.5);
+
+        cells[5].textContent = (i3ph / 1000).toFixed(2);
+        cells[6].textContent = (i1ph / 1000).toFixed(2);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${label}</td>
+          <td>${cumZ.toFixed(2)}</td>
+          <td><strong>${(i3ph/1000).toFixed(2)}</strong></td>
+          <td><strong>${(i1ph/1000).toFixed(2)}</strong></td>
+          <td><span class="${(i3ph/1000) > 25 ? 'fail' : 'pass'}">${(i3ph/1000) > 25 ? '⚠ >25kA — verify device rating' : '✓ ≤25kA typical rating OK'}</span></td>
+        `;
+        summaryBody.appendChild(tr);
+      });
+
+      document.getElementById('summarySection').style.display = 'block';
+    }
+
+    // Initialise with 2 nodes
+    addNode();
+    addNode();
+  </script>
+</body>
+</html>

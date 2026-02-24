@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Harmonics Analysis - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-row.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; }
+    .result-box { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 24px; margin-top: 24px; }
+    .result-box h3 { margin-top: 0; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-top: 16px; }
+    .result-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .result-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; }
+    .result-value { font-size: 1.8em; font-weight: bold; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .pass-box { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 16px; margin: 16px 0; }
+    .fail-box { background: #ffebee; border-left: 4px solid #c62828; padding: 16px; margin: 16px 0; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 200px; padding: 10px; background: #f8f9fa; border: 1px solid #e0e0e0; margin: 16px 0; }
+    .bar-col { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .bar { width: 100%; background: #1976d2; border-radius: 2px 2px 0 0; transition: height 0.3s; min-width: 20px; }
+    .bar.over { background: #c62828; }
+    .bar-label { font-size: 0.75em; margin-top: 4px; text-align: center; }
+    .bar-value { font-size: 0.7em; font-weight: bold; margin-bottom: 2px; }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    .ref-table th { background: #1976d2; color: white; }
+    .ref-table tr:nth-child(even) { background: #f8f9fa; }
+    @media (max-width: 768px) { .input-row, .input-row.three, .input-row.four { grid-template-columns: 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a><a href="as3000viewer.html">AS3000 Viewer</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>Harmonics Analysis Estimator</h1>
+    <p>Estimate total harmonic distortion (THD) for LED/VSD-heavy installations per <strong>AS/NZS 61000.3.2</strong>, <strong>AS/NZS 61000.3.12</strong>, and distributor harmonic limits.</p>
+    <div class="calc-section">
+      <h2>Installation Load Mix</h2>
+      <div class="info-box"><strong>AS/NZS 61000.3.12:</strong> Limits harmonic current emissions for equipment with input current >16 A per phase. Installations must comply with distributor harmonic voltage limits (typically THD-V ≤ 8%).</div>
+      <div class="input-row four">
+        <div class="input-group"><label for="ledQty">LED Drivers (qty)</label><input type="number" id="ledQty" value="100" min="0" /></div>
+        <div class="input-group"><label for="ledW">Per LED Driver (W)</label><input type="number" id="ledW" value="40" min="1" /></div>
+        <div class="input-group"><label for="vsdQty">VSDs (qty)</label><input type="number" id="vsdQty" value="5" min="0" /></div>
+        <div class="input-group"><label for="vsdKW">Per VSD (kW)</label><input type="number" id="vsdKW" value="15" min="0.1" step="0.1" /></div>
+      </div>
+      <div class="input-row four">
+        <div class="input-group"><label for="itQty">IT/SMPS Loads (qty)</label><input type="number" id="itQty" value="20" min="0" /></div>
+        <div class="input-group"><label for="itW">Per IT Load (W)</label><input type="number" id="itW" value="300" min="1" /></div>
+        <div class="input-group"><label for="linearKW">Linear Loads (kW total)</label><input type="number" id="linearKW" value="100" min="0" /></div>
+        <div class="input-group"><label for="totalSupplyA">Supply Rating (A per phase)</label><input type="number" id="totalSupplyA" value="630" min="10" /></div>
+      </div>
+      <button class="calc-button" onclick="calculate()">Estimate Harmonics</button>
+    </div>
+    <div id="resultSection" style="display:none;">
+      <div class="result-box">
+        <h3>Harmonic Distortion Estimate</h3>
+        <div class="result-grid">
+          <div class="result-item"><div class="result-label">THD-I (Current)</div><div class="result-value" id="resTHDI">—</div></div>
+          <div class="result-item"><div class="result-label">THD-V (Voltage, est.)</div><div class="result-value" id="resTHDV">—</div></div>
+          <div class="result-item"><div class="result-label">Non-linear Load %</div><div class="result-value" id="resNL">—</div></div>
+          <div class="result-item"><div class="result-label">Neutral Current Multiplier</div><div class="result-value" id="resNeutral">—</div></div>
+        </div>
+      </div>
+      <div class="calc-section" style="margin-top:24px;">
+        <h2>Harmonic Spectrum (Estimated)</h2>
+        <div id="barChart" class="bar-chart"></div>
+        <div id="spectrumTable"></div>
+      </div>
+      <div id="verdict"></div>
+      <div id="mitigation" class="info-box" style="margin-top:16px;display:none;"></div>
+    </div>
+  </div>
+  <script>
+    // Typical harmonic current spectra (% of fundamental) for common load types
+    const spectra = {
+      led:  { 3: 80, 5: 55, 7: 30, 9: 15, 11: 8, 13: 5 },   // cheap LED drivers
+      vsd6: { 3: 2, 5: 25, 7: 12, 9: 1, 11: 7, 13: 4 },      // 6-pulse VSD
+      smps: { 3: 75, 5: 50, 7: 25, 9: 10, 11: 7, 13: 4 },     // IT SMPS
+    };
+
+    // AS/NZS 61000.3.12 limits (% of fundamental at PCC, for Rsce ≥ 33)
+    const limits = { 3: 21.6, 5: 10.7, 7: 7.2, 9: 3.8, 11: 3.1, 13: 2.0, thd: 23 };
+
+    function calculate() {
+      const ledTotal = parseInt(document.getElementById('ledQty').value) * parseFloat(document.getElementById('ledW').value);
+      const vsdTotal = parseInt(document.getElementById('vsdQty').value) * parseFloat(document.getElementById('vsdKW').value) * 1000;
+      const itTotal = parseInt(document.getElementById('itQty').value) * parseFloat(document.getElementById('itW').value);
+      const linearTotal = parseFloat(document.getElementById('linearKW').value) * 1000;
+      const supplyA = parseFloat(document.getElementById('totalSupplyA').value);
+
+      const totalLoad = ledTotal + vsdTotal + itTotal + linearTotal;
+      const nlLoad = ledTotal + vsdTotal + itTotal;
+      const nlPct = (nlLoad / totalLoad * 100);
+
+      // Weighted harmonic current for each order
+      const orders = [3, 5, 7, 9, 11, 13];
+      const harmonicI = {};
+      let sumSqI = 0;
+
+      orders.forEach(h => {
+        // RMS addition (geometric) of harmonic currents from each source
+        const ledI = (ledTotal / 230) * (spectra.led[h] || 0) / 100;
+        const vsdI = (vsdTotal / 400 / 1.732) * (spectra.vsd6[h] || 0) / 100;
+        const itI = (itTotal / 230) * (spectra.smps[h] || 0) / 100;
+        // For 3-phase cancellation: triplen harmonics from 3-phase balanced loads cancel
+        const totalHI = Math.sqrt(ledI*ledI + vsdI*vsdI + itI*itI);
+        harmonicI[h] = totalHI;
+        sumSqI += totalHI * totalHI;
+      });
+
+      const fundamentalI = totalLoad / (230 * 1.732); // 3-phase equivalent
+      const thdi = (Math.sqrt(sumSqI) / fundamentalI * 100);
+
+      // THD-V estimate (simple): THD-V ≈ THD-I × Zsc/Zload (simplified: THD-I × source impedance factor)
+      const thdv = thdi * 0.15; // rough: ~15% of THD-I for typical LV installations
+
+      // Neutral current multiplier for triplen harmonics (3-phase 4-wire)
+      const tripleI = (harmonicI[3] || 0) * 3; // triplen harmonics add in neutral
+      const neutralMult = Math.max(1, tripleI / fundamentalI + 0.3);
+
+      document.getElementById('resTHDI').textContent = thdi.toFixed(1) + '%';
+      document.getElementById('resTHDV').textContent = thdv.toFixed(1) + '%';
+      document.getElementById('resNL').textContent = nlPct.toFixed(0) + '%';
+      document.getElementById('resNeutral').textContent = neutralMult.toFixed(2) + '×';
+
+      // Bar chart
+      const chart = document.getElementById('barChart');
+      chart.innerHTML = '';
+      const maxVal = Math.max(...orders.map(h => (harmonicI[h]/fundamentalI*100)), 30);
+      let specHtml = '<table class="ref-table"><thead><tr><th>Harmonic</th><th>Estimated %</th><th>AS/NZS 61000.3.12 Limit %</th><th>Status</th></tr></thead><tbody>';
+
+      orders.forEach(h => {
+        const pct = harmonicI[h] / fundamentalI * 100;
+        const lim = limits[h] || 999;
+        const over = pct > lim;
+        const barH = Math.max(2, (pct / maxVal) * 180);
+        const col = document.createElement('div');
+        col.className = 'bar-col';
+        col.innerHTML = `<div class="bar-value">${pct.toFixed(1)}%</div><div class="bar ${over?'over':''}" style="height:${barH}px;"></div><div class="bar-label">H${h}</div>`;
+        chart.appendChild(col);
+        specHtml += `<tr><td>H${h} (${h*50} Hz)</td><td>${pct.toFixed(1)}%</td><td>${lim}%</td><td style="color:${over?'#c62828':'#2e7d32'};font-weight:bold;">${over?'⚠ EXCEEDS':'✓ OK'}</td></tr>`;
+      });
+      specHtml += `<tr><td><strong>THD-I</strong></td><td><strong>${thdi.toFixed(1)}%</strong></td><td><strong>${limits.thd}%</strong></td><td style="color:${thdi>limits.thd?'#c62828':'#2e7d32'};font-weight:bold;">${thdi>limits.thd?'⚠ EXCEEDS':'✓ OK'}</td></tr>`;
+      specHtml += '</tbody></table>';
+      document.getElementById('spectrumTable').innerHTML = specHtml;
+
+      // Verdict
+      const anyOver = orders.some(h => (harmonicI[h]/fundamentalI*100) > limits[h]) || thdi > limits.thd;
+      const verd = document.getElementById('verdict');
+      if (anyOver) {
+        verd.innerHTML = `<div class="fail-box"><strong>⚠ Harmonic limits exceeded.</strong> Mitigation measures are recommended. See below.</div>`;
+        const mit = document.getElementById('mitigation');
+        mit.style.display = 'block';
+        mit.innerHTML = `<strong>Recommended Mitigation:</strong><ul>
+          <li>Install <strong>active harmonic filters</strong> at MSB (most effective for mixed harmonics)</li>
+          <li>Use <strong>18-pulse or AFE (Active Front End) VSDs</strong> for large motors</li>
+          <li>Specify LED drivers with <strong>THD-I < 10%</strong> (Class C compliant per AS/NZS 61000.3.2)</li>
+          <li>Use <strong>detuned PFC</strong> to avoid resonance (see PFC Sizing tool)</li>
+          <li>Oversize <strong>neutral conductors</strong> — size for ${neutralMult.toFixed(2)}× phase current due to triplen harmonics</li>
+          <li>Consider <strong>K-rated transformers</strong> or derating standard transformers</li>
+          </ul><em>Refer to AS/NZS 61000.3.2 (≤16A equipment), AS/NZS 61000.3.12 (>16A), and distributor harmonic policies.</em>`;
+      } else {
+        verd.innerHTML = `<div class="pass-box"><strong>✓ Estimated harmonic levels within AS/NZS 61000.3.12 limits.</strong> No active mitigation required; maintain monitoring at commissioning.</div>`;
+        document.getElementById('mitigation').style.display = 'none';
+      }
+      document.getElementById('resultSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

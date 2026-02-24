@@ -14,20 +14,12 @@
     <a class="tab" href="switchboard.html">Switchboard Sizer</a>
     <a class="tab" href="switchroom.html">Switchroom Sizer</a>
     <a class="tab" href="lightingsearch.html">Lighting Search</a>
-    <div class="tab has-dropdown">
-      <span>TBC</span>
-      <div class="dropdown-content">
-        <a href="conduit.html">Conduit Sizer</a>
-        <a href="cablesizing.html">Cable Sizing</a>
-        <a href="cableweight.html">Cable Weight</a>
-        <a href="pvsizing.html">PV Sizing</a>
-        <a href="emergencylighting.html">Emergency Lighting</a>
-        <a href="inspection.html">Site Inspection</a>
-        <a href="sld.html">Single Line Diagram</a>
-        <a href="as3000tips.html">AS3000 Tips</a>
-        <a href="maxdemand.html">Maximum Demand</a>
-      </div>
-    </div>
+    <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a></div></div>
     <a class="tab" href="qa.html">Verification</a>
   </div>
   <div class="main-content">
@@ -57,18 +49,54 @@
       </li>
     </ul>
 
-    <h3 class="tbc-heading">TBC Tools</h3>
-    <p>
-      <a href="conduit.html">Conduit Sizer</a> • 
-      <a href="cablesizing.html">Cable Sizing</a> • 
-      <a href="cableweight.html">Cable Weight</a> • 
-      <a href="pvsizing.html">PV Sizing</a> • 
-      <a href="emergencylighting.html">Emergency Lighting</a> • 
-      <a href="inspection.html">Site Inspection</a> • 
-      <a href="sld.html">Single Line Diagram</a> • 
-      <a href="as3000tips.html">AS3000 Tips</a> • 
-      <a href="maxdemand.html">Maximum Demand</a>
-    </p>
+    <h2>Power Systems</h2>
+    <ul class="tool-list">
+      <li><a href="cablesizing.html"><strong>Cable Sizing</strong></a> <span class="tool-desc">Cable selection per AS/NZS 3008.1.1 with current capacity, voltage drop, and earth fault ratings.</span></li>
+      <li><a href="cableweight.html"><strong>Cable Weight</strong></a> <span class="tool-desc">Calculate cable weights for structural and containment sizing.</span></li>
+      <li><a href="maxdemand.html"><strong>Maximum Demand</strong></a> <span class="tool-desc">Maximum demand calculator per AS/NZS 3000 Appendix C for domestic and commercial installations.</span></li>
+      <li><a href="diversity.html"><strong>Diversity Factors</strong></a> <span class="tool-desc">AS/NZS 3000 Appendix C diversity factor lookup for domestic, commercial, and industrial loads.</span></li>
+      <li><a href="faultlevel.html"><strong>Fault Level Calculator</strong></a> <span class="tool-desc">Prospective fault current from transformer to downstream nodes per IEC 60909 / AS/NZS 3000.</span></li>
+      <li><a href="loopimpedance.html"><strong>Loop Impedance</strong></a> <span class="tool-desc">Earth fault loop impedance Zs calculator per AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.2">cl. 2.6.2–2.6.3</a>.</span></li>
+      <li><a href="discrimination.html"><strong>Discrimination Check</strong></a> <span class="tool-desc">Selectivity verification between upstream and downstream protective devices.</span></li>
+      <li><a href="txsizing.html"><strong>Transformer Sizing</strong></a> <span class="tool-desc">Transformer kVA selection with losses, impedance, and fault current estimation per AS 2374.</span></li>
+      <li><a href="gensizing.html"><strong>Generator Sizing</strong></a> <span class="tool-desc">Generator kVA sizing with step-loading sequence per AS/NZS 3010:2017.</span></li>
+      <li><a href="upssizing.html"><strong>UPS Sizing</strong></a> <span class="tool-desc">UPS kVA and battery Ah calculator per AS 4044:2019.</span></li>
+      <li><a href="pfcsizing.html"><strong>PFC Sizing</strong></a> <span class="tool-desc">Power factor correction capacitor bank sizing with harmonic resonance check.</span></li>
+      <li><a href="harmonics.html"><strong>Harmonics Analysis</strong></a> <span class="tool-desc">THD estimation for LED/VSD-heavy installations per AS/NZS 61000.3 series.</span></li>
+      <li><a href="busbarsizing.html"><strong>Busbar Sizing</strong></a> <span class="tool-desc">Copper/aluminium busbar current capacity and short-circuit withstand per AS/NZS 61439.</span></li>
+      <li><a href="ctsizing.html"><strong>CT Sizing</strong></a> <span class="tool-desc">Current transformer ratio, accuracy class, and burden calculation per AS 1284.1 / AS 60044-1.</span></li>
+      <li><a href="earthing.html"><strong>Earthing Calculator</strong></a> <span class="tool-desc">Earth electrode resistance for rods, strips, grids, and plates using Laurent-Niemann formulas.</span></li>
+    </ul>
+
+    <h2>Protection</h2>
+    <ul class="tool-list">
+      <li><a href="rcdselect.html"><strong>RCD Selector</strong></a> <span class="tool-desc">RCD type and sensitivity selection per AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.3">cl. 2.6.3–2.6.4</a>.</span></li>
+      <li><a href="spdsizing.html"><strong>SPD Sizing</strong></a> <span class="tool-desc">Surge protection device risk assessment and selection per AS/NZS 1768:2021.</span></li>
+      <li><a href="iprating.html"><strong>IP/IK Rating Guide</strong></a> <span class="tool-desc">IP and IK rating decoder with environment-based recommendations per AS 60529 / AS 62262.</span></li>
+      <li><a href="conduit.html"><strong>Conduit Sizer</strong></a> <span class="tool-desc">Conduit fill calculations for various cable types and configurations.</span></li>
+      <li><a href="pvsizing.html"><strong>PV Sizing</strong></a> <span class="tool-desc">Solar PV system sizing and inverter selection per AS/NZS 5033.</span></li>
+    </ul>
+
+    <h2>Lighting & Fire</h2>
+    <ul class="tool-list">
+      <li><a href="luxcalc.html"><strong>Lux Calculator</strong></a> <span class="tool-desc">Lumen method illuminance calculator per AS/NZS 1680.1.</span></li>
+      <li><a href="luxlevels.html"><strong>Lux Levels Reference</strong></a> <span class="tool-desc">Searchable database of required illuminance levels per AS/NZS 1680.</span></li>
+      <li><a href="emergencylighting.html"><strong>Emergency Lighting</strong></a> <span class="tool-desc">Emergency and exit lighting design per AS 2293.</span></li>
+      <li><a href="fireinterface.html"><strong>Fire Interface Matrix</strong></a> <span class="tool-desc">Fire cause-and-effect matrix per AS 1670.1, AS 1668.1, and NCC.</span></li>
+      <li><a href="smokecontrol.html"><strong>Smoke Control</strong></a> <span class="tool-desc">Smoke control electrical requirements and power estimation per AS 1668.1.</span></li>
+      <li><a href="essentialservices.html"><strong>Essential Services</strong></a> <span class="tool-desc">Essential safety measures register with maintenance schedules per NCC Section E.</span></li>
+    </ul>
+
+    <h2>Documentation</h2>
+    <ul class="tool-list">
+      <li><a href="loadschedule.html"><strong>Load Schedule</strong></a> <span class="tool-desc">Interactive load schedule builder with automatic demand and diversity calculations.</span></li>
+      <li><a href="cableschedule.html"><strong>Cable Schedule</strong></a> <span class="tool-desc">Cable schedule table builder with export to CSV and print formatting.</span></li>
+      <li><a href="designcert.html"><strong>Design Certificate</strong></a> <span class="tool-desc">Generate design compliance certificates with standards references and print/PDF output.</span></li>
+      <li><a href="tcommissioning.html"><strong>T&C Checklists</strong></a> <span class="tool-desc">Testing and commissioning checklists per AS/NZS 3000 <a href="as3000viewer.html#cl-8.1">Section 8</a> and AS/NZS 3017.</span></li>
+      <li><a href="inspection.html"><strong>Site Inspection</strong></a> <span class="tool-desc">Site inspection checklists and reporting tools.</span></li>
+      <li><a href="sld.html"><strong>Single Line Diagram</strong></a> <span class="tool-desc">Interactive single line diagram builder for electrical distribution systems.</span></li>
+      <li><a href="as3000tips.html"><strong>AS3000 Tips</strong></a> <span class="tool-desc">Quick reference tips and common requirements from AS/NZS 3000.</span></li>
+    </ul>
     <div class="useful-links">
       <h2>Standards & Resources</h2>
       <ul class="useful-links-list">

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Load Schedule Builder - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 4px; font-weight: bold; color: #333; font-size: 0.85em; }
+    .input-group input, .input-group select { padding: 6px 8px; border: 1px solid #b7c5dd; font-size: 0.9em; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .calc-button { background: #1976d2; color: white; padding: 10px 24px; border: none; font-size: 1em; cursor: pointer; margin-top: 8px; }
+    .calc-button:hover { background: #1565c0; }
+    .calc-button.sm { font-size: 0.9em; padding: 6px 14px; }
+    .calc-button.green { background: #2e7d32; }
+    .calc-button.green:hover { background: #1b5e20; }
+    .calc-button.red { background: #c62828; }
+    .calc-button.red:hover { background: #b71c1c; }
+    .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
+    .schedule-table th, .schedule-table td { border: 1px solid #ccc; padding: 4px 6px; }
+    .schedule-table th { background: #1976d2; color: white; font-size: 0.78em; white-space: nowrap; position: sticky; top: 0; }
+    .schedule-table input, .schedule-table select { width: 100%; border: none; padding: 3px; font-size: 0.9em; box-sizing: border-box; }
+    .schedule-table tr:nth-child(even) { background: #f8f9fa; }
+    .schedule-table tr:hover { background: #e3f0fc; }
+    .schedule-table .calc-cell { background: #e8f5e9; font-weight: bold; text-align: center; font-size: 0.9em; }
+    .totals-row td { background: #1976d2; color: white; font-weight: bold; font-size: 0.9em; padding: 6px; }
+    .btn-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
+    .summary-item { background: #e3f0fc; border: 1px solid #1976d2; padding: 12px; text-align: center; }
+    .summary-item .value { font-size: 1.5em; font-weight: bold; color: #1976d2; }
+    .summary-item .label { font-size: 0.85em; color: #666; }
+    @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon, .btn-row { display: none !important; } .schedule-table input, .schedule-table select { border: none !important; background: transparent !important; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown active"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a><a href="as3000viewer.html">AS3000 Viewer</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>Load Schedule Builder</h1>
+    <p>Build an electrical load schedule with automatic demand calculation per AS/NZS 3000 diversity principles. Running totals update automatically.</p>
+
+    <div class="calc-section">
+      <h2>Board Details</h2>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Board Designation</label>
+          <input type="text" id="boardName" value="MSB-01" />
+        </div>
+        <div class="input-group">
+          <label>Supply Voltage (V)</label>
+          <select id="supplyVoltage">
+            <option value="230">230V Single Phase</option>
+            <option value="400" selected>400V Three Phase</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="calc-button sm" onclick="addRow()">+ Add Circuit</button>
+      <button class="calc-button sm" onclick="addMultipleRows(5)">+ Add 5 Rows</button>
+      <button class="calc-button sm red" onclick="deleteLastRow()">- Delete Last</button>
+      <button class="calc-button sm" onclick="recalcAll()">Recalculate All</button>
+      <button class="calc-button sm green" onclick="exportCSV()">Export CSV</button>
+      <button class="calc-button sm" onclick="window.print()">Print</button>
+      <button class="calc-button sm red" onclick="clearAll()">Clear All</button>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="schedule-table" id="scheduleTable">
+        <thead>
+          <tr>
+            <th style="width:25px;">#</th>
+            <th>Circuit ID</th>
+            <th>Description</th>
+            <th>Phase(s)</th>
+            <th>Connected Load (VA)</th>
+            <th>Qty</th>
+            <th>Total VA</th>
+            <th>Diversity (%)</th>
+            <th>Demand (VA)</th>
+            <th>Current (A)</th>
+            <th>Category</th>
+            <th>Essential</th>
+          </tr>
+        </thead>
+        <tbody id="scheduleBody"></tbody>
+        <tfoot>
+          <tr class="totals-row">
+            <td colspan="6" style="text-align:right;">TOTALS:</td>
+            <td id="totalVA">0</td>
+            <td>—</td>
+            <td id="totalDemand">0</td>
+            <td id="totalCurrent">0</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="summary-grid" id="summaryGrid">
+      <div class="summary-item"><div class="value" id="sumConnected">0</div><div class="label">Total Connected (kVA)</div></div>
+      <div class="summary-item"><div class="value" id="sumDemand">0</div><div class="label">Total Demand (kVA)</div></div>
+      <div class="summary-item"><div class="value" id="sumCurrent">0</div><div class="label">Total Current (A)</div></div>
+      <div class="summary-item"><div class="value" id="sumDiversity">0%</div><div class="label">Overall Diversity</div></div>
+    </div>
+
+    <div class="info-box" style="margin-top:24px;">
+      <strong>Diversity Factor Guide (AS/NZS 3000 Appendix C):</strong><br>
+      <strong>Lighting:</strong> 90-100% — continuous loads, minimal diversity<br>
+      <strong>Socket Outlets (GPO):</strong> 50-80% — depends on quantity and usage<br>
+      <strong>HVAC:</strong> 80-100% — high utilisation plant<br>
+      <strong>Lifts:</strong> 60-80% — intermittent duty<br>
+      <strong>Small Power:</strong> 30-50% — general appliances, low coincidence<br>
+      <strong>Motors (Direct):</strong> 100% — starting and running considered<br>
+      <strong>Spare Capacity:</strong> Typically include 20-30% spare for future loads
+    </div>
+
+    <div class="warn-box">
+      <strong>Note:</strong> This load schedule is an estimation tool. Final demand calculations must comply with AS/NZS 3000 Section 2 and Appendix C. Essential supply circuits should be identified for generator/UPS sizing as a separate exercise.
+    </div>
+  </div>
+  <script>
+    let rowCount = 0;
+    const phaseOptions = ['1P', '3P'];
+    const categoryOptions = ['Lighting', 'GPO', 'Small Power', 'HVAC', 'Mechanical', 'Lifts', 'Fire Systems', 'IT / Comms', 'EV Charging', 'Spare', 'Other'];
+
+    function addRow(data) {
+      rowCount++;
+      const d = data || {};
+      const tr = document.createElement('tr');
+      const phSel = phaseOptions.map(o => `<option${o===(d.phase||'3P')?' selected':''}>${o}</option>`).join('');
+      const catSel = categoryOptions.map(o => `<option${o===(d.category||'Lighting')?' selected':''}>${o}</option>`).join('');
+      tr.innerHTML = `
+        <td style="text-align:center;font-weight:bold;color:#666;">${rowCount}</td>
+        <td><input type="text" value="${d.id || ''}" placeholder="C${rowCount}" onchange="recalcAll()" /></td>
+        <td><input type="text" value="${d.desc || ''}" placeholder="Description" /></td>
+        <td><select onchange="recalcAll()">${phSel}</select></td>
+        <td><input type="number" value="${d.va || ''}" placeholder="0" onchange="recalcAll()" /></td>
+        <td><input type="number" value="${d.qty || 1}" min="1" style="width:40px;" onchange="recalcAll()" /></td>
+        <td class="calc-cell">0</td>
+        <td><input type="number" value="${d.div || 100}" min="0" max="100" style="width:50px;" onchange="recalcAll()" /> </td>
+        <td class="calc-cell">0</td>
+        <td class="calc-cell">0</td>
+        <td><select>${catSel}</select></td>
+        <td style="text-align:center;"><input type="checkbox" ${d.essential ? 'checked' : ''} /></td>`;
+      document.getElementById('scheduleBody').appendChild(tr);
+      recalcAll();
+    }
+
+    function addMultipleRows(n) { for (let i = 0; i < n; i++) addRow(); }
+
+    function deleteLastRow() {
+      const body = document.getElementById('scheduleBody');
+      if (body.lastChild) { body.removeChild(body.lastChild); rowCount--; recalcAll(); }
+    }
+
+    function clearAll() {
+      if (confirm('Clear all circuit entries?')) {
+        document.getElementById('scheduleBody').innerHTML = '';
+        rowCount = 0;
+        recalcAll();
+      }
+    }
+
+    function recalcAll() {
+      const rows = document.querySelectorAll('#scheduleBody tr');
+      const voltage = parseFloat(document.getElementById('supplyVoltage').value);
+      let totalVA = 0, totalDemand = 0, totalCurrent = 0;
+
+      rows.forEach(row => {
+        const inputs = row.querySelectorAll('input, select');
+        const phase = inputs[2].value; // phase select
+        const vaPerUnit = parseFloat(inputs[3].value) || 0;
+        const qty = parseFloat(inputs[4].value) || 1;
+        const diversity = parseFloat(inputs[6].value) || 100;
+
+        const connectedVA = vaPerUnit * qty;
+        const demandVA = connectedVA * (diversity / 100);
+        let current;
+        if (phase === '3P') {
+          current = demandVA / (voltage * Math.sqrt(3));
+          if (voltage === 230) current = demandVA / (400 * Math.sqrt(3)); // assume 400V for 3P
+        } else {
+          current = demandVA / 230; // single phase always 230V
+        }
+
+        const calcCells = row.querySelectorAll('.calc-cell');
+        calcCells[0].textContent = Math.round(connectedVA).toLocaleString();
+        calcCells[1].textContent = Math.round(demandVA).toLocaleString();
+        calcCells[2].textContent = current.toFixed(1);
+
+        totalVA += connectedVA;
+        totalDemand += demandVA;
+        totalCurrent += current;
+      });
+
+      document.getElementById('totalVA').textContent = Math.round(totalVA).toLocaleString();
+      document.getElementById('totalDemand').textContent = Math.round(totalDemand).toLocaleString();
+      document.getElementById('totalCurrent').textContent = totalCurrent.toFixed(1);
+
+      document.getElementById('sumConnected').textContent = (totalVA / 1000).toFixed(1);
+      document.getElementById('sumDemand').textContent = (totalDemand / 1000).toFixed(1);
+      document.getElementById('sumCurrent').textContent = totalCurrent.toFixed(1);
+      document.getElementById('sumDiversity').textContent = totalVA > 0 ? Math.round((totalDemand / totalVA) * 100) + '%' : '0%';
+    }
+
+    function exportCSV() {
+      const board = document.getElementById('boardName').value;
+      const headers = ['#', 'Circuit ID', 'Description', 'Phase', 'VA per Unit', 'Qty', 'Total VA', 'Diversity %', 'Demand VA', 'Current A', 'Category', 'Essential'];
+      const rows = document.querySelectorAll('#scheduleBody tr');
+      let csv = `Board: ${board}\n` + headers.join(',') + '\n';
+      rows.forEach((row, i) => {
+        const cells = row.querySelectorAll('input, select');
+        const calcCells = row.querySelectorAll('.calc-cell');
+        csv += [
+          i + 1,
+          '"' + (cells[0].value || '') + '"',
+          '"' + (cells[1].value || '') + '"',
+          cells[2].value,
+          cells[3].value || 0,
+          cells[4].value || 1,
+          calcCells[0].textContent,
+          cells[6].value || 100,
+          calcCells[1].textContent,
+          calcCells[2].textContent,
+          cells[7] ? cells[7].value : '',
+          cells[8] && cells[8].checked ? 'Yes' : 'No'
+        ].join(',') + '\n';
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = board.replace(/\s+/g, '_') + '_load_schedule.csv';
+      a.click();
+    }
+
+    // Start with sample rows
+    addRow({ id: 'C01', desc: 'Level 1 Lighting', phase: '3P', va: 5000, qty: 1, div: 90, category: 'Lighting' });
+    addRow({ id: 'C02', desc: 'Level 1 GPOs', phase: '1P', va: 2300, qty: 10, div: 50, category: 'GPO' });
+    addRow({ id: 'C03', desc: 'AHU-01', phase: '3P', va: 15000, qty: 1, div: 100, category: 'HVAC' });
+    addRow({ id: 'C04', desc: 'Lift Motor', phase: '3P', va: 22000, qty: 1, div: 70, category: 'Lifts' });
+    addRow({ id: 'C05', desc: 'Fire Panel', phase: '1P', va: 500, qty: 1, div: 100, category: 'Fire Systems', essential: true });
+  </script>
+</body>
+</html>

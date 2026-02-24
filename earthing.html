@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Earthing Calculator - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; }
+    .result-box { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 24px; margin-top: 24px; }
+    .result-box h3 { margin-top: 0; margin-bottom: 12px; font-size: 1.3em; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 16px; }
+    .result-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .result-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; }
+    .result-value { font-size: 1.8em; font-weight: bold; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    .ref-table th { background: #1976d2; color: white; }
+    .ref-table tr:nth-child(even) { background: #f8f9fa; }
+    @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
+    @media print {
+      .top-tabs, .calc-button, .topleft-icon { display: none !important; }
+      .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active">
+      <span>Power Systems</span>
+      <div class="dropdown-content">
+        <a href="cablesizing.html">Cable Sizing</a>
+        <a href="cableweight.html">Cable Weight</a>
+        <a href="maxdemand.html">Maximum Demand</a>
+        <a href="diversity.html">Diversity Factors</a>
+        <a href="faultlevel.html">Fault Level</a>
+        <a href="loopimpedance.html">Loop Impedance</a>
+        <a href="discrimination.html">Discrimination Check</a>
+        <a href="txsizing.html">Transformer Sizing</a>
+        <a href="gensizing.html">Generator Sizing</a>
+        <a href="upssizing.html">UPS Sizing</a>
+        <a href="pfcsizing.html">PFC Sizing</a>
+        <a href="harmonics.html">Harmonics Analysis</a>
+        <a href="busbarsizing.html">Busbar Sizing</a>
+        <a href="ctsizing.html">CT Sizing</a>
+        <a href="earthing.html">Earthing Calculator</a>
+      </div>
+    </div>
+    <div class="tab has-dropdown">
+      <span>Protection</span>
+      <div class="dropdown-content">
+        <a href="rcdselect.html">RCD Selector</a>
+        <a href="spdsizing.html">SPD Sizing</a>
+        <a href="iprating.html">IP/IK Rating Guide</a>
+        <a href="conduit.html">Conduit Sizer</a>
+        <a href="pvsizing.html">PV Sizing</a>
+      </div>
+    </div>
+    <div class="tab has-dropdown">
+      <span>Lighting & Fire</span>
+      <div class="dropdown-content">
+        <a href="luxcalc.html">Lux Calculator</a>
+        <a href="luxlevels.html">Lux Levels Reference</a>
+        <a href="emergencylighting.html">Emergency Lighting</a>
+        <a href="fireinterface.html">Fire Interface Matrix</a>
+        <a href="smokecontrol.html">Smoke Control</a>
+        <a href="essentialservices.html">Essential Services</a>
+      </div>
+    </div>
+    <div class="tab has-dropdown">
+      <span>Documentation</span>
+      <div class="dropdown-content">
+        <a href="loadschedule.html">Load Schedule</a>
+        <a href="cableschedule.html">Cable Schedule</a>
+        <a href="designcert.html">Design Certificate</a>
+        <a href="tcommissioning.html">T&C Checklists</a>
+        <a href="inspection.html">Site Inspection</a>
+        <a href="sld.html">Single Line Diagram</a>
+        <a href="as3000tips.html">AS3000 Tips</a>
+      </div>
+    </div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+
+  <div class="main-content">
+    <h1>Earthing Calculator</h1>
+    <p>Size earthing electrodes and estimate earth resistance per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-5.1">Section 5</a></strong> (<a href="as3000viewer.html#cl-5.3">cl. 5.3</a>, <a href="as3000viewer.html#cl-5.6">5.6</a>) and <strong>ENA EG-0</strong>.</p>
+
+    <div class="calc-section">
+      <h2>Soil &amp; Site Data</h2>
+      <div class="info-box">
+        <strong>AS/NZS 3000 <a href="as3000viewer.html#cl-5.6.2">cl. 5.6.2</a>:</strong> The earthing system shall provide an impedance low enough for protective devices to operate within required disconnection times. Soil resistivity is the key variable — values range from 10 Ω·m (wet clay) to 10,000 Ω·m (dry rock).
+      </div>
+      <div class="input-row three">
+        <div class="input-group">
+          <label for="soilRes">Soil Resistivity ρ (Ω·m)</label>
+          <input type="number" id="soilRes" value="100" min="1" step="1" />
+        </div>
+        <div class="input-group">
+          <label for="soilType">Soil Type (guide)</label>
+          <select id="soilType" onchange="setSoilRes()">
+            <option value="">— Select to auto-fill —</option>
+            <option value="10">Wet clay / marshy ground (~10)</option>
+            <option value="30">Loam / garden soil (~30)</option>
+            <option value="100">Clay (~100)</option>
+            <option value="200">Sandy clay (~200)</option>
+            <option value="500">Sand (~500)</option>
+            <option value="1000">Gravel (~1000)</option>
+            <option value="3000">Dry sand / rock (~3000)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="targetR">Target Earth Resistance (Ω)</label>
+          <input type="number" id="targetR" value="1" min="0.1" step="0.1" />
+          <span style="font-size:0.8em;color:#888;">AS/NZS 3000 recommends ≤1 Ω for MEN; distributors may require lower</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-section">
+      <h2>Electrode Configuration</h2>
+      <div class="input-row three">
+        <div class="input-group">
+          <label for="electrodeType">Electrode Type</label>
+          <select id="electrodeType" onchange="toggleElectrodeInputs()">
+            <option value="rod" selected>Vertical Rod</option>
+            <option value="strip">Horizontal Strip / Conductor</option>
+            <option value="grid">Earth Grid (mesh)</option>
+            <option value="plate">Earth Plate</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="electrodeMat">Material</label>
+          <select id="electrodeMat">
+            <option value="cu">Copper</option>
+            <option value="galv" selected>Galvanised Steel</option>
+            <option value="cuclad">Copper-Clad Steel</option>
+          </select>
+        </div>
+        <div class="input-group" id="numElectrodesGroup">
+          <label for="numElectrodes">Number of Electrodes</label>
+          <input type="number" id="numElectrodes" value="1" min="1" max="50" step="1" />
+        </div>
+      </div>
+
+      <div id="rodInputs">
+        <div class="input-row three">
+          <div class="input-group">
+            <label for="rodLength">Rod Length (m)</label>
+            <select id="rodLength">
+              <option value="1.2">1.2 m</option>
+              <option value="1.8">1.8 m</option>
+              <option value="2.4" selected>2.4 m</option>
+              <option value="3.0">3.0 m</option>
+              <option value="3.6">3.6 m</option>
+              <option value="4.8">4.8 m</option>
+              <option value="6.0">6.0 m</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="rodDia">Rod Diameter (mm)</label>
+            <select id="rodDia">
+              <option value="12.7">12.7 (½")</option>
+              <option value="15.9" selected>15.9 (⅝")</option>
+              <option value="19.1">19.1 (¾")</option>
+              <option value="25.4">25.4 (1")</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="rodSpacing">Spacing Between Rods (m)</label>
+            <input type="number" id="rodSpacing" value="3" min="1" step="0.5" />
+            <span style="font-size:0.8em;color:#888;">Recommended ≥ rod length for full benefit</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="stripInputs" style="display:none;">
+        <div class="input-row three">
+          <div class="input-group">
+            <label for="stripLength">Total Strip Length (m)</label>
+            <input type="number" id="stripLength" value="20" min="1" step="1" />
+          </div>
+          <div class="input-group">
+            <label for="stripWidth">Strip Width (mm)</label>
+            <input type="number" id="stripWidth" value="25" min="10" step="5" />
+          </div>
+          <div class="input-group">
+            <label for="stripDepth">Burial Depth (m)</label>
+            <input type="number" id="stripDepth" value="0.5" min="0.3" step="0.1" />
+          </div>
+        </div>
+      </div>
+
+      <div id="gridInputs" style="display:none;">
+        <div class="input-row three">
+          <div class="input-group">
+            <label for="gridL">Grid Length (m)</label>
+            <input type="number" id="gridL" value="10" min="1" step="1" />
+          </div>
+          <div class="input-group">
+            <label for="gridW">Grid Width (m)</label>
+            <input type="number" id="gridW" value="10" min="1" step="1" />
+          </div>
+          <div class="input-group">
+            <label for="gridSpacing">Conductor Spacing (m)</label>
+            <input type="number" id="gridSpacing" value="3" min="0.5" step="0.5" />
+          </div>
+        </div>
+      </div>
+
+      <div id="plateInputs" style="display:none;">
+        <div class="input-row three">
+          <div class="input-group">
+            <label for="plateArea">Plate Area (m²)</label>
+            <input type="number" id="plateArea" value="1" min="0.1" step="0.1" />
+          </div>
+          <div class="input-group">
+            <label for="plateDepth">Burial Depth to Centre (m)</label>
+            <input type="number" id="plateDepth" value="1" min="0.3" step="0.1" />
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-button" onclick="calculate()">Calculate Earth Resistance</button>
+    </div>
+
+    <div id="resultSection" style="display:none;">
+      <div class="result-box">
+        <h3>Estimated Earth Resistance</h3>
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="result-label">Single Electrode R (Ω)</div>
+            <div class="result-value" id="singleR">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Combined System R (Ω)</div>
+            <div class="result-value" id="combinedR">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Target R (Ω)</div>
+            <div class="result-value" id="targetRval">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Status</div>
+            <div class="result-value" id="status">—</div>
+          </div>
+        </div>
+      </div>
+      <div id="recommendation" class="info-box" style="margin-top:16px;"></div>
+
+      <div class="calc-section" style="margin-top:24px;">
+        <h2>Quick Reference — Typical Soil Resistivity (Ω·m)</h2>
+        <table class="ref-table">
+          <thead><tr><th>Soil Type</th><th>Typical Range (Ω·m)</th><th>Design Value</th></tr></thead>
+          <tbody>
+            <tr><td>Marshy ground</td><td>2 – 50</td><td>10</td></tr>
+            <tr><td>Loam / garden soil</td><td>5 – 50</td><td>30</td></tr>
+            <tr><td>Clay</td><td>20 – 200</td><td>100</td></tr>
+            <tr><td>Sandy clay</td><td>50 – 500</td><td>200</td></tr>
+            <tr><td>Sand</td><td>200 – 2000</td><td>500</td></tr>
+            <tr><td>Gravel</td><td>300 – 5000</td><td>1000</td></tr>
+            <tr><td>Rock / dry sand</td><td>1000 – 10000</td><td>3000</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setSoilRes() {
+      const v = document.getElementById('soilType').value;
+      if (v) document.getElementById('soilRes').value = v;
+    }
+
+    function toggleElectrodeInputs() {
+      const t = document.getElementById('electrodeType').value;
+      document.getElementById('rodInputs').style.display = t === 'rod' ? '' : 'none';
+      document.getElementById('stripInputs').style.display = t === 'strip' ? '' : 'none';
+      document.getElementById('gridInputs').style.display = t === 'grid' ? '' : 'none';
+      document.getElementById('plateInputs').style.display = t === 'plate' ? '' : 'none';
+      document.getElementById('numElectrodesGroup').style.display = (t === 'rod') ? '' : 'none';
+    }
+
+    function calculate() {
+      const rho = parseFloat(document.getElementById('soilRes').value);
+      const target = parseFloat(document.getElementById('targetR').value);
+      const type = document.getElementById('electrodeType').value;
+      let singleR = 0, combinedR = 0;
+
+      if (type === 'rod') {
+        const L = parseFloat(document.getElementById('rodLength').value);
+        const d = parseFloat(document.getElementById('rodDia').value) / 1000;
+        const n = parseInt(document.getElementById('numElectrodes').value);
+        const s = parseFloat(document.getElementById('rodSpacing').value);
+
+        // R = (ρ / 2πL) × ln(4L/d)  — single vertical rod formula
+        singleR = (rho / (2 * Math.PI * L)) * Math.log(4 * L / d);
+
+        // Parallel rods with utilisation factor
+        if (n === 1) {
+          combinedR = singleR;
+        } else {
+          // Schwarz-based utilisation: η ≈ 1 - (0.5 × ln(n) × L / (n × s))
+          const eta = Math.min(1, 1 / (1 + (n - 1) * 0.5 * (L / s > 1 ? L / s * 0.3 : 0.15)));
+          combinedR = singleR / (n * eta);
+          // Simplified: parallel reduction with coupling factor
+          const kFactor = 1 - 0.05 * (n - 1) * Math.min(1, L / s);
+          combinedR = (singleR / n) / Math.max(0.3, kFactor);
+        }
+      } else if (type === 'strip') {
+        const L = parseFloat(document.getElementById('stripLength').value);
+        const w = parseFloat(document.getElementById('stripWidth').value) / 1000;
+        const d = parseFloat(document.getElementById('stripDepth').value);
+        // R = (ρ / πL) × ln(2L² / (w×d))
+        singleR = (rho / (Math.PI * L)) * Math.log((2 * L * L) / (w * d));
+        combinedR = singleR;
+      } else if (type === 'grid') {
+        const gL = parseFloat(document.getElementById('gridL').value);
+        const gW = parseFloat(document.getElementById('gridW').value);
+        const sp = parseFloat(document.getElementById('gridSpacing').value);
+        const A = gL * gW;
+        const totalConductor = (Math.floor(gW / sp) + 1) * gL + (Math.floor(gL / sp) + 1) * gW;
+        // Laurent-Niemann: R ≈ ρ/(4√A) + ρ/L_total
+        singleR = rho / (4 * Math.sqrt(A)) + rho / totalConductor;
+        combinedR = singleR;
+      } else if (type === 'plate') {
+        const Ap = parseFloat(document.getElementById('plateArea').value);
+        const dp = parseFloat(document.getElementById('plateDepth').value);
+        // R = ρ / (4 × √(A/π)) — circular plate approximation
+        const eqR = Math.sqrt(Ap / Math.PI);
+        singleR = rho / (4 * eqR);
+        combinedR = singleR;
+      }
+
+      document.getElementById('singleR').textContent = singleR.toFixed(2);
+      document.getElementById('combinedR').textContent = combinedR.toFixed(2);
+      document.getElementById('targetRval').textContent = target.toFixed(1);
+
+      const pass = combinedR <= target;
+      document.getElementById('status').textContent = pass ? '✓ OK' : '✕ Too High';
+      document.getElementById('status').style.color = pass ? '#a5d6a7' : '#ef9a9a';
+
+      // Recommendation
+      const rec = document.getElementById('recommendation');
+      if (pass) {
+        rec.innerHTML = `<strong>✓ Result:</strong> Estimated earth resistance of <strong>${combinedR.toFixed(2)} Ω</strong> meets the target of <strong>${target.toFixed(1)} Ω</strong>. Confirm with field measurements per AS/NZS 3017 (fall-of-potential test).`;
+        rec.className = 'info-box';
+        rec.style.borderLeftColor = '#2e7d32';
+        rec.style.background = '#e8f5e9';
+      } else {
+        let advice = `<strong>✕ Result:</strong> Estimated earth resistance of <strong>${combinedR.toFixed(2)} Ω</strong> exceeds target of <strong>${target.toFixed(1)} Ω</strong>.<br><strong>Options:</strong><ul>`;
+        if (type === 'rod') {
+          const neededN = Math.ceil(singleR / target * 1.3);
+          advice += `<li>Increase to approximately <strong>${neededN} rods</strong> (with spacing ≥ rod length)</li>`;
+          advice += `<li>Use longer rods (3.0–6.0 m) to reach lower-resistivity layers</li>`;
+        }
+        advice += `<li>Augment with horizontal strip/ring earth</li>`;
+        advice += `<li>Use soil treatment (bentonite / Marconite) to reduce local ρ</li>`;
+        advice += `<li>Combine rod + grid configuration</li></ul>`;
+        rec.innerHTML = advice;
+        rec.className = 'warn-box';
+      }
+
+      document.getElementById('resultSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

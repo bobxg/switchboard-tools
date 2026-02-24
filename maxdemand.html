@@ -72,24 +72,13 @@
 <body>
   <img src="icon.png" class="topleft-icon" alt="App Icon" />
   <div class="top-tabs">
-    <a class="tab" href="index.html">Home</a>
-    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
-    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
-    <a class="tab" href="lightingsearch.html">Lighting Search</a>
-    <div class="tab has-dropdown active">
-      <span>TBC</span>
-      <div class="dropdown-content">
-        <a href="conduit.html">Conduit Sizer</a>
-        <a href="cablesizing.html">Cable Sizing</a>
-        <a href="cableweight.html">Cable Weight</a>
-        <a href="pvsizing.html">PV Sizing</a>
-        <a href="emergencylighting.html">Emergency Lighting</a>
-        <a href="inspection.html">Site Inspection</a>
-        <a href="sld.html">Single Line Diagram</a>
-        <a href="as3000tips.html">AS3000 Tips</a>
-        <a href="maxdemand.html">Maximum Demand</a>
-      </div>
-    </div>
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a><a href="as3000viewer.html">AS3000 Viewer</a></div></div>
     <a class="tab" href="qa.html">Verification</a>
   </div>
 
@@ -101,7 +90,6 @@
       <button class="sub-tab active" data-tab="c1">Table C1 — Domestic</button>
       <button class="sub-tab" data-tab="c2">Table C2 — Non-Domestic</button>
       <button class="sub-tab" data-tab="c3">Table C3 — VA/m²</button>
-      <button class="sub-tab" data-tab="c4">Table C4 — Switchboard</button>
       <button class="sub-tab" data-tab="c5">Summary / Export</button>
     </div>
 
@@ -500,6 +488,7 @@
           <div class="input-group">
             <label for="c2Voltage">Supply Voltage (V)</label>
             <input type="number" id="c2Voltage" min="200" max="260" value="230" oninput="c2Calc()">
+            <span class="note-text" id="c2VoltageNote">Used for single-phase load conversion</span>
           </div>
           <div class="input-group">
             <label for="c2Supply">Supply Configuration</label>
@@ -519,6 +508,7 @@
           (c) Cooking/heating/cooling: Highest full + 75% remainder &nbsp;|&nbsp;
           (d) Motors: Highest full + 75% 2nd highest + 50% remainder &nbsp;|&nbsp;
           (e) Lifts: 125% + 75% + 50% &nbsp;|&nbsp;
+          (f) Fuel dispensing: Motors 100/50/25 + lighting full &nbsp;|&nbsp;
           (g) Thermal storage heaters: Full-load current
         </div>
 
@@ -615,12 +605,40 @@
               <td><input type="number" id="c2Lift3" min="0" step="0.1" value="0" oninput="c2Calc()"> <span class="note-text">A</span></td>
             </tr>
 
+            <tr class="group-header"><td colspan="4">(f) Fuel Dispensing Units</td></tr>
+            <tr>
+              <td class="row-label">Fuel dispensing motor — first motor (full load current)</td>
+              <td><input type="number" id="c2FuelMotor1" min="0" step="0.1" value="0" oninput="c2Calc()"> <span class="note-text">A</span></td>
+              <td class="row-amps" id="c2FuelA" rowspan="4" style="vertical-align:middle;">0.0 A</td>
+              <td class="row-note" id="c2FuelF" rowspan="4">Motors: 100% + 50% + 25%, lighting full</td>
+            </tr>
+            <tr>
+              <td class="row-label">Fuel dispensing motor — second motor</td>
+              <td><input type="number" id="c2FuelMotor2" min="0" step="0.1" value="0" oninput="c2Calc()"> <span class="note-text">A</span></td>
+            </tr>
+            <tr>
+              <td class="row-label">Fuel dispensing motors — additional motors (total)</td>
+              <td><input type="number" id="c2FuelMotor3" min="0" step="0.1" value="0" oninput="c2Calc()"> <span class="note-text">A</span></td>
+            </tr>
+            <tr>
+              <td class="row-label">Fuel dispensing lighting (connected load)</td>
+              <td><input type="number" id="c2FuelLight" min="0" value="0" oninput="c2Calc()"> <span class="note-text">W</span></td>
+            </tr>
+
             <tr class="group-header"><td colspan="4">(g) Thermal Storage Heaters (water, space, pool, spa, sauna)</td></tr>
             <tr>
               <td class="row-label">Total thermal storage heater load (on this phase)</td>
               <td><input type="number" id="c2Thermal" min="0" value="0" oninput="c2Calc()"> <span class="note-text">W</span></td>
               <td class="row-amps" id="c2ThermalA">0.0 A</td>
               <td class="row-note">Full-load current</td>
+            </tr>
+
+            <tr class="group-header"><td colspan="4">(h) Welding Machines</td></tr>
+            <tr>
+              <td class="row-label">Welding machines demand <span class="note-text">(per C2.5.2 incl. PF correction)</span></td>
+              <td><input type="number" id="c2WeldA" min="0" step="0.1" value="0" oninput="c2Calc()"> <span class="note-text">A</span></td>
+              <td class="row-amps" id="c2WeldDisplay">0.0 A</td>
+              <td class="row-note">Per C2.5.2</td>
             </tr>
 
             <tr class="group-header"><td colspan="4">(i) X-Ray Equipment</td></tr>
@@ -651,7 +669,7 @@
               <div class="result-value" id="c2DemandA">0 A</div>
             </div>
             <div class="result-item">
-              <div class="result-label">Approx. Power (per phase)</div>
+              <div class="result-label" id="c2PowerLabel">Approx. Power (per phase)</div>
               <div class="result-value" id="c2PowerkW">0 kW</div>
             </div>
             <div class="result-item">
@@ -760,64 +778,6 @@
     </div>
 
     <!-- ================================================================
-         TABLE C4 — SWITCHBOARD DIVERSITY
-         AS/NZS 3000:2018 Table C4
-         ================================================================ -->
-    <div id="panel-c4" class="tab-panel">
-      <div class="calc-section">
-        <h2>Table C4 — Upstream Circuit Loading After Diversity</h2>
-        <div class="info-box">
-          <strong>AS/NZS 3000:2018 C2.4.4, Table C4:</strong> For switchboards conforming with AS/NZS 3439 or AS/NZS 61439 series, the maximum demand may be determined by multiplying the arithmetic sum of the circuit overload ratings by the diversity factor from Table C4.
-        </div>
-
-        <div class="diversity-ref">
-          <strong>Table C4 — Diversity Factors:</strong><br>
-          2–3 downstream devices → <strong>0.9</strong> &nbsp;|&nbsp;
-          4–5 devices → <strong>0.8</strong> &nbsp;|&nbsp;
-          6–9 devices → <strong>0.7</strong> &nbsp;|&nbsp;
-          10 or more devices → <strong>0.6</strong>
-        </div>
-
-        <div class="input-row">
-          <div class="input-group">
-            <label for="c4Devices">Number of Downstream Circuit-Protection Devices</label>
-            <input type="number" id="c4Devices" min="2" max="500" value="2" oninput="c4Calc()">
-          </div>
-          <div class="input-group">
-            <label for="c4SumRatings">Arithmetic Sum of Circuit Overload Ratings (A)</label>
-            <input type="number" id="c4SumRatings" min="0" step="0.1" value="0" oninput="c4Calc()">
-          </div>
-        </div>
-
-        <div class="result-box" id="c4Result">
-          <h3>Switchboard Diversity (Table C4)</h3>
-          <div class="result-grid">
-            <div class="result-item">
-              <div class="result-label">Downstream Devices</div>
-              <div class="result-value" id="c4ResDevices">2</div>
-            </div>
-            <div class="result-item">
-              <div class="result-label">Diversity Factor</div>
-              <div class="result-value" id="c4ResDF">0.9</div>
-            </div>
-            <div class="result-item">
-              <div class="result-label">Sum of Ratings</div>
-              <div class="result-value" id="c4ResSum">0 A</div>
-            </div>
-            <div class="result-item">
-              <div class="result-label">Maximum Demand After Diversity</div>
-              <div class="result-value" id="c4ResDemand">0 A</div>
-            </div>
-            <div class="result-item">
-              <div class="result-label">Suggested Main Switch</div>
-              <div class="result-value" id="c4ResSwitch">—</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ================================================================
          SUMMARY / EXPORT
          ================================================================ -->
     <div id="panel-c5" class="tab-panel">
@@ -869,14 +829,6 @@
             <tr><th>Building Type / Density</th><td id="sumC3Info">—</td></tr>
             <tr><th class="summary-total">Total Demand</th><td class="summary-total" id="sumC3Total">—</td></tr>
             <tr><th>Current (per phase)</th><td id="sumC3Current">—</td></tr>
-          </table>
-        </div>
-
-        <div class="summary-card" id="summaryC4">
-          <h3>Table C4 — Switchboard Diversity</h3>
-          <table class="summary-table">
-            <tr><th>Devices / Diversity Factor</th><td id="sumC4Info">—</td></tr>
-            <tr><th class="summary-total">Diversified Demand</th><td class="summary-total" id="sumC4Total">—</td></tr>
           </table>
         </div>
 
@@ -1226,7 +1178,21 @@
        ═══════════════════════════════════════════════════ */
     function c2Calc() {
       const type = document.getElementById('c2Type').value; // 'residential' or 'commercial'
-      const V = parseFloat(document.getElementById('c2Voltage').value) || 230;
+      const supply = document.getElementById('c2Supply').value; // '1' or '3'
+      const vInput = document.getElementById('c2Voltage');
+      const vNote = document.getElementById('c2VoltageNote');
+      const powerLabel = document.getElementById('c2PowerLabel');
+      if (supply === '3') {
+        vInput.value = 230;
+        vInput.disabled = true;
+        vNote.textContent = 'For three-phase, per-phase conversion uses 230 V';
+        powerLabel.textContent = 'Approx. Power (3φ total)';
+      } else {
+        vInput.disabled = false;
+        vNote.textContent = 'Used for single-phase load conversion';
+        powerLabel.textContent = 'Approx. Power (per phase)';
+      }
+      const V = parseFloat(vInput.value) || 230;
       const isRes = type === 'residential';
 
       // Update reference box
@@ -1239,7 +1205,9 @@
           '(c) Cooking/heating/cooling: Highest full + 50% remainder &nbsp;|&nbsp;' +
           '(d) Motors: Highest full + 50% remainder &nbsp;|&nbsp;' +
           '(e) Lifts: 125% + 75% + 50% &nbsp;|&nbsp;' +
-          '(g) Thermal storage: Full-load current';
+          '(f) Fuel dispensing: Motors 100/50/25 + lighting full &nbsp;|&nbsp;' +
+          '(g) Thermal storage: Full-load current &nbsp;|&nbsp;' +
+          '(h) Welding: Per C2.5.2';
       } else {
         document.getElementById('c2RefBox').innerHTML = '<strong>Table C2 Column 3 (Commercial):</strong><br>' +
           '(a) Lighting: 100% connected load &nbsp;|&nbsp;' +
@@ -1249,7 +1217,9 @@
           '(c) Cooking/heating/cooling: Highest full + 75% remainder &nbsp;|&nbsp;' +
           '(d) Motors: Highest full + 75% 2nd highest + 50% remainder &nbsp;|&nbsp;' +
           '(e) Lifts: 125% + 75% + 50% &nbsp;|&nbsp;' +
-          '(g) Thermal storage: Full-load current';
+          '(f) Fuel dispensing: Motors 100/50/25 + lighting full &nbsp;|&nbsp;' +
+          '(g) Thermal storage: Full-load current &nbsp;|&nbsp;' +
+          '(h) Welding: Per C2.5.2';
       }
 
       // (a) Lighting
@@ -1323,6 +1293,20 @@
       const liftA = roundA(lift1 * 1.25 + lift2 * 0.75 + lift3 * 0.5);
       document.getElementById('c2LiftDemand').textContent = liftA.toFixed(1) + ' A';
 
+      // (f) Fuel dispensing units: motors 100/50/25 + lighting full
+      const fuelMotor1 = parseFloat(document.getElementById('c2FuelMotor1').value) || 0;
+      const fuelMotor2 = parseFloat(document.getElementById('c2FuelMotor2').value) || 0;
+      const fuelMotor3 = parseFloat(document.getElementById('c2FuelMotor3').value) || 0;
+      const fuelLightW = parseFloat(document.getElementById('c2FuelLight').value) || 0;
+      const fuelMotorA = fuelMotor1 + fuelMotor2 * 0.5 + fuelMotor3 * 0.25;
+      const fuelLightA = fuelLightW / V;
+      const fuelA = roundA(fuelMotorA + fuelLightA);
+      document.getElementById('c2FuelA').textContent = fuelA.toFixed(1) + ' A';
+
+      // (h) Welding machines: per C2.5.2 by user-entered demand
+      const weldA = roundA(parseFloat(document.getElementById('c2WeldA').value) || 0);
+      document.getElementById('c2WeldDisplay').textContent = weldA.toFixed(1) + ' A';
+
       // (g) Thermal storage heaters: full-load current
       const thermalW = parseFloat(document.getElementById('c2Thermal').value) || 0;
       const thermalA = roundA(thermalW / V);
@@ -1337,11 +1321,14 @@
       document.getElementById('c2OtherA').textContent = otherA.toFixed(1) + ' A';
 
       // Total
-      const totalA = roundA(lightA + totalSockA + sockHiA + appA + evA + motorA + liftA + thermalA + xrayA + otherA);
+      const totalA = roundA(lightA + totalSockA + sockHiA + appA + evA + motorA + liftA + fuelA + thermalA + weldA + xrayA + otherA);
       document.getElementById('c2TotalA').textContent = totalA.toFixed(1) + ' A';
 
       document.getElementById('c2DemandA').textContent = totalA.toFixed(1) + ' A';
-      document.getElementById('c2PowerkW').textContent = (totalA * V / 1000).toFixed(1) + ' kW';
+      const powerKW = supply === '3'
+        ? (totalA * Math.sqrt(3) * 400 / 1000)
+        : (totalA * V / 1000);
+      document.getElementById('c2PowerkW').textContent = powerKW.toFixed(1) + ' kW';
       document.getElementById('c2MainSwitch').textContent = suggestMainSwitch(totalA) + ' A';
     }
 
@@ -1403,32 +1390,6 @@
     c3Calc();
 
     /* ═══════════════════════════════════════════════════
-       TABLE C4 — SWITCHBOARD DIVERSITY
-       AS/NZS 3000:2018 Table C4
-       ═══════════════════════════════════════════════════ */
-    function getC4DF(n) {
-      if (n <= 3) return 0.9;
-      if (n <= 5) return 0.8;
-      if (n <= 9) return 0.7;
-      return 0.6;
-    }
-
-    function c4Calc() {
-      const devices = parseInt(document.getElementById('c4Devices').value) || 2;
-      const sumRatings = parseFloat(document.getElementById('c4SumRatings').value) || 0;
-      const df = getC4DF(devices);
-      const demand = roundA(sumRatings * df);
-
-      document.getElementById('c4ResDevices').textContent = devices;
-      document.getElementById('c4ResDF').textContent = df.toFixed(1);
-      document.getElementById('c4ResSum').textContent = sumRatings.toFixed(1) + ' A';
-      document.getElementById('c4ResDemand').textContent = demand.toFixed(1) + ' A';
-      document.getElementById('c4ResSwitch').textContent = suggestMainSwitch(demand) + ' A';
-    }
-
-    c4Calc();
-
-    /* ═══════════════════════════════════════════════════
        SUMMARY / EXPORT
        ═══════════════════════════════════════════════════ */
     function updateSummary() {
@@ -1469,10 +1430,6 @@
       document.getElementById('sumC3Total').textContent = document.getElementById('c3ReskVA').textContent;
       document.getElementById('sumC3Current').textContent = document.getElementById('c3ResCurrent').textContent;
 
-      // C4
-      document.getElementById('sumC4Info').textContent =
-        document.getElementById('c4ResDevices').textContent + ' devices → DF ' + document.getElementById('c4ResDF').textContent;
-      document.getElementById('sumC4Total').textContent = document.getElementById('c4ResDemand').textContent;
     }
 
     function printClientReport() {
@@ -1490,7 +1447,6 @@
       const c1mA = parseFloat(document.getElementById('c1mResTotal').textContent) || 0;
       const c2A = parseFloat(document.getElementById('c2TotalA').textContent) || 0;
       const c3VA = parseFloat(document.getElementById('c3ResVA').textContent) || 0;
-      const c4A = parseFloat(document.getElementById('c4ResDemand').textContent) || 0;
 
       let sections = '';
 
@@ -1543,22 +1499,13 @@
         sections += '<span>Main Switch: <strong>' + document.getElementById('c3ResSwitch').textContent + '</strong></span></div></div>';
       }
 
-      if (c4A > 0) {
-        sections += '<div class="rpt-section"><h3>Table C4 — Switchboard Diversity</h3>';
-        sections += '<table><tbody>';
-        sections += '<tr><td>Downstream Devices</td><td class="r">' + document.getElementById('c4ResDevices').textContent + '</td></tr>';
-        sections += '<tr><td>Diversity Factor</td><td class="r">' + document.getElementById('c4ResDF').textContent + '</td></tr>';
-        sections += '<tr><td>Sum of Ratings</td><td class="r">' + document.getElementById('c4ResSum').textContent + '</td></tr>';
-        sections += '</tbody><tfoot><tr class="total-row"><td>Diversified Demand</td><td class="r">' + c4A.toFixed(1) + ' A</td></tr></tfoot></table></div>';
-      }
-
       if (!sections) { alert('No calculations to print. Please enter load data in at least one tab.'); return; }
 
       const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Maximum Demand Report — ' + projName + '</title>' +
         '<style>@page{size:A4;margin:15mm 18mm;}*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,Helvetica,sans-serif;font-size:9.5pt;color:#222;line-height:1.4;}' +
         '.header{border-bottom:3px solid #1565c0;padding-bottom:10px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-end;}' +
         '.header-left h1{font-size:15pt;color:#1565c0;margin-bottom:2px;}.header-left p{font-size:8pt;color:#666;}' +
-        '.header-right{text-align:right;font-size:8pt;color:#555;}' +
+        '.header-right{text-align:right;font-size:8pt;color:#555;}.brand{font-size:10pt;font-weight:700;color:#1565c0;margin-bottom:2px;}.brand-sub{font-size:7.5pt;color:#888;font-style:italic;}' +
         '.proj-table{width:100%;border-collapse:collapse;margin-bottom:12px;}.proj-table td{padding:4px 8px;border:1px solid #ddd;font-size:8.5pt;}' +
         '.proj-table .lbl{background:#f0f4f8;font-weight:600;color:#333;width:18%;}' +
         '.rpt-section{margin-bottom:16px;page-break-inside:avoid;}.rpt-section h3{font-size:10.5pt;color:#1565c0;border-bottom:2px solid #1565c0;padding-bottom:4px;margin-bottom:6px;}' +
@@ -1571,13 +1518,13 @@
         (projNotes ? '.notes{background:#fffbe6;border:1px solid #ffc107;padding:6px 10px;margin-bottom:12px;font-size:8.5pt;}' : '') +
         '</style></head><body>' +
         '<div class="header"><div class="header-left"><h1>Maximum Demand Calculation</h1><p>Per AS/NZS 3000:2018 Appendix C</p></div>' +
-        '<div class="header-right">Date: ' + today + '<br>Rev: ' + projRevision + '</div></div>' +
+        '<div class="header-right"><div class="brand">ADP Consulting</div><div class="brand-sub">an Ayesa Company</div><br>Date: ' + today + '<br>Rev: ' + projRevision + '</div></div>' +
         '<table class="proj-table"><tr><td class="lbl">Project</td><td>' + projName + '</td><td class="lbl">Job No.</td><td>' + projNumber + '</td></tr>' +
         '<tr><td class="lbl">Client</td><td>' + projClient + '</td><td class="lbl">Prepared By</td><td>' + projEngineer + '</td></tr></table>' +
         (projNotes ? '<div class="notes"><strong>Notes:</strong> ' + projNotes + '</div>' : '') +
         sections +
         '<div class="disclaimer">This document has been prepared in accordance with AS/NZS 3000:2018 Wiring Rules, Appendix C — Estimation of Maximum Demand. All diversity factors applied per the relevant tables. Values should be verified by a qualified electrical engineer prior to construction.</div>' +
-        '<div class="footer"><span>' + projName + ' — ' + projNumber + '</span><span>Rev ' + projRevision + ' — ' + today + '</span></div>' +
+        '<div class="footer"><span>ADP Consulting, an Ayesa Company</span><span>' + projName + ' — ' + projNumber + ' — Rev ' + projRevision + ' — ' + today + '</span></div>' +
         '<script>window.onload=function(){window.print();}<\/script></body></html>';
 
       const win = window.open('', '_blank');
@@ -1616,9 +1563,6 @@
       csv += 'Demand,' + document.getElementById('c3ReskVA').textContent + '\n';
       csv += 'Current,' + document.getElementById('c3ResCurrent').textContent + '\n\n';
 
-      csv += 'Table C4 — Switchboard Diversity\n';
-      csv += 'Diversified Demand,' + document.getElementById('c4ResDemand').textContent + '\n';
-
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1649,9 +1593,6 @@
       text += '── Table C3 — Energy Demand ──\n';
       text += 'Demand:         ' + document.getElementById('c3ReskVA').textContent + '\n';
       text += 'Current:        ' + document.getElementById('c3ResCurrent').textContent + '\n\n';
-
-      text += '── Table C4 — Switchboard Diversity ──\n';
-      text += 'Demand:         ' + document.getElementById('c4ResDemand').textContent + '\n';
 
       navigator.clipboard.writeText(text).then(() => {
         const btn = document.querySelector('.export-btn[onclick="copyToClipboard()"]');

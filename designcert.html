@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Design Certificate Generator - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select, .input-group textarea { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; font-family: inherit; }
+    .input-group textarea { resize: vertical; min-height: 60px; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .calc-button.green { background: #2e7d32; }
+    .calc-button.green:hover { background: #1b5e20; }
+    .cert-preview { border: 2px solid #333; padding: 40px; margin: 24px 0; background: #fff; font-family: 'Times New Roman', serif; color: #333; }
+    .cert-preview h1 { text-align: center; border-bottom: 3px double #333; padding-bottom: 12px; font-size: 1.6em; }
+    .cert-preview .cert-field { margin: 12px 0; }
+    .cert-preview .cert-label { font-weight: bold; display: inline-block; min-width: 200px; }
+    .cert-preview .cert-value { border-bottom: 1px solid #999; display: inline-block; min-width: 300px; padding: 2px 8px; }
+    .cert-preview .cert-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .cert-preview .cert-table th, .cert-preview .cert-table td { border: 1px solid #666; padding: 6px 8px; text-align: left; font-size: 0.9em; }
+    .cert-preview .cert-table th { background: #eee; }
+    .cert-preview .signature { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+    .cert-preview .sig-line { border-top: 1px solid #333; padding-top: 4px; margin-top: 40px; font-size: 0.9em; }
+    @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon, .calc-section { display: none !important; } .cert-preview { border: none; padding: 20px; margin: 0; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown active"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>Electrical Design Certificate Generator</h1>
+    <p>Generate an electrical design compliance certificate per state regulations and <strong>AS/NZS 3000:2018</strong>. Suitable for certifying design intent for building approvals.</p>
+
+    <div class="calc-section">
+      <h2>Project Details</h2>
+      <div class="input-row">
+        <div class="input-group"><label for="projName">Project Name</label><input type="text" id="projName" value="" placeholder="e.g., 123 Main Street Office Fitout" /></div>
+        <div class="input-group"><label for="projAddr">Project Address</label><input type="text" id="projAddr" value="" placeholder="Full address" /></div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group"><label for="projNum">Project Number</label><input type="text" id="projNum" value="" placeholder="e.g., E12345" /></div>
+        <div class="input-group"><label for="projStage">Design Stage</label>
+          <select id="projStage"><option>Schematic Design (SD)</option><option>Design Development (DD)</option><option selected>Construction Documentation (CD)</option><option>For Construction (FC)</option><option>As-Built</option></select></div>
+        <div class="input-group"><label for="certDate">Date</label><input type="date" id="certDate" /></div>
+      </div>
+    </div>
+
+    <div class="calc-section">
+      <h2>Designer Details</h2>
+      <div class="input-row">
+        <div class="input-group"><label for="designerName">Designer Name</label><input type="text" id="designerName" placeholder="Full name" /></div>
+        <div class="input-group"><label for="designerCompany">Company</label><input type="text" id="designerCompany" placeholder="Company name" /></div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group"><label for="designerLic">Licence / Registration No.</label><input type="text" id="designerLic" placeholder="e.g., NSW Lic 12345" /></div>
+        <div class="input-group"><label for="designerState">State</label>
+          <select id="designerState"><option>NSW</option><option>VIC</option><option>QLD</option><option>SA</option><option>WA</option><option>TAS</option><option>ACT</option><option>NT</option></select></div>
+        <div class="input-group"><label for="designerEmail">Email</label><input type="email" id="designerEmail" placeholder="email@company.com" /></div>
+      </div>
+    </div>
+
+    <div class="calc-section">
+      <h2>Design Scope & Standards Compliance</h2>
+      <div class="input-group" style="margin-bottom:16px;"><label for="scopeDesc">Description of Electrical Works</label><textarea id="scopeDesc" rows="3" placeholder="Brief description of the electrical design scope..."></textarea></div>
+      <div class="input-group" style="margin-bottom:16px;"><label>Standards Compliance (check all applicable)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+          <label><input type="checkbox" class="std-check" checked value="AS/NZS 3000:2018 — Wiring Rules" /> AS/NZS 3000:2018 — Wiring Rules</label>
+          <label><input type="checkbox" class="std-check" checked value="AS/NZS 3008.1.1 — Cable selection" /> AS/NZS 3008.1.1 — Cable selection</label>
+          <label><input type="checkbox" class="std-check" value="AS/NZS 3010 — Generator installations" /> AS/NZS 3010 — Generator installations</label>
+          <label><input type="checkbox" class="std-check" checked value="AS/NZS 61439 — Switchgear assemblies" /> AS/NZS 61439 — Switchgear assemblies</label>
+          <label><input type="checkbox" class="std-check" value="AS 1670.1 — Fire detection systems" /> AS 1670.1 — Fire detection systems</label>
+          <label><input type="checkbox" class="std-check" checked value="AS/NZS 1680 — Interior lighting" /> AS/NZS 1680 — Interior lighting</label>
+          <label><input type="checkbox" class="std-check" checked value="AS/NZS 2293 — Emergency lighting" /> AS/NZS 2293 — Emergency lighting</label>
+          <label><input type="checkbox" class="std-check" value="AS/NZS 5033 — PV installations" /> AS/NZS 5033 — PV installations</label>
+          <label><input type="checkbox" class="std-check" checked value="NCC 2022 — National Construction Code" /> NCC 2022 — National Construction Code</label>
+          <label><input type="checkbox" class="std-check" value="AS/NZS 3003 — Medical installations" /> AS/NZS 3003 — Electrical installations in patient areas</label>
+          <label><input type="checkbox" class="std-check" value="AS 1668.1 — Smoke control" /> AS 1668.1 — Fire and smoke control</label>
+          <label><input type="checkbox" class="std-check" value="AS/NZS 1768 — Lightning protection" /> AS/NZS 1768 — Lightning protection</label>
+        </div>
+      </div>
+      <div class="input-group"><label for="assumptions">Key Design Assumptions & Exclusions</label><textarea id="assumptions" rows="3" placeholder="e.g., Max demand based on AS/NZS 3000 Appendix C. Excludes fire detection (by others). Supply capacity confirmed with distributor..."></textarea></div>
+    </div>
+
+    <div class="calc-section">
+      <h2>Design Parameters</h2>
+      <div class="input-row three">
+        <div class="input-group"><label for="supplyVoltage">Supply Voltage</label><input type="text" id="supplyVoltage" value="415V 3-phase + N" /></div>
+        <div class="input-group"><label for="maxDemand">Maximum Demand (kVA)</label><input type="number" id="maxDemand" value="250" /></div>
+        <div class="input-group"><label for="faultLevel">Prospective SC (kA)</label><input type="number" id="faultLevel" value="10" step="0.1" /></div>
+      </div>
+    </div>
+
+    <button class="calc-button green" onclick="generateCert()">Generate Certificate Preview</button>
+
+    <div id="certOutput" style="display:none;">
+      <div class="cert-preview" id="certPreview"></div>
+      <button class="calc-button" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+  <script>
+    // Set today's date
+    document.getElementById('certDate').valueAsDate = new Date();
+
+    function generateCert() {
+      const proj = {
+        name: document.getElementById('projName').value || '[Project Name]',
+        addr: document.getElementById('projAddr').value || '[Address]',
+        num: document.getElementById('projNum').value || '[Proj No.]',
+        stage: document.getElementById('projStage').value,
+        date: document.getElementById('certDate').value || new Date().toISOString().split('T')[0],
+      };
+      const designer = {
+        name: document.getElementById('designerName').value || '[Designer Name]',
+        company: document.getElementById('designerCompany').value || '[Company]',
+        lic: document.getElementById('designerLic').value || '[Licence No.]',
+        state: document.getElementById('designerState').value,
+        email: document.getElementById('designerEmail').value || '',
+      };
+      const scope = document.getElementById('scopeDesc').value || '[Scope description]';
+      const assumptions = document.getElementById('assumptions').value || '[Assumptions]';
+      const voltage = document.getElementById('supplyVoltage').value;
+      const md = document.getElementById('maxDemand').value;
+      const sc = document.getElementById('faultLevel').value;
+
+      const standards = [...document.querySelectorAll('.std-check:checked')].map(c => c.value);
+
+      let html = `<h1>Electrical Design Compliance Certificate</h1>
+        <div class="cert-field"><span class="cert-label">Project:</span> <span class="cert-value">${proj.name}</span></div>
+        <div class="cert-field"><span class="cert-label">Address:</span> <span class="cert-value">${proj.addr}</span></div>
+        <div class="cert-field"><span class="cert-label">Project Number:</span> <span class="cert-value">${proj.num}</span></div>
+        <div class="cert-field"><span class="cert-label">Design Stage:</span> <span class="cert-value">${proj.stage}</span></div>
+        <div class="cert-field"><span class="cert-label">Date:</span> <span class="cert-value">${proj.date}</span></div>
+        <hr>
+        <h3>Scope of Electrical Works</h3>
+        <p>${scope}</p>
+        <h3>Design Parameters</h3>
+        <table class="cert-table">
+          <tr><th>Parameter</th><th>Value</th></tr>
+          <tr><td>Supply Voltage</td><td>${voltage}</td></tr>
+          <tr><td>Maximum Demand</td><td>${md} kVA</td></tr>
+          <tr><td>Prospective Short Circuit</td><td>${sc} kA</td></tr>
+        </table>
+        <h3>Standards Compliance</h3>
+        <p>This electrical design has been prepared in compliance with the following Australian Standards and codes:</p>
+        <table class="cert-table">
+          <tr><th>Standard</th></tr>
+          ${standards.map(s => `<tr><td>${s}</td></tr>`).join('')}
+        </table>
+        <h3>Assumptions & Exclusions</h3>
+        <p>${assumptions}</p>
+        <h3>Certification Statement</h3>
+        <p>I certify that the electrical design for the above project has been prepared in accordance with the standards listed above and is suitable for its intended purpose at the <strong>${proj.stage}</strong> stage of design. This certificate is issued subject to the assumptions and exclusions noted above.</p>
+        <p>This certificate relates to the electrical <em>design</em> only. Compliance of the completed electrical installation must be verified by a licensed electrical contractor and certified separately per AS/NZS 3000 <a href="as3000viewer.html#cl-8.1" class="clause">Section 8</a>.</p>
+        <div class="signature">
+          <div>
+            <div class="sig-line"><strong>Designer:</strong> ${designer.name}</div>
+            <div style="margin-top:8px;"><strong>Company:</strong> ${designer.company}</div>
+            <div><strong>Licence:</strong> ${designer.lic} (${designer.state})</div>
+          </div>
+          <div>
+            <div class="sig-line"><strong>Signature:</strong></div>
+            <div style="margin-top:8px;"><strong>Date:</strong> ${proj.date}</div>
+          </div>
+        </div>`;
+
+      document.getElementById('certPreview').innerHTML = html;
+      document.getElementById('certOutput').style.display = 'block';
+      document.getElementById('certOutput').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

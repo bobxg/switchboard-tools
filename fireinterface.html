@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Fire Systems Interface Matrix - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .pass-box { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 16px; margin: 16px 0; }
+    .fail-box { background: #ffebee; border-left: 4px solid #c62828; padding: 16px; margin: 16px 0; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .matrix-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.85em; }
+    .matrix-table th, .matrix-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: center; }
+    .matrix-table th { background: #1976d2; color: white; position: sticky; top: 0; z-index: 2; }
+    .matrix-table th.row-header { background: #1565c0; text-align: left; min-width: 200px; }
+    .matrix-table td.cell-on { background: #e8f5e9; color: #2e7d32; font-weight: bold; }
+    .matrix-table td.cell-off { background: #ffebee; color: #c62828; font-weight: bold; }
+    .matrix-table td.cell-na { background: #f5f5f5; color: #999; }
+    .matrix-table td.cell-monitor { background: #e3f0fc; color: #1976d2; font-weight: bold; }
+    .matrix-table td.cell-trip { background: #fff3e0; color: #e65100; font-weight: bold; }
+    .matrix-table tr:hover { background: #f0f4ff; }
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; font-size: 0.9em; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-box { width: 20px; height: 20px; border: 1px solid #ccc; }
+    .filter-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .filter-row label { display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 6px 12px; border: 1px solid #ddd; background: #f8f9fa; font-size: 0.9em; }
+    .filter-row label:hover { background: #e3f0fc; }
+    .filter-row input[type="checkbox"] { margin: 0; }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; }
+    .ref-table th { background: #1976d2; color: white; text-align: center; }
+    .ref-table tr:nth-child(even) { background: #f8f9fa; }
+    @media (max-width: 768px) { .matrix-table { font-size: 0.75em; } .matrix-table th, .matrix-table td { padding: 4px; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon, .filter-row { display: none !important; } .matrix-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown active"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>Fire Systems Interface Matrix</h1>
+    <p>Cause-and-effect interface matrix for fire detection and essential services per <strong>AS 1670.1</strong>, <strong>AS 1668.1</strong>, <strong>NCC E1/E2</strong>. Shows what electrical systems respond to fire alarm signals.</p>
+
+    <div class="calc-section">
+      <h2>Filter Systems</h2>
+      <div class="filter-row" id="filterRow"></div>
+      <button class="calc-button" onclick="generateMatrix()">Generate Matrix</button>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-box" style="background:#e8f5e9;"></div> ON — Activate/Start</div>
+      <div class="legend-item"><div class="legend-box" style="background:#ffebee;"></div> OFF — Shut Down</div>
+      <div class="legend-item"><div class="legend-box" style="background:#fff3e0;"></div> TRIP — Trip/Isolate</div>
+      <div class="legend-item"><div class="legend-box" style="background:#e3f0fc;"></div> MON — Monitor/Alarm</div>
+      <div class="legend-item"><div class="legend-box" style="background:#f5f5f5;"></div> N/A — Not Applicable</div>
+    </div>
+
+    <div id="matrixContainer" style="overflow-x:auto;"></div>
+
+    <div class="calc-section" style="margin-top:24px;">
+      <h2>Standards Reference</h2>
+      <table class="ref-table">
+        <thead><tr><th>Standard</th><th>Title</th><th>Relevance</th></tr></thead>
+        <tbody>
+          <tr><td>AS 1670.1:2018</td><td>Fire detection, warning, control and intercom systems — System design, installation and commissioning — Part 1: Fire</td><td>Fire detection and alarm system design</td></tr>
+          <tr><td>AS 1668.1:2015</td><td>The use of ventilation and airconditioning in buildings — Part 1: Fire and smoke control in buildings</td><td>Smoke control electrical requirements</td></tr>
+          <tr><td>AS 1851:2012</td><td>Routine service of fire protection systems and equipment</td><td>Maintenance requirements</td></tr>
+          <tr><td>NCC E1.4/E1.5</td><td>National Construction Code — Fire detection and alarm systems</td><td>When FIP/EWIS required</td></tr>
+          <tr><td>NCC E2.2</td><td>National Construction Code — Emergency lighting</td><td>Emergency lighting requirements</td></tr>
+          <tr><td>AS/NZS 2293</td><td>Emergency escape lighting and exit signs</td><td>Emergency lighting standards</td></tr>
+          <tr><td>AS/NZS 3000 <a href="as3000viewer.html#cl-7.5" class="clause">cl 7.5</a></td><td>Wiring Rules — Fire protection systems</td><td>Wiring requirements for fire circuits</td></tr>
+        </tbody>
+      </table>
+      <div class="warn-box"><strong>Important:</strong> This matrix is a TYPICAL guide only. The actual cause-and-effect matrix MUST be developed in coordination with the fire engineer and approved by the fire authority having jurisdiction. Every project is unique — verify requirements against NCC, state regulations, and the fire engineering brief.</div>
+    </div>
+  </div>
+  <script>
+    // Define the fire interface matrix data
+    const triggers = [
+      { id: 'alarm', name: 'Fire Alarm (General)' },
+      { id: 'evac', name: 'Evacuation Signal' },
+      { id: 'alert', name: 'Alert Signal' },
+      { id: 'sprinkler', name: 'Sprinkler Flow Switch' },
+      { id: 'smoke_zone', name: 'Smoke Detector (Zone)' },
+      { id: 'thermal', name: 'Thermal Detector' },
+      { id: 'manual', name: 'Manual Call Point (MCP)' },
+      { id: 'gas', name: 'Gas Suppression Trigger' },
+      { id: 'power_fail', name: 'Mains Power Failure' },
+    ];
+
+    const systems = [
+      { id: 'em_light', name: 'Emergency Lighting', cat: 'Essential' },
+      { id: 'exit_signs', name: 'Exit Signs', cat: 'Essential' },
+      { id: 'ewis', name: 'EWIS Speakers', cat: 'Fire' },
+      { id: 'fire_pump', name: 'Fire Pump', cat: 'Fire' },
+      { id: 'smoke_fan', name: 'Smoke Exhaust Fans', cat: 'Smoke' },
+      { id: 'stair_press', name: 'Stairwell Pressurisation', cat: 'Smoke' },
+      { id: 'smoke_damper', name: 'Smoke/Fire Dampers', cat: 'Smoke' },
+      { id: 'hvac', name: 'HVAC Systems', cat: 'HVAC' },
+      { id: 'lifts', name: 'Passenger Lifts', cat: 'Vertical' },
+      { id: 'fire_lift', name: 'Fire Service Lift', cat: 'Vertical' },
+      { id: 'access', name: 'Access Control (Mag Locks)', cat: 'Security' },
+      { id: 'cctv', name: 'CCTV / Security', cat: 'Security' },
+      { id: 'bms', name: 'BMS / BMCS', cat: 'Controls' },
+      { id: 'gas_shut', name: 'Gas Shutoff Valve', cat: 'Services' },
+      { id: 'kitchen_hood', name: 'Kitchen Exhaust Hood', cat: 'Services' },
+      { id: 'gen', name: 'Emergency Generator', cat: 'Essential' },
+      { id: 'normal_light', name: 'Normal Lighting', cat: 'General' },
+      { id: 'normal_power', name: 'Normal Power (GPOs)', cat: 'General' },
+    ];
+
+    // Matrix: trigger → system → action (ON/OFF/TRIP/MON/NA)
+    const matrix = {
+      'alarm':      { em_light:'ON', exit_signs:'ON', ewis:'ON', fire_pump:'MON', smoke_fan:'ON', stair_press:'ON', smoke_damper:'TRIP', hvac:'OFF', lifts:'TRIP', fire_lift:'ON', access:'TRIP', cctv:'MON', bms:'MON', gas_shut:'TRIP', kitchen_hood:'OFF', gen:'ON', normal_light:'NA', normal_power:'NA' },
+      'evac':       { em_light:'ON', exit_signs:'ON', ewis:'ON', fire_pump:'NA', smoke_fan:'ON', stair_press:'ON', smoke_damper:'TRIP', hvac:'OFF', lifts:'TRIP', fire_lift:'ON', access:'TRIP', cctv:'MON', bms:'MON', gas_shut:'NA', kitchen_hood:'OFF', gen:'NA', normal_light:'NA', normal_power:'NA' },
+      'alert':      { em_light:'NA', exit_signs:'NA', ewis:'ON', fire_pump:'NA', smoke_fan:'NA', stair_press:'NA', smoke_damper:'NA', hvac:'NA', lifts:'NA', fire_lift:'NA', access:'NA', cctv:'MON', bms:'MON', gas_shut:'NA', kitchen_hood:'NA', gen:'NA', normal_light:'NA', normal_power:'NA' },
+      'sprinkler':  { em_light:'ON', exit_signs:'ON', ewis:'ON', fire_pump:'ON', smoke_fan:'ON', stair_press:'ON', smoke_damper:'TRIP', hvac:'OFF', lifts:'TRIP', fire_lift:'ON', access:'TRIP', cctv:'MON', bms:'MON', gas_shut:'TRIP', kitchen_hood:'OFF', gen:'ON', normal_light:'NA', normal_power:'NA' },
+      'smoke_zone': { em_light:'ON', exit_signs:'ON', ewis:'ON', fire_pump:'MON', smoke_fan:'ON', stair_press:'ON', smoke_damper:'TRIP', hvac:'OFF', lifts:'MON', fire_lift:'MON', access:'NA', cctv:'MON', bms:'MON', gas_shut:'NA', kitchen_hood:'NA', gen:'NA', normal_light:'NA', normal_power:'NA' },
+      'thermal':    { em_light:'ON', exit_signs:'ON', ewis:'ON', fire_pump:'MON', smoke_fan:'ON', stair_press:'ON', smoke_damper:'TRIP', hvac:'OFF', lifts:'TRIP', fire_lift:'ON', access:'TRIP', cctv:'MON', bms:'MON', gas_shut:'TRIP', kitchen_hood:'OFF', gen:'NA', normal_light:'NA', normal_power:'NA' },
+      'manual':     { em_light:'ON', exit_signs:'ON', ewis:'ON', fire_pump:'MON', smoke_fan:'ON', stair_press:'ON', smoke_damper:'TRIP', hvac:'OFF', lifts:'TRIP', fire_lift:'ON', access:'TRIP', cctv:'MON', bms:'MON', gas_shut:'TRIP', kitchen_hood:'OFF', gen:'ON', normal_light:'NA', normal_power:'NA' },
+      'gas':        { em_light:'ON', exit_signs:'ON', ewis:'ON', fire_pump:'NA', smoke_fan:'OFF', stair_press:'NA', smoke_damper:'TRIP', hvac:'OFF', lifts:'NA', fire_lift:'NA', access:'TRIP', cctv:'MON', bms:'MON', gas_shut:'NA', kitchen_hood:'OFF', gen:'NA', normal_light:'OFF', normal_power:'OFF' },
+      'power_fail': { em_light:'ON', exit_signs:'ON', ewis:'MON', fire_pump:'ON', smoke_fan:'MON', stair_press:'MON', smoke_damper:'NA', hvac:'NA', lifts:'MON', fire_lift:'MON', access:'TRIP', cctv:'MON', bms:'MON', gas_shut:'NA', kitchen_hood:'NA', gen:'ON', normal_light:'OFF', normal_power:'OFF' },
+    };
+
+    const categories = [...new Set(systems.map(s => s.cat))];
+
+    // Build filter checkboxes
+    function buildFilters() {
+      const row = document.getElementById('filterRow');
+      categories.forEach(cat => {
+        const label = document.createElement('label');
+        label.innerHTML = `<input type="checkbox" checked value="${cat}" onchange="generateMatrix()" /> ${cat}`;
+        row.appendChild(label);
+      });
+    }
+
+    function generateMatrix() {
+      const checked = [...document.querySelectorAll('#filterRow input:checked')].map(i => i.value);
+      const filteredSystems = systems.filter(s => checked.includes(s.cat));
+
+      if (filteredSystems.length === 0) {
+        document.getElementById('matrixContainer').innerHTML = '<div class="warn-box">No system categories selected. Check at least one filter above.</div>';
+        return;
+      }
+
+      let html = '<table class="matrix-table"><thead><tr><th class="row-header">Trigger ↓ / Response →</th>';
+      filteredSystems.forEach(s => {
+        html += `<th style="writing-mode:vertical-rl;text-orientation:mixed;min-width:35px;padding:8px 4px;">${s.name}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+
+      triggers.forEach(t => {
+        html += `<tr><th class="row-header">${t.name}</th>`;
+        filteredSystems.forEach(s => {
+          const action = matrix[t.id]?.[s.id] || 'NA';
+          let cls = 'cell-na';
+          if (action === 'ON') cls = 'cell-on';
+          else if (action === 'OFF') cls = 'cell-off';
+          else if (action === 'TRIP') cls = 'cell-trip';
+          else if (action === 'MON') cls = 'cell-monitor';
+          html += `<td class="${cls}">${action}</td>`;
+        });
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      document.getElementById('matrixContainer').innerHTML = html;
+    }
+
+    buildFilters();
+    generateMatrix();
+  </script>
+</body>
+</html>

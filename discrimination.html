@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Discrimination Check - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; }
+    .result-box { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 24px; margin-top: 24px; }
+    .result-box h3 { margin-top: 0; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 16px; }
+    .result-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .result-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; }
+    .result-value { font-size: 1.6em; font-weight: bold; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .pass-box { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 16px; margin: 16px 0; font-size: 1em; }
+    .fail-box { background: #ffebee; border-left: 4px solid #c62828; padding: 16px; margin: 16px 0; font-size: 1em; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .pair-card { border: 2px solid #e0e0e0; padding: 20px; margin-bottom: 16px; border-radius: 4px; }
+    .pair-card h3 { color: #1976d2; margin-top: 0; }
+    .cascade-visual { display: flex; align-items: center; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+    .cascade-block { background: #1976d2; color: white; padding: 12px 20px; border-radius: 4px; text-align: center; min-width: 120px; }
+    .cascade-arrow { font-size: 1.5em; color: #1976d2; }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    .ref-table th { background: #1976d2; color: white; }
+    .ref-table tr:nth-child(even) { background: #f8f9fa; }
+    @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
+    @media print {
+      .top-tabs, .calc-button, .topleft-icon { display: none !important; }
+      .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active">
+      <span>Power Systems</span>
+      <div class="dropdown-content">
+        <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a>
+        <a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a>
+        <a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a>
+        <a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a>
+        <a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+      </div>
+    </div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content">
+      <a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content">
+      <a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a>
+      <a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content">
+      <a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a>
+      <a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a>
+    </div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+
+  <div class="main-content">
+    <h1>Discrimination (Selectivity) Check</h1>
+    <p>Check basic discrimination between upstream and downstream protective devices per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.5.5">cl. 2.5.5</a></strong>. Flags potential non-coordination without full manufacturer software.</p>
+
+    <div class="calc-section">
+      <h2>Protection Pair</h2>
+      <div class="info-box">
+        <strong>AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.5.2">cl. 2.5.5.2</a>:</strong> Where discrimination is required, the characteristics of the protective devices shall be coordinated so that only the device closest to the fault operates. Full discrimination requires comparison of time-current curves.
+      </div>
+
+      <div class="pair-card">
+        <h3>Upstream Device (Source Side)</h3>
+        <div class="input-row three">
+          <div class="input-group">
+            <label for="upType">Device Type</label>
+            <select id="upType">
+              <option value="mccb">MCCB</option>
+              <option value="mcb_b">MCB Type B</option>
+              <option value="mcb_c">MCB Type C</option>
+              <option value="mcb_d">MCB Type D</option>
+              <option value="hrc">HRC Fuse (BS 88)</option>
+              <option value="nh_fuse">NH Fuse</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="upRating">Rating (A)</label>
+            <input type="number" id="upRating" value="250" min="1" />
+          </div>
+          <div class="input-group">
+            <label for="upSetting">Trip Setting / Ir (×In)</label>
+            <input type="number" id="upSetting" value="1.0" min="0.4" max="1.0" step="0.05" />
+            <span style="font-size:0.8em;color:#888;">MCBs: 1.0; MCCBs: adjustable 0.4–1.0</span>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="upInstant">Instantaneous Setting (×In)</label>
+            <input type="number" id="upInstant" value="10" min="1" max="50" step="0.5" />
+            <span style="font-size:0.8em;color:#888;">MCB-B: 3–5, MCB-C: 5–10, MCB-D: 10–20, MCCB: adjustable</span>
+          </div>
+          <div class="input-group">
+            <label for="upKA">Breaking Capacity (kA)</label>
+            <input type="number" id="upKA" value="36" min="1" />
+          </div>
+        </div>
+      </div>
+
+      <div class="cascade-visual">
+        <div class="cascade-block" id="upBlock">Upstream<br><span id="upLabel">MCCB 250A</span></div>
+        <div class="cascade-arrow">→</div>
+        <div class="cascade-block" style="background:#555;" id="cableBlock">Cable</div>
+        <div class="cascade-arrow">→</div>
+        <div class="cascade-block" style="background:#2e7d32;" id="dnBlock">Downstream<br><span id="dnLabel">MCB-C 32A</span></div>
+      </div>
+
+      <div class="pair-card">
+        <h3>Downstream Device (Load Side)</h3>
+        <div class="input-row three">
+          <div class="input-group">
+            <label for="dnType">Device Type</label>
+            <select id="dnType">
+              <option value="mcb_b">MCB Type B</option>
+              <option value="mcb_c" selected>MCB Type C</option>
+              <option value="mcb_d">MCB Type D</option>
+              <option value="mccb">MCCB</option>
+              <option value="hrc">HRC Fuse (BS 88)</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="dnRating">Rating (A)</label>
+            <input type="number" id="dnRating" value="32" min="1" />
+          </div>
+          <div class="input-group">
+            <label for="dnInstant">Instantaneous Setting (×In)</label>
+            <input type="number" id="dnInstant" value="10" min="1" max="50" step="0.5" />
+          </div>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="faultLevel">Prospective Fault Current at Downstream Device (kA)</label>
+          <input type="number" id="faultLevel" value="10" min="0.1" step="0.1" />
+          <span style="font-size:0.8em;color:#888;">Use the Fault Level Calculator to determine this value</span>
+        </div>
+        <div class="input-group">
+          <label>&nbsp;</label>
+          <a href="faultlevel.html" style="color:#1976d2; font-size:0.95em;">→ Open Fault Level Calculator</a>
+        </div>
+      </div>
+
+      <button class="calc-button" onclick="checkDiscrimination()">Check Discrimination</button>
+    </div>
+
+    <div id="resultSection" style="display:none;">
+      <div class="calc-section">
+        <h2>Discrimination Assessment</h2>
+        <div id="resultContent"></div>
+      </div>
+
+      <div class="calc-section">
+        <h2>General Discrimination Rules of Thumb</h2>
+        <table class="ref-table">
+          <thead><tr><th>Combination</th><th>Rule for Full Discrimination</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>MCB upstream / MCB downstream</td><td>Upstream ≥ 1.6× downstream rating AND different curve type preferred</td><td>Difficult to achieve full discrimination with same curve type</td></tr>
+            <tr><td>MCCB upstream / MCB downstream</td><td>MCCB instantaneous > MCB instantaneous trip current</td><td>Best with adjustable MCCB short-time delay (STD)</td></tr>
+            <tr><td>Fuse upstream / MCB downstream</td><td>Fuse I²t let-through > MCB total I²t at fault level</td><td>Generally good discrimination with HRC fuses</td></tr>
+            <tr><td>MCCB upstream / MCCB downstream</td><td>Upstream Ir > downstream Ir; upstream STD > downstream</td><td>Use zone-selective interlocking (ZSI) where available</td></tr>
+            <tr><td>Fuse / Fuse (same type)</td><td>Upstream ≥ 1.6× downstream rating</td><td>Excellent inherent discrimination</td></tr>
+          </tbody>
+        </table>
+        <div class="warn-box">
+          <strong>Limitation:</strong> This tool provides a simplified rule-of-thumb assessment. Full discrimination verification requires comparison of manufacturer time-current curves and I²t let-through energy data. Consult device manufacturer coordination tables for confirmed discrimination limits.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateVisual() {
+      document.getElementById('upLabel').textContent = document.getElementById('upType').value.toUpperCase() + ' ' + document.getElementById('upRating').value + 'A';
+      document.getElementById('dnLabel').textContent = document.getElementById('dnType').value.toUpperCase() + ' ' + document.getElementById('dnRating').value + 'A';
+    }
+    document.querySelectorAll('#upType,#upRating,#dnType,#dnRating').forEach(el => el.addEventListener('change', updateVisual));
+
+    function getInstantTrip(type, rating, setting) {
+      const In = parseFloat(rating);
+      const mult = parseFloat(setting);
+      if (type === 'mcb_b') return { low: 3 * In, high: 5 * In };
+      if (type === 'mcb_c') return { low: 5 * In, high: 10 * In };
+      if (type === 'mcb_d') return { low: 10 * In, high: 20 * In };
+      if (type === 'mccb') return { low: mult * In, high: mult * In * 1.2 };
+      if (type === 'hrc' || type === 'nh_fuse') return { low: 3 * In, high: 6 * In };
+      return { low: mult * In, high: mult * In };
+    }
+
+    function checkDiscrimination() {
+      const upType = document.getElementById('upType').value;
+      const upRating = parseFloat(document.getElementById('upRating').value);
+      const upSetting = parseFloat(document.getElementById('upSetting').value);
+      const upInstant = parseFloat(document.getElementById('upInstant').value);
+      const upKA = parseFloat(document.getElementById('upKA').value);
+      const dnType = document.getElementById('dnType').value;
+      const dnRating = parseFloat(document.getElementById('dnRating').value);
+      const dnInstant = parseFloat(document.getElementById('dnInstant').value);
+      const faultLevel = parseFloat(document.getElementById('faultLevel').value);
+
+      const upTrip = getInstantTrip(upType, upRating, upInstant);
+      const dnTrip = getInstantTrip(dnType, dnRating, dnInstant);
+
+      let overloadOK = false, scOK = false;
+      let notes = [];
+
+      // 1. Overload discrimination: rating ratio
+      const ratingRatio = upRating / dnRating;
+      if (ratingRatio >= 2.0) {
+        overloadOK = true;
+        notes.push(`✓ Rating ratio ${ratingRatio.toFixed(1)}:1 (≥2:1) — overload discrimination likely OK.`);
+      } else if (ratingRatio >= 1.6) {
+        overloadOK = true;
+        notes.push(`⚠ Rating ratio ${ratingRatio.toFixed(1)}:1 (≥1.6:1 but <2:1) — overload discrimination marginal. Verify with curves.`);
+      } else {
+        overloadOK = false;
+        notes.push(`✕ Rating ratio ${ratingRatio.toFixed(1)}:1 (<1.6:1) — overload discrimination unlikely.`);
+      }
+
+      // 2. Short-circuit discrimination
+      const faultA = faultLevel * 1000;
+      if (upTrip.low > dnTrip.high) {
+        scOK = true;
+        notes.push(`✓ Upstream instantaneous trip (${upTrip.low.toFixed(0)} A) > downstream instantaneous trip (${dnTrip.high.toFixed(0)} A) — short-circuit discrimination likely up to this level.`);
+      } else {
+        scOK = false;
+        notes.push(`✕ Upstream instantaneous trip (${upTrip.low.toFixed(0)} A) overlaps with downstream instantaneous trip (${dnTrip.high.toFixed(0)} A) — short-circuit discrimination NOT achieved at this fault level.`);
+      }
+
+      // Fuse combination check
+      if ((upType === 'hrc' || upType === 'nh_fuse') && (dnType === 'hrc' || dnType === 'nh_fuse')) {
+        if (ratingRatio >= 1.6) {
+          scOK = true;
+          notes.push(`✓ Fuse-fuse combination with ≥1.6:1 ratio — inherently good discrimination.`);
+        }
+      }
+      if ((upType === 'hrc' || upType === 'nh_fuse') && dnType.startsWith('mcb')) {
+        notes.push(`ℹ Fuse upstream / MCB downstream: Generally provides good discrimination due to fuse I²t characteristics.`);
+        scOK = true;
+      }
+
+      // MCCB with short-time delay
+      if (upType === 'mccb') {
+        notes.push(`ℹ MCCB upstream: Consider enabling Short-Time Delay (STD) on the upstream MCCB to improve discrimination. Zone Selective Interlocking (ZSI) can further enhance selectivity.`);
+      }
+
+      // Backup protection note
+      if (!scOK && faultA > dnTrip.high) {
+        notes.push(`ℹ If full discrimination is not achievable, backup protection (cascading) per AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.5.3">cl. 2.5.5.3</a> may be acceptable — both devices operate for high-level faults.`);
+      }
+
+      // Breaking capacity check
+      if (faultLevel > upKA) {
+        notes.push(`⚠ CRITICAL: Prospective fault current (${faultLevel} kA) exceeds upstream device breaking capacity (${upKA} kA). Device is NOT RATED for this fault level.`);
+      }
+
+      const overall = overloadOK && scOK;
+      let html = `<div class="${overall ? 'pass-box' : 'fail-box'}">
+        <strong>${overall ? '✓ DISCRIMINATION LIKELY ACHIEVED' : '✕ DISCRIMINATION NOT FULLY ACHIEVED'}</strong>
+        — ${upType.toUpperCase()} ${upRating}A → ${dnType.toUpperCase()} ${dnRating}A at ${faultLevel} kA prospective fault
+      </div>`;
+      html += '<div class="info-box"><ul>';
+      notes.forEach(n => { html += `<li>${n}</li>`; });
+      html += '</ul></div>';
+
+      document.getElementById('resultContent').innerHTML = html;
+      document.getElementById('resultSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

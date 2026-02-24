@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Transformer Sizing - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-row.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; }
+    .result-box { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 24px; margin-top: 24px; }
+    .result-box h3 { margin-top: 0; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-top: 16px; }
+    .result-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .result-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; }
+    .result-value { font-size: 1.8em; font-weight: bold; }
+    .result-value.small { font-size: 1.3em; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .pass-box { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 16px; margin: 16px 0; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    .ref-table th { background: #1976d2; color: white; }
+    .ref-table tr:nth-child(even) { background: #f8f9fa; }
+    @media (max-width: 768px) { .input-row, .input-row.three, .input-row.four { grid-template-columns: 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>Transformer Sizing Calculator</h1>
+    <p>Size distribution transformers per <strong>AS 2374 series</strong> and <strong>AS/NZS 60076</strong>. Includes losses estimation, impedance parameters, and fault current contribution.</p>
+
+    <div class="calc-section">
+      <h2>Load & Transformer Parameters</h2>
+      <div class="info-box"><strong>AS 2374.1:</strong> Power transformers — General. Standard kVA ratings: 100, 160, 200, 250, 315, 400, 500, 630, 750, 800, 1000, 1250, 1500, 1600, 2000, 2500 kVA.</div>
+
+      <div class="input-row three">
+        <div class="input-group"><label for="totalLoadKVA">Total Connected Load (kVA)</label><input type="number" id="totalLoadKVA" value="450" min="1" /></div>
+        <div class="input-group"><label for="diversityFactor">Diversity Factor</label><input type="number" id="diversityFactor" value="0.8" min="0.1" max="1" step="0.01" /></div>
+        <div class="input-group"><label for="growthFactor">Growth Allowance (%)</label><input type="number" id="growthFactor" value="20" min="0" max="100" /></div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group"><label for="txVoltage">Primary Voltage (V)</label><select id="txVoltage"><option value="11000" selected>11 kV</option><option value="22000">22 kV</option><option value="33000">33 kV</option><option value="6600">6.6 kV</option></select></div>
+        <div class="input-group"><label for="secVoltage">Secondary Voltage (V)</label><select id="secVoltage"><option value="433">433V (3-phase)</option><option value="415">415V (3-phase)</option><option value="240">240V (single-phase)</option></select></div>
+        <div class="input-group"><label for="txType">Transformer Type</label><select id="txType"><option value="onan">ONAN (Oil natural)</option><option value="dry" selected>Dry type (AN)</option><option value="dry_af">Dry type (AF)</option></select></div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group"><label for="loadPF">Load Power Factor</label><input type="number" id="loadPF" value="0.9" min="0.7" max="1" step="0.01" /></div>
+        <div class="input-group"><label for="ambientTemp">Ambient Temperature (°C)</label><input type="number" id="ambientTemp" value="40" min="20" max="55" /></div>
+        <div class="input-group"><label for="txImpedance">Impedance (%Zk) — leave 0 for auto</label><input type="number" id="txImpedance" value="0" min="0" max="15" step="0.1" /></div>
+      </div>
+      <button class="calc-button" onclick="calculate()">Size Transformer</button>
+    </div>
+
+    <div id="resultSection" style="display:none;">
+      <div class="result-box">
+        <h3>Transformer Selection</h3>
+        <div class="result-grid">
+          <div class="result-item"><div class="result-label">Design Load (kVA)</div><div class="result-value" id="resDesign">—</div></div>
+          <div class="result-item"><div class="result-label">Selected TX Rating</div><div class="result-value" id="resTX">—</div></div>
+          <div class="result-item"><div class="result-label">Loading (%)</div><div class="result-value" id="resLoading">—</div></div>
+          <div class="result-item"><div class="result-label">%Zk (Impedance)</div><div class="result-value" id="resZ">—</div></div>
+          <div class="result-item"><div class="result-label">Prospective Fault (kA)</div><div class="result-value" id="resFault">—</div></div>
+          <div class="result-item"><div class="result-label">Secondary FLC (A)</div><div class="result-value" id="resFLC">—</div></div>
+        </div>
+      </div>
+      <div class="calc-section" style="margin-top:24px;">
+        <h2>Estimated Losses & Efficiency</h2>
+        <div class="result-grid" style="color:#333;">
+          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">No-Load Loss (W)</div><div class="result-value small" id="resNLL" style="color:#333;">—</div></div>
+          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">Load Loss at 100% (W)</div><div class="result-value small" id="resLL" style="color:#333;">—</div></div>
+          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">Total Losses at Design Load (W)</div><div class="result-value small" id="resTotalLoss" style="color:#333;">—</div></div>
+          <div class="result-item" style="background:#f0f4f8;"><div class="result-label" style="color:#666;">Efficiency (%)</div><div class="result-value small" id="resEff" style="color:#333;">—</div></div>
+        </div>
+      </div>
+      <div id="recommendations"></div>
+      <div class="calc-section" style="margin-top:24px;">
+        <h2>Standard Transformer Ratings Reference</h2>
+        <table class="ref-table">
+          <thead><tr><th>Rating (kVA)</th><th>Typical %Zk (Dry)</th><th>Typical %Zk (Oil)</th><th>NLL (W, est.)</th><th>LL (W, est.)</th><th>Secondary FLC @ 433V (A)</th></tr></thead>
+          <tbody id="refTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script>
+    const stdRatings = [100, 160, 200, 250, 315, 400, 500, 630, 750, 800, 1000, 1250, 1500, 1600, 2000, 2500];
+
+    // Typical impedance values for dry-type transformers (%)
+    function typicalZ(kva, type) {
+      if (type === 'onan') {
+        if (kva <= 200) return 4.0;
+        if (kva <= 500) return 4.5;
+        if (kva <= 1000) return 5.0;
+        if (kva <= 1600) return 5.75;
+        return 6.0;
+      }
+      // dry type
+      if (kva <= 200) return 4.5;
+      if (kva <= 500) return 5.0;
+      if (kva <= 1000) return 5.75;
+      if (kva <= 1600) return 6.0;
+      return 6.25;
+    }
+
+    // Estimated no-load and load losses
+    function estLosses(kva, type) {
+      const f = type === 'onan' ? 1 : 1.3; // dry type generally higher losses
+      // Approximate AS 2374.1 loss values (W)
+      const nll = Math.round(kva * (1.5 + kva * 0.0005) * (type === 'onan' ? 1 : 1.3));
+      const ll = Math.round(kva * (5 + kva * 0.002) * (type === 'onan' ? 1 : 1.15));
+      return { nll: Math.min(nll, kva*12), ll: Math.min(ll, kva*18) };
+    }
+
+    function calculate() {
+      const totalLoad = parseFloat(document.getElementById('totalLoadKVA').value);
+      const df = parseFloat(document.getElementById('diversityFactor').value);
+      const growth = parseFloat(document.getElementById('growthFactor').value) / 100;
+      const primaryV = parseFloat(document.getElementById('txVoltage').value);
+      const secV = parseFloat(document.getElementById('secVoltage').value);
+      const txType = document.getElementById('txType').value;
+      const loadPF = parseFloat(document.getElementById('loadPF').value);
+      const ambTemp = parseFloat(document.getElementById('ambientTemp').value);
+      const userZ = parseFloat(document.getElementById('txImpedance').value);
+
+      const designLoad = totalLoad * df * (1 + growth);
+
+      // Temperature derating: dry type derated above 40°C
+      let tempDerate = 1.0;
+      if (txType !== 'onan' && ambTemp > 40) {
+        tempDerate = 1 - (ambTemp - 40) * 0.01; // ~1% per °C above 40
+      } else if (txType === 'onan' && ambTemp > 40) {
+        tempDerate = 1 - (ambTemp - 40) * 0.007;
+      }
+
+      // Select next standard rating
+      let selectedKVA = stdRatings[stdRatings.length - 1];
+      for (const r of stdRatings) {
+        if (r * tempDerate >= designLoad) { selectedKVA = r; break; }
+      }
+
+      const loading = (designLoad / (selectedKVA * tempDerate) * 100);
+      const zk = userZ > 0 ? userZ : typicalZ(selectedKVA, txType);
+
+      // Secondary full load current
+      const flc = secV > 300 ? (selectedKVA * 1000) / (secV * Math.sqrt(3)) : (selectedKVA * 1000) / secV;
+
+      // Prospective fault current (symmetrical)
+      const ifault = flc / (zk / 100);
+
+      // Losses
+      const losses = estLosses(selectedKVA, txType);
+      const loadFraction = designLoad / selectedKVA;
+      const totalLoss = losses.nll + losses.ll * loadFraction * loadFraction;
+      const efficiency = ((designLoad * loadPF * 1000) / (designLoad * loadPF * 1000 + totalLoss) * 100);
+
+      document.getElementById('resDesign').textContent = designLoad.toFixed(0) + ' kVA';
+      document.getElementById('resTX').textContent = selectedKVA + ' kVA';
+      document.getElementById('resLoading').textContent = loading.toFixed(1) + '%';
+      document.getElementById('resZ').textContent = zk.toFixed(2) + '%';
+      document.getElementById('resFault').textContent = (ifault / 1000).toFixed(1) + ' kA';
+      document.getElementById('resFLC').textContent = flc.toFixed(0) + ' A';
+      document.getElementById('resNLL').textContent = losses.nll.toLocaleString();
+      document.getElementById('resLL').textContent = losses.ll.toLocaleString();
+      document.getElementById('resTotalLoss').textContent = Math.round(totalLoss).toLocaleString();
+      document.getElementById('resEff').textContent = efficiency.toFixed(2) + '%';
+
+      // Recommendations
+      let rec = '';
+      if (loading > 100) {
+        rec += `<div class="warn-box"><strong>⚠ Overloaded:</strong> Design load exceeds selected TX rating after derating. Consider next size up (${stdRatings[stdRatings.indexOf(selectedKVA)+1] || 'parallel TX'} kVA) or reduce load.</div>`;
+      } else if (loading > 85) {
+        rec += `<div class="warn-box"><strong>Caution:</strong> Loading > 85%. Limited capacity for future growth. Consider ${stdRatings[stdRatings.indexOf(selectedKVA)+1] || selectedKVA} kVA.</div>`;
+      } else if (loading < 40) {
+        rec += `<div class="info-box"><strong>Note:</strong> TX loading < 40%. Consider down-sizing to reduce no-load losses, or verify growth projection warrants this capacity.</div>`;
+      } else {
+        rec += `<div class="pass-box"><strong>✓ Suitable selection.</strong> Loading is within recommended 60–80% range.</div>`;
+      }
+      if (ambTemp > 40) {
+        rec += `<div class="warn-box"><strong>Temperature Derating Applied:</strong> Ambient ${ambTemp}°C exceeds reference 40°C. Effective TX capacity derated to ${(selectedKVA * tempDerate).toFixed(0)} kVA.</div>`;
+      }
+      if (ifault / 1000 > 50) {
+        rec += `<div class="warn-box"><strong>High Fault Level:</strong> Prospective fault current ${(ifault/1000).toFixed(1)} kA exceeds 50 kA. Ensure switchgear rated accordingly per AS/NZS 61439.</div>`;
+      }
+      rec += `<div class="info-box"><strong>Standards:</strong> AS 2374.1 (general), AS 2374.2 (temperature rise), AS 60076.11 (dry type), AS/NZS 3000 <a href="as3000viewer.html#cl-1.5.4" class="clause">cl 1.5.4</a> (installation). Ensure cable sizing to TX per AS/NZS 3008.1.1 for ${flc.toFixed(0)} A secondary FLC.</div>`;
+      document.getElementById('recommendations').innerHTML = rec;
+
+      // Reference table
+      let tbody = '';
+      stdRatings.forEach(r => {
+        const z_dry = typicalZ(r, 'dry');
+        const z_oil = typicalZ(r, 'onan');
+        const l = estLosses(r, 'dry');
+        const fla = (r * 1000) / (433 * Math.sqrt(3));
+        const sel = r === selectedKVA ? ' style="background:#bbdefb;font-weight:bold;"' : '';
+        tbody += `<tr${sel}><td>${r}</td><td>${z_dry.toFixed(1)}</td><td>${z_oil.toFixed(1)}</td><td>${l.nll.toLocaleString()}</td><td>${l.ll.toLocaleString()}</td><td>${fla.toFixed(0)}</td></tr>`;
+      });
+      document.getElementById('refTableBody').innerHTML = tbody;
+      document.getElementById('resultSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

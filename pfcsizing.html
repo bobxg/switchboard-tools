@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>PFC Sizing - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; }
+    .result-box { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 24px; margin-top: 24px; }
+    .result-box h3 { margin-top: 0; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-top: 16px; }
+    .result-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .result-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; }
+    .result-value { font-size: 1.8em; font-weight: bold; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a><a href="as3000viewer.html">AS3000 Viewer</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>Power Factor Correction Calculator</h1>
+    <p>Size PFC capacitor banks and check for harmonic resonance per <strong>AS/NZS 2897</strong>, <strong>AS/NZS 61921</strong>, and distributor supply agreements.</p>
+    <div class="calc-section">
+      <h2>Load Profile</h2>
+      <div class="info-box"><strong>Distributor requirement:</strong> Most Australian distributors (e.g., Ausgrid NS220, SA Power Networks) require power factor ≥ 0.9 lagging at the point of supply. Penalties apply for PF below this threshold.</div>
+      <div class="input-row three">
+        <div class="input-group"><label for="loadKW">Total Load (kW)</label><input type="number" id="loadKW" value="500" min="1" /></div>
+        <div class="input-group"><label for="existPF">Existing Power Factor</label><input type="number" id="existPF" value="0.75" min="0.3" max="1.0" step="0.01" /></div>
+        <div class="input-group"><label for="targetPF">Target Power Factor</label><input type="number" id="targetPF" value="0.95" min="0.85" max="1.0" step="0.01" /></div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group"><label for="voltage">Supply Voltage (V L-L)</label><select id="voltage"><option value="400" selected>400 V</option><option value="415">415 V</option><option value="690">690 V</option><option value="11000">11 kV</option></select></div>
+        <div class="input-group"><label for="freq">Frequency (Hz)</label><input type="number" id="freq" value="50" readonly /></div>
+        <div class="input-group"><label for="txKVA">Supply Transformer (kVA)</label><input type="number" id="txKVA" value="1000" min="50" /><span style="font-size:0.8em;color:#888;">For resonance check</span></div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group"><label for="txZ">Transformer Impedance (%)</label><input type="number" id="txZ" value="5" min="1" max="15" step="0.5" /></div>
+        <div class="input-group"><label for="harmPresent">Significant Harmonics Present?</label>
+          <select id="harmPresent"><option value="no">No — mostly linear loads</option><option value="low">Low — some VFDs/LEDs (<20% non-linear)</option><option value="high" selected>High — many VFDs/LEDs (>20% non-linear)</option></select>
+        </div>
+        <div class="input-group"><label for="stepMode">Switching Type</label>
+          <select id="stepMode"><option value="auto" selected>Automatic stepped</option><option value="fixed">Fixed bank</option></select>
+        </div>
+      </div>
+      <button class="calc-button" onclick="calculate()">Calculate PFC</button>
+    </div>
+    <div id="resultSection" style="display:none;">
+      <div class="result-box">
+        <h3>PFC Sizing Results</h3>
+        <div class="result-grid">
+          <div class="result-item"><div class="result-label">Required kVAr</div><div class="result-value" id="resKVAr">—</div></div>
+          <div class="result-item"><div class="result-label">Existing kVAr (reactive)</div><div class="result-value" id="resExistKVAr">—</div></div>
+          <div class="result-item"><div class="result-label">New kVA (corrected)</div><div class="result-value" id="resNewKVA">—</div></div>
+          <div class="result-item"><div class="result-label">kVA Reduction</div><div class="result-value" id="resReduction">—</div></div>
+          <div class="result-item"><div class="result-label">Resonant Harmonic Order</div><div class="result-value" id="resResonant">—</div></div>
+          <div class="result-item"><div class="result-label">Detuned Reactor Needed</div><div class="result-value" id="resDetuned">—</div></div>
+        </div>
+      </div>
+      <div id="details" class="info-box" style="margin-top:16px;"></div>
+      <div id="resonanceNote" class="warn-box" style="margin-top:16px;display:none;"></div>
+    </div>
+  </div>
+  <script>
+    function calculate() {
+      const kw = parseFloat(document.getElementById('loadKW').value);
+      const pf1 = parseFloat(document.getElementById('existPF').value);
+      const pf2 = parseFloat(document.getElementById('targetPF').value);
+      const txKVA = parseFloat(document.getElementById('txKVA').value);
+      const txZ = parseFloat(document.getElementById('txZ').value);
+      const harmonic = document.getElementById('harmPresent').value;
+      const stepped = document.getElementById('stepMode').value;
+
+      const phi1 = Math.acos(pf1);
+      const phi2 = Math.acos(pf2);
+      const tan1 = Math.tan(phi1);
+      const tan2 = Math.tan(phi2);
+
+      const existKVAr = kw * tan1;
+      const targetKVAr = kw * tan2;
+      const requiredKVAr = existKVAr - targetKVAr;
+
+      const existKVA = kw / pf1;
+      const newKVA = kw / pf2;
+      const reduction = existKVA - newKVA;
+
+      // Resonant harmonic check: hr = √(SscMVA / QcMVAr)
+      // Ssc = txKVA / (txZ/100), in kVA
+      const sscKVA = txKVA / (txZ / 100);
+      const hr = Math.sqrt(sscKVA / requiredKVAr);
+
+      // Identify nearest harmonic
+      const harmonicOrders = [3, 5, 7, 11, 13];
+      let nearestH = null;
+      for (const h of harmonicOrders) {
+        if (Math.abs(hr - h) < 0.8) { nearestH = h; break; }
+      }
+
+      const needDetuned = nearestH !== null || harmonic === 'high';
+      const detunePct = nearestH && nearestH <= 5 ? '7% (189 Hz)' : nearestH && nearestH <= 7 ? '5.67% (210 Hz)' : '7% (189 Hz)';
+
+      // Suggested step sizes
+      const stepSize = requiredKVAr / (stepped === 'auto' ? 6 : 1);
+      const stdSteps = [5, 10, 12.5, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125, 150, 200];
+      let selectedStep = stepSize;
+      for (const s of stdSteps) { if (s >= stepSize * 0.8) { selectedStep = s; break; } }
+
+      document.getElementById('resKVAr').textContent = requiredKVAr.toFixed(0);
+      document.getElementById('resExistKVAr').textContent = existKVAr.toFixed(0);
+      document.getElementById('resNewKVA').textContent = newKVA.toFixed(0);
+      document.getElementById('resReduction').textContent = reduction.toFixed(0) + ' kVA';
+      document.getElementById('resResonant').textContent = hr.toFixed(1) + 'th';
+      document.getElementById('resDetuned').textContent = needDetuned ? 'YES' : 'No';
+
+      document.getElementById('details').innerHTML = `
+        <strong>Sizing Summary:</strong><br>
+        • Existing: ${kw} kW at PF ${pf1} = ${existKVA.toFixed(0)} kVA / ${existKVAr.toFixed(0)} kVAr reactive<br>
+        • Target: PF ${pf2} = ${newKVA.toFixed(0)} kVA / ${targetKVAr.toFixed(0)} kVAr reactive<br>
+        • Required PFC: <strong>${requiredKVAr.toFixed(0)} kVAr</strong><br>
+        • Suggested configuration: ${stepped === 'auto' ? Math.round(requiredKVAr / selectedStep) + ' steps × ' + selectedStep + ' kVAr = ' + (Math.round(requiredKVAr / selectedStep) * selectedStep) + ' kVAr' : 'Fixed bank ' + requiredKVAr.toFixed(0) + ' kVAr'}<br>
+        • Current reduction: ${(existKVA * 1000 / 400 / 1.732).toFixed(0)} A → ${(newKVA * 1000 / 400 / 1.732).toFixed(0)} A (at 400V, 3-phase)<br>
+        <em>Refer to AS/NZS 2897 for PFC installation requirements; AS/NZS 61921 for capacitor specifications.</em>
+      `;
+
+      const resNote = document.getElementById('resonanceNote');
+      if (needDetuned) {
+        resNote.style.display = 'block';
+        resNote.innerHTML = `
+          <strong>⚠ Harmonic Resonance Risk:</strong> Natural resonant frequency is at the <strong>${hr.toFixed(1)}th harmonic</strong>${nearestH ? ' — near the ' + nearestH + 'th harmonic!' : '.'}
+          <br>With significant non-linear loads present, <strong>detuned reactors</strong> are recommended (tuning factor: ${detunePct}) to shift resonance below the lowest significant harmonic.
+          <br>Without detuning, capacitor banks can amplify harmonics, causing overheating, nuisance tripping, and premature failure.
+        `;
+      } else {
+        resNote.style.display = 'none';
+      }
+      document.getElementById('resultSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

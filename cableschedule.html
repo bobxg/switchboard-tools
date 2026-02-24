@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Cable Schedule Builder - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.six { grid-template-columns: repeat(6, 1fr); }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 4px; font-weight: bold; color: #333; font-size: 0.85em; }
+    .input-group input, .input-group select { padding: 6px 8px; border: 1px solid #b7c5dd; font-size: 0.9em; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .calc-button { background: #1976d2; color: white; padding: 10px 24px; border: none; font-size: 1em; cursor: pointer; margin-top: 8px; }
+    .calc-button:hover { background: #1565c0; }
+    .calc-button.sm { font-size: 0.9em; padding: 6px 14px; }
+    .calc-button.green { background: #2e7d32; }
+    .calc-button.green:hover { background: #1b5e20; }
+    .calc-button.red { background: #c62828; }
+    .calc-button.red:hover { background: #b71c1c; }
+    .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
+    .schedule-table th, .schedule-table td { border: 1px solid #ccc; padding: 4px 6px; }
+    .schedule-table th { background: #1976d2; color: white; font-size: 0.8em; white-space: nowrap; position: sticky; top: 0; }
+    .schedule-table input, .schedule-table select { width: 100%; border: none; padding: 3px; font-size: 0.9em; box-sizing: border-box; }
+    .schedule-table tr:nth-child(even) { background: #f8f9fa; }
+    .schedule-table tr:hover { background: #e3f0fc; }
+    .btn-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+    @media (max-width: 768px) { .input-row.six { grid-template-columns: 1fr 1fr 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon, .btn-row, .input-row { display: none !important; } .schedule-table input, .schedule-table select { border: none !important; background: transparent !important; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown active"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a><a href="as3000viewer.html">AS3000 Viewer</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>Cable Schedule Builder</h1>
+    <p>Build a cable schedule table for project documentation. Enter cable details, then export as CSV or print.</p>
+
+    <div class="btn-row">
+      <button class="calc-button sm" onclick="addRow()">+ Add Cable</button>
+      <button class="calc-button sm" onclick="addMultipleRows(5)">+ Add 5 Rows</button>
+      <button class="calc-button sm red" onclick="deleteLastRow()">- Delete Last Row</button>
+      <button class="calc-button sm green" onclick="exportCSV()">Export CSV</button>
+      <button class="calc-button sm" onclick="window.print()">Print</button>
+      <button class="calc-button sm" onclick="clearAll()">Clear All</button>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="schedule-table" id="scheduleTable">
+        <thead>
+          <tr>
+            <th style="width:30px;">#</th>
+            <th>Cable Tag</th>
+            <th>From (Board)</th>
+            <th>To (Equipment)</th>
+            <th>Cable Type</th>
+            <th>Cores × Size</th>
+            <th>Earth (mm²)</th>
+            <th>Length (m)</th>
+            <th>Route / Containment</th>
+            <th>Circuit #</th>
+            <th>Voltage Drop (%)</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="scheduleBody"></tbody>
+      </table>
+    </div>
+
+    <div class="info-box" style="margin-top:24px;">
+      <strong>Cable Types (common abbreviations):</strong><br>
+      <strong>V-90:</strong> PVC/PVC 90°C — general wiring per AS/NZS 5000.1<br>
+      <strong>X-90:</strong> XLPE/PVC 90°C — higher CCC, suitable for sub-mains per AS/NZS 5000.1<br>
+      <strong>X-HF:</strong> XLPE halogen-free — required in some buildings<br>
+      <strong>MICC:</strong> Mineral insulated — fire-rated circuits<br>
+      <strong>2C+E, 3C+E, 4C+E:</strong> Core count + earth (e.g., 4C+E for 3-phase + neutral + earth)<br>
+      <strong>Fire rated:</strong> Append "(FR)" for AS/NZS 3013 fire-rated circuits
+    </div>
+  </div>
+  <script>
+    let rowCount = 0;
+
+    const cableTypes = ['V-90', 'X-90', 'X-HF', 'MICC', 'TPS', 'SDI', 'Other'];
+    const coreOptions = ['2C+E 1.5mm²', '2C+E 2.5mm²', '2C+E 4mm²', '2C+E 6mm²', '3C+E 2.5mm²', '3C+E 4mm²', '3C+E 6mm²', '4C+E 2.5mm²', '4C+E 4mm²', '4C+E 6mm²', '4C+E 10mm²', '4C+E 16mm²', '4C+E 25mm²', '4C+E 35mm²', '4C+E 50mm²', '4C+E 70mm²', '4C+E 95mm²', '4C+E 120mm²', '4C+E 150mm²', '4C+E 185mm²', '4C+E 240mm²', '4C+E 300mm²', '2×(4C+E 240mm²)', '3×(4C+E 240mm²)', 'Custom'];
+
+    function makeSelect(options, defaultVal) {
+      return `<select>${options.map(o => `<option${o===defaultVal?' selected':''}>${o}</option>`).join('')}</select>`;
+    }
+
+    function addRow(data) {
+      rowCount++;
+      const d = data || {};
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="text-align:center;font-weight:bold;color:#666;">${rowCount}</td>
+        <td><input type="text" value="${d.tag || 'C' + String(rowCount).padStart(3,'0')}" /></td>
+        <td><input type="text" value="${d.from || ''}" placeholder="MSB" /></td>
+        <td><input type="text" value="${d.to || ''}" placeholder="DB-L01" /></td>
+        <td>${makeSelect(cableTypes, d.type || 'X-90')}</td>
+        <td>${makeSelect(coreOptions, d.cores || '4C+E 16mm²')}</td>
+        <td><input type="text" value="${d.earth || '16'}" style="width:40px;" /></td>
+        <td><input type="number" value="${d.length || ''}" style="width:50px;" /></td>
+        <td><input type="text" value="${d.route || ''}" placeholder="CT1 → Riser" /></td>
+        <td><input type="text" value="${d.circuit || ''}" style="width:50px;" /></td>
+        <td><input type="text" value="${d.vd || ''}" style="width:40px;" /></td>
+        <td><input type="text" value="${d.notes || ''}" /></td>`;
+      document.getElementById('scheduleBody').appendChild(tr);
+    }
+
+    function addMultipleRows(n) {
+      for (let i = 0; i < n; i++) addRow();
+    }
+
+    function deleteLastRow() {
+      const body = document.getElementById('scheduleBody');
+      if (body.lastChild) { body.removeChild(body.lastChild); rowCount--; }
+    }
+
+    function clearAll() {
+      if (confirm('Clear all cable entries?')) {
+        document.getElementById('scheduleBody').innerHTML = '';
+        rowCount = 0;
+      }
+    }
+
+    function exportCSV() {
+      const headers = ['#', 'Cable Tag', 'From', 'To', 'Cable Type', 'Cores × Size', 'Earth (mm²)', 'Length (m)', 'Route', 'Circuit #', 'VD (%)', 'Notes'];
+      const rows = document.querySelectorAll('#scheduleBody tr');
+      let csv = headers.join(',') + '\n';
+      rows.forEach((row, i) => {
+        const cells = row.querySelectorAll('input, select');
+        const vals = [(i+1)];
+        cells.forEach(c => vals.push('"' + (c.value || '').replace(/"/g, '""') + '"'));
+        csv += vals.join(',') + '\n';
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'cable_schedule.csv';
+      a.click();
+    }
+
+    // Start with 5 empty rows
+    addMultipleRows(5);
+  </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>CT Sizing - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; }
+    .result-box { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 24px; margin-top: 24px; }
+    .result-box h3 { margin-top: 0; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-top: 16px; }
+    .result-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .result-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; }
+    .result-value { font-size: 1.5em; font-weight: bold; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .pass-box { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 16px; margin: 16px 0; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    .ref-table th { background: #1976d2; color: white; }
+    .ref-table tr:nth-child(even) { background: #f8f9fa; }
+    @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown active"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a><a href="as3000viewer.html">AS3000 Viewer</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>CT Sizing Calculator</h1>
+    <p>Size metering current transformers per <strong>AS 1284.1</strong> and <strong>AS 60044-1</strong>. Covers CT ratio, class, burden, and NMI requirements for revenue metering.</p>
+
+    <div class="calc-section">
+      <h2>Metering CT Parameters</h2>
+      <div class="info-box"><strong>AS 1284.1:</strong> Electricity metering — Requirements for pattern approval of metering installations. NMI (National Measurement Institute) approved CTs required for revenue metering (>100A installations).</div>
+      <div class="input-row three">
+        <div class="input-group"><label for="supplyA">Circuit/Incomer Rating (A)</label><input type="number" id="supplyA" value="400" min="10" /></div>
+        <div class="input-group"><label for="expectedLoad">Expected Max Load (%)</label><input type="number" id="expectedLoad" value="80" min="10" max="100" /></div>
+        <div class="input-group"><label for="meteringType">Metering Purpose</label>
+          <select id="meteringType">
+            <option value="revenue">Revenue / Utility (NMI)</option>
+            <option value="submeter">Sub-metering / BMS</option>
+            <option value="protection">Protection relay</option>
+          </select></div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group"><label for="meterBurden">Meter Burden (VA)</label><input type="number" id="meterBurden" value="5" min="1" max="30" step="0.5" /><small style="color:#666;">Typical: 2.5-5 VA (electronic), 10-15 VA (electromechanical)</small></div>
+        <div class="input-group"><label for="cableLength">CT to Meter Cable Length (m)</label><input type="number" id="cableLength" value="15" min="1" max="200" /></div>
+        <div class="input-group"><label for="cableSize">CT Secondary Cable (mm²)</label>
+          <select id="cableSize">
+            <option value="2.5" selected>2.5 mm²</option>
+            <option value="4">4 mm²</option>
+            <option value="6">6 mm²</option>
+          </select></div>
+      </div>
+      <button class="calc-button" onclick="calculate()">Size CT</button>
+    </div>
+
+    <div id="resultSection" style="display:none;">
+      <div class="result-box">
+        <h3>CT Selection</h3>
+        <div class="result-grid">
+          <div class="result-item"><div class="result-label">CT Ratio</div><div class="result-value" id="resRatio">—</div></div>
+          <div class="result-item"><div class="result-label">Accuracy Class</div><div class="result-value" id="resClass">—</div></div>
+          <div class="result-item"><div class="result-label">Min CT Burden (VA)</div><div class="result-value" id="resBurden">—</div></div>
+          <div class="result-item"><div class="result-label">Cable Burden (VA)</div><div class="result-value" id="resCableBurden">—</div></div>
+          <div class="result-item"><div class="result-label">Total Burden (VA)</div><div class="result-value" id="resTotalBurden">—</div></div>
+          <div class="result-item"><div class="result-label">CT at Design Load</div><div class="result-value" id="resLoadPct">—</div></div>
+        </div>
+      </div>
+      <div id="notes"></div>
+    </div>
+
+    <div class="calc-section">
+      <h2>Standard CT Ratios</h2>
+      <table class="ref-table">
+        <thead><tr><th>Primary (A)</th><th>Secondary (A)</th><th>Typical Application</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>50/5</td><td>5</td><td>Small sub-metering</td><td>Split-core or window CT</td></tr>
+          <tr><td>100/5</td><td>5</td><td>100A circuits</td><td>NMI for revenue if >100A supply</td></tr>
+          <tr><td>150/5</td><td>5</td><td>150A circuits</td><td></td></tr>
+          <tr><td>200/5</td><td>5</td><td>200A sub-main</td><td></td></tr>
+          <tr><td>250/5</td><td>5</td><td>250A circuits</td><td></td></tr>
+          <tr><td>300/5</td><td>5</td><td>300A sub-main</td><td></td></tr>
+          <tr><td>400/5</td><td>5</td><td>400A incomer</td><td>Common for MSB</td></tr>
+          <tr><td>500/5</td><td>5</td><td>500A incomer</td><td></td></tr>
+          <tr><td>600/5</td><td>5</td><td>600A incomer</td><td></td></tr>
+          <tr><td>800/5</td><td>5</td><td>800A incomer</td><td>Large commercial</td></tr>
+          <tr><td>1000/5</td><td>5</td><td>1000A incomer</td><td></td></tr>
+          <tr><td>1200/5</td><td>5</td><td>1200A incomer</td><td></td></tr>
+          <tr><td>1500/5</td><td>5</td><td>1500A incomer</td><td>Large industrial</td></tr>
+          <tr><td>2000/5</td><td>5</td><td>2000A incomer</td><td></td></tr>
+          <tr><td>2500/5</td><td>5</td><td>2500A busbar</td><td>Major distribution</td></tr>
+          <tr><td>3000/5</td><td>5</td><td>3000A busbar</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="calc-section">
+      <h2>CT Accuracy Classes</h2>
+      <table class="ref-table">
+        <thead><tr><th>Class</th><th>Accuracy at Rated</th><th>Accuracy at 10%</th><th>Application</th><th>Standard</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Class 0.2s</strong></td><td>±0.2%</td><td>±0.75%</td><td>Revenue metering (NMI) — high accuracy</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>Class 0.5s</strong></td><td>±0.5%</td><td>±1.5%</td><td>Revenue metering (NMI) — standard</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>Class 0.5</strong></td><td>±0.5%</td><td>±1.5%</td><td>Sub-metering / check meters</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>Class 1</strong></td><td>±1.0%</td><td>±3.0%</td><td>BMS monitoring, general metering</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>Class 3</strong></td><td>±3.0%</td><td>—</td><td>Indication only</td><td>AS 60044-1</td></tr>
+          <tr><td><strong>5P / 10P</strong></td><td>±1% / ±3%</td><td>—</td><td>Protection CTs (5% / 10% composite error at ALF × In)</td><td>AS 60044-1</td></tr>
+        </tbody>
+      </table>
+      <div class="warn-box"><strong>NMI Revenue Metering (>100A supply):</strong> Must use <strong>Class 0.5s or better</strong> CTs that are NMI-approved (pattern approved). CT ratio must be selected so current at typical load is between 10% and 120% of CT primary rating. The distributor (e.g., Ausgrid, Citipower, Energex) will specify exact CT requirements.</div>
+    </div>
+  </div>
+  <script>
+    const stdPrimaries = [50, 75, 100, 150, 200, 250, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000, 2500, 3000];
+
+    function calculate() {
+      const supplyA = parseFloat(document.getElementById('supplyA').value);
+      const loadPct = parseFloat(document.getElementById('expectedLoad').value) / 100;
+      const meteringType = document.getElementById('meteringType').value;
+      const meterBurden = parseFloat(document.getElementById('meterBurden').value);
+      const cableLen = parseFloat(document.getElementById('cableLength').value);
+      const cableSize = parseFloat(document.getElementById('cableSize').value);
+
+      const expectedA = supplyA * loadPct;
+
+      // Select CT ratio — primary should be ≥ supply rating, and expected load should be ≥ 10% of primary
+      let selectedPrimary = stdPrimaries[stdPrimaries.length - 1];
+      for (const p of stdPrimaries) {
+        if (p >= supplyA && (expectedA / p) >= 0.1) {
+          selectedPrimary = p;
+          break;
+        }
+      }
+      // If expected load < 10% of selected primary, try smaller
+      if (expectedA / selectedPrimary < 0.1) {
+        for (let i = stdPrimaries.length - 1; i >= 0; i--) {
+          if (expectedA / stdPrimaries[i] >= 0.1) {
+            selectedPrimary = stdPrimaries[i];
+            break;
+          }
+        }
+      }
+
+      const ratio = `${selectedPrimary}/5`;
+      const loadOnCT = (expectedA / selectedPrimary * 100);
+
+      // Accuracy class
+      let accClass = 'Class 1';
+      if (meteringType === 'revenue') accClass = 'Class 0.5s';
+      else if (meteringType === 'submeter') accClass = 'Class 0.5';
+      else accClass = '5P20';
+
+      // Cable burden: P = I²R, R = ρL/A (both ways), ρ copper = 0.0178 Ω·mm²/m
+      // Secondary current at rated = 5A
+      const cableR = 2 * cableLen * 0.0178 / cableSize; // both ways
+      const cableBurden = 5 * 5 * cableR; // I²R at 5A secondary
+      const totalBurden = meterBurden + cableBurden;
+
+      // Typical CT burden ratings: 5, 10, 15, 20, 30 VA
+      const stdBurdens = [5, 10, 15, 20, 30];
+      let minCTBurden = stdBurdens[0];
+      for (const b of stdBurdens) {
+        if (b >= totalBurden) { minCTBurden = b; break; }
+        minCTBurden = b;
+      }
+
+      document.getElementById('resRatio').textContent = ratio;
+      document.getElementById('resClass').textContent = accClass;
+      document.getElementById('resBurden').textContent = minCTBurden + ' VA';
+      document.getElementById('resCableBurden').textContent = cableBurden.toFixed(1) + ' VA';
+      document.getElementById('resTotalBurden').textContent = totalBurden.toFixed(1) + ' VA';
+      document.getElementById('resLoadPct').textContent = loadOnCT.toFixed(0) + '%';
+
+      let notes = '';
+      if (loadOnCT < 10) {
+        notes += `<div class="fail-box"><strong>⚠ Low CT loading:</strong> Expected load is only ${loadOnCT.toFixed(0)}% of CT primary. Accuracy degrades below 10% loading. Consider a lower CT ratio.</div>`;
+      } else if (loadOnCT > 120) {
+        notes += `<div class="fail-box"><strong>⚠ CT overloaded:</strong> Expected load exceeds 120% of CT primary. Select higher ratio or verify load calculation.</div>`;
+      } else {
+        notes += `<div class="pass-box"><strong>✓ CT loading satisfactory.</strong> Expected ${loadOnCT.toFixed(0)}% of rated — within optimal 10-120% operating range.</div>`;
+      }
+
+      if (totalBurden > minCTBurden) {
+        notes += `<div class="warn-box"><strong>Burden Warning:</strong> Total connected burden (${totalBurden.toFixed(1)} VA) exceeds CT rated burden (${minCTBurden} VA). Increase CT burden rating or use larger secondary cable to reduce cable burden.</div>`;
+      } else {
+        notes += `<div class="info-box"><strong>Burden OK:</strong> Total burden ${totalBurden.toFixed(1)} VA ≤ CT rated burden ${minCTBurden} VA. Margin: ${(minCTBurden - totalBurden).toFixed(1)} VA.</div>`;
+      }
+
+      if (meteringType === 'revenue') {
+        notes += `<div class="warn-box"><strong>NMI Revenue Metering Requirements:</strong>
+          <ul>
+            <li>CTs must be NMI pattern-approved (check distributor approved CT list)</li>
+            <li>CT ratio ${ratio} — verify with distributor (e.g., Ausgrid, Citipower, Energex, SA Power Networks)</li>
+            <li>Class 0.5s minimum. Some distributors require Class 0.2s for large sites (&gt;1 MVA)</li>
+            <li>CT secondary circuit must NOT pass through any isolating device</li>
+            <li>CT terminal box must be sealable by the meter provider</li>
+            <li>Use 2.5 mm² minimum for CT secondary cables; 4 mm² for long runs (&gt;20m)</li>
+            <li>Short-circuit facility (CT shorting blocks) must be provided at CT and meter ends</li>
+          </ul></div>`;
+      }
+
+      if (cableBurden > 3) {
+        notes += `<div class="warn-box"><strong>High cable burden:</strong> ${cableBurden.toFixed(1)} VA. Consider increasing cable size from ${cableSize} mm² to ${cableSize < 4 ? '4' : '6'} mm² to reduce burden to ${(5*5*2*cableLen*0.0178/(cableSize < 4 ? 4 : 6)).toFixed(1)} VA.</div>`;
+      }
+
+      document.getElementById('notes').innerHTML = notes;
+      document.getElementById('resultSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

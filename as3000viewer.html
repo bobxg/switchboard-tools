@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>AS/NZS 3000 Viewer - OMNI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { margin: 0; overflow: hidden; }
+    .viewer-wrap {
+      display: flex;
+      height: calc(100vh - 51px);
+    }
+    /* ---- sidebar ---- */
+    .as-sidebar {
+      width: 320px;
+      min-width: 220px;
+      max-width: 420px;
+      background: #f5f7fa;
+      border-right: 2px solid #d0d7de;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      resize: horizontal;
+    }
+    .as-sidebar-header {
+      padding: 12px 14px 8px 14px;
+      background: #2c5f8d;
+      color: #fff;
+    }
+    .as-sidebar-header h2 {
+      margin: 0 0 8px 0;
+      font-size: 1.05em;
+      letter-spacing: 0.5px;
+    }
+    #tocSearch {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 7px 10px;
+      border: 1px solid #8ab4d9;
+      border-radius: 4px;
+      font-size: 0.95em;
+      outline: none;
+    }
+    #tocSearch:focus { border-color: #4a9eff; box-shadow: 0 0 4px #4a9eff66; }
+    .toc-tree {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 0 18px 0;
+    }
+    .toc-tree::-webkit-scrollbar { width: 7px; }
+    .toc-tree::-webkit-scrollbar-thumb { background: #b0bec5; border-radius: 4px; }
+    .toc-section {
+      margin: 0;
+    }
+    .toc-section-title {
+      font-weight: bold;
+      font-size: 0.92em;
+      padding: 8px 14px 4px 14px;
+      color: #1a3a52;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+    .toc-section-title:hover { background: #e3eaf1; }
+    .toc-section-title .arrow {
+      display: inline-block;
+      transition: transform 0.18s;
+      font-size: 0.7em;
+    }
+    .toc-section-title.collapsed .arrow { transform: rotate(-90deg); }
+    .toc-clauses {
+      list-style: none;
+      margin: 0;
+      padding: 0 0 0 16px;
+    }
+    .toc-clauses.hidden { display: none; }
+    .toc-clause {
+      padding: 0;
+    }
+    .toc-clause a {
+      display: block;
+      padding: 3px 14px 3px 8px;
+      color: #2c5f8d;
+      text-decoration: none;
+      font-size: 0.88em;
+      border-radius: 3px;
+      transition: background 0.15s;
+    }
+    .toc-clause a:hover { background: #d0e3f7; }
+    .toc-clause a.active-clause { background: #4a9eff; color: #fff; }
+    .toc-clause .sub-clauses {
+      list-style: none;
+      margin: 0;
+      padding: 0 0 0 14px;
+    }
+    .toc-clause .sub-clauses a { font-size: 0.84em; color: #456; }
+    /* ---- content ---- */
+    .as-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .as-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 14px;
+      background: #eef2f6;
+      border-bottom: 1px solid #d0d7de;
+      font-size: 0.9em;
+    }
+    .as-toolbar label { font-weight: bold; color: #2c5f8d; }
+    #clauseJump {
+      padding: 5px 8px;
+      border: 1px solid #b0bec5;
+      border-radius: 4px;
+      width: 110px;
+      font-size: 0.95em;
+    }
+    #btnJump {
+      padding: 5px 14px;
+      background: #2c5f8d;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    #btnJump:hover { background: #1a3a52; }
+    #statusMsg {
+      color: #666;
+      font-style: italic;
+      margin-left: 10px;
+    }
+    #as3000frame {
+      flex: 1;
+      border: none;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a>
+    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
+    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
+    <a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting &amp; Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown active"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&amp;C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a><a href="as3000viewer.html">AS3000 Viewer</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+
+  <div class="viewer-wrap">
+    <!-- Sidebar TOC -->
+    <div class="as-sidebar">
+      <div class="as-sidebar-header">
+        <h2>AS/NZS 3000:2018</h2>
+        <input type="text" id="tocSearch" placeholder="Search clauses..." autocomplete="off" />
+      </div>
+      <div class="toc-tree" id="tocTree"></div>
+    </div>
+
+    <!-- Main content -->
+    <div class="as-content">
+      <div class="as-toolbar">
+        <label for="clauseJump">Go to clause:</label>
+        <input type="text" id="clauseJump" placeholder="e.g. 2.6.3" />
+        <button id="btnJump">Go</button>
+        <span id="statusMsg">Loading document...</span>
+      </div>
+      <iframe id="as3000frame" src="AS3000-2018-Clean-Purple-cover.htm"></iframe>
+    </div>
+  </div>
+
+<script>
+/* ===== AS/NZS 3000 Viewer — TOC & Navigation ===== */
+(function () {
+  'use strict';
+
+  /* ---------- Table of contents data ---------- */
+  var TOC = [
+    { sec: 1, title: 'SCOPE, APPLICATION AND FUNDAMENTAL PRINCIPLES', clauses: [
+      { cl: '1.1', t: 'Scope' },
+      { cl: '1.2', t: 'Application' },
+      { cl: '1.3', t: 'Referenced documents' },
+      { cl: '1.4', t: 'Definitions' },
+      { cl: '1.5', t: 'Fundamental principles' },
+      { cl: '1.6', t: 'Design of an electrical installation' },
+      { cl: '1.7', t: 'Selection and installation of electrical equipment' },
+      { cl: '1.8', t: 'Verification (inspection and testing)' },
+      { cl: '1.9', t: 'Means of compliance' }
+    ]},
+    { sec: 2, title: 'GENERAL ARRANGEMENT, CONTROL AND PROTECTION', clauses: [
+      { cl: '2.1', t: 'General' },
+      { cl: '2.2', t: 'Arrangement of electrical installation' },
+      { cl: '2.3', t: 'Control of electrical installation' },
+      { cl: '2.4', t: 'Fault protection' },
+      { cl: '2.5', t: 'Protection against overcurrent' },
+      { cl: '2.6', t: 'Additional protection by residual current devices' },
+      { cl: '2.7', t: 'Protection against overvoltage' },
+      { cl: '2.8', t: 'Protection against undervoltage' },
+      { cl: '2.9', t: 'Protection against fire hazard due to arcing faults' },
+      { cl: '2.10', t: 'Switchboards' }
+    ]},
+    { sec: 3, title: 'SELECTION AND INSTALLATION OF WIRING SYSTEMS', clauses: [
+      { cl: '3.1', t: 'General' },
+      { cl: '3.2', t: 'Types of wiring systems' },
+      { cl: '3.3', t: 'External influences' },
+      { cl: '3.4', t: 'Current-carrying capacity' },
+      { cl: '3.5', t: 'Conductor size' },
+      { cl: '3.6', t: 'Voltage drop' },
+      { cl: '3.7', t: 'Electrical connections' },
+      { cl: '3.8', t: 'Identification' },
+      { cl: '3.9', t: 'Installation requirements' },
+      { cl: '3.10', t: 'Enclosure of cables' },
+      { cl: '3.11', t: 'Underground wiring systems' },
+      { cl: '3.12', t: 'Aerial wiring systems' },
+      { cl: '3.13', t: 'Cables supported by a catenary' },
+      { cl: '3.14', t: 'Safety services' },
+      { cl: '3.15', t: 'Busways, including rising mains systems' },
+      { cl: '3.16', t: 'Earth sheath return (ESR) system' }
+    ]},
+    { sec: 4, title: 'SELECTION AND INSTALLATION OF ELECTRICAL EQUIPMENT', clauses: [
+      { cl: '4.1', t: 'General' },
+      { cl: '4.2', t: 'Protection against thermal effects' },
+      { cl: '4.3', t: 'Connection of electrical equipment' },
+      { cl: '4.4', t: 'Socket-outlets' },
+      { cl: '4.5', t: 'Lighting equipment and accessories' },
+      { cl: '4.6', t: 'Smoke alarms' },
+      { cl: '4.7', t: 'Cooking appliances' },
+      { cl: '4.8', t: 'Appliances producing hot water or steam' },
+      { cl: '4.9', t: 'Room heaters' },
+      { cl: '4.11', t: 'Electric duct heaters' },
+      { cl: '4.12', t: 'Electricity converters' },
+      { cl: '4.13', t: 'Motors' },
+      { cl: '4.14', t: 'Transformers' },
+      { cl: '4.15', t: 'Capacitors' },
+      { cl: '4.16', t: 'Electrical equipment containing liquid dielectrics' },
+      { cl: '4.17', t: 'Batteries' },
+      { cl: '4.18', t: 'Gas appliances and equipment' },
+      { cl: '4.19', t: 'Airconditioning and heat pump systems' },
+      { cl: '4.20', t: 'Lifts' }
+    ]},
+    { sec: 5, title: 'EARTHING ARRANGEMENTS AND EQUIPOTENTIAL BONDING', clauses: [
+      { cl: '5.1', t: 'General' },
+      { cl: '5.2', t: 'Earthing functions' },
+      { cl: '5.3', t: 'Earthing system parts' },
+      { cl: '5.4', t: 'Earthing of equipment' },
+      { cl: '5.5', t: 'Earthing arrangements' },
+      { cl: '5.6', t: 'Equipotential bonding' },
+      { cl: '5.7', t: 'Earth fault-loop impedance' },
+      { cl: '5.8', t: 'Other earthing arrangements' }
+    ]},
+    { sec: 6, title: 'DAMP SITUATIONS, WATER HEATERS AND SWIMMING POOLS', clauses: [
+      { cl: '6.1', t: 'General' },
+      { cl: '6.2', t: 'Baths, showers and other fixed water containers' },
+      { cl: '6.4', t: 'Fountains and water features' },
+      { cl: '6.5', t: 'Saunas' },
+      { cl: '6.6', t: 'Refrigeration rooms' },
+      { cl: '6.7', t: 'Sanitization and general hosing-down operations' }
+    ]},
+    { sec: 7, title: 'SPECIAL ELECTRICAL INSTALLATIONS', clauses: [
+      { cl: '7.1', t: 'General' },
+      { cl: '7.2', t: 'Safety services' },
+      { cl: '7.3', t: 'Electricity generation systems' },
+      { cl: '7.5', t: 'Extra-low voltage electrical installations' },
+      { cl: '7.6', t: 'High voltage electrical installations' },
+      { cl: '7.8', t: 'Standards for specific electrical installations' },
+      { cl: '7.9', t: 'Supplies for electric vehicles (NZ only)' }
+    ]},
+    { sec: 8, title: 'VERIFICATION', clauses: [
+      { cl: '8.1', t: 'General' },
+      { cl: '8.2', t: 'Visual inspection' },
+      { cl: '8.3', t: 'Testing' },
+      { cl: '8.4', t: 'Verification records' }
+    ]}
+  ];
+
+  /* ---------- Build sidebar TOC ---------- */
+  var tree = document.getElementById('tocTree');
+
+  TOC.forEach(function (section) {
+    var div = document.createElement('div');
+    div.className = 'toc-section';
+    div.setAttribute('data-sec', section.sec);
+
+    var btn = document.createElement('button');
+    btn.className = 'toc-section-title';
+    btn.innerHTML = '<span class="arrow">&#9660;</span> Section ' + section.sec + ' &mdash; ' + section.title;
+    btn.addEventListener('click', function () {
+      btn.classList.toggle('collapsed');
+      ul.classList.toggle('hidden');
+    });
+
+    var ul = document.createElement('ul');
+    ul.className = 'toc-clauses';
+
+    section.clauses.forEach(function (c) {
+      var li = document.createElement('li');
+      li.className = 'toc-clause';
+      li.setAttribute('data-cl', c.cl);
+      var a = document.createElement('a');
+      a.href = '#cl-' + c.cl;
+      a.textContent = c.cl + '  ' + c.t;
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        navigateToClause(c.cl);
+      });
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+
+    div.appendChild(btn);
+    div.appendChild(ul);
+    tree.appendChild(div);
+  });
+
+  /* ---------- Iframe management ---------- */
+  var iframe = document.getElementById('as3000frame');
+  var statusMsg = document.getElementById('statusMsg');
+  var iframeReady = false;
+  var pendingClause = null;
+
+  iframe.addEventListener('load', function () {
+    try {
+      injectAnchors();
+      iframeReady = true;
+      statusMsg.textContent = 'Document loaded.';
+
+      // If there was a pending clause from the URL hash, navigate now
+      if (pendingClause) {
+        scrollToClause(pendingClause);
+        pendingClause = null;
+      } else {
+        // Check URL hash
+        var hash = window.location.hash;
+        if (hash && hash.indexOf('#cl-') === 0) {
+          scrollToClause(hash.substring(4));
+        }
+      }
+    } catch (err) {
+      statusMsg.textContent = 'Document loaded (cross-origin — use Go to clause).';
+      console.warn('Cannot access iframe:', err);
+    }
+  });
+
+  /* Inject id="cl-X.Y.Z" on every <li data-list-text="X.Y.Z"> in the body content area */
+  function injectAnchors() {
+    var doc = iframe.contentDocument || iframe.contentWindow.document;
+    var items = doc.querySelectorAll('li[data-list-text]');
+    var count = 0;
+    // We only want body content — skip the first occurrences that are in the TOC.
+    // Strategy: the body clauses have <p> children with class containing "s17" or "s16"
+    // or they have <a name="bookmark..."> children. We'll just tag all of them —
+    // the last occurrence wins for duplicate clause numbers (body comes after TOC).
+    var seen = {};
+    // First pass: collect all, last occurrence wins
+    for (var i = 0; i < items.length; i++) {
+      var cl = items[i].getAttribute('data-list-text');
+      if (/^\d/.test(cl)) {
+        seen[cl] = items[i];
+      }
+    }
+    for (var cl in seen) {
+      seen[cl].id = 'cl-' + cl;
+      count++;
+    }
+    console.log('Injected ' + count + ' clause anchors');
+  }
+
+  function scrollToClause(clause) {
+    if (!iframeReady) {
+      pendingClause = clause;
+      statusMsg.textContent = 'Waiting for document to load...';
+      return;
+    }
+
+    var doc;
+    try {
+      doc = iframe.contentDocument || iframe.contentWindow.document;
+    } catch (e) {
+      statusMsg.textContent = 'Cannot access document (cross-origin).';
+      return;
+    }
+
+    // Try exact clause ID first
+    var el = doc.getElementById('cl-' + clause);
+
+    if (!el) {
+      // Try searching via data-list-text attribute (body content — last match)
+      var all = doc.querySelectorAll('li[data-list-text="' + clause + '"]');
+      if (all.length > 0) {
+        el = all[all.length - 1]; // last one = body content
+      }
+    }
+
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Briefly highlight
+      var orig = el.style.backgroundColor;
+      el.style.backgroundColor = '#fff3cd';
+      el.style.transition = 'background-color 0.3s';
+      setTimeout(function () {
+        el.style.backgroundColor = '#ffffaa';
+        setTimeout(function () {
+          el.style.backgroundColor = orig || '';
+        }, 2000);
+      }, 300);
+      statusMsg.textContent = 'Showing clause ' + clause;
+      highlightTocItem(clause);
+      // Update URL hash without reload
+      history.replaceState(null, '', '#cl-' + clause);
+    } else {
+      statusMsg.textContent = 'Clause ' + clause + ' not found in document.';
+    }
+  }
+
+  function highlightTocItem(clause) {
+    // Remove old highlights
+    document.querySelectorAll('.toc-clause a.active-clause').forEach(function (a) {
+      a.classList.remove('active-clause');
+    });
+    // Match closest clause in sidebar
+    var tocLinks = document.querySelectorAll('.toc-clause a');
+    // Try exact match first, then parent match (e.g., for 2.6.3, highlight 2.6)
+    var bestMatch = null;
+    tocLinks.forEach(function (a) {
+      var href = a.getAttribute('href');
+      if (href === '#cl-' + clause) {
+        bestMatch = a;
+      }
+    });
+    if (!bestMatch) {
+      // Try parent clause (strip last .N)
+      var parts = clause.split('.');
+      while (parts.length > 2 && !bestMatch) {
+        parts.pop();
+        var parent = parts.join('.');
+        tocLinks.forEach(function (a) {
+          if (a.getAttribute('href') === '#cl-' + parent) {
+            bestMatch = a;
+          }
+        });
+      }
+    }
+    if (bestMatch) {
+      bestMatch.classList.add('active-clause');
+      bestMatch.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // Ensure parent section is expanded
+      var sec = bestMatch.closest('.toc-section');
+      if (sec) {
+        var btn = sec.querySelector('.toc-section-title');
+        var ul = sec.querySelector('.toc-clauses');
+        if (btn && btn.classList.contains('collapsed')) {
+          btn.classList.remove('collapsed');
+          ul.classList.remove('hidden');
+        }
+      }
+    }
+  }
+
+  function navigateToClause(clause) {
+    scrollToClause(clause);
+  }
+
+  /* ---------- Go-to-clause toolbar ---------- */
+  document.getElementById('btnJump').addEventListener('click', function () {
+    var val = document.getElementById('clauseJump').value.trim();
+    if (val) {
+      // Clean common formats: "cl 2.6.3", "cl. 2.6.3", "Clause 2.6.3", just "2.6.3"
+      val = val.replace(/^(clause|cl\.?\s*)/i, '').trim();
+      navigateToClause(val);
+    }
+  });
+  document.getElementById('clauseJump').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      document.getElementById('btnJump').click();
+    }
+  });
+
+  /* ---------- Search filter ---------- */
+  document.getElementById('tocSearch').addEventListener('input', function () {
+    var query = this.value.toLowerCase().trim();
+    var sections = document.querySelectorAll('.toc-section');
+
+    sections.forEach(function (sec) {
+      var btn = sec.querySelector('.toc-section-title');
+      var ul = sec.querySelector('.toc-clauses');
+      var clauses = sec.querySelectorAll('.toc-clause');
+      var anyVisible = false;
+
+      clauses.forEach(function (li) {
+        var text = li.textContent.toLowerCase();
+        var cl = li.getAttribute('data-cl') || '';
+        if (!query || text.indexOf(query) !== -1 || cl.indexOf(query) !== -1) {
+          li.style.display = '';
+          anyVisible = true;
+        } else {
+          li.style.display = 'none';
+        }
+      });
+
+      sec.style.display = anyVisible || !query ? '' : 'none';
+      // Auto-expand sections with matches
+      if (query && anyVisible) {
+        btn.classList.remove('collapsed');
+        ul.classList.remove('hidden');
+      }
+    });
+  });
+
+  /* ---------- Handle initial URL hash ---------- */
+  var initialHash = window.location.hash;
+  if (initialHash && initialHash.indexOf('#cl-') === 0) {
+    pendingClause = initialHash.substring(4);
+    statusMsg.textContent = 'Loading clause ' + pendingClause + '...';
+  }
+
+  /* Listen for hash changes (from other pages linking here) */
+  window.addEventListener('hashchange', function () {
+    var hash = window.location.hash;
+    if (hash && hash.indexOf('#cl-') === 0) {
+      navigateToClause(hash.substring(4));
+    }
+  });
+
+})();
+</script>
+</body>
+</html>

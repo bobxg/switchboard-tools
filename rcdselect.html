@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>RCD Selector - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; }
+    .result-box { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 24px; margin-top: 24px; }
+    .result-box h3 { margin-top: 0; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 16px; }
+    .result-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .result-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; }
+    .result-value { font-size: 1.5em; font-weight: bold; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .pass-box { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 16px; margin: 16px 0; }
+    .fail-box { background: #ffebee; border-left: 4px solid #c62828; padding: 16px; margin: 16px 0; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .ref-table th { background: #1976d2; color: white; text-align: center; }
+    .ref-table tr:nth-child(even) { background: #f8f9fa; }
+    .rcd-card { border: 2px solid #1976d2; padding: 18px; margin: 12px 0; background: #f8fbff; }
+    .rcd-card h4 { margin: 0 0 8px 0; color: #1976d2; }
+    .rcd-card .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 6px; margin-bottom: 4px; }
+    .tag-required { background: #c62828; color: #fff; }
+    .tag-recommended { background: #ff9800; color: #fff; }
+    .tag-optional { background: #1976d2; color: #fff; }
+    @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown active"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>RCD Type Selector</h1>
+    <p>Select the correct RCD type per <strong>AS/NZS 3000:2018</strong> clauses <a href="as3000viewer.html#cl-2.6.3" class="clause">2.6.3</a> and <a href="as3000viewer.html#cl-2.6.4" class="clause">2.6.4</a>. Covers Type I (AC), Type II (A), Type III (B/B+), sensitivity, and application rules.</p>
+    <div class="calc-section">
+      <h2>Application Details</h2>
+      <div class="input-row three">
+        <div class="input-group"><label for="circuitType">Circuit / Load Type</label>
+          <select id="circuitType">
+            <option value="gpo">General Power Outlets (GPOs)</option>
+            <option value="lighting">Lighting Circuits</option>
+            <option value="socket_outdoor">Socket outlets — outdoor / wet area</option>
+            <option value="socket_indoor">Socket outlets — indoor general</option>
+            <option value="fixed_appliance">Fixed appliance (oven, cooktop, etc.)</option>
+            <option value="hot_water">Electric hot water (resistive)</option>
+            <option value="aircon">Air conditioning / heat pump</option>
+            <option value="ev_charger">EV Charger (Mode 3)</option>
+            <option value="vsd_motor">VSD / motor drive</option>
+            <option value="medical">Medical facility circuit</option>
+            <option value="fire_essential">Fire / essential services</option>
+            <option value="solar_inverter">Solar inverter output</option>
+          </select></div>
+        <div class="input-group"><label for="location">Installation Location</label>
+          <select id="location">
+            <option value="residential">Residential dwelling</option>
+            <option value="commercial">Commercial premises</option>
+            <option value="industrial">Industrial premises</option>
+            <option value="construction">Construction site</option>
+            <option value="outdoor">Outdoor / exposed</option>
+            <option value="wet_area">Wet area (bathroom, laundry)</option>
+            <option value="pool">Swimming pool zone</option>
+            <option value="carpark">Car park</option>
+          </select></div>
+        <div class="input-group"><label for="circuitRating">Circuit Rating (A)</label>
+          <select id="circuitRating">
+            <option value="10">10 A</option>
+            <option value="16">16 A</option>
+            <option value="20" selected>20 A</option>
+            <option value="25">25 A</option>
+            <option value="32">32 A</option>
+            <option value="40">40 A</option>
+            <option value="50">50 A</option>
+            <option value="63">63 A</option>
+          </select></div>
+      </div>
+      <button class="calc-button" onclick="selectRCD()">Determine RCD Requirements</button>
+    </div>
+    <div id="resultSection" style="display:none;"></div>
+    <div class="calc-section">
+      <h2>AS/NZS 3000:2018 RCD Requirements Quick Reference</h2>
+      <table class="ref-table">
+        <thead><tr><th>Application</th><th>RCD Required?</th><th>Max IΔn (mA)</th><th>AS/NZS 3000 Clause</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>All socket outlets ≤ 20 A (residential)</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All final subcircuits in domestic installations</td></tr>
+          <tr><td>All socket outlets ≤ 20 A (commercial)</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All GPO circuits ≤ 20A</td></tr>
+          <tr><td>Lighting final subcircuits (residential)</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.3" class="clause">2.6.3.3</a></td><td>All lighting circuits in domestic</td></tr>
+          <tr><td>Socket outlets > 20 A</td><td>No (unless wet area)</td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>Recommended for additional protection</td></tr>
+          <tr><td>Outdoor / exposed circuits</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>Any circuit supplying outdoor equipment</td></tr>
+          <tr><td>Wet areas (bathroom, pool zone)</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.4" class="clause">2.6.3.4</a></td><td>Zone 0-2: mandatory 30 mA</td></tr>
+          <tr><td>Construction sites</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All circuits</td></tr>
+          <tr><td>EV charging (Mode 3)</td><td><strong>YES — Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a> + AS/NZS 3001</td><td>Type A or B per charger requirements</td></tr>
+          <tr><td>VSD/Inverter circuits</td><td>If required by above</td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>Type B/B+ required (DC fault current detection)</td></tr>
+          <tr><td>Medical — Body-protected</td><td><strong>YES — Mandatory</strong></td><td>10</td><td>AS/NZS 3003</td><td>Type A minimum, all patient care areas</td></tr>
+          <tr><td>Fire/Essential services</td><td>Generally exempt</td><td>—</td><td><a href="as3000viewer.html#cl-2.6.3.5" class="clause">2.6.3.5</a></td><td>RCD may cause nuisance trip; dedicated circuits</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box"><strong>RCD Types per AS/NZS 3190:</strong><br>
+        <strong>Type I (AC):</strong> Detects AC residual current only. Being phased out from new installations.<br>
+        <strong>Type II (A):</strong> Detects AC and pulsating DC residual current. Standard for most applications.<br>
+        <strong>Type III (B/B+):</strong> Detects AC, pulsating DC, and smooth DC. Required for VSD/inverter loads.<br>
+        <strong>IΔn ratings:</strong> 10 mA (medical), 30 mA (personal protection), 100/300 mA (fire protection), 500 mA (equipment protection).</div>
+    </div>
+  </div>
+  <script>
+    function selectRCD() {
+      const circType = document.getElementById('circuitType').value;
+      const location = document.getElementById('location').value;
+      const rating = parseInt(document.getElementById('circuitRating').value);
+
+      let required = true;
+      let sensitivity = 30;
+      let rcdType = 'Type II (A)';
+      let clause = '2.6.3.2';
+      let notes = [];
+      let priority = 'required'; // required, recommended, optional
+
+      // Determine requirements based on circuit type
+      switch (circType) {
+        case 'gpo':
+        case 'socket_indoor':
+          required = true;
+          sensitivity = 30;
+          clause = '2.6.3.2';
+          if (rating > 20 && location !== 'residential') { required = false; priority = 'recommended'; notes.push('Socket outlets > 20 A: RCD recommended but not mandatory unless in wet/outdoor area.'); }
+          else { notes.push('All socket outlet circuits ≤ 20 A require 30 mA RCD protection.'); }
+          break;
+        case 'socket_outdoor':
+          required = true; sensitivity = 30; clause = '2.6.3.2';
+          notes.push('All outdoor socket outlets require 30 mA RCD protection.');
+          break;
+        case 'lighting':
+          if (location === 'residential') { required = true; clause = '2.6.3.3'; notes.push('All lighting final subcircuits in domestic installations require 30 mA RCD.'); }
+          else { required = false; priority = 'recommended'; notes.push('Lighting in commercial: RCD recommended for personal protection, not mandatory unless specific risk.'); }
+          break;
+        case 'fixed_appliance':
+          if (location === 'residential') { required = true; notes.push('Residential fixed appliances on dedicated circuits still require RCD per <a href="as3000viewer.html#cl-2.6.3" class="clause">cl. 2.6.3</a>.'); }
+          else { priority = 'recommended'; notes.push('Commercial fixed appliances: RCD recommended.'); }
+          break;
+        case 'hot_water':
+          if (location === 'residential') { required = true; notes.push('Residential hot water: RCD required.'); }
+          else { priority = 'recommended'; notes.push('Commercial hot water: assess if in wet area.'); }
+          break;
+        case 'aircon':
+          if (location === 'residential') { required = true; notes.push('Residential A/C: RCD required on dedicated circuit.'); }
+          else { priority = 'recommended'; notes.push('Commercial A/C with VSD: consider Type B.'); }
+          if (true) { rcdType = 'Type II (A) minimum'; notes.push('If inverter-type A/C (VSD compressor), Type III (B) is STRONGLY recommended to detect DC fault currents.'); }
+          break;
+        case 'ev_charger':
+          required = true; sensitivity = 30;
+          rcdType = 'Type III (B) or Type II (A) with DC 6 mA detection';
+          clause = '2.6.3.2 + AS/NZS 3001';
+          notes.push('EV chargers (Mode 3) MUST have RCD with DC fault current detection. Type B RCD or Type A with integrated 6 mA DC detection per IEC 62955.');
+          break;
+        case 'vsd_motor':
+          rcdType = 'Type III (B/B+)';
+          notes.push('VSD loads produce smooth DC fault currents that Type A/AC RCDs cannot detect. Type B or B+ is REQUIRED where RCD protection is applied.');
+          if (rating <= 20 || location === 'construction' || location === 'outdoor') { required = true; }
+          else { priority = 'recommended'; }
+          break;
+        case 'medical':
+          required = true; sensitivity = 10;
+          rcdType = 'Type II (A) minimum (AS/NZS 3003)';
+          clause = 'AS/NZS 3003 cl. 5.2';
+          notes.push('Medical patient care areas: 10 mA body-protected RCD required. Group 2 medical: consider isolated power supply (IPS) with insulation monitoring device (IMD).');
+          break;
+        case 'fire_essential':
+          required = false; priority = 'optional';
+          sensitivity = 0;
+          clause = '2.6.3.5';
+          notes.push('Fire and essential services circuits are generally EXEMPT from RCD requirements to avoid nuisance tripping compromising life safety systems.');
+          notes.push('Where RCD is unavoidable, use 300 mA time-delayed type to minimise nuisance trips.');
+          break;
+        case 'solar_inverter':
+          rcdType = 'Type III (B) or Type II (A) per inverter manufacturer';
+          clause = 'AS/NZS 5033 + 4777.1';
+          required = true; sensitivity = 30;
+          notes.push('Solar inverters may produce DC fault currents. Check inverter datasheet — many have internal RCM (residual current monitoring) allowing Type A external RCD.');
+          break;
+      }
+
+      // Location overrides
+      if (location === 'wet_area' || location === 'pool') {
+        required = true; sensitivity = 30; clause = '2.6.3.4';
+        notes.push('Wet areas and pool zones: 30 mA RCD mandatory on ALL circuits (including lighting and fixed appliances).');
+      }
+      if (location === 'construction') {
+        required = true; sensitivity = 30;
+        notes.push('Construction sites: 30 mA RCD mandatory on ALL circuits per AS/NZS 3012.');
+      }
+      if (location === 'outdoor') {
+        required = true;
+        notes.push('Outdoor installations: 30 mA RCD required.');
+      }
+
+      // Build output
+      let html = '';
+      html += `<div class="result-box"><h3>RCD Selection Result</h3>
+        <div class="result-grid">
+          <div class="result-item"><div class="result-label">RCD Required?</div><div class="result-value">${required ? 'YES' : (priority==='recommended' ? 'RECOMMENDED' : 'NOT REQUIRED')}</div></div>
+          <div class="result-item"><div class="result-label">RCD Type</div><div class="result-value" style="font-size:1.2em;">${sensitivity > 0 ? rcdType : 'N/A'}</div></div>
+          <div class="result-item"><div class="result-label">Sensitivity (IΔn)</div><div class="result-value">${sensitivity > 0 ? sensitivity + ' mA' : 'N/A'}</div></div>
+          <div class="result-item"><div class="result-label">Reference</div><div class="result-value" style="font-size:1.1em;">AS/NZS 3000 ${clause}</div></div>
+        </div></div>`;
+
+      // Notes
+      const boxClass = required ? (sensitivity <= 10 ? 'fail-box' : 'pass-box') : (priority === 'recommended' ? 'warn-box' : 'info-box');
+      html += `<div class="${boxClass}" style="margin-top:16px;"><strong>Application Notes:</strong><ul>`;
+      notes.forEach(n => html += `<li>${n}</li>`);
+      html += `</ul></div>`;
+
+      // Additional guidance
+      html += `<div class="calc-section" style="margin-top:16px;"><h2>Selection Guidance</h2>`;
+      html += `<div class="rcd-card"><h4>Type II (A) — Standard</h4>
+        <span class="tag tag-required">Most common</span>
+        <p>Detects AC and pulsating DC residual currents. Suitable for resistive loads, standard motors, lighting, GPOs. This is the default selection for most circuits in AS/NZS 3000.</p></div>`;
+      html += `<div class="rcd-card"><h4>Type III (B/B+) — VSD / DC Fault</h4>
+        <span class="tag tag-recommended">Required for VSD/EV/inverter</span>
+        <p>Detects smooth DC residual currents in addition to AC and pulsating DC. Required where variable speed drives, EV chargers, or PV inverters could produce DC fault current. Also called Type B per IEC 62423.</p></div>`;
+      html += `<div class="rcd-card"><h4>30 mA — Personal Protection</h4>
+        <span class="tag tag-required">Standard</span>
+        <p>Primary sensitivity for additional protection against direct contact. Required for socket outlets ≤ 20 A, residential circuits, wet areas, outdoor, construction sites.</p></div>`;
+      html += `<div class="rcd-card"><h4>10 mA — Body-Protected (Medical)</h4>
+        <span class="tag tag-required">Medical only</span>
+        <p>Enhanced sensitivity for patient care areas per AS/NZS 3003. Limits leakage current to safe levels for direct patient contact.</p></div>`;
+      html += `<div class="rcd-card"><h4>100–300 mA — Fire Protection</h4>
+        <span class="tag tag-optional">Equipment / fire prevention</span>
+        <p>Provides fire protection by detecting larger earth leakage that could cause heating. Not suitable for personal protection. Use time-delayed to discriminate with downstream 30 mA RCDs.</p></div>`;
+      html += `</div>`;
+
+      document.getElementById('resultSection').innerHTML = html;
+      document.getElementById('resultSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>Essential Services Register - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .calc-button { background: #1976d2; color: white; padding: 10px 24px; border: none; font-size: 1em; cursor: pointer; margin-top: 8px; }
+    .calc-button:hover { background: #1565c0; }
+    .calc-button.sm { font-size: 0.9em; padding: 6px 14px; }
+    .calc-button.green { background: #2e7d32; }
+    .calc-button.green:hover { background: #1b5e20; }
+    .calc-button.red { background: #c62828; }
+    .calc-button.red:hover { background: #b71c1c; }
+    .btn-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 2px; margin-bottom: 0; }
+    .tab-btn { padding: 10px 18px; background: #e0e0e0; border: none; cursor: pointer; font-size: 0.95em; font-weight: bold; border-radius: 6px 6px 0 0; }
+    .tab-btn.active { background: #1976d2; color: white; }
+    .tab-content { display: none; padding: 20px; border: 2px solid #1976d2; border-top: none; background: #fff; }
+    .tab-content.active { display: block; }
+    .register-table { width: 100%; border-collapse: collapse; font-size: 0.82em; }
+    .register-table th, .register-table td { border: 1px solid #ccc; padding: 6px 8px; }
+    .register-table th { background: #1976d2; color: white; font-size: 0.8em; white-space: nowrap; }
+    .register-table tr:nth-child(even) { background: #f8f9fa; }
+    .register-table tr:hover { background: #e3f0fc; }
+    .register-table input, .register-table select { width: 100%; border: none; padding: 3px; font-size: 0.9em; box-sizing: border-box; }
+    .status-compliant { background: #e8f5e9; color: #2e7d32; font-weight: bold; text-align: center; }
+    .status-due { background: #fff3e0; color: #e65100; font-weight: bold; text-align: center; }
+    .status-overdue { background: #ffebee; color: #c62828; font-weight: bold; text-align: center; }
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 16px 0; }
+    .summary-item { padding: 14px; text-align: center; border-radius: 4px; }
+    .summary-item .value { font-size: 1.6em; font-weight: bold; }
+    .summary-item .label { font-size: 0.85em; color: #555; }
+    .summary-item.green { background: #e8f5e9; border: 1px solid #2e7d32; }
+    .summary-item.green .value { color: #2e7d32; }
+    .summary-item.orange { background: #fff3e0; border: 1px solid #ff9800; }
+    .summary-item.orange .value { color: #e65100; }
+    .summary-item.red { background: #ffebee; border: 1px solid #c62828; }
+    .summary-item.red .value { color: #c62828; }
+    .summary-item.blue { background: #e3f0fc; border: 1px solid #1976d2; }
+    .summary-item.blue .value { color: #1976d2; }
+    .filter-row { display: flex; gap: 12px; margin: 12px 0; align-items: center; flex-wrap: wrap; }
+    .filter-row label { font-weight: bold; font-size: 0.9em; }
+    .filter-row select, .filter-row input { padding: 5px 8px; font-size: 0.9em; }
+    @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon, .btn-row, .tabs, .filter-row { display: none !important; } .tab-content { display: block !important; border: none !important; } .register-table input, .register-table select { border: none !important; background: transparent !important; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown active"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>Essential Services Register</h1>
+    <p>Register of essential safety measures per NCC Section E (Vol. 1) and relevant state building regulations. Track maintenance, inspection and compliance status.</p>
+
+    <div class="summary-grid" id="summaryGrid">
+      <div class="summary-item blue"><div class="value" id="totalMeasures">0</div><div class="label">Total Measures</div></div>
+      <div class="summary-item green"><div class="value" id="compliantCount">0</div><div class="label">Compliant</div></div>
+      <div class="summary-item orange"><div class="value" id="dueCount">0</div><div class="label">Due Soon (30 days)</div></div>
+      <div class="summary-item red"><div class="value" id="overdueCount">0</div><div class="label">Overdue</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('register')">Register</button>
+      <button class="tab-btn" onclick="showTab('ncc')">NCC Requirements</button>
+      <button class="tab-btn" onclick="showTab('maintenance')">Maintenance Schedule</button>
+    </div>
+
+    <!-- Register Tab -->
+    <div class="tab-content active" id="tab-register">
+      <div class="filter-row">
+        <label>Filter by Category:</label>
+        <select id="filterCat" onchange="filterTable()">
+          <option value="all">All Categories</option>
+          <option value="Fire Detection">Fire Detection</option>
+          <option value="Fire Suppression">Fire Suppression</option>
+          <option value="Emergency Lighting">Emergency Lighting</option>
+          <option value="Exit Signs">Exit Signs</option>
+          <option value="Smoke Control">Smoke Control</option>
+          <option value="Fire Doors">Fire Doors</option>
+          <option value="Emergency Power">Emergency Power</option>
+          <option value="Lifts">Lifts</option>
+          <option value="Other">Other</option>
+        </select>
+        <label>Status:</label>
+        <select id="filterStatus" onchange="filterTable()">
+          <option value="all">All</option>
+          <option value="Compliant">Compliant</option>
+          <option value="Due">Due Soon</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="calc-button sm" onclick="addEntry()">+ Add Entry</button>
+        <button class="calc-button sm" onclick="addMultiple(5)">+ Add 5 Rows</button>
+        <button class="calc-button sm red" onclick="deleteLast()">- Delete Last</button>
+        <button class="calc-button sm green" onclick="exportCSV()">Export CSV</button>
+        <button class="calc-button sm" onclick="window.print()">Print</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="register-table" id="registerTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Essential Safety Measure</th>
+              <th>Category</th>
+              <th>Location / Zone</th>
+              <th>Standard / NCC Clause</th>
+              <th>Inspection Freq.</th>
+              <th>Last Inspected</th>
+              <th>Next Due</th>
+              <th>Status</th>
+              <th>Responsible Party</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="registerBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NCC Requirements Tab -->
+    <div class="tab-content" id="tab-ncc">
+      <h3 style="color:#1976d2;">NCC Essential Safety Measures — Electrical Requirements</h3>
+      <table class="register-table">
+        <thead>
+          <tr><th>NCC Clause</th><th>Essential Safety Measure</th><th>Electrical Requirement</th><th>Inspection Frequency</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>E1.4 / E1.5</td><td>Fire Detection & Alarm Systems</td><td>Dedicated supply from switchboard, fire-rated wiring, battery backup min. 24hrs standby + 30min alarm</td><td>Monthly test, Annual professional</td></tr>
+          <tr><td>E1.8</td><td>Sprinkler Systems</td><td>Fire pump power supply, auto-changeover, dedicated circuit, no RCD on fire pump</td><td>Weekly flow test, Annual full</td></tr>
+          <tr><td>E2.2c</td><td>Emergency Lighting</td><td>Min. 90 min battery duration, 0.2 lux min on escape routes, monthly 1-sec test, 6-monthly 90-min test</td><td>Monthly / 6-monthly / Annual</td></tr>
+          <tr><td>E4.5 / E4.6</td><td>Exit Signs</td><td>Illuminated or photoluminescent, battery backup, located per AS 2293.1</td><td>Monthly / 6-monthly / Annual</td></tr>
+          <tr><td>E2.2</td><td>Smoke Hazard Management</td><td>Mechanical exhaust/pressurisation, fire-rated power supply, FSCP integration</td><td>Monthly, Annual professional</td></tr>
+          <tr><td>E2.2b</td><td>Fire/Smoke Doors & Shutters</td><td>Hold-open devices via fire alarm relay, fail-safe operation, fire-rated cabling</td><td>Monthly, Annual professional</td></tr>
+          <tr><td>E2.2a</td><td>Stairwell Pressurisation</td><td>Dedicated essential supply, auto-start on fire signal, fire-rated cables</td><td>Monthly, Annual professional</td></tr>
+          <tr><td>G3.8</td><td>Lifts (Emergency Recall)</td><td>Fire service recall to lobby, emergency supply for car lighting, intercom power</td><td>Monthly, Annual professional</td></tr>
+          <tr><td>EP2.1</td><td>Emergency Warning & Intercom</td><td>EWIS per AS 1670.4, dedicated supply, battery backup, fire-rated wiring</td><td>Monthly, Annual professional</td></tr>
+          <tr><td>—</td><td>Essential Generator Supply</td><td>Auto-start within 10s (NCC), supply to all essential services, per AS/NZS 3010</td><td>Monthly test run, Annual full load</td></tr>
+          <tr><td>—</td><td>Fire Command Panel (FSCP)</td><td>Dedicated supply, fire-rated wiring, battery backup, located at main entry per FIP location</td><td>Monthly, Annual professional</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Maintenance Schedule Tab -->
+    <div class="tab-content" id="tab-maintenance">
+      <h3 style="color:#1976d2;">Standard Maintenance Frequencies</h3>
+      <table class="register-table">
+        <thead>
+          <tr><th>Measure</th><th>Applicable Standard</th><th>Weekly</th><th>Monthly</th><th>6-Monthly</th><th>Annual</th><th>5-Yearly</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Fire Detection & Alarm</td><td>AS 1851 / AS 1670.1</td><td>—</td><td>Detector sampling test</td><td>Full zone test</td><td>Professional service</td><td>Full system overhaul</td></tr>
+          <tr><td>Sprinkler System</td><td>AS 1851 / AS 2118</td><td>Flow alarm test</td><td>Pump run test</td><td>Valve inspection</td><td>Full system test</td><td>—</td></tr>
+          <tr><td>Emergency Lighting</td><td>AS 2293.2</td><td>—</td><td>1-second discharge test</td><td>90-minute discharge test</td><td>Full compliance audit</td><td>Battery replacement (10yr)</td></tr>
+          <tr><td>Exit Signs</td><td>AS 2293.1 / .2</td><td>—</td><td>Visual check + 1-sec test</td><td>90-minute test</td><td>Full compliance audit</td><td>—</td></tr>
+          <tr><td>Smoke Control</td><td>AS 1668.1</td><td>—</td><td>Manual activation test</td><td>—</td><td>Full commissioning test</td><td>—</td></tr>
+          <tr><td>Fire/Smoke Doors</td><td>AS 1905 / AS 1851</td><td>—</td><td>Visual + operation check</td><td>—</td><td>Professional inspection</td><td>—</td></tr>
+          <tr><td>Generator</td><td>AS/NZS 3010</td><td>—</td><td>30-min test run</td><td>—</td><td>Full load bank test</td><td>Major service</td></tr>
+          <tr><td>UPS</td><td>AS 4044</td><td>—</td><td>Visual + status check</td><td>—</td><td>Battery impedance test</td><td>Battery replacement</td></tr>
+          <tr><td>EWIS / Intercom</td><td>AS 1670.4</td><td>—</td><td>Microphone test</td><td>Zone broadcast test</td><td>Full professional test</td><td>—</td></tr>
+          <tr><td>Lifts (Fire Recall)</td><td>AS 1735</td><td>—</td><td>Recall test</td><td>—</td><td>Professional inspection</td><td>—</td></tr>
+          <tr><td>RCDs</td><td>AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.4" class="clause">cl 2.6.4</a></td><td>—</td><td>—</td><td>Push-button test (non-essential)</td><td>Trip-time test by electrician</td><td>—</td></tr>
+        </tbody>
+      </table>
+
+      <div class="warn-box" style="margin-top:16px;">
+        <strong>State/Territory Variations:</strong> Maintenance requirements may vary by jurisdiction. Check local Building Regulations, Essential Safety Measures (ESM) determination notices, and Annual Essential Safety Measures Report (AESMR) requirements for your state. VIC: Building Regulations 2018 Part 12. NSW: EP&A Reg Schedule 4. QLD: Building Fire Safety Regulation 2008.
+      </div>
+    </div>
+
+    <div class="info-box" style="margin-top:16px;">
+      <strong>Key Standards:</strong> NCC 2022 Vol. 1 (especially Sections E &amp; G) · AS 1851 Maintenance of fire protection systems · AS 2293.2 Emergency lighting maintenance · AS 1670.1 Fire detection · AS 1668.1 Smoke control · AS/NZS 3010 Generating sets · AS 4044 UPS systems · AS 1735 Lifts
+    </div>
+  </div>
+  <script>
+    let entryCount = 0;
+    const categories = ['Fire Detection', 'Fire Suppression', 'Emergency Lighting', 'Exit Signs', 'Smoke Control', 'Fire Doors', 'Emergency Power', 'Lifts', 'Other'];
+    const frequencies = ['Weekly', 'Monthly', '6-Monthly', 'Annually', '2-Yearly', '5-Yearly'];
+
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function getStatus(nextDueStr) {
+      if (!nextDueStr) return { text: '—', cls: '' };
+      const due = new Date(nextDueStr);
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const diff = (due - today) / (1000 * 60 * 60 * 24);
+      if (diff < 0) return { text: 'OVERDUE', cls: 'status-overdue' };
+      if (diff <= 30) return { text: 'DUE SOON', cls: 'status-due' };
+      return { text: 'COMPLIANT', cls: 'status-compliant' };
+    }
+
+    function addEntry(data) {
+      entryCount++;
+      const d = data || {};
+      const tr = document.createElement('tr');
+      const catSel = categories.map(c => `<option${c===(d.cat||'')?' selected':''}>${c}</option>`).join('');
+      const freqSel = frequencies.map(f => `<option${f===(d.freq||'Annually')?' selected':''}>${f}</option>`).join('');
+      tr.innerHTML = `
+        <td style="text-align:center;font-weight:bold;color:#666;">${entryCount}</td>
+        <td><input type="text" value="${d.measure || ''}" placeholder="e.g. Fire Detection Panel" /></td>
+        <td><select onchange="filterTable()">${catSel}</select></td>
+        <td><input type="text" value="${d.location || ''}" placeholder="e.g. Level 1" /></td>
+        <td><input type="text" value="${d.standard || ''}" placeholder="e.g. AS 1670.1 / E1.4" /></td>
+        <td><select>${freqSel}</select></td>
+        <td><input type="date" value="${d.lastInsp || ''}" onchange="updateDueDate(this)" /></td>
+        <td><input type="date" value="${d.nextDue || ''}" onchange="updateStatuses()" /></td>
+        <td class="status-cell">—</td>
+        <td><input type="text" value="${d.responsible || ''}" placeholder="Contractor" /></td>
+        <td><input type="text" value="${d.notes || ''}" /></td>`;
+      document.getElementById('registerBody').appendChild(tr);
+      updateStatuses();
+    }
+
+    function addMultiple(n) { for (let i = 0; i < n; i++) addEntry(); }
+
+    function deleteLast() {
+      const body = document.getElementById('registerBody');
+      if (body.lastChild) { body.removeChild(body.lastChild); entryCount--; updateStatuses(); }
+    }
+
+    function updateDueDate(dateInput) {
+      const row = dateInput.closest('tr');
+      const lastDate = new Date(dateInput.value);
+      const freqSelect = row.querySelectorAll('select')[1]; // frequency select
+      const freq = freqSelect.value;
+      const nextInput = row.querySelectorAll('input[type="date"]')[1];
+
+      if (!dateInput.value) return;
+      let nextDate = new Date(lastDate);
+      switch(freq) {
+        case 'Weekly': nextDate.setDate(nextDate.getDate() + 7); break;
+        case 'Monthly': nextDate.setMonth(nextDate.getMonth() + 1); break;
+        case '6-Monthly': nextDate.setMonth(nextDate.getMonth() + 6); break;
+        case 'Annually': nextDate.setFullYear(nextDate.getFullYear() + 1); break;
+        case '2-Yearly': nextDate.setFullYear(nextDate.getFullYear() + 2); break;
+        case '5-Yearly': nextDate.setFullYear(nextDate.getFullYear() + 5); break;
+      }
+      nextInput.value = nextDate.toISOString().split('T')[0];
+      updateStatuses();
+    }
+
+    function updateStatuses() {
+      const rows = document.querySelectorAll('#registerBody tr');
+      let total = 0, compliant = 0, due = 0, overdue = 0;
+      rows.forEach(row => {
+        const nextDueInput = row.querySelectorAll('input[type="date"]')[1];
+        const statusCell = row.querySelector('.status-cell') || row.cells[8];
+        if (statusCell) {
+          const s = getStatus(nextDueInput ? nextDueInput.value : '');
+          statusCell.textContent = s.text;
+          statusCell.className = 'status-cell ' + s.cls;
+          total++;
+          if (s.text === 'COMPLIANT') compliant++;
+          else if (s.text === 'DUE SOON') due++;
+          else if (s.text === 'OVERDUE') overdue++;
+        }
+      });
+      document.getElementById('totalMeasures').textContent = total;
+      document.getElementById('compliantCount').textContent = compliant;
+      document.getElementById('dueCount').textContent = due;
+      document.getElementById('overdueCount').textContent = overdue;
+    }
+
+    function filterTable() {
+      const catFilter = document.getElementById('filterCat').value;
+      const statusFilter = document.getElementById('filterStatus').value;
+      const rows = document.querySelectorAll('#registerBody tr');
+      rows.forEach(row => {
+        const cat = row.querySelectorAll('select')[0].value;
+        const statusCell = row.querySelector('.status-cell') || row.cells[8];
+        const statusText = statusCell ? statusCell.textContent : '';
+        let show = true;
+        if (catFilter !== 'all' && cat !== catFilter) show = false;
+        if (statusFilter !== 'all') {
+          if (statusFilter === 'Compliant' && statusText !== 'COMPLIANT') show = false;
+          if (statusFilter === 'Due' && statusText !== 'DUE SOON') show = false;
+          if (statusFilter === 'Overdue' && statusText !== 'OVERDUE') show = false;
+        }
+        row.style.display = show ? '' : 'none';
+      });
+    }
+
+    function exportCSV() {
+      const headers = ['#', 'Essential Safety Measure', 'Category', 'Location', 'Standard/NCC', 'Frequency', 'Last Inspected', 'Next Due', 'Status', 'Responsible', 'Notes'];
+      let csv = headers.join(',') + '\n';
+      const rows = document.querySelectorAll('#registerBody tr');
+      rows.forEach((row, i) => {
+        const inputs = row.querySelectorAll('input, select');
+        const statusCell = row.querySelector('.status-cell') || row.cells[8];
+        csv += [
+          i + 1,
+          '"' + (inputs[0].value || '') + '"',
+          '"' + (inputs[1].value || '') + '"',
+          '"' + (inputs[2].value || '') + '"',
+          '"' + (inputs[3].value || '') + '"',
+          '"' + (inputs[4].value || '') + '"',
+          inputs[5].value || '',
+          inputs[6].value || '',
+          '"' + (statusCell ? statusCell.textContent : '') + '"',
+          '"' + (inputs[7].value || '') + '"',
+          '"' + (inputs[8].value || '') + '"'
+        ].join(',') + '\n';
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'essential_services_register.csv';
+      a.click();
+    }
+
+    // Pre-populate with common essential services
+    const today = new Date();
+    const sixMonthsAgo = new Date(today); sixMonthsAgo.setMonth(today.getMonth() - 6);
+    const threeMonthsAgo = new Date(today); threeMonthsAgo.setMonth(today.getMonth() - 3);
+    const fmt = d => d.toISOString().split('T')[0];
+
+    addEntry({ measure: 'Fire Detection & Alarm System (FDAS)', cat: 'Fire Detection', location: 'Whole Building', standard: 'AS 1670.1 / NCC E1.4', freq: 'Monthly', lastInsp: fmt(threeMonthsAgo), responsible: 'Fire Services Co.' });
+    addEntry({ measure: 'Sprinkler System', cat: 'Fire Suppression', location: 'Whole Building', standard: 'AS 2118 / NCC E1.5', freq: 'Monthly', lastInsp: fmt(threeMonthsAgo), responsible: 'Fire Services Co.' });
+    addEntry({ measure: 'Emergency Lighting', cat: 'Emergency Lighting', location: 'All Levels', standard: 'AS 2293.1 / NCC E4.2', freq: 'Monthly', lastInsp: fmt(threeMonthsAgo), responsible: 'Electrical Contractor' });
+    addEntry({ measure: 'Exit Signs', cat: 'Exit Signs', location: 'All Levels', standard: 'AS 2293.1 / NCC E4.5', freq: 'Monthly', lastInsp: fmt(threeMonthsAgo), responsible: 'Electrical Contractor' });
+    addEntry({ measure: 'Smoke Exhaust System', cat: 'Smoke Control', location: 'Basement & Stairwells', standard: 'AS 1668.1 / NCC E2.2', freq: 'Monthly', lastInsp: fmt(sixMonthsAgo), responsible: 'Mechanical Contractor' });
+    addEntry({ measure: 'Fire/Smoke Doors', cat: 'Fire Doors', location: 'All Levels', standard: 'AS 1905 / NCC C3.4', freq: 'Annually', lastInsp: fmt(sixMonthsAgo), responsible: 'Fire Services Co.' });
+    addEntry({ measure: 'Essential Generator', cat: 'Emergency Power', location: 'Plant Room L0', standard: 'AS/NZS 3010 / NCC EP2.1', freq: 'Monthly', lastInsp: fmt(threeMonthsAgo), responsible: 'Generator Contractor' });
+    addEntry({ measure: 'Lift Fire Service Recall', cat: 'Lifts', location: 'All Lifts', standard: 'AS 1735 / NCC G3.8', freq: 'Monthly', lastInsp: fmt(threeMonthsAgo), responsible: 'Lift Contractor' });
+  </script>
+</body>
+</html>

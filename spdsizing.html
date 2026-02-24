@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <title>SPD Sizing - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .input-group { display: flex; flex-direction: column; }
+    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
+    .input-group input, .input-group select { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; }
+    .result-box { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; padding: 24px; margin-top: 24px; }
+    .result-box h3 { margin-top: 0; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-top: 16px; }
+    .result-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .result-label { font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; }
+    .result-value { font-size: 1.5em; font-weight: bold; }
+    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
+    .pass-box { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 16px; margin: 16px 0; }
+    .fail-box { background: #ffebee; border-left: 4px solid #c62828; padding: 16px; margin: 16px 0; }
+    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
+    .calc-button:hover { background: #1565c0; }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    .ref-table th { background: #1976d2; color: white; }
+    .ref-table tr:nth-child(even) { background: #f8f9fa; }
+    .zone-diagram { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+    .zone-card { border: 2px solid #1976d2; padding: 16px; text-align: center; background: #f8fbff; }
+    .zone-card h4 { margin: 0 0 8px 0; color: #1976d2; }
+    .zone-card.active { border-color: #2e7d32; background: #e8f5e9; }
+    @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } .zone-diagram { grid-template-columns: 1fr; } }
+    @media print { .top-tabs, .calc-button, .topleft-icon { display: none !important; } .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+  <img src="icon.png" class="topleft-icon" alt="App Icon" />
+  <div class="top-tabs">
+    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
+    <div class="tab has-dropdown"><span>Power Systems</span><div class="dropdown-content">
+      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
+    </div></div>
+    <div class="tab has-dropdown active"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
+    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
+    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a><a href="as3000viewer.html">AS3000 Viewer</a></div></div>
+    <a class="tab" href="qa.html">Verification</a>
+  </div>
+  <div class="main-content">
+    <h1>SPD Sizing & Risk Assessment</h1>
+    <p>Surge protection device selection per <strong>AS/NZS 1768:2021</strong> and <strong>AS/NZS 4777.1</strong>. Risk assessment and SPD class/type selection.</p>
+
+    <div class="calc-section">
+      <h2>Installation Risk Assessment</h2>
+      <div class="info-box"><strong>AS/NZS 1768:2021:</strong> Lightning protection — General principles. Requires risk assessment to determine if SPD protection is needed and what class is appropriate.</div>
+      <div class="input-row three">
+        <div class="input-group"><label for="buildingType">Building Type</label>
+          <select id="buildingType">
+            <option value="commercial">Commercial office</option>
+            <option value="hospital">Hospital / medical</option>
+            <option value="data_centre">Data centre / comms</option>
+            <option value="industrial">Industrial / manufacturing</option>
+            <option value="residential">Residential</option>
+            <option value="school">School / education</option>
+            <option value="retail">Retail / shopping centre</option>
+            <option value="high_rise">High-rise (>25m)</option>
+          </select></div>
+        <div class="input-group"><label for="thunderDays">Thunderstorm Days/Year (Td)</label><input type="number" id="thunderDays" value="20" min="1" max="100" /><small style="color:#666;">Sydney ~15, Brisbane ~30, Darwin ~80, Melbourne ~10</small></div>
+        <div class="input-group"><label for="supplyType">Supply Type</label>
+          <select id="supplyType">
+            <option value="underground">Underground supply</option>
+            <option value="overhead" selected>Overhead supply</option>
+            <option value="overhead_exposed">Overhead — exposed/rural</option>
+          </select></div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group"><label for="sensitiveLoads">Sensitive Electronic Loads?</label>
+          <select id="sensitiveLoads"><option value="yes" selected>Yes (IT, medical, comms)</option><option value="no">No (mostly resistive/motor)</option></select></div>
+        <div class="input-group"><label for="lightningProtection">External Lightning Protection?</label>
+          <select id="lightningProtection"><option value="yes">Yes (LPS installed)</option><option value="no" selected>No</option></select></div>
+        <div class="input-group"><label for="solarPV">Solar PV System?</label>
+          <select id="solarPV"><option value="yes">Yes</option><option value="no" selected>No</option></select></div>
+      </div>
+      <button class="calc-button" onclick="assessRisk()">Assess & Select SPD</button>
+    </div>
+
+    <div id="resultSection" style="display:none;"></div>
+
+    <div class="calc-section">
+      <h2>SPD Zone Protection Concept</h2>
+      <div class="zone-diagram">
+        <div class="zone-card"><h4>Zone 0 → 1</h4><p><strong>Type 1 (Class I)</strong><br>At MSB / main switchboard<br>Iimp ≥ 12.5 kA (10/350 µs)<br>Handles direct lightning current</p></div>
+        <div class="zone-card"><h4>Zone 1 → 2</h4><p><strong>Type 2 (Class II)</strong><br>At sub-distribution boards<br>In ≥ 20 kA (8/20 µs)<br>Handles indirect surges</p></div>
+        <div class="zone-card"><h4>Zone 2 → 3</h4><p><strong>Type 3 (Class III)</strong><br>At point of use / GPO<br>Imax ≥ 10 kA (8/20 µs)<br>Fine protection for sensitive equipment</p></div>
+      </div>
+      <div class="info-box"><strong>Coordination:</strong> SPDs at different zones must be coordinated. Minimum 10m cable between Type 1 and Type 2 SPDs, or use coordinated SPD sets. Many manufacturers offer combined Type 1+2 devices.</div>
+    </div>
+
+    <div class="calc-section">
+      <h2>SPD Selection Parameters Reference</h2>
+      <table class="ref-table">
+        <thead><tr><th>Parameter</th><th>Type 1 (Class I)</th><th>Type 2 (Class II)</th><th>Type 3 (Class III)</th></tr></thead>
+        <tbody>
+          <tr><td>Location</td><td>MSB / MEN point</td><td>Sub-distribution boards</td><td>Point of use</td></tr>
+          <tr><td>Lightning Current (Iimp)</td><td>≥ 12.5 kA per pole (10/350µs)</td><td>N/A</td><td>N/A</td></tr>
+          <tr><td>Discharge Current (In)</td><td>—</td><td>≥ 20 kA (8/20µs)</td><td>—</td></tr>
+          <tr><td>Max Discharge (Imax)</td><td>—</td><td>≥ 40 kA (8/20µs)</td><td>≥ 10 kA (8/20µs)</td></tr>
+          <tr><td>Voltage Protection (Up)</td><td>≤ 4 kV</td><td>≤ 2.5 kV</td><td>≤ 1.5 kV</td></tr>
+          <tr><td>Uc (Max continuous V)</td><td colspan="3">≥ 275 V (L-N) for 230V systems, ≥ 440V (L-L) for 400V systems</td></tr>
+          <tr><td>Backup Protection</td><td>Fuse/MCB per manufacturer</td><td>Fuse/MCB per manufacturer</td><td>Upstream OCPD</td></tr>
+          <tr><td>Status Indication</td><td>Required (green/red)</td><td>Required</td><td>Recommended</td></tr>
+          <tr><td>Standard</td><td>AS/NZS 1768, IEC 61643-11</td><td>AS/NZS 1768, IEC 61643-11</td><td>IEC 61643-11</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    function assessRisk() {
+      const buildingType = document.getElementById('buildingType').value;
+      const td = parseInt(document.getElementById('thunderDays').value);
+      const supplyType = document.getElementById('supplyType').value;
+      const sensitive = document.getElementById('sensitiveLoads').value === 'yes';
+      const lps = document.getElementById('lightningProtection').value === 'yes';
+      const solar = document.getElementById('solarPV').value === 'yes';
+
+      // Risk scoring (simplified AS/NZS 1768 Annex risk assessment)
+      let riskScore = 0;
+
+      // Thunder days contribution
+      if (td >= 40) riskScore += 4;
+      else if (td >= 20) riskScore += 3;
+      else if (td >= 10) riskScore += 2;
+      else riskScore += 1;
+
+      // Building type
+      const buildingRisk = { hospital: 5, data_centre: 5, high_rise: 4, industrial: 3, commercial: 3, school: 3, retail: 2, residential: 1 };
+      riskScore += buildingRisk[buildingType] || 2;
+
+      // Supply type
+      if (supplyType === 'overhead_exposed') riskScore += 3;
+      else if (supplyType === 'overhead') riskScore += 2;
+      else riskScore += 1;
+
+      // Sensitive loads
+      if (sensitive) riskScore += 2;
+
+      // Solar PV
+      if (solar) riskScore += 1;
+
+      // LPS
+      if (lps) riskScore += 1; // LPS present means Type 1 is essential
+
+      // Determine SPD requirements
+      let type1 = false, type2 = false, type3 = false;
+      let riskLevel = '';
+      let recommendations = [];
+
+      if (riskScore >= 12) {
+        riskLevel = 'VERY HIGH';
+        type1 = true; type2 = true; type3 = true;
+        recommendations.push('Install Type 1 SPD at MSB with Iimp ≥ 25 kA per pole.');
+        recommendations.push('Install Type 2 SPDs at ALL sub-distribution boards.');
+        recommendations.push('Install Type 3 SPDs at sensitive equipment locations.');
+      } else if (riskScore >= 8) {
+        riskLevel = 'HIGH';
+        type1 = true; type2 = true; type3 = sensitive;
+        recommendations.push('Install Type 1 SPD at MSB (mandatory per risk assessment).');
+        recommendations.push('Install Type 2 SPDs at sub-distribution boards.');
+        if (sensitive) recommendations.push('Install Type 3 fine protection at IT/medical equipment.');
+      } else if (riskScore >= 5) {
+        riskLevel = 'MODERATE';
+        type1 = false; type2 = true; type3 = sensitive;
+        recommendations.push('Install Type 2 SPDs at MSB and critical sub-boards.');
+        if (sensitive) recommendations.push('Consider Type 3 at sensitive loads.');
+      } else {
+        riskLevel = 'LOW';
+        type2 = true;
+        recommendations.push('Minimum Type 2 SPD at MSB recommended as good practice.');
+      }
+
+      // Mandatory cases
+      if (lps) {
+        type1 = true;
+        recommendations.unshift('Type 1 SPD is MANDATORY when external lightning protection system (LPS) is installed per AS/NZS 1768 cl. 4.3.');
+      }
+      if (solar) {
+        recommendations.push('DC side SPD (Type 2) required at PV array combiner box per AS/NZS 5033. AC side SPD at inverter output also recommended.');
+      }
+
+      // Build output
+      const riskColor = riskScore >= 12 ? '#c62828' : riskScore >= 8 ? '#ff9800' : riskScore >= 5 ? '#1976d2' : '#2e7d32';
+      let html = `<div class="result-box"><h3>Risk Assessment Result</h3>
+        <div class="result-grid">
+          <div class="result-item"><div class="result-label">Risk Score</div><div class="result-value">${riskScore}/16</div></div>
+          <div class="result-item"><div class="result-label">Risk Level</div><div class="result-value" style="color:${riskColor === '#c62828' ? '#ffcdd2' : '#fff'}">${riskLevel}</div></div>
+          <div class="result-item"><div class="result-label">Type 1 Required</div><div class="result-value">${type1 ? 'YES' : 'NO'}</div></div>
+          <div class="result-item"><div class="result-label">Type 2 Required</div><div class="result-value">${type2 ? 'YES' : 'NO'}</div></div>
+          <div class="result-item"><div class="result-label">Type 3 Required</div><div class="result-value">${type3 ? 'YES' : 'NO'}</div></div>
+        </div></div>`;
+
+      // Zoned diagram with active zones
+      html += `<div class="calc-section" style="margin-top:16px;"><h2>Required Protection Zones</h2><div class="zone-diagram">
+        <div class="zone-card ${type1?'active':''}"><h4>Type 1 ${type1?'✓ REQUIRED':'— Not required'}</h4><p>${type1?'Install at MSB. Iimp ≥ 12.5 kA (10/350µs). Up ≤ 4 kV.':'Low risk — Type 1 not needed for this installation.'}</p></div>
+        <div class="zone-card ${type2?'active':''}"><h4>Type 2 ${type2?'✓ REQUIRED':'— Not required'}</h4><p>${type2?'Install at sub-DBs. In ≥ 20 kA (8/20µs). Up ≤ 2.5 kV.':'Not required based on risk assessment.'}</p></div>
+        <div class="zone-card ${type3?'active':''}"><h4>Type 3 ${type3?'✓ REQUIRED':'— Optional'}</h4><p>${type3?'Install at sensitive equipment. Imax ≥ 10 kA. Up ≤ 1.5 kV.':'Optional — no critical sensitive loads identified.'}</p></div>
+      </div></div>`;
+
+      // Recommendations
+      const boxClass = riskScore >= 8 ? 'warn-box' : 'info-box';
+      html += `<div class="${boxClass}"><strong>Recommendations:</strong><ul>`;
+      recommendations.forEach(r => html += `<li>${r}</li>`);
+      html += `</ul><p><em>Ensure SPD Uc ≥ 275V for 230V L-N systems. Use SPD backup fuses as specified by manufacturer (typically 125A gG for Type 1, 63-125A for Type 2). All SPDs must have remote status indication to BMS where fitted.</em></p></div>`;
+
+      document.getElementById('resultSection').innerHTML = html;
+      document.getElementById('resultSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
