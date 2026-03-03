@@ -6,30 +6,20 @@
   <title>Testing & Commissioning Checklists - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
-    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
-    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
-    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; margin-top: 12px; }
-    .calc-button:hover { background: #1565c0; }
-    .tabs { display: flex; gap: 0; border-bottom: 3px solid #1976d2; margin-bottom: 0; }
-    .tabs button { padding: 10px 20px; border: none; border-bottom: 3px solid transparent; background: #f0f4f8; cursor: pointer; font-size: 0.95em; font-weight: bold; color: #666; margin-bottom: -3px; }
-    .tabs button.active { background: #fff; color: #1976d2; border-bottom-color: #1976d2; }
-    .tab-content { display: none; padding: 24px; border: 2px solid #1976d2; border-top: none; background: #fff; }
-    .tab-content.active { display: block; }
-    .checklist { list-style: none; padding: 0; margin: 0; }
-    .checklist li { padding: 10px 12px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
-    .checklist li label { cursor: pointer; display: flex; gap: 10px; align-items: flex-start; }
-    .checklist input[type="checkbox"] { margin-top: 4px; width: 18px; height: 18px; flex-shrink: 0; }
-    .checklist .clause { color: #1976d2; font-weight: bold; font-size: 0.85em; white-space: nowrap; }
-    .progress-bar { height: 8px; background: #e0e0e0; border-radius: 4px; margin: 12px 0; }
-    .progress-fill { height: 100%; background: #2e7d32; border-radius: 4px; transition: width 0.3s; }
-    .progress-text { font-size: 0.9em; color: #666; margin-bottom: 8px; }
-    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
-    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; }
-    .ref-table th { background: #1976d2; color: white; text-align: center; }
-    .ref-table tr:nth-child(even) { background: #f8f9fa; }
-    @media print { .top-tabs, .calc-button, .tabs { display: none !important; } .tab-content { display: block !important; border: none; page-break-before: always; } .checklist input[type="checkbox"] { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    .tabs { display: flex; gap: 0; border-bottom: 3px solid #2563eb; margin-bottom: 0; }
+        .tabs button { padding: 10px 20px; border: none; border-bottom: 3px solid transparent; background: #f1f5f9; cursor: pointer; font-size: 0.95em; font-weight: bold; color: #666; margin-bottom: -3px; }
+        .tabs button.active { background: #fff; color: #2563eb; border-bottom-color: #2563eb; }
+        .tab-content { display: none; padding: 24px; border: 2px solid #2563eb; border-top: none; background: #fff; }
+        .tab-content.active { display: block; }
+        .checklist { list-style: none; padding: 0; margin: 0; }
+        .checklist li { padding: 10px 12px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+        .checklist li label { cursor: pointer; display: flex; gap: 10px; align-items: flex-start; }
+        .checklist input[type="checkbox"] { margin-top: 4px; width: 18px; height: 18px; flex-shrink: 0; }
+        .checklist .clause { color: #2563eb; font-weight: bold; font-size: 0.85em; white-space: nowrap; }
+        .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; margin: 12px 0; }
+        .progress-fill { height: 100%; background: #16a34a; border-radius: 4px; transition: width 0.3s; }
+        .progress-text { font-size: 0.9em; color: #666; margin-bottom: 8px; }
+        @media print { .top-tabs, .calc-button, .tabs { display: none !important; } .tab-content { display: block !important; border: none; page-break-before: always; } .checklist input[type="checkbox"] { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>

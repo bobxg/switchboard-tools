@@ -6,106 +6,18 @@
   <title>Emergency Lighting - Switchboard Tools</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .calc-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .calc-section {
-      background: #fff;
-      border: 2px solid #1976d2;
-      padding: 24px;
-      margin-bottom: 20px;
-    }
-    .calc-section h2 {
-      color: #1976d2;
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 1.5em;
-      border-bottom: 2px solid #1976d2;
-      padding-bottom: 10px;
-    }
-    .input-group {
-      margin-bottom: 20px;
-    }
-    .input-group label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 6px;
-      color: #333;
-    }
-    .input-group input,
-    .input-group select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      font-size: 1em;
-      box-sizing: border-box;
-    }
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .result-box {
-      background: #e3f2fd;
-      border: 2px solid #1976d2;
-      border-radius: 4px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-    .result-box h3 {
-      color: #1976d2;
-      margin-top: 0;
-      margin-bottom: 15px;
-    }
-    .result-value {
-      font-size: 2em;
-      font-weight: bold;
-      color: #1976d2;
-      margin: 10px 0;
-    }
-    .result-detail {
-      font-size: 1em;
-      color: #555;
-      margin: 8px 0;
-    }
-    .warning-box {
-      background: #fff3cd;
-      border-left: 4px solid #ff9800;
-      padding: 16px;
-      margin: 16px 0;
-    }
-    .info-box {
-      background: #e8f5e9;
-      border-left: 4px solid #4caf50;
-      padding: 16px;
-      margin: 16px 0;
-    }
-    .reference-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 16px 0;
-    }
-    .reference-table th,
-    .reference-table td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-    }
-    .reference-table th {
-      background: #1976d2;
-      color: white;
-      font-weight: bold;
-    }
-    .reference-table tr:nth-child(even) {
-      background: #f9f9f9;
-    }
-    .note-text {
-      font-size: 0.9em;
-      color: #555;
-      margin: 8px 0 0 0;
-    }
+    .calc-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .result-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 3px; padding: 20px; margin: 20px 0; color: #1e293b; }
+    .result-box h3 { color: #1e293b; margin-top: 0; margin-bottom: 15px; }
+    .result-value { font-size: 2em; font-weight: 700; color: #2563eb; margin: 10px 0; }
+    .result-detail { font-size: 1em; color: #64748b; margin: 8px 0; }
+    .warning-box { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 14px 18px; margin: 16px 0; border-radius: 0 2px 2px 0; }
+    .info-box { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 14px 18px; margin: 16px 0; border-radius: 0 2px 2px 0; }
+    .reference-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 16px 0; border-radius: 2px; overflow: hidden; border: 1px solid #e2e8f0; }
+    .reference-table th, .reference-table td { border-bottom: 1px solid #f1f5f9; padding: 10px; text-align: left; }
+    .reference-table th { background: #1e293b; color: white; font-weight: 600; border-bottom: none; }
+    .reference-table tr:nth-child(even) { background: #f8fafc; }
+    .note-text { font-size: 0.9em; color: #64748b; margin: 8px 0 0 0; }
   </style>
 </head>
 <body>

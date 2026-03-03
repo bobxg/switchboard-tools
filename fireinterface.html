@@ -6,37 +6,26 @@
   <title>Fire Systems Interface Matrix - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
-    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
-    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
-    .pass-box { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 16px; margin: 16px 0; }
-    .fail-box { background: #ffebee; border-left: 4px solid #c62828; padding: 16px; margin: 16px 0; }
-    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
-    .calc-button:hover { background: #1565c0; }
-    .matrix-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.85em; }
-    .matrix-table th, .matrix-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: center; }
-    .matrix-table th { background: #1976d2; color: white; position: sticky; top: 0; z-index: 2; }
-    .matrix-table th.row-header { background: #1565c0; text-align: left; min-width: 200px; }
-    .matrix-table td.cell-on { background: #e8f5e9; color: #2e7d32; font-weight: bold; }
-    .matrix-table td.cell-off { background: #ffebee; color: #c62828; font-weight: bold; }
-    .matrix-table td.cell-na { background: #f5f5f5; color: #999; }
-    .matrix-table td.cell-monitor { background: #e3f0fc; color: #1976d2; font-weight: bold; }
-    .matrix-table td.cell-trip { background: #fff3e0; color: #e65100; font-weight: bold; }
-    .matrix-table tr:hover { background: #f0f4ff; }
-    .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; font-size: 0.9em; }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-box { width: 20px; height: 20px; border: 1px solid #ccc; }
-    .filter-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
-    .filter-row label { display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 6px 12px; border: 1px solid #ddd; background: #f8f9fa; font-size: 0.9em; }
-    .filter-row label:hover { background: #e3f0fc; }
-    .filter-row input[type="checkbox"] { margin: 0; }
-    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
-    .ref-table th, .ref-table td { border: 1px solid #ddd; padding: 8px; }
-    .ref-table th { background: #1976d2; color: white; text-align: center; }
-    .ref-table tr:nth-child(even) { background: #f8f9fa; }
-    @media (max-width: 768px) { .matrix-table { font-size: 0.75em; } .matrix-table th, .matrix-table td { padding: 4px; } }
-    @media print { .top-tabs, .calc-button, .filter-row { display: none !important; } .matrix-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    .fail-box { background: #fef2f2; border-left: 4px solid #dc2626; padding: 16px; margin: 16px 0; }
+        .matrix-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.85em; }
+        .matrix-table th, .matrix-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: center; }
+        .matrix-table th { background: #2563eb; color: white; position: sticky; top: 0; z-index: 2; }
+        .matrix-table th.row-header { background: #1d4ed8; text-align: left; min-width: 200px; }
+        .matrix-table td.cell-on { background: #f0fdf4; color: #16a34a; font-weight: bold; }
+        .matrix-table td.cell-off { background: #fef2f2; color: #dc2626; font-weight: bold; }
+        .matrix-table td.cell-na { background: #f8fafc; color: #999; }
+        .matrix-table td.cell-monitor { background: #eff6ff; color: #2563eb; font-weight: bold; }
+        .matrix-table td.cell-trip { background: #fffbeb; color: #d97706; font-weight: bold; }
+        .matrix-table tr:hover { background: #eff6ff; }
+        .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; font-size: 0.9em; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-box { width: 20px; height: 20px; border: 1px solid #ccc; }
+        .filter-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+        .filter-row label { display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 6px 12px; border: 1px solid #ddd; background: #f8fafc; font-size: 0.9em; }
+        .filter-row label:hover { background: #eff6ff; }
+        .filter-row input[type="checkbox"] { margin: 0; }
+        @media (max-width: 768px) { .matrix-table { font-size: 0.75em; } .matrix-table th, .matrix-table td { padding: 4px; } }
+        @media print { .top-tabs, .calc-button, .filter-row { display: none !important; } .matrix-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
 <body>

@@ -6,181 +6,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    .room-container {
-      flex: 1;
-      padding: 20px;
-    }
-    .room-label {
-      font-size: 1.3em;
-      font-weight: bold;
-      color: #1976d2;
-      margin-bottom: 12px;
-    }
-    .room-box {
-      position: relative;
-      background: #f9f9f9;
-      border: 3px solid #1976d2;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-      overflow: visible;
-      min-width: 120px;
-      min-height: 120px;
-    }
-    .equip-rect {
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8em;
-      font-weight: bold;
-      color: #fff;
-      border: 2px solid #333;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-      text-align: center;
-      padding: 4px;
-      cursor: move;
-      box-sizing: border-box;
-    }
-    .equip-rect-msb { background: #1976d2; }
-    .equip-rect-mssb { background: #388e3c; }
-    .equip-rect-db { background: #00796b; }
-    .equip-rect-meter { background: #ffa000; color: #000; }
-    .equip-rect-ct { background: #8e24aa; }
-    .clearance-zone-red {
-      position: absolute;
-      border: 2px solid #d32f2f;
-      background: rgba(211, 47, 47, 0.2);
-      pointer-events: none;
-      box-sizing: border-box;
-    }
-    .clearance-zone-yellow {
-      position: absolute;
-      border: 2px dashed #ffa000;
-      background: rgba(255, 160, 0, 0.15);
-      pointer-events: none;
-      box-sizing: border-box;
-    }
-    .door {
-      position: absolute;
-      border: 3px solid #795548;
-      background: #d7ccc8;
-      box-sizing: border-box;
-    }
-    .door-swing {
-      position: absolute;
-      border: 2px solid #795548;
-      border-radius: 0;
-      background: transparent;
-      pointer-events: none;
-    }
-    .room-dims {
-      margin: 12px 0;
-      padding: 12px;
-      background: #e3f0fc;
-      border-left: 4px solid #1976d2;
-      font-size: 1em;
-    }
-    .room-dims strong {
-      color: #1976d2;
-    }
-    .equip-controls {
-      background: #f8f8f8;
-      padding: 20px;
-      border-right: 1px solid #b7c5dd;
-      min-width: 320px;
-      max-width: 400px;
-    }
-    .equip-controls h2 {
-      color: #1976d2;
-      margin-bottom: 18px;
-      font-size: 1.5em;
-    }
-    .add-equip-section {
-      margin-bottom: 24px;
-      padding: 16px;
-      background: #fff;
-      border: 1px solid #b7c5dd;
-    }
-    .add-equip-section h3 {
-      color: #1976d2;
-      margin-bottom: 12px;
-      font-size: 1.1em;
-    }
-    .input-group {
-      margin-bottom: 12px;
-    }
-    .input-group label {
-      display: block;
-      margin-bottom: 4px;
-      font-weight: bold;
-      color: #333;
-    }
-    .input-group input,
-    .input-group select {
-      width: 100%;
-      padding: 6px;
-      border: 1px solid #b7c5dd;
-    }
-    .add-btn {
-      width: 100%;
-      padding: 10px;
-      background: #1976d2;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-    .add-btn:hover {
-      background: #1565c0;
-    }
-    .equipment-list {
-      margin-top: 20px;
-    }
-    .equipment-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px;
-      margin-bottom: 6px;
-      background: #fff;
-      border: 1px solid #ddd;
-    }
-    .equipment-item-info {
-      flex: 1;
-    }
-    .remove-btn {
-      padding: 4px 12px;
-      background: #d32f2f;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-size: 0.85em;
-    }
-    .remove-btn:hover {
-      background: #b71c1c;
-    }
-    .clearance-info {
-      margin-top: 20px;
-      padding: 12px;
-      background: #fff3e0;
-      border-left: 4px solid #ff9800;
-      font-size: 0.9em;
-    }
-    .clearance-info h4 {
-      color: #e65100;
-      margin-bottom: 8px;
-    }
-    @media (max-width: 900px) {
-      .main-content {
-        flex-direction: column !important;
-      }
-      .equip-controls {
-        max-width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #b7c5dd;
-      }
-    }
+    .equip-rect { position: absolute; display: flex; align-items: center; justify-content: center; font-size: 0.8em; font-weight: bold; color: #fff; border: 2px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.3); text-align: center; padding: 4px; cursor: move; box-sizing: border-box; }
+    .equip-rect-msb { background: #2563eb; }
+    .equip-rect-mssb { background: #16a34a; }
+    .equip-rect-db { background: #0d9488; }
+    .equip-rect-meter { background: #f59e0b; color: #000; }
+    .equip-rect-ct { background: #9333ea; }
+    .clearance-zone-red { position: absolute; border: 2px solid #dc2626; background: rgba(220,38,38,0.15); pointer-events: none; box-sizing: border-box; }
+    .clearance-zone-yellow { position: absolute; border: 2px dashed #f59e0b; background: rgba(245,158,11,0.12); pointer-events: none; box-sizing: border-box; }
+    .door { position: absolute; border: 3px solid #78716c; background: #d6d3d1; box-sizing: border-box; }
+    .door-swing { position: absolute; border: 2px solid #78716c; border-radius: 0; background: transparent; pointer-events: none; }
+    .equip-controls { background: #f8fafc; padding: 20px; border-right: 1px solid #e2e8f0; min-width: 320px; max-width: 400px; }
+    .equip-controls h2 { color: #1e293b; margin-bottom: 18px; font-size: 1.35em; font-weight: 700; }
+    .add-equip-section { margin-bottom: 24px; padding: 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 3px; }
+    .add-equip-section h3 { color: #1e293b; margin-bottom: 12px; font-size: 1.1em; font-weight: 600; }
+    .add-btn { width: 100%; padding: 10px; background: #2563eb; color: #fff; border: none; cursor: pointer; font-weight: 600; margin-top: 8px; border-radius: 3px; transition: background 0.15s; }
+    .add-btn:hover { background: #1d4ed8; }
+    .equipment-list { margin-top: 20px; }
+    .equipment-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; margin-bottom: 6px; background: #fff; border: 1px solid #e2e8f0; border-radius: 3px; }
+    .equipment-item-info { flex: 1; }
+    .remove-btn { padding: 4px 12px; background: #dc2626; color: #fff; border: none; cursor: pointer; font-size: 0.85em; border-radius: 2px; transition: background 0.15s; }
+    .remove-btn:hover { background: #b91c1c; }
+    .clearance-info { margin-top: 20px; padding: 14px; background: #fffbeb; border-left: 4px solid #f59e0b; font-size: 0.9em; border-radius: 0 2px 2px 0; }
+    .clearance-info h4 { color: #d97706; margin-bottom: 8px; }
+    @media (max-width: 900px) { .main-content { flex-direction: column !important; } .equip-controls { max-width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; } }
   </style>
 </head>
 <body>

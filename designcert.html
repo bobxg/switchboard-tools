@@ -6,32 +6,20 @@
   <title>Design Certificate Generator - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .calc-section { background: #fff; border: 2px solid #1976d2; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .calc-section h2 { color: #1976d2; margin-top: 0; margin-bottom: 18px; font-size: 1.5em; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
-    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
-    .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
-    .input-group { display: flex; flex-direction: column; }
-    .input-group label { margin-bottom: 6px; font-weight: bold; color: #333; font-size: 0.95em; }
-    .input-group input, .input-group select, .input-group textarea { padding: 8px 12px; border: 1px solid #b7c5dd; font-size: 1em; font-family: inherit; }
     .input-group textarea { resize: vertical; min-height: 60px; }
-    .info-box { background: #e3f0fc; border-left: 4px solid #1976d2; padding: 16px; margin: 16px 0; font-size: 0.95em; }
-    .warn-box { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 16px 0; font-size: 0.95em; }
-    .calc-button { background: #1976d2; color: white; padding: 12px 32px; border: none; font-size: 1.1em; cursor: pointer; width: 100%; margin-top: 12px; }
-    .calc-button:hover { background: #1565c0; }
-    .calc-button.green { background: #2e7d32; }
-    .calc-button.green:hover { background: #1b5e20; }
-    .cert-preview { border: 2px solid #333; padding: 40px; margin: 24px 0; background: #fff; font-family: 'Times New Roman', serif; color: #333; }
-    .cert-preview h1 { text-align: center; border-bottom: 3px double #333; padding-bottom: 12px; font-size: 1.6em; }
-    .cert-preview .cert-field { margin: 12px 0; }
-    .cert-preview .cert-label { font-weight: bold; display: inline-block; min-width: 200px; }
-    .cert-preview .cert-value { border-bottom: 1px solid #999; display: inline-block; min-width: 300px; padding: 2px 8px; }
-    .cert-preview .cert-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-    .cert-preview .cert-table th, .cert-preview .cert-table td { border: 1px solid #666; padding: 6px 8px; text-align: left; font-size: 0.9em; }
-    .cert-preview .cert-table th { background: #eee; }
-    .cert-preview .signature { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-    .cert-preview .sig-line { border-top: 1px solid #333; padding-top: 4px; margin-top: 40px; font-size: 0.9em; }
-    @media (max-width: 768px) { .input-row, .input-row.three { grid-template-columns: 1fr; } }
-    @media print { .top-tabs, .calc-button, .calc-section { display: none !important; } .cert-preview { border: none; padding: 20px; margin: 0; } }
+        .calc-button.green { background: #16a34a; }
+        .calc-button.green:hover { background: #15803d; }
+        .cert-preview { border: 2px solid #333; padding: 40px; margin: 24px 0; background: #fff; font-family: 'Times New Roman', serif; color: #333; }
+        .cert-preview h1 { text-align: center; border-bottom: 3px double #333; padding-bottom: 12px; font-size: 1.6em; }
+        .cert-preview .cert-field { margin: 12px 0; }
+        .cert-preview .cert-label { font-weight: bold; display: inline-block; min-width: 200px; }
+        .cert-preview .cert-value { border-bottom: 1px solid #999; display: inline-block; min-width: 300px; padding: 2px 8px; }
+        .cert-preview .cert-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        .cert-preview .cert-table th, .cert-preview .cert-table td { border: 1px solid #666; padding: 6px 8px; text-align: left; font-size: 0.9em; }
+        .cert-preview .cert-table th { background: #eee; }
+        .cert-preview .signature { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .cert-preview .sig-line { border-top: 1px solid #333; padding-top: 4px; margin-top: 40px; font-size: 0.9em; }
+        @media print { .top-tabs, .calc-button, .calc-section { display: none !important; } .cert-preview { border: none; padding: 20px; margin: 0; } }
   </style>
 </head>
 <body>
