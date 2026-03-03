@@ -325,7 +325,7 @@
         <div class="equipment-item">
           <div class="equipment-item-info">
             <strong>${eq.type}</strong><br>
-            <small>${eq.width}W Ã— ${eq.depth}D Ã— ${eq.height}H mm</small>
+            <small>${eq.width}W &times; ${eq.depth}D &times; ${eq.height}H mm</small>
           </div>
           <button class="remove-btn" onclick="removeEquipment(${eq.id})">Remove</button>
         </div>
@@ -471,7 +471,7 @@
         eqDiv.style.height = eqDepthPx + 'px';
         eqDiv.style.left = ((eq.x / 1000) * SCALE) + 'px';
         eqDiv.style.top = ((eq.y / 1000) * SCALE) + 'px';
-        eqDiv.innerHTML = `${eq.type}<br>${eq.width}Ã—${eq.depth}mm`;
+        eqDiv.innerHTML = `${eq.type}<br>${eq.width}&times;${eq.depth}mm`;
         
         roomBox.appendChild(eqDiv);
 
@@ -516,7 +516,7 @@
         eqDiv.style.height = eqDepthPx + 'px';
         eqDiv.style.left = ((eq.x / 1000) * SCALE) + 'px';
         eqDiv.style.top = ((eq.y / 1000) * SCALE) + 'px';
-        eqDiv.innerHTML = `${eq.type}<br>${eq.width}Ã—${eq.depth}mm`;
+        eqDiv.innerHTML = `${eq.type}<br>${eq.width}&times;${eq.depth}mm`;
         
         roomBox.appendChild(eqDiv);
 
@@ -560,7 +560,7 @@
         eqDiv.style.height = eqDepthPx + 'px';
         eqDiv.style.left = ((eq.x / 1000) * SCALE) + 'px';
         eqDiv.style.top = (((eq.y) / 1000) * SCALE) + 'px';
-        eqDiv.innerHTML = `${eq.type}<br>${eq.width}Ã—${eq.depth}mm`;
+        eqDiv.innerHTML = `${eq.type}<br>${eq.width}&times;${eq.depth}mm`;
         
         roomBox.appendChild(eqDiv);
 
@@ -595,7 +595,7 @@
         <strong>Room Dimensions:</strong><br>
         Width: ${(dimensions.width / 1000).toFixed(2)}m (${dimensions.width}mm)<br>
         Depth: ${(dimensions.depth / 1000).toFixed(2)}m (${dimensions.depth}mm)<br>
-        Area: ${totalArea.toFixed(2)}mÂ²<br>
+        Area: ${totalArea.toFixed(2)}m&sup2;<br>
         <strong>Layout:</strong> ${layoutType}<br>
         <em style="color:#666;font-size:0.9em;">Includes AS/NZS 3000 required clearances</em>
       `;

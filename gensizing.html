@@ -70,7 +70,7 @@
     <div class="calc-section">
       <h2>Site Conditions &amp; Derating</h2>
       <div class="info-box">
-        <strong>AS/NZS 3010:2017 cl. 4.4:</strong> Generator output shall be derated for altitude above 1000m and ambient temperature above 40Ã‚Â°C. Standard ratings are at sea level, 40Ã‚Â°C ambient.
+        <strong>AS/NZS 3010:2017 cl. 4.4:</strong> Generator output shall be derated for altitude above 1000m and ambient temperature above 40&deg;C. Standard ratings are at sea level, 40&deg;C ambient.
       </div>
       <div class="input-row three">
         <div class="input-group">
@@ -78,7 +78,7 @@
           <input type="number" id="altitude" value="0" min="0" step="100" />
         </div>
         <div class="input-group">
-          <label for="ambientTemp">Max Ambient Temperature (Ã‚Â°C)</label>
+          <label for="ambientTemp">Max Ambient Temperature (&deg;C)</label>
           <input type="number" id="ambientTemp" value="40" min="0" max="55" step="1" />
         </div>
         <div class="input-group">
@@ -112,7 +112,7 @@
     <div class="calc-section">
       <h2>Load Steps</h2>
       <div class="info-box">
-        Add loads in the sequence they will be connected after generator start. Motor starting kVA is the transient demand during DOL start (typically 6Ã¢â‚¬â€œ8Ãƒâ€” FLC). Group loads into steps that switch on simultaneously.
+        Add loads in the sequence they will be connected after generator start. Motor starting kVA is the transient demand during DOL start (typically 6&ndash;8&times; FLC). Group loads into steps that switch on simultaneously.
       </div>
       <table class="load-table" id="loadTable">
         <thead>
@@ -139,27 +139,27 @@
         <div class="result-grid">
           <div class="result-item">
             <div class="result-label">Total Running Load (kW)</div>
-            <div class="result-value" id="resTotalKW">Ã¢â‚¬â€</div>
+            <div class="result-value" id="resTotalKW">&mdash;</div>
           </div>
           <div class="result-item">
             <div class="result-label">Total Running (kVA)</div>
-            <div class="result-value" id="resTotalKVA">Ã¢â‚¬â€</div>
+            <div class="result-value" id="resTotalKVA">&mdash;</div>
           </div>
           <div class="result-item">
             <div class="result-label">Peak Step kVA</div>
-            <div class="result-value" id="resPeakStep">Ã¢â‚¬â€</div>
+            <div class="result-value" id="resPeakStep">&mdash;</div>
           </div>
           <div class="result-item">
             <div class="result-label">Minimum Gen. kVA (derated)</div>
-            <div class="result-value" id="resMinKVA">Ã¢â‚¬â€</div>
+            <div class="result-value" id="resMinKVA">&mdash;</div>
           </div>
           <div class="result-item">
             <div class="result-label">Recommended Size (kVA)</div>
-            <div class="result-value" id="resRecKVA">Ã¢â‚¬â€</div>
+            <div class="result-value" id="resRecKVA">&mdash;</div>
           </div>
           <div class="result-item">
             <div class="result-label">Indicative Fuel Tank (L)</div>
-            <div class="result-value" id="resFuel">Ã¢â‚¬â€</div>
+            <div class="result-value" id="resFuel">&mdash;</div>
           </div>
         </div>
       </div>
@@ -195,16 +195,16 @@
         <td><input type="text" value="Step ${stepCount}" /></td>
         <td><select>
           <option value="static">Static (lighting, heaters)</option>
-          <option value="motor_dol">Motor Ã¢â‚¬â€ DOL Start</option>
-          <option value="motor_sd">Motor Ã¢â‚¬â€ Star-Delta</option>
-          <option value="motor_vsd">Motor Ã¢â‚¬â€ VSD</option>
+          <option value="motor_dol">Motor &mdash; DOL Start</option>
+          <option value="motor_sd">Motor &mdash; Star-Delta</option>
+          <option value="motor_vsd">Motor &mdash; VSD</option>
           <option value="ups">UPS / IT Load</option>
         </select></td>
         <td><input type="number" value="50" min="0" step="1" /></td>
         <td><input type="number" value="0.85" min="0.5" max="1.0" step="0.05" /></td>
         <td><input type="number" value="0" min="0" step="1" /><span style="font-size:0.75em;color:#888;">0 = auto</span></td>
         <td><select><option value="yes">Essential</option><option value="no">Non-essential</option></select></td>
-        <td><button class="remove-btn" onclick="this.closest('tr').remove()">Ã¢Å“â€¢</button></td>
+        <td><button class="remove-btn" onclick="this.closest('tr').remove()">&#10005;</button></td>
       `;
       tbody.appendChild(tr);
     }
@@ -213,9 +213,9 @@
       if (manualKVA > 0) return manualKVA;
       const runKVA = kW / pf;
       switch (type) {
-        case 'motor_dol': return runKVA * 6.5; // DOL: ~6-8Ãƒâ€” FLC
-        case 'motor_sd': return runKVA * 2.5; // Star-delta: ~2-3Ãƒâ€” FLC
-        case 'motor_vsd': return runKVA * 1.2; // VSD: ~1.0-1.5Ãƒâ€” FLC
+        case 'motor_dol': return runKVA * 6.5; // DOL: ~6-8&times; FLC
+        case 'motor_sd': return runKVA * 2.5; // Star-delta: ~2-3&times; FLC
+        case 'motor_vsd': return runKVA * 1.2; // VSD: ~1.0-1.5&times; FLC
         case 'ups': return runKVA * 1.5; // UPS inrush
         default: return runKVA; // Static: no inrush
       }
@@ -232,7 +232,7 @@
       let altDerate = 1.0;
       if (altitude > 1000) altDerate = 1 - (altitude - 1000) * 0.035 / 1000; // ~3.5% per 1000m above 1000m
       let tempDerate = 1.0;
-      if (temp > 40) tempDerate = 1 - (temp - 40) * 0.02; // ~2% per Ã‚Â°C above 40Ã‚Â°C
+      if (temp > 40) tempDerate = 1 - (temp - 40) * 0.02; // ~2% per &deg;C above 40&deg;C
       const totalDerate = altDerate * tempDerate;
 
       const rows = document.getElementById('loadBody').querySelectorAll('tr');
@@ -257,7 +257,7 @@
         const stepKVA = cumKVA - runKVA + startKVA; // existing running + this step starting
         if (stepKVA > peakStepKVA) peakStepKVA = stepKVA;
 
-        // Voltage dip estimate: Vdip Ã¢â€°Ë† (startKVA / genKVA) Ãƒâ€” 100%
+        // Voltage dip estimate: Vdip &#8776; (startKVA / genKVA) &times; 100%
         // We'll calculate after we know gen size
         allSteps.push({ desc, kw, runKVA, startKVA, cumKW, cumKVA, stepKVA });
       });
@@ -300,8 +300,8 @@
 
       document.getElementById('dipNote').innerHTML = `
         <strong>Voltage Dip Assessment:</strong> Maximum step voltage dip estimated at <strong>${maxDip.toFixed(1)}%</strong> of generator rated kVA.
-        ${maxDip > 30 ? 'Ã¢Å¡Â  Exceeds 30% Ã¢â‚¬â€ consider increasing generator size or staggering load steps.' : maxDip > 20 ? 'Ã¢Å¡Â  Marginal (20Ã¢â‚¬â€œ30%) Ã¢â‚¬â€ verify with manufacturer data.' : 'Ã¢Å“â€œ Within acceptable limits (<20%).'}<br>
-        <strong>AS/NZS 3010 cl. 3.8:</strong> Frequency dip should not exceed Ã‚Â±5% and voltage dip should recover within acceptable limits.
+        ${maxDip > 30 ? '&#9888; Exceeds 30% &mdash; consider increasing generator size or staggering load steps.' : maxDip > 20 ? '&#9888; Marginal (20&ndash;30%) &mdash; verify with manufacturer data.' : '&#10003; Within acceptable limits (<20%).'}<br>
+        <strong>AS/NZS 3010 cl. 3.8:</strong> Frequency dip should not exceed &plusmn;5% and voltage dip should recover within acceptable limits.
         ${totalDerate < 1 ? '<br><strong>Derating applied:</strong> ' + ((1-totalDerate)*100).toFixed(1) + '% (altitude + temperature).' : ''}
       `;
 

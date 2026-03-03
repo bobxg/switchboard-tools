@@ -65,8 +65,8 @@
             <th>From (Board)</th>
             <th>To (Equipment)</th>
             <th>Cable Type</th>
-            <th>Cores Ãƒâ€” Size</th>
-            <th>Earth (mmÃ‚Â²)</th>
+            <th>Cores &times; Size</th>
+            <th>Earth (mm&sup2;)</th>
             <th>Length (m)</th>
             <th>Route / Containment</th>
             <th>Circuit #</th>
@@ -80,10 +80,10 @@
 
     <div class="info-box" style="margin-top:24px;">
       <strong>Cable Types (common abbreviations):</strong><br>
-      <strong>V-90:</strong> PVC/PVC 90Ã‚Â°C Ã¢â‚¬â€ general wiring per AS/NZS 5000.1<br>
-      <strong>X-90:</strong> XLPE/PVC 90Ã‚Â°C Ã¢â‚¬â€ higher CCC, suitable for sub-mains per AS/NZS 5000.1<br>
-      <strong>X-HF:</strong> XLPE halogen-free Ã¢â‚¬â€ required in some buildings<br>
-      <strong>MICC:</strong> Mineral insulated Ã¢â‚¬â€ fire-rated circuits<br>
+      <strong>V-90:</strong> PVC/PVC 90&deg;C &mdash; general wiring per AS/NZS 5000.1<br>
+      <strong>X-90:</strong> XLPE/PVC 90&deg;C &mdash; higher CCC, suitable for sub-mains per AS/NZS 5000.1<br>
+      <strong>X-HF:</strong> XLPE halogen-free &mdash; required in some buildings<br>
+      <strong>MICC:</strong> Mineral insulated &mdash; fire-rated circuits<br>
       <strong>2C+E, 3C+E, 4C+E:</strong> Core count + earth (e.g., 4C+E for 3-phase + neutral + earth)<br>
       <strong>Fire rated:</strong> Append "(FR)" for AS/NZS 3013 fire-rated circuits
     </div>
@@ -92,7 +92,7 @@
     let rowCount = 0;
 
     const cableTypes = ['V-90', 'X-90', 'X-HF', 'MICC', 'TPS', 'SDI', 'Other'];
-    const coreOptions = ['2C+E 1.5mmÃ‚Â²', '2C+E 2.5mmÃ‚Â²', '2C+E 4mmÃ‚Â²', '2C+E 6mmÃ‚Â²', '3C+E 2.5mmÃ‚Â²', '3C+E 4mmÃ‚Â²', '3C+E 6mmÃ‚Â²', '4C+E 2.5mmÃ‚Â²', '4C+E 4mmÃ‚Â²', '4C+E 6mmÃ‚Â²', '4C+E 10mmÃ‚Â²', '4C+E 16mmÃ‚Â²', '4C+E 25mmÃ‚Â²', '4C+E 35mmÃ‚Â²', '4C+E 50mmÃ‚Â²', '4C+E 70mmÃ‚Â²', '4C+E 95mmÃ‚Â²', '4C+E 120mmÃ‚Â²', '4C+E 150mmÃ‚Â²', '4C+E 185mmÃ‚Â²', '4C+E 240mmÃ‚Â²', '4C+E 300mmÃ‚Â²', '2Ãƒâ€”(4C+E 240mmÃ‚Â²)', '3Ãƒâ€”(4C+E 240mmÃ‚Â²)', 'Custom'];
+    const coreOptions = ['2C+E 1.5mm&sup2;', '2C+E 2.5mm&sup2;', '2C+E 4mm&sup2;', '2C+E 6mm&sup2;', '3C+E 2.5mm&sup2;', '3C+E 4mm&sup2;', '3C+E 6mm&sup2;', '4C+E 2.5mm&sup2;', '4C+E 4mm&sup2;', '4C+E 6mm&sup2;', '4C+E 10mm&sup2;', '4C+E 16mm&sup2;', '4C+E 25mm&sup2;', '4C+E 35mm&sup2;', '4C+E 50mm&sup2;', '4C+E 70mm&sup2;', '4C+E 95mm&sup2;', '4C+E 120mm&sup2;', '4C+E 150mm&sup2;', '4C+E 185mm&sup2;', '4C+E 240mm&sup2;', '4C+E 300mm&sup2;', '2&times;(4C+E 240mm&sup2;)', '3&times;(4C+E 240mm&sup2;)', 'Custom'];
 
     function makeSelect(options, defaultVal) {
       return `<select>${options.map(o => `<option${o===defaultVal?' selected':''}>${o}</option>`).join('')}</select>`;
@@ -108,10 +108,10 @@
         <td><input type="text" value="${d.from || ''}" placeholder="MSB" /></td>
         <td><input type="text" value="${d.to || ''}" placeholder="DB-L01" /></td>
         <td>${makeSelect(cableTypes, d.type || 'X-90')}</td>
-        <td>${makeSelect(coreOptions, d.cores || '4C+E 16mmÃ‚Â²')}</td>
+        <td>${makeSelect(coreOptions, d.cores || '4C+E 16mm&sup2;')}</td>
         <td><input type="text" value="${d.earth || '16'}" style="width:40px;" /></td>
         <td><input type="number" value="${d.length || ''}" style="width:50px;" /></td>
-        <td><input type="text" value="${d.route || ''}" placeholder="CT1 Ã¢â€ â€™ Riser" /></td>
+        <td><input type="text" value="${d.route || ''}" placeholder="CT1 &#8594; Riser" /></td>
         <td><input type="text" value="${d.circuit || ''}" style="width:50px;" /></td>
         <td><input type="text" value="${d.vd || ''}" style="width:40px;" /></td>
         <td><input type="text" value="${d.notes || ''}" /></td>`;
@@ -135,7 +135,7 @@
     }
 
     function exportCSV() {
-      const headers = ['#', 'Cable Tag', 'From', 'To', 'Cable Type', 'Cores Ãƒâ€” Size', 'Earth (mmÃ‚Â²)', 'Length (m)', 'Route', 'Circuit #', 'VD (%)', 'Notes'];
+      const headers = ['#', 'Cable Tag', 'From', 'To', 'Cable Type', 'Cores &times; Size', 'Earth (mm&sup2;)', 'Length (m)', 'Route', 'Circuit #', 'VD (%)', 'Notes'];
       const rows = document.querySelectorAll('#scheduleBody tr');
       let csv = headers.join(',') + '\n';
       rows.forEach((row, i) => {

@@ -101,29 +101,29 @@
       <h2>Cable Weight Calculator</h2>
       <p style="background:#f0f7ff; padding:12px; border-left:4px solid #1976d2; margin-bottom:20px; font-size:0.95em;">
         <strong>Data Sources:</strong> Cable weights sourced from manufacturer technical datasheets including Olex, Prysmian, and Nexans. 
-        Weights are for XLPE/PVC insulated cables at 20Â°C. Actual weights may vary Â±5% depending on manufacturing tolerances and specific product variants.
+        Weights are for XLPE/PVC insulated cables at 20&deg;C. Actual weights may vary &plusmn;5% depending on manufacturing tolerances and specific product variants.
       </p>
       
       <div class="input-row">
         <div class="input-group">
-          <label for="cableSize">Cable Size (mmÂ²)</label>
+          <label for="cableSize">Cable Size (mm&sup2;)</label>
           <select id="cableSize">
-            <option value="1.5">1.5 mmÂ²</option>
-            <option value="2.5">2.5 mmÂ²</option>
-            <option value="4">4 mmÂ²</option>
-            <option value="6">6 mmÂ²</option>
-            <option value="10">10 mmÂ²</option>
-            <option value="16" selected>16 mmÂ²</option>
-            <option value="25">25 mmÂ²</option>
-            <option value="35">35 mmÂ²</option>
-            <option value="50">50 mmÂ²</option>
-            <option value="70">70 mmÂ²</option>
-            <option value="95">95 mmÂ²</option>
-            <option value="120">120 mmÂ²</option>
-            <option value="150">150 mmÂ²</option>
-            <option value="185">185 mmÂ²</option>
-            <option value="240">240 mmÂ²</option>
-            <option value="300">300 mmÂ²</option>
+            <option value="1.5">1.5 mm&sup2;</option>
+            <option value="2.5">2.5 mm&sup2;</option>
+            <option value="4">4 mm&sup2;</option>
+            <option value="6">6 mm&sup2;</option>
+            <option value="10">10 mm&sup2;</option>
+            <option value="16" selected>16 mm&sup2;</option>
+            <option value="25">25 mm&sup2;</option>
+            <option value="35">35 mm&sup2;</option>
+            <option value="50">50 mm&sup2;</option>
+            <option value="70">70 mm&sup2;</option>
+            <option value="95">95 mm&sup2;</option>
+            <option value="120">120 mm&sup2;</option>
+            <option value="150">150 mm&sup2;</option>
+            <option value="185">185 mm&sup2;</option>
+            <option value="240">240 mm&sup2;</option>
+            <option value="300">300 mm&sup2;</option>
           </select>
         </div>
         <div class="input-group">
@@ -321,7 +321,7 @@
       document.getElementById('resultDetails').innerHTML = `
         <div style="display:grid; grid-template-columns: auto 1fr; gap: 8px 16px; margin-bottom:16px;">
           <strong>Cable Specification:</strong>
-          <span>${cores} Core Ã— ${size} mmÂ² ${conductorName} ${armouredType}</span>
+          <span>${cores} Core &times; ${size} mm&sup2; ${conductorName} ${armouredType}</span>
           
           <strong>Weight per meter:</strong>
           <span>${weightPerMeter.toFixed(3)} kg/m</span>

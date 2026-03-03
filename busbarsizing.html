@@ -60,9 +60,9 @@
       <div class="input-row three">
         <div class="input-group"><label for="barMaterial">Material</label>
           <select id="barMaterial"><option value="copper" selected>Copper (ETP Cu)</option><option value="aluminium">Aluminium (EC grade)</option></select></div>
-        <div class="input-group"><label for="ambientTemp">Ambient Temperature (Ã‚Â°C)</label><input type="number" id="ambientTemp" value="40" min="20" max="55" /></div>
-        <div class="input-group"><label for="maxTemp">Max Operating Temperature (Ã‚Â°C)</label>
-          <select id="maxTemp"><option value="70">70Ã‚Â°C (standard)</option><option value="90">90Ã‚Â°C (silver-plated joints)</option><option value="105">105Ã‚Â°C (insulated bars)</option></select></div>
+        <div class="input-group"><label for="ambientTemp">Ambient Temperature (&deg;C)</label><input type="number" id="ambientTemp" value="40" min="20" max="55" /></div>
+        <div class="input-group"><label for="maxTemp">Max Operating Temperature (&deg;C)</label>
+          <select id="maxTemp"><option value="70">70&deg;C (standard)</option><option value="90">90&deg;C (silver-plated joints)</option><option value="105">105&deg;C (insulated bars)</option></select></div>
       </div>
       <button class="calc-button" onclick="calculate()">Size Busbar</button>
     </div>
@@ -71,11 +71,11 @@
       <div class="result-box">
         <h3>Busbar Selection</h3>
         <div class="result-grid">
-          <div class="result-item"><div class="result-label">Busbar Size</div><div class="result-value" id="resSize">Ã¢â‚¬â€</div></div>
-          <div class="result-item"><div class="result-label">Bars per Phase</div><div class="result-value" id="resBarsPerPhase">Ã¢â‚¬â€</div></div>
-          <div class="result-item"><div class="result-label">Continuous Rating</div><div class="result-value" id="resRating">Ã¢â‚¬â€</div></div>
-          <div class="result-item"><div class="result-label">Temp Rise (ÃŽâ€T est.)</div><div class="result-value" id="resTempRise">Ã¢â‚¬â€</div></div>
-          <div class="result-item"><div class="result-label">SC Withstand (kA/1s)</div><div class="result-value" id="resSC">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Busbar Size</div><div class="result-value" id="resSize">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">Bars per Phase</div><div class="result-value" id="resBarsPerPhase">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">Continuous Rating</div><div class="result-value" id="resRating">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">Temp Rise (&#916;T est.)</div><div class="result-value" id="resTempRise">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">SC Withstand (kA/1s)</div><div class="result-value" id="resSC">&mdash;</div></div>
         </div>
       </div>
       <div id="notes"></div>
@@ -83,9 +83,9 @@
 
     <div class="calc-section">
       <h2>Standard Copper Busbar Current Ratings</h2>
-      <div class="info-box">Ratings based on a single vertical bar, 40Ã‚Â°C ambient, 70Ã‚Â°C max temperature (30Ã‚Â°C rise), natural convection. For multiple bars per phase, apply derating factor for proximity (~0.85 for 2 bars, ~0.78 for 3 bars).</div>
+      <div class="info-box">Ratings based on a single vertical bar, 40&deg;C ambient, 70&deg;C max temperature (30&deg;C rise), natural convection. For multiple bars per phase, apply derating factor for proximity (~0.85 for 2 bars, ~0.78 for 3 bars).</div>
       <table class="ref-table" id="ratingTable">
-        <thead><tr><th>Width Ãƒâ€” Thickness (mm)</th><th>Cross Section (mmÃ‚Â²)</th><th>Rating @ 30Ã‚Â°C Rise (A)</th><th>SC Withstand (kA/1s)</th><th>Weight (kg/m)</th></tr></thead>
+        <thead><tr><th>Width &times; Thickness (mm)</th><th>Cross Section (mm&sup2;)</th><th>Rating @ 30&deg;C Rise (A)</th><th>SC Withstand (kA/1s)</th><th>Weight (kg/m)</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -95,10 +95,10 @@
       <div class="info-box">
         <strong>Busbar design considerations per AS/NZS 61439:</strong>
         <ul>
-          <li><strong>Temperature rise:</strong> Max 70Ã‚Â°C for tin-plated joints, 90Ã‚Â°C for silver-plated joints, 105Ã‚Â°C for insulated bars (above 40Ã‚Â°C ambient)</li>
-          <li><strong>Short-circuit:</strong> Busbar must withstand Icw (rated short-time withstand current) for rated duration. Copper: 13 A/mmÃ‚Â² per Ã¢Ë†Å¡s; Aluminium: 8.5 A/mmÃ‚Â² per Ã¢Ë†Å¡s</li>
-          <li><strong>Electrodynamic forces:</strong> For fault currents >25 kA, verify busbar support spacing for electromagnetic forces: F = 0.2 Ãƒâ€” IpkÃ‚Â² Ãƒâ€” L / d (N/m)</li>
-          <li><strong>Voltage drop:</strong> Busbar voltage drop = I Ãƒâ€” (RÃƒâ€”cos Ãâ€  + XÃƒâ€”sin Ãâ€ ) Ãƒâ€” L. Typically negligible for short bus lengths</li>
+          <li><strong>Temperature rise:</strong> Max 70&deg;C for tin-plated joints, 90&deg;C for silver-plated joints, 105&deg;C for insulated bars (above 40&deg;C ambient)</li>
+          <li><strong>Short-circuit:</strong> Busbar must withstand Icw (rated short-time withstand current) for rated duration. Copper: 13 A/mm&sup2; per &#8730;s; Aluminium: 8.5 A/mm&sup2; per &#8730;s</li>
+          <li><strong>Electrodynamic forces:</strong> For fault currents >25 kA, verify busbar support spacing for electromagnetic forces: F = 0.2 &times; Ipk&sup2; &times; L / d (N/m)</li>
+          <li><strong>Voltage drop:</strong> Busbar voltage drop = I &times; (R&times;cos &#966; + X&times;sin &#966;) &times; L. Typically negligible for short bus lengths</li>
           <li><strong>Earth bar:</strong> Size earth busbar for at least 50% of phase busbar cross-section (AS/NZS 3000)</li>
           <li><strong>Neutral bar:</strong> Full-size neutral for harmonic-rich loads (3rd harmonic). Can be 50% of phase for linear balanced loads</li>
         </ul>
@@ -106,7 +106,7 @@
     </div>
   </div>
   <script>
-    // Standard copper busbar sizes [width mm, thickness mm, rating A @ 30Ã‚Â°C rise single bar vertical]
+    // Standard copper busbar sizes [width mm, thickness mm, rating A @ 30&deg;C rise single bar vertical]
     const copperBars = [
       { w: 15, t: 3, rating: 80 },
       { w: 20, t: 3, rating: 115 },
@@ -130,12 +130,12 @@
       { w: 200, t: 10, rating: 1830 },
     ];
 
-    const aluminiumFactor = 0.6; // Aluminium rating Ã¢â€°Ë† 60% of copper
+    const aluminiumFactor = 0.6; // Aluminium rating &#8776; 60% of copper
 
     function barArea(bar) { return bar.w * bar.t; }
     function scWithstand(area_mm2, material, duration) {
-      // Copper: 13 A/mmÃ‚Â²/Ã¢Ë†Å¡s (from IEC 61439 / IEEE)
-      // Aluminium: 8.5 A/mmÃ‚Â²/Ã¢Ë†Å¡s
+      // Copper: 13 A/mm&sup2;/&#8730;s (from IEC 61439 / IEEE)
+      // Aluminium: 8.5 A/mm&sup2;/&#8730;s
       const k = material === 'copper' ? 13 : 8.5;
       return (k * area_mm2) / (Math.sqrt(duration) * 1000); // kA
     }
@@ -150,7 +150,7 @@
 
       const tempRiseAllowed = maxTemp - ambTemp;
       const matFactor = material === 'copper' ? 1.0 : aluminiumFactor;
-      // Temp rise correction: rating Ã¢Ë†Â Ã¢Ë†Å¡(ÃŽâ€T_actual / ÃŽâ€T_ref)
+      // Temp rise correction: rating &#8733; &#8730;(&#916;T_actual / &#916;T_ref)
       const tempFactor = Math.sqrt(tempRiseAllowed / 30);
 
       // Try single bar first, then 2 bars, then 3
@@ -183,26 +183,26 @@
       const sc = scWithstand(area, material, faultDur);
       const tempRise = tempRiseAllowed * Math.pow(designA / totalRating, 2);
 
-      const barLabel = numBars > 1 ? `${numBars}Ãƒâ€” ${selectedBar.w}Ãƒâ€”${selectedBar.t}` : `${selectedBar.w}Ãƒâ€”${selectedBar.t}`;
+      const barLabel = numBars > 1 ? `${numBars}&times; ${selectedBar.w}&times;${selectedBar.t}` : `${selectedBar.w}&times;${selectedBar.t}`;
 
       document.getElementById('resSize').textContent = barLabel + ' mm';
       document.getElementById('resBarsPerPhase').textContent = numBars;
       document.getElementById('resRating').textContent = Math.round(totalRating) + ' A';
-      document.getElementById('resTempRise').textContent = tempRise.toFixed(0) + 'Ã‚Â°C';
+      document.getElementById('resTempRise').textContent = tempRise.toFixed(0) + '&deg;C';
       document.getElementById('resSC').textContent = sc.toFixed(1) + ' kA';
 
       let notes = '';
       if (totalRating >= designA) {
-        notes += `<div class="pass-box"><strong>Ã¢Å“â€œ Current capacity OK.</strong> Selected ${barLabel} mm ${material} Ã¢â‚¬â€ rated ${Math.round(totalRating)} A Ã¢â€°Â¥ design ${designA} A (${(designA/totalRating*100).toFixed(0)}% utilisation).</div>`;
+        notes += `<div class="pass-box"><strong>&#10003; Current capacity OK.</strong> Selected ${barLabel} mm ${material} &mdash; rated ${Math.round(totalRating)} A &#8805; design ${designA} A (${(designA/totalRating*100).toFixed(0)}% utilisation).</div>`;
       } else {
-        notes += `<div class="fail-box"><strong>Ã¢Å¡Â  Underrated.</strong> Maximum available configuration only provides ${Math.round(totalRating)} A. Consider parallel busbars or larger enclosure.</div>`;
+        notes += `<div class="fail-box"><strong>&#9888; Underrated.</strong> Maximum available configuration only provides ${Math.round(totalRating)} A. Consider parallel busbars or larger enclosure.</div>`;
       }
       if (sc >= faultKA) {
-        notes += `<div class="pass-box"><strong>Ã¢Å“â€œ Short-circuit withstand OK.</strong> ${sc.toFixed(1)} kA for ${faultDur}s Ã¢â€°Â¥ prospective ${faultKA} kA.</div>`;
+        notes += `<div class="pass-box"><strong>&#10003; Short-circuit withstand OK.</strong> ${sc.toFixed(1)} kA for ${faultDur}s &#8805; prospective ${faultKA} kA.</div>`;
       } else {
-        notes += `<div class="fail-box"><strong>Ã¢Å¡Â  Insufficient SC withstand.</strong> ${sc.toFixed(1)} kA < ${faultKA} kA for ${faultDur}s. Increase busbar cross-section or reduce fault clearance time.</div>`;
+        notes += `<div class="fail-box"><strong>&#9888; Insufficient SC withstand.</strong> ${sc.toFixed(1)} kA < ${faultKA} kA for ${faultDur}s. Increase busbar cross-section or reduce fault clearance time.</div>`;
       }
-      notes += `<div class="info-box"><strong>Earth bus:</strong> Minimum ${Math.round(area*0.5)} mmÃ‚Â² (50% of phase). <strong>Neutral bus:</strong> ${Math.round(area)} mmÃ‚Â² (full size recommended for harmonic loads).</div>`;
+      notes += `<div class="info-box"><strong>Earth bus:</strong> Minimum ${Math.round(area*0.5)} mm&sup2; (50% of phase). <strong>Neutral bus:</strong> ${Math.round(area)} mm&sup2; (full size recommended for harmonic loads).</div>`;
 
       document.getElementById('notes').innerHTML = notes;
       document.getElementById('resultSection').style.display = 'block';
@@ -216,7 +216,7 @@
         const s = scWithstand(a, material, 1);
         const wt = (a * (material === 'copper' ? 8.96 : 2.7) / 1000).toFixed(2);
         const sel = (bar === selectedBar) ? ' style="background:#bbdefb;font-weight:bold;"' : '';
-        html += `<tr${sel}><td>${bar.w} Ãƒâ€” ${bar.t}</td><td>${a}</td><td>${r}</td><td>${s.toFixed(1)}</td><td>${wt}</td></tr>`;
+        html += `<tr${sel}><td>${bar.w} &times; ${bar.t}</td><td>${a}</td><td>${r}</td><td>${s.toFixed(1)}</td><td>${wt}</td></tr>`;
       });
       tbody.innerHTML = html;
     }

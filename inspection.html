@@ -360,9 +360,9 @@
 
       <div id="pdfViewer" class="pdf-viewer">
         <div class="page-nav">
-          <button class="btn" id="prevPage">â† Previous</button>
+          <button class="btn" id="prevPage">&#8592; Previous</button>
           <span class="page-info">Page <span id="pageNum">1</span> of <span id="pageCount">1</span></span>
-          <button class="btn" id="nextPage">Next â†’</button>
+          <button class="btn" id="nextPage">Next &#8594;</button>
           <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
             <button class="btn" id="zoomOut">Zoom Out</button>
             <span class="page-info"><span id="zoomLevel">100</span>%</span>
@@ -387,9 +387,9 @@
       <div id="summaryStats" style="display: none; margin-bottom: 15px; padding: 12px; background: #e3f2fd; border: 1px solid #90caf9; border-radius: 4px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.85em;">
           <div><strong>Total:</strong> <span id="statTotal">0</span></div>
-          <div><strong>ðŸ”´ Open:</strong> <span id="statOpen">0</span></div>
-          <div><strong>ðŸŸ¡ Progress:</strong> <span id="statProgress">0</span></div>
-          <div><strong>ðŸŸ¢ Resolved:</strong> <span id="statResolved">0</span></div>
+          <div><strong>&#128308; Open:</strong> <span id="statOpen">0</span></div>
+          <div><strong>&#128993; Progress:</strong> <span id="statProgress">0</span></div>
+          <div><strong>&#128994; Resolved:</strong> <span id="statResolved">0</span></div>
         </div>
       </div>
       
@@ -418,7 +418,7 @@
       
       <div class="controls">
         <div style="position: relative; display: inline-block;">
-          <button class="btn btn-success" id="exportReport">Export Report â–¼</button>
+          <button class="btn btn-success" id="exportReport">Export Report &#9660;</button>
           <div id="exportMenu" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ccc; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; min-width: 150px; margin-top: 4px;">
             <button class="btn" id="exportPDF" style="width: 100%; text-align: left; border: none; border-radius: 0; background: white; color: #333;">Export as PDF</button>
             <button class="btn" id="exportWord" style="width: 100%; text-align: left; border: none; border-radius: 0; background: white; color: #333;">Export as Word</button>
@@ -443,20 +443,20 @@
       
       <label for="defectCategory">Category:</label>
       <select id="defectCategory" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; font-size: 1em;">
-        <option value="electrical">âš¡ Electrical</option>
-        <option value="plumbing">ðŸš° Plumbing</option>
-        <option value="structural">ðŸ—ï¸ Structural</option>
-        <option value="hvac">â„ï¸ HVAC</option>
-        <option value="safety">âš ï¸ Safety</option>
-        <option value="other">ðŸ“‹ Other</option>
+        <option value="electrical">&#9889; Electrical</option>
+        <option value="plumbing">&#128688; Plumbing</option>
+        <option value="structural">&#127959; Structural</option>
+        <option value="hvac">&#10052; HVAC</option>
+        <option value="safety">&#9888; Safety</option>
+        <option value="other">&#128203; Other</option>
       </select>
       
       <label for="defectStatus">Status:</label>
       <select id="defectStatus" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; font-size: 1em;">
-        <option value="open">ðŸ”´ Open</option>
-        <option value="in-progress">ðŸŸ¡ In Progress</option>
-        <option value="resolved">ðŸŸ¢ Resolved</option>
-        <option value="verified">ðŸ”µ Verified</option>
+        <option value="open">&#128308; Open</option>
+        <option value="in-progress">&#128993; In Progress</option>
+        <option value="resolved">&#128994; Resolved</option>
+        <option value="verified">&#128309; Verified</option>
       </select>
       
       <label for="defectAssignee">Assigned To (optional):</label>

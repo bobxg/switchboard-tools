@@ -43,7 +43,7 @@
     <p>Size PFC capacitor banks and check for harmonic resonance per <strong>AS/NZS 2897</strong>, <strong>AS/NZS 61921</strong>, and distributor supply agreements.</p>
     <div class="calc-section">
       <h2>Load Profile</h2>
-      <div class="info-box"><strong>Distributor requirement:</strong> Most Australian distributors (e.g., Ausgrid NS220, SA Power Networks) require power factor Ã¢â€°Â¥ 0.9 lagging at the point of supply. Penalties apply for PF below this threshold.</div>
+      <div class="info-box"><strong>Distributor requirement:</strong> Most Australian distributors (e.g., Ausgrid NS220, SA Power Networks) require power factor &#8805; 0.9 lagging at the point of supply. Penalties apply for PF below this threshold.</div>
       <div class="input-row three">
         <div class="input-group"><label for="loadKW">Total Load (kW)</label><input type="number" id="loadKW" value="500" min="1" /></div>
         <div class="input-group"><label for="existPF">Existing Power Factor</label><input type="number" id="existPF" value="0.75" min="0.3" max="1.0" step="0.01" /></div>
@@ -57,7 +57,7 @@
       <div class="input-row three">
         <div class="input-group"><label for="txZ">Transformer Impedance (%)</label><input type="number" id="txZ" value="5" min="1" max="15" step="0.5" /></div>
         <div class="input-group"><label for="harmPresent">Significant Harmonics Present?</label>
-          <select id="harmPresent"><option value="no">No Ã¢â‚¬â€ mostly linear loads</option><option value="low">Low Ã¢â‚¬â€ some VFDs/LEDs (<20% non-linear)</option><option value="high" selected>High Ã¢â‚¬â€ many VFDs/LEDs (>20% non-linear)</option></select>
+          <select id="harmPresent"><option value="no">No &mdash; mostly linear loads</option><option value="low">Low &mdash; some VFDs/LEDs (<20% non-linear)</option><option value="high" selected>High &mdash; many VFDs/LEDs (>20% non-linear)</option></select>
         </div>
         <div class="input-group"><label for="stepMode">Switching Type</label>
           <select id="stepMode"><option value="auto" selected>Automatic stepped</option><option value="fixed">Fixed bank</option></select>
@@ -69,12 +69,12 @@
       <div class="result-box">
         <h3>PFC Sizing Results</h3>
         <div class="result-grid">
-          <div class="result-item"><div class="result-label">Required kVAr</div><div class="result-value" id="resKVAr">Ã¢â‚¬â€</div></div>
-          <div class="result-item"><div class="result-label">Existing kVAr (reactive)</div><div class="result-value" id="resExistKVAr">Ã¢â‚¬â€</div></div>
-          <div class="result-item"><div class="result-label">New kVA (corrected)</div><div class="result-value" id="resNewKVA">Ã¢â‚¬â€</div></div>
-          <div class="result-item"><div class="result-label">kVA Reduction</div><div class="result-value" id="resReduction">Ã¢â‚¬â€</div></div>
-          <div class="result-item"><div class="result-label">Resonant Harmonic Order</div><div class="result-value" id="resResonant">Ã¢â‚¬â€</div></div>
-          <div class="result-item"><div class="result-label">Detuned Reactor Needed</div><div class="result-value" id="resDetuned">Ã¢â‚¬â€</div></div>
+          <div class="result-item"><div class="result-label">Required kVAr</div><div class="result-value" id="resKVAr">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">Existing kVAr (reactive)</div><div class="result-value" id="resExistKVAr">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">New kVA (corrected)</div><div class="result-value" id="resNewKVA">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">kVA Reduction</div><div class="result-value" id="resReduction">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">Resonant Harmonic Order</div><div class="result-value" id="resResonant">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">Detuned Reactor Needed</div><div class="result-value" id="resDetuned">&mdash;</div></div>
         </div>
       </div>
       <div id="details" class="info-box" style="margin-top:16px;"></div>
@@ -104,7 +104,7 @@
       const newKVA = kw / pf2;
       const reduction = existKVA - newKVA;
 
-      // Resonant harmonic check: hr = Ã¢Ë†Å¡(SscMVA / QcMVAr)
+      // Resonant harmonic check: hr = &#8730;(SscMVA / QcMVAr)
       // Ssc = txKVA / (txZ/100), in kVA
       const sscKVA = txKVA / (txZ / 100);
       const hr = Math.sqrt(sscKVA / requiredKVAr);
@@ -134,11 +134,11 @@
 
       document.getElementById('details').innerHTML = `
         <strong>Sizing Summary:</strong><br>
-        Ã¢â‚¬Â¢ Existing: ${kw} kW at PF ${pf1} = ${existKVA.toFixed(0)} kVA / ${existKVAr.toFixed(0)} kVAr reactive<br>
-        Ã¢â‚¬Â¢ Target: PF ${pf2} = ${newKVA.toFixed(0)} kVA / ${targetKVAr.toFixed(0)} kVAr reactive<br>
-        Ã¢â‚¬Â¢ Required PFC: <strong>${requiredKVAr.toFixed(0)} kVAr</strong><br>
-        Ã¢â‚¬Â¢ Suggested configuration: ${stepped === 'auto' ? Math.round(requiredKVAr / selectedStep) + ' steps Ãƒâ€” ' + selectedStep + ' kVAr = ' + (Math.round(requiredKVAr / selectedStep) * selectedStep) + ' kVAr' : 'Fixed bank ' + requiredKVAr.toFixed(0) + ' kVAr'}<br>
-        Ã¢â‚¬Â¢ Current reduction: ${(existKVA * 1000 / 400 / 1.732).toFixed(0)} A Ã¢â€ â€™ ${(newKVA * 1000 / 400 / 1.732).toFixed(0)} A (at 400V, 3-phase)<br>
+        &#8226; Existing: ${kw} kW at PF ${pf1} = ${existKVA.toFixed(0)} kVA / ${existKVAr.toFixed(0)} kVAr reactive<br>
+        &#8226; Target: PF ${pf2} = ${newKVA.toFixed(0)} kVA / ${targetKVAr.toFixed(0)} kVAr reactive<br>
+        &#8226; Required PFC: <strong>${requiredKVAr.toFixed(0)} kVAr</strong><br>
+        &#8226; Suggested configuration: ${stepped === 'auto' ? Math.round(requiredKVAr / selectedStep) + ' steps &times; ' + selectedStep + ' kVAr = ' + (Math.round(requiredKVAr / selectedStep) * selectedStep) + ' kVAr' : 'Fixed bank ' + requiredKVAr.toFixed(0) + ' kVAr'}<br>
+        &#8226; Current reduction: ${(existKVA * 1000 / 400 / 1.732).toFixed(0)} A &#8594; ${(newKVA * 1000 / 400 / 1.732).toFixed(0)} A (at 400V, 3-phase)<br>
         <em>Refer to AS/NZS 2897 for PFC installation requirements; AS/NZS 61921 for capacitor specifications.</em>
       `;
 
@@ -146,7 +146,7 @@
       if (needDetuned) {
         resNote.style.display = 'block';
         resNote.innerHTML = `
-          <strong>Ã¢Å¡Â  Harmonic Resonance Risk:</strong> Natural resonant frequency is at the <strong>${hr.toFixed(1)}th harmonic</strong>${nearestH ? ' Ã¢â‚¬â€ near the ' + nearestH + 'th harmonic!' : '.'}
+          <strong>&#9888; Harmonic Resonance Risk:</strong> Natural resonant frequency is at the <strong>${hr.toFixed(1)}th harmonic</strong>${nearestH ? ' &mdash; near the ' + nearestH + 'th harmonic!' : '.'}
           <br>With significant non-linear loads present, <strong>detuned reactors</strong> are recommended (tuning factor: ${detunePct}) to shift resonance below the lowest significant harmonic.
           <br>Without detuning, capacitor banks can amplify harmonics, causing overheating, nuisance tripping, and premature failure.
         `;
