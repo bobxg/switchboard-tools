@@ -11,6 +11,7 @@ const OmniNav = {
     { label: 'Home', href: 'index.html' },
     { label: 'Switchboard Sizer', href: 'switchboard.html' },
     { label: 'Switchroom Sizer', href: 'switchroom.html' },
+    { label: 'Cable Tray Sizer', href: 'cabletraysizing.html' },
     { label: 'Lighting Search', href: 'lightingsearch.html' },
     { label: 'Power Systems', children: [
       { label: 'Cable Sizing', href: 'cablesizing.html' },
@@ -23,19 +24,18 @@ const OmniNav = {
       { label: 'Transformer Sizing', href: 'txsizing.html' },
       { label: 'Generator Sizing', href: 'gensizing.html' },
       { label: 'UPS Sizing', href: 'upssizing.html' },
+      { label: 'PV Sizing', href: 'pvsizing.html' },
       { label: 'PFC Sizing', href: 'pfcsizing.html' },
       { label: 'Harmonics Analysis', href: 'harmonics.html' },
       { label: 'Busbar Sizing', href: 'busbarsizing.html' },
       { label: 'CT Sizing', href: 'ctsizing.html' },
       { label: 'Earthing Calculator', href: 'earthing.html' }
     ]},
-    { label: 'Protection', children: [
+    { label: 'Protection & Containment', children: [
       { label: 'RCD Selector', href: 'rcdselect.html' },
       { label: 'SPD Sizing', href: 'spdsizing.html' },
       { label: 'IP/IK Rating Guide', href: 'iprating.html' },
-      { label: 'Conduit Sizer', href: 'conduit.html' },
-      { label: 'Cable Tray Sizer', href: 'cabletraysizing.html' },
-      { label: 'PV Sizing', href: 'pvsizing.html' }
+      { label: 'Conduit Sizer', href: 'conduit.html' }
     ]},
     { label: 'Lighting & Fire', children: [
       { label: 'Lux Calculator', href: 'luxcalc.html' },
