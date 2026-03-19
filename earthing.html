@@ -7,66 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="top-tabs">
-    <a class="tab" href="index.html">Home</a>
-    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
-    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
-    <a class="tab" href="lightingsearch.html">Lighting Search</a>
-    <div class="tab has-dropdown active">
-      <span>Power Systems</span>
-      <div class="dropdown-content">
-        <a href="cablesizing.html">Cable Sizing</a>
-        <a href="cableweight.html">Cable Weight</a>
-        <a href="maxdemand.html">Maximum Demand</a>
-        <a href="diversity.html">Diversity Factors</a>
-        <a href="faultlevel.html">Fault Level</a>
-        <a href="loopimpedance.html">Loop Impedance</a>
-        <a href="discrimination.html">Discrimination Check</a>
-        <a href="txsizing.html">Transformer Sizing</a>
-        <a href="gensizing.html">Generator Sizing</a>
-        <a href="upssizing.html">UPS Sizing</a>
-        <a href="pfcsizing.html">PFC Sizing</a>
-        <a href="harmonics.html">Harmonics Analysis</a>
-        <a href="busbarsizing.html">Busbar Sizing</a>
-        <a href="ctsizing.html">CT Sizing</a>
-        <a href="earthing.html">Earthing Calculator</a>
-      </div>
-    </div>
-    <div class="tab has-dropdown">
-      <span>Protection</span>
-      <div class="dropdown-content">
-        <a href="rcdselect.html">RCD Selector</a>
-        <a href="spdsizing.html">SPD Sizing</a>
-        <a href="iprating.html">IP/IK Rating Guide</a>
-        <a href="conduit.html">Conduit Sizer</a>
-        <a href="pvsizing.html">PV Sizing</a>
-      </div>
-    </div>
-    <div class="tab has-dropdown">
-      <span>Lighting & Fire</span>
-      <div class="dropdown-content">
-        <a href="luxcalc.html">Lux Calculator</a>
-        <a href="luxlevels.html">Lux Levels Reference</a>
-        <a href="emergencylighting.html">Emergency Lighting</a>
-        <a href="fireinterface.html">Fire Interface Matrix</a>
-        <a href="smokecontrol.html">Smoke Control</a>
-        <a href="essentialservices.html">Essential Services</a>
-      </div>
-    </div>
-    <div class="tab has-dropdown">
-      <span>Documentation</span>
-      <div class="dropdown-content">
-        <a href="loadschedule.html">Load Schedule</a>
-        <a href="cableschedule.html">Cable Schedule</a>
-        <a href="designcert.html">Design Certificate</a>
-        <a href="tcommissioning.html">T&C Checklists</a>
-        <a href="inspection.html">Site Inspection</a>
-        <a href="sld.html">Single Line Diagram</a>
-        <a href="as3000tips.html">AS3000 Tips</a>
-      </div>
-    </div>
-    <a class="tab" href="qa.html">Verification</a>
-  </div>
+  <div class="top-tabs"></div>
 
   <div class="main-content">
     <h1>Earthing Calculator</h1>
@@ -208,6 +149,7 @@
       </div>
 
       <button class="calc-button" onclick="calculate()">Calculate Earth Resistance</button>
+      <button class="calc-button" style="background:#16a34a;margin-top:8px" onclick="exportEarthResult()">Export Result as CSV</button>
     </div>
 
     <div id="resultSection" style="display:none;">
@@ -253,6 +195,25 @@
   </div>
 
   <script>
+    let lastEarthResult = null;
+
+    function exportEarthResult() {
+      if (!lastEarthResult) { OmniToast.show('Calculate first', 'warn'); return; }
+      const r = lastEarthResult;
+      OmniExport.toCSV(
+        ['Parameter', 'Value'],
+        [
+          ['Electrode Type', r.type],
+          ['Soil Resistivity', r.rho + ' \u03A9\u00B7m'],
+          ['Single Electrode R', r.singleR + ' \u03A9'],
+          ['Combined System R', r.combinedR + ' \u03A9'],
+          ['Target R', r.target + ' \u03A9'],
+          ['Status', r.pass ? 'PASS' : 'FAIL']
+        ],
+        'earthing-result'
+      );
+    }
+
     function setSoilRes() {
       const v = document.getElementById('soilType').value;
       if (v) document.getElementById('soilRes').value = v;
@@ -268,8 +229,10 @@
     }
 
     function calculate() {
-      const rho = parseFloat(document.getElementById('soilRes').value);
-      const target = parseFloat(document.getElementById('targetR').value);
+      OmniValidate.clearErrors();
+      const rho = OmniValidate.parseNum('soilRes', 100);
+      const target = OmniValidate.parseNum('targetR', 1);
+      if (rho <= 0) { OmniToast.show('Soil resistivity must be > 0', 'warn'); return; }
       const type = document.getElementById('electrodeType').value;
       let singleR = 0, combinedR = 0;
 
@@ -323,7 +286,8 @@
       document.getElementById('targetRval').textContent = target.toFixed(1);
 
       const pass = combinedR <= target;
-      document.getElementById('status').textContent = pass ? '&#10003; OK' : '&#10005; Too High';
+      lastEarthResult = { type, rho, singleR: singleR.toFixed(2), combinedR: combinedR.toFixed(2), target, pass };
+      document.getElementById('status').textContent = pass ? '\u2713 OK' : '\u2717 Too High';
       document.getElementById('status').style.color = pass ? '#a5d6a7' : '#ef9a9a';
 
       // Recommendation
@@ -350,5 +314,5 @@
       document.getElementById('resultSection').style.display = 'block';
     }
   </script>
-</body>
+  <script src="omni-utils.js"></script></body>
 </html>

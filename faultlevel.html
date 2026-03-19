@@ -23,66 +23,7 @@
   </style>
 </head>
 <body>
-  <div class="top-tabs">
-    <a class="tab" href="index.html">Home</a>
-    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
-    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
-    <a class="tab" href="lightingsearch.html">Lighting Search</a>
-    <div class="tab has-dropdown active">
-      <span>Power Systems</span>
-      <div class="dropdown-content">
-        <a href="cablesizing.html">Cable Sizing</a>
-        <a href="cableweight.html">Cable Weight</a>
-        <a href="maxdemand.html">Maximum Demand</a>
-        <a href="diversity.html">Diversity Factors</a>
-        <a href="faultlevel.html">Fault Level</a>
-        <a href="loopimpedance.html">Loop Impedance</a>
-        <a href="discrimination.html">Discrimination Check</a>
-        <a href="txsizing.html">Transformer Sizing</a>
-        <a href="gensizing.html">Generator Sizing</a>
-        <a href="upssizing.html">UPS Sizing</a>
-        <a href="pfcsizing.html">PFC Sizing</a>
-        <a href="harmonics.html">Harmonics Analysis</a>
-        <a href="busbarsizing.html">Busbar Sizing</a>
-        <a href="ctsizing.html">CT Sizing</a>
-        <a href="earthing.html">Earthing Calculator</a>
-      </div>
-    </div>
-    <div class="tab has-dropdown">
-      <span>Protection</span>
-      <div class="dropdown-content">
-        <a href="rcdselect.html">RCD Selector</a>
-        <a href="spdsizing.html">SPD Sizing</a>
-        <a href="iprating.html">IP/IK Rating Guide</a>
-        <a href="conduit.html">Conduit Sizer</a>
-        <a href="pvsizing.html">PV Sizing</a>
-      </div>
-    </div>
-    <div class="tab has-dropdown">
-      <span>Lighting & Fire</span>
-      <div class="dropdown-content">
-        <a href="luxcalc.html">Lux Calculator</a>
-        <a href="luxlevels.html">Lux Levels Reference</a>
-        <a href="emergencylighting.html">Emergency Lighting</a>
-        <a href="fireinterface.html">Fire Interface Matrix</a>
-        <a href="smokecontrol.html">Smoke Control</a>
-        <a href="essentialservices.html">Essential Services</a>
-      </div>
-    </div>
-    <div class="tab has-dropdown">
-      <span>Documentation</span>
-      <div class="dropdown-content">
-        <a href="loadschedule.html">Load Schedule</a>
-        <a href="cableschedule.html">Cable Schedule</a>
-        <a href="designcert.html">Design Certificate</a>
-        <a href="tcommissioning.html">T&C Checklists</a>
-        <a href="inspection.html">Site Inspection</a>
-        <a href="sld.html">Single Line Diagram</a>
-        <a href="as3000tips.html">AS3000 Tips</a>
-      </div>
-    </div>
-    <a class="tab" href="qa.html">Verification</a>
-  </div>
+  <div class="top-tabs"></div>
 
   <div class="main-content">
     <h1>Fault Level Calculator</h1>
@@ -189,6 +130,7 @@
       </table>
       <button class="add-row-btn" onclick="addNode()">+ Add Cable Node</button>
       <button class="calc-button" onclick="calculate()" style="margin-top:16px;">Calculate Fault Levels</button>
+      <button class="calc-button" onclick="exportFaultResult()" style="margin-top:16px; background:#217346;">&#128190; Export CSV</button>
     </div>
 
     <div class="calc-section" id="summarySection" style="display:none;">
@@ -261,6 +203,28 @@
     function getTxKVA() {
       const sel = document.getElementById('txKVA').value;
       return sel === 'custom' ? parseFloat(document.getElementById('txKVAcustom').value) : parseFloat(sel);
+    }
+
+    function exportFaultResult() {
+      var tx = document.getElementById('txResult');
+      var sum = document.getElementById('summarySection');
+      if ((!tx || tx.style.display === 'none') && (!sum || sum.style.display === 'none')) { OmniToast.show('Calculate first', 'warn'); return; }
+      var rows = [];
+      rows.push(['Parameter', 'Value']);
+      rows.push(['3-Phase Fault (kA sym)', document.getElementById('txFault3ph').textContent]);
+      rows.push(['1-Phase-to-Earth Fault (kA)', document.getElementById('txFault1ph').textContent]);
+      rows.push(['TX Full Load Current (A)', document.getElementById('txFLC').textContent]);
+      rows.push(['TX Secondary Z (mohm)', document.getElementById('txZmOhm').textContent]);
+      var st = document.getElementById('summaryTable');
+      if (st) {
+        rows.push([]);
+        st.querySelectorAll('tr').forEach(function(tr) {
+          var cells = [];
+          tr.querySelectorAll('th, td').forEach(function(td) { cells.push(td.textContent.trim()); });
+          if (cells.length) rows.push(cells);
+        });
+      }
+      OmniExport.toCSV(rows[0], rows.slice(1), 'fault-level');
     }
 
     function calculate() {
@@ -350,5 +314,5 @@
     addNode();
     addNode();
   </script>
-</body>
+  <script src="omni-utils.js"></script></body>
 </html>

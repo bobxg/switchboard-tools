@@ -7,66 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="top-tabs">
-    <a class="tab" href="index.html">Home</a>
-    <a class="tab" href="switchboard.html">Switchboard Sizer</a>
-    <a class="tab" href="switchroom.html">Switchroom Sizer</a>
-    <a class="tab" href="lightingsearch.html">Lighting Search</a>
-    <div class="tab has-dropdown active">
-      <span>Power Systems</span>
-      <div class="dropdown-content">
-        <a href="cablesizing.html">Cable Sizing</a>
-        <a href="cableweight.html">Cable Weight</a>
-        <a href="maxdemand.html">Maximum Demand</a>
-        <a href="diversity.html">Diversity Factors</a>
-        <a href="faultlevel.html">Fault Level</a>
-        <a href="loopimpedance.html">Loop Impedance</a>
-        <a href="discrimination.html">Discrimination Check</a>
-        <a href="txsizing.html">Transformer Sizing</a>
-        <a href="gensizing.html">Generator Sizing</a>
-        <a href="upssizing.html">UPS Sizing</a>
-        <a href="pfcsizing.html">PFC Sizing</a>
-        <a href="harmonics.html">Harmonics Analysis</a>
-        <a href="busbarsizing.html">Busbar Sizing</a>
-        <a href="ctsizing.html">CT Sizing</a>
-        <a href="earthing.html">Earthing Calculator</a>
-      </div>
-    </div>
-    <div class="tab has-dropdown">
-      <span>Protection</span>
-      <div class="dropdown-content">
-        <a href="rcdselect.html">RCD Selector</a>
-        <a href="spdsizing.html">SPD Sizing</a>
-        <a href="iprating.html">IP/IK Rating Guide</a>
-        <a href="conduit.html">Conduit Sizer</a>
-        <a href="pvsizing.html">PV Sizing</a>
-      </div>
-    </div>
-    <div class="tab has-dropdown">
-      <span>Lighting & Fire</span>
-      <div class="dropdown-content">
-        <a href="luxcalc.html">Lux Calculator</a>
-        <a href="luxlevels.html">Lux Levels Reference</a>
-        <a href="emergencylighting.html">Emergency Lighting</a>
-        <a href="fireinterface.html">Fire Interface Matrix</a>
-        <a href="smokecontrol.html">Smoke Control</a>
-        <a href="essentialservices.html">Essential Services</a>
-      </div>
-    </div>
-    <div class="tab has-dropdown">
-      <span>Documentation</span>
-      <div class="dropdown-content">
-        <a href="loadschedule.html">Load Schedule</a>
-        <a href="cableschedule.html">Cable Schedule</a>
-        <a href="designcert.html">Design Certificate</a>
-        <a href="tcommissioning.html">T&C Checklists</a>
-        <a href="inspection.html">Site Inspection</a>
-        <a href="sld.html">Single Line Diagram</a>
-        <a href="as3000tips.html">AS3000 Tips</a>
-      </div>
-    </div>
-    <a class="tab" href="qa.html">Verification</a>
-  </div>
+  <div class="top-tabs"></div>
 
   <div class="main-content">
     <h1>Earth Fault Loop Impedance Calculator</h1>
@@ -201,6 +142,7 @@
         </div>
       </div>
       <button class="calc-button" onclick="calculate()">Check Loop Impedance</button>
+      <button class="calc-button" style="background:#16a34a;margin-top:8px" onclick="exportLoopResult()">Export Loop Result as CSV</button>
     </div>
 
     <div id="resultSection" style="display:none;">
@@ -273,6 +215,17 @@
       return Uo / tripI;
     }
 
+
+    function exportLoopResult() {
+      var rb = document.getElementById('calcZs');
+      if (!rb || rb.textContent === '\u2014') { OmniToast.show('Calculate first', 'warn'); return; }
+      OmniExport.toCSV(['Parameter','Value'],[
+        ['Calculated Zs', document.getElementById('calcZs').textContent],
+        ['Max Permitted Zs', document.getElementById('maxZs').textContent],
+        ['Fault Current (A)', document.getElementById('faultI').textContent],
+        ['Max Cable Length (m)', document.getElementById('maxLength').textContent]
+      ], 'loop-impedance');
+    }
     function calculate() {
       const circuitType = document.getElementById('circuitType').value;
       const deviceType = document.getElementById('deviceType').value;
@@ -343,5 +296,5 @@
 
     function updateDeviceRatings() { /* ratings are common &mdash; no change needed */ }
   </script>
-</body>
+  <script src="omni-utils.js"></script></body>
 </html>

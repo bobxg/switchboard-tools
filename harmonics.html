@@ -7,16 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="top-tabs">
-    <a class="tab" href="index.html">Home</a><a class="tab" href="switchboard.html">Switchboard Sizer</a><a class="tab" href="switchroom.html">Switchroom Sizer</a><a class="tab" href="lightingsearch.html">Lighting Search</a>
-    <div class="tab has-dropdown active"><span>Power Systems</span><div class="dropdown-content">
-      <a href="cablesizing.html">Cable Sizing</a><a href="cableweight.html">Cable Weight</a><a href="maxdemand.html">Maximum Demand</a><a href="diversity.html">Diversity Factors</a><a href="faultlevel.html">Fault Level</a><a href="loopimpedance.html">Loop Impedance</a><a href="discrimination.html">Discrimination Check</a><a href="txsizing.html">Transformer Sizing</a><a href="gensizing.html">Generator Sizing</a><a href="upssizing.html">UPS Sizing</a><a href="pfcsizing.html">PFC Sizing</a><a href="harmonics.html">Harmonics Analysis</a><a href="busbarsizing.html">Busbar Sizing</a><a href="ctsizing.html">CT Sizing</a><a href="earthing.html">Earthing Calculator</a>
-    </div></div>
-    <div class="tab has-dropdown"><span>Protection</span><div class="dropdown-content"><a href="rcdselect.html">RCD Selector</a><a href="spdsizing.html">SPD Sizing</a><a href="iprating.html">IP/IK Rating Guide</a><a href="conduit.html">Conduit Sizer</a><a href="pvsizing.html">PV Sizing</a></div></div>
-    <div class="tab has-dropdown"><span>Lighting & Fire</span><div class="dropdown-content"><a href="luxcalc.html">Lux Calculator</a><a href="luxlevels.html">Lux Levels Reference</a><a href="emergencylighting.html">Emergency Lighting</a><a href="fireinterface.html">Fire Interface Matrix</a><a href="smokecontrol.html">Smoke Control</a><a href="essentialservices.html">Essential Services</a></div></div>
-    <div class="tab has-dropdown"><span>Documentation</span><div class="dropdown-content"><a href="loadschedule.html">Load Schedule</a><a href="cableschedule.html">Cable Schedule</a><a href="designcert.html">Design Certificate</a><a href="tcommissioning.html">T&C Checklists</a><a href="inspection.html">Site Inspection</a><a href="sld.html">Single Line Diagram</a><a href="as3000tips.html">AS3000 Tips</a><a href="as3000viewer.html">AS3000 Viewer</a></div></div>
-    <a class="tab" href="qa.html">Verification</a>
-  </div>
+  <div class="top-tabs"></div>
   <div class="main-content">
     <h1>Harmonics Analysis Estimator</h1>
     <p>Estimate total harmonic distortion (THD) for LED/VSD-heavy installations per <strong>AS/NZS 61000.3.2</strong>, <strong>AS/NZS 61000.3.12</strong>, and distributor harmonic limits.</p>
@@ -36,6 +27,7 @@
         <div class="input-group"><label for="totalSupplyA">Supply Rating (A per phase)</label><input type="number" id="totalSupplyA" value="630" min="10" /></div>
       </div>
       <button class="calc-button" onclick="calculate()">Estimate Harmonics</button>
+      <button class="calc-button" style="background:#16a34a;margin-top:8px" onclick="exportHarmonicsResult()">Export Harmonics Result as CSV</button>
     </div>
     <div id="resultSection" style="display:none;">
       <div class="result-box">
@@ -67,6 +59,17 @@
     // AS/NZS 61000.3.12 limits (% of fundamental at PCC, for Rsce &#8805; 33)
     const limits = { 3: 21.6, 5: 10.7, 7: 7.2, 9: 3.8, 11: 3.1, 13: 2.0, thd: 23 };
 
+
+    function exportHarmonicsResult() {
+      var rb = document.getElementById('resTHDI');
+      if (!rb || rb.textContent === '\u2014') { OmniToast.show('Calculate first', 'warn'); return; }
+      OmniExport.toCSV(['Parameter','Value'],[
+        ['THD-I (%)', document.getElementById('resTHDI').textContent],
+        ['THD-V (%)', document.getElementById('resTHDV').textContent],
+        ['Non-linear Load (%)', document.getElementById('resNL').textContent],
+        ['Neutral Multiplier', document.getElementById('resNeutral').textContent]
+      ], 'harmonics-analysis');
+    }
     function calculate() {
       const ledTotal = parseInt(document.getElementById('ledQty').value) * parseFloat(document.getElementById('ledW').value);
       const vsdTotal = parseInt(document.getElementById('vsdQty').value) * parseFloat(document.getElementById('vsdKW').value) * 1000;
@@ -152,5 +155,5 @@
       document.getElementById('resultSection').style.display = 'block';
     }
   </script>
-</body>
+  <script src="omni-utils.js"></script></body>
 </html>
