@@ -12,7 +12,7 @@
     <h1>Conduit Sizer (AS/NZS 3000)</h1>
     <p>
       Enter the number of each cable size to calculate the smallest conduit size required.<br>
-      <span style="color:#1976d2; font-size:0.95em;">
+      <span style="color:var(--accent); font-size:0.95em;">
         (Fill factors per AS/NZS 3000 Appendix C: 1 cable = 50%, 2 cables = 33%, 3+ cables = 40%)
       </span>
     </p>
@@ -24,7 +24,7 @@
       </select>
     </div>
     <form id="cableForm" autocomplete="off">
-      <table style="margin:0 auto 20px auto; border-collapse:collapse; width:100%; max-width:350px; background:#fff; box-shadow:0 2px 8px #eee;">
+        <table style="margin:0 auto 20px auto; border-collapse:collapse; width:100%; max-width:350px; background:var(--bg-card); box-shadow:var(--shadow);">
         <thead>
           <tr>
             <th>Cable Area (mm&sup2;)</th>
@@ -36,7 +36,7 @@
       <div class="conduit-result" id="conduitResult">
         Smallest Suitable Conduit: -
       </div>
-      <button class="calc-button" onclick="exportConduitResult()" style="background:#217346; margin-top:10px;">&#128190; Export CSV</button>
+      <button class="calc-button green" onclick="exportConduitResult()" style="margin-top:10px;">&#128190; Export CSV</button>
     </form>
   </div>
     <script src="omni-utils.js"></script>

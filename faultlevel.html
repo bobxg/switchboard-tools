@@ -7,10 +7,10 @@
   <link rel="stylesheet" href="style.css" />
   <style>
     .node-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-        .node-table th, .node-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        .node-table th { background: #2563eb; color: white; font-weight: bold; }
-        .node-table tr:nth-child(even) { background: #f8fafc; }
-        .node-table input, .node-table select { width: 100%; padding: 6px 8px; border: 1px solid #cbd5e1; font-size: 0.95em; box-sizing: border-box; }
+        .node-table th, .node-table td { border: 1px solid var(--border-light); padding: 10px; text-align: left; }
+        .node-table th { background: var(--accent); color: white; font-weight: bold; }
+        .node-table tr:nth-child(even) { background: var(--bg-table-stripe); }
+        .node-table input, .node-table select { width: 100%; padding: 6px 8px; border: 1px solid var(--border-input); font-size: 0.95em; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); }
         .add-row-btn { background: #16a34a; color: white; border: none; padding: 8px 20px; font-size: 0.95em; cursor: pointer; margin-top: 8px; }
         .add-row-btn:hover { background: #15803d; }
         .remove-btn { background: #dc2626; color: white; border: none; padding: 4px 12px; cursor: pointer; font-size: 0.85em; }
@@ -79,7 +79,7 @@
         <div class="input-group">
           <label for="upstreamFault">Upstream Fault Level (MVA)</label>
           <input type="number" id="upstreamFault" value="150" min="10" step="1" />
-          <span style="font-size:0.8em;color:#888;">HV network &mdash; use 150 MVA if unknown</span>
+          <span style="font-size:0.8em;color:var(--text-secondary);">HV network &mdash; use 150 MVA if unknown</span>
         </div>
       </div>
 
@@ -130,7 +130,7 @@
       </table>
       <button class="add-row-btn" onclick="addNode()">+ Add Cable Node</button>
       <button class="calc-button" onclick="calculate()" style="margin-top:16px;">Calculate Fault Levels</button>
-      <button class="calc-button" onclick="exportFaultResult()" style="margin-top:16px; background:#217346;">&#128190; Export CSV</button>
+      <button class="calc-button green" onclick="exportFaultResult()" style="margin-top:16px;">&#128190; Export CSV</button>
     </div>
 
     <div class="calc-section" id="summarySection" style="display:none;">

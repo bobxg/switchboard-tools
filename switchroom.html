@@ -16,20 +16,20 @@
     .clearance-zone-yellow { position: absolute; border: 2px dashed #f59e0b; background: rgba(245,158,11,0.12); pointer-events: none; box-sizing: border-box; }
     .door { position: absolute; border: 3px solid #78716c; background: #d6d3d1; box-sizing: border-box; }
     .door-swing { position: absolute; border: 2px solid #78716c; border-radius: 0; background: transparent; pointer-events: none; }
-    .equip-controls { background: #f8fafc; padding: 20px; border-right: 1px solid #e2e8f0; min-width: 320px; max-width: 400px; }
-    .equip-controls h2 { color: #1e293b; margin-bottom: 18px; font-size: 1.35em; font-weight: 700; }
-    .add-equip-section { margin-bottom: 24px; padding: 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 3px; }
-    .add-equip-section h3 { color: #1e293b; margin-bottom: 12px; font-size: 1.1em; font-weight: 600; }
-    .add-btn { width: 100%; padding: 10px; background: #2563eb; color: #fff; border: none; cursor: pointer; font-weight: 600; margin-top: 8px; border-radius: 3px; transition: background 0.15s; }
+    .equip-controls { background: var(--bg-input); padding: 20px; border-right: 1px solid var(--border-light); min-width: 320px; max-width: 400px; }
+    .equip-controls h2 { color: var(--text-primary); margin-bottom: 18px; font-size: 1.35em; font-weight: 700; }
+    .add-equip-section { margin-bottom: 24px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 3px; }
+    .add-equip-section h3 { color: var(--text-primary); margin-bottom: 12px; font-size: 1.1em; font-weight: 600; }
+    .add-btn { width: 100%; padding: 10px; background: var(--accent); color: #fff; border: none; cursor: pointer; font-weight: 600; margin-top: 8px; border-radius: 3px; transition: background 0.15s; }
     .add-btn:hover { background: #1d4ed8; }
     .equipment-list { margin-top: 20px; }
-    .equipment-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; margin-bottom: 6px; background: #fff; border: 1px solid #e2e8f0; border-radius: 3px; }
+    .equipment-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; margin-bottom: 6px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 3px; }
     .equipment-item-info { flex: 1; }
     .remove-btn { padding: 4px 12px; background: #dc2626; color: #fff; border: none; cursor: pointer; font-size: 0.85em; border-radius: 2px; transition: background 0.15s; }
     .remove-btn:hover { background: #b91c1c; }
-    .clearance-info { margin-top: 20px; padding: 14px; background: #fffbeb; border-left: 4px solid #f59e0b; font-size: 0.9em; border-radius: 0 2px 2px 0; }
+    .clearance-info { margin-top: 20px; padding: 14px; background: var(--bg-warn); border-left: 4px solid #f59e0b; font-size: 0.9em; border-radius: 0 2px 2px 0; }
     .clearance-info h4 { color: #d97706; margin-bottom: 8px; }
-    @media (max-width: 900px) { .main-content { flex-direction: column !important; } .equip-controls { max-width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; } }
+    @media (max-width: 900px) { .main-content { flex-direction: column !important; } .equip-controls { max-width: 100%; border-right: none; border-bottom: 1px solid var(--border-light); } }
   </style>
 </head>
 <body>
@@ -85,13 +85,13 @@
       </div>
     </div>
 
-    <button class="calc-button" onclick="exportSwitchroom()" style="background:#217346; margin-bottom:16px;">&#128190; Export Equipment CSV</button>
+    <button class="calc-button green" onclick="exportSwitchroom()" style="margin-bottom:16px;">&#128190; Export Equipment CSV</button>
 
     <div class="room-container">
       <div class="room-label">Switchroom Layout (Top View - To Scale)</div>
       <div id="roomBox" class="room-box"></div>
       <div class="room-dims" id="roomDims"></div>
-      <div style="margin-top:12px;font-size:0.9em;color:#666;">
+      <div style="margin-top:12px;font-size:0.9em;color:var(--text-secondary);">
         <strong>Scale:</strong> <span id="scaleInfo">60px = 1m</span>
       </div>
     </div>
@@ -159,7 +159,7 @@
     function updateEquipmentListDisplay() {
       const container = document.getElementById('equipmentListContainer');
       if (equipmentList.length === 0) {
-        container.innerHTML = '<div style="color:#999;font-style:italic;padding:8px;">No equipment added</div>';
+        container.innerHTML = '<div style="color:var(--text-secondary);font-style:italic;padding:8px;">No equipment added</div>';
         return;
       }
 
@@ -277,7 +277,7 @@
       roomBox.innerHTML = '';
 
       if (equipmentList.length === 0) {
-        roomBox.innerHTML = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#999;font-style:italic;">Add equipment to see layout</div>';
+        roomBox.innerHTML = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--text-secondary);font-style:italic;">Add equipment to see layout</div>';
         updateDimensionsDisplay(dimensions);
         return;
       }
@@ -439,7 +439,7 @@
         Depth: ${(dimensions.depth / 1000).toFixed(2)}m (${dimensions.depth}mm)<br>
         Area: ${totalArea.toFixed(2)}m&sup2;<br>
         <strong>Layout:</strong> ${layoutType}<br>
-        <em style="color:#666;font-size:0.9em;">Includes AS/NZS 3000 required clearances</em>
+        <em style="color:var(--text-secondary);font-size:0.9em;">Includes AS/NZS 3000 required clearances</em>
       `;
     }
 

@@ -6,41 +6,35 @@
   <title>Essential Services Register - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .calc-button.sm { font-size: 0.9em; padding: 6px 14px; }
-        .calc-button.green { background: #16a34a; }
-        .calc-button.green:hover { background: #15803d; }
-        .calc-button.red { background: #dc2626; }
-        .calc-button.red:hover { background: #b91c1c; }
-        .btn-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
-        .tabs { display: flex; gap: 2px; margin-bottom: 0; }
-        .tab-btn { padding: 10px 18px; background: #e2e8f0; border: none; cursor: pointer; font-size: 0.95em; font-weight: bold; border-radius: 6px 6px 0 0; }
-        .tab-btn.active { background: #2563eb; color: white; }
-        .tab-content { display: none; padding: 20px; border: 2px solid #2563eb; border-top: none; background: #fff; }
+    .tabs { display: flex; gap: 2px; margin-bottom: 0; }
+        .tab-btn { padding: 10px 18px; background: var(--border-light); border: none; cursor: pointer; font-size: 0.95em; font-weight: bold; border-radius: 6px 6px 0 0; color: var(--text-primary); }
+        .tab-btn.active { background: var(--accent); color: white; }
+        .tab-content { display: none; padding: 20px; border: 2px solid var(--accent); border-top: none; background: var(--bg-card); }
         .tab-content.active { display: block; }
         .register-table { width: 100%; border-collapse: collapse; font-size: 0.82em; }
-        .register-table th, .register-table td { border: 1px solid #ccc; padding: 6px 8px; }
-        .register-table th { background: #2563eb; color: white; font-size: 0.8em; white-space: nowrap; }
-        .register-table tr:nth-child(even) { background: #f8fafc; }
-        .register-table tr:hover { background: #eff6ff; }
-        .register-table input, .register-table select { width: 100%; border: none; padding: 3px; font-size: 0.9em; box-sizing: border-box; }
-        .status-compliant { background: #f0fdf4; color: #16a34a; font-weight: bold; text-align: center; }
-        .status-due { background: #fffbeb; color: #d97706; font-weight: bold; text-align: center; }
-        .status-overdue { background: #fef2f2; color: #dc2626; font-weight: bold; text-align: center; }
+        .register-table th, .register-table td { border: 1px solid var(--border-light); padding: 6px 8px; }
+        .register-table th { background: var(--accent); color: white; font-size: 0.8em; white-space: nowrap; }
+        .register-table tr:nth-child(even) { background: var(--bg-table-stripe); }
+        .register-table tr:hover { background: var(--bg-info); }
+        .register-table input, .register-table select { width: 100%; border: none; padding: 3px; font-size: 0.9em; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); }
+        .status-compliant { background: var(--bg-pass); color: #16a34a; font-weight: bold; text-align: center; }
+        .status-due { background: var(--bg-warn); color: #d97706; font-weight: bold; text-align: center; }
+        .status-overdue { background: var(--bg-fail); color: #dc2626; font-weight: bold; text-align: center; }
         .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 16px 0; }
         .summary-item { padding: 14px; text-align: center; border-radius: 4px; }
         .summary-item .value { font-size: 1.6em; font-weight: bold; }
-        .summary-item .label { font-size: 0.85em; color: #555; }
-        .summary-item.green { background: #f0fdf4; border: 1px solid #16a34a; }
+        .summary-item .label { font-size: 0.85em; color: var(--text-secondary); }
+        .summary-item.green { background: var(--bg-pass); border: 1px solid #16a34a; }
         .summary-item.green .value { color: #16a34a; }
-        .summary-item.orange { background: #fffbeb; border: 1px solid #f59e0b; }
+        .summary-item.orange { background: var(--bg-warn); border: 1px solid #f59e0b; }
         .summary-item.orange .value { color: #d97706; }
-        .summary-item.red { background: #fef2f2; border: 1px solid #dc2626; }
+        .summary-item.red { background: var(--bg-fail); border: 1px solid #dc2626; }
         .summary-item.red .value { color: #dc2626; }
-        .summary-item.blue { background: #eff6ff; border: 1px solid #2563eb; }
-        .summary-item.blue .value { color: #2563eb; }
+        .summary-item.blue { background: var(--bg-info); border: 1px solid var(--accent); }
+        .summary-item.blue .value { color: var(--accent); }
         .filter-row { display: flex; gap: 12px; margin: 12px 0; align-items: center; flex-wrap: wrap; }
         .filter-row label { font-weight: bold; font-size: 0.9em; }
-        .filter-row select, .filter-row input { padding: 5px 8px; font-size: 0.9em; }
+        .filter-row select, .filter-row input { padding: 5px 8px; font-size: 0.9em; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-input); }
         @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
         @media print { .top-tabs, .calc-button, .btn-row, .tabs, .filter-row { display: none !important; } .tab-content { display: block !important; border: none !important; } .register-table input, .register-table select { border: none !important; background: transparent !important; } }
   </style>
@@ -119,7 +113,7 @@
 
     <!-- NCC Requirements Tab -->
     <div class="tab-content" id="tab-ncc">
-      <h3 style="color:#1976d2;">NCC Essential Safety Measures &mdash; Electrical Requirements</h3>
+      <h3 style="color:var(--accent);">NCC Essential Safety Measures &mdash; Electrical Requirements</h3>
       <table class="register-table">
         <thead>
           <tr><th>NCC Clause</th><th>Essential Safety Measure</th><th>Electrical Requirement</th><th>Inspection Frequency</th></tr>
@@ -142,7 +136,7 @@
 
     <!-- Maintenance Schedule Tab -->
     <div class="tab-content" id="tab-maintenance">
-      <h3 style="color:#1976d2;">Standard Maintenance Frequencies</h3>
+      <h3 style="color:var(--accent);">Standard Maintenance Frequencies</h3>
       <table class="register-table">
         <thead>
           <tr><th>Measure</th><th>Applicable Standard</th><th>Weekly</th><th>Monthly</th><th>6-Monthly</th><th>Annual</th><th>5-Yearly</th></tr>
@@ -201,7 +195,7 @@
       const catSel = categories.map(c => `<option${c===(d.cat||'')?' selected':''}>${c}</option>`).join('');
       const freqSel = frequencies.map(f => `<option${f===(d.freq||'Annually')?' selected':''}>${f}</option>`).join('');
       tr.innerHTML = `
-        <td style="text-align:center;font-weight:bold;color:#666;">${entryCount}</td>
+        <td style="text-align:center;font-weight:bold;color:var(--text-secondary);">${entryCount}</td>
         <td><input type="text" value="${d.measure || ''}" placeholder="e.g. Fire Detection Panel" /></td>
         <td><select onchange="filterTable()">${catSel}</select></td>
         <td><input type="text" value="${d.location || ''}" placeholder="e.g. Level 1" /></td>

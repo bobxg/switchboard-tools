@@ -12,7 +12,7 @@
   <div class="calculator-container">
     <div class="calc-section">
       <h2>Cable Weight Calculator</h2>
-      <p style="background:#f0f7ff; padding:12px; border-left:4px solid #1976d2; margin-bottom:20px; font-size:0.95em;">
+      <p style="background:var(--bg-info); padding:12px; border-left:4px solid var(--accent); margin-bottom:20px; font-size:0.95em;">
         <strong>Data Sources:</strong> Cable weights sourced from manufacturer technical datasheets including Olex, Prysmian, and Nexans. 
         Weights are for XLPE/PVC insulated cables at 20&deg;C. Actual weights may vary &plusmn;5% depending on manufacturing tolerances and specific product variants.
       </p>
@@ -74,7 +74,7 @@
       </div>
 
       <button class="calc-button" onclick="calculateWeight()">Calculate Weight</button>
-      <button class="calc-button" style="background:#16a34a;margin-top:8px" onclick="exportWeightResult()">Export Result as CSV</button>
+      <button class="calc-buttongreen" style="margin-top:8px" onclick="exportWeightResult()">Export Result as CSV</button>
 
       <div id="resultBox" style="display:none;">
         <div class="result-box">
@@ -233,7 +233,7 @@
       const conductorName = conductor === 'cu' ? 'Copper' : 'Aluminium';
       const armouredType = isArmoured ? 'SWA (Steel Wire Armoured)' : 'Unarmoured';
       lastWeightResult = {
-        spec: cores + 'C x ' + size + 'mm² ' + conductorName + ' ' + armouredType,
+        spec: cores + 'C x ' + size + 'mmï¿½ ' + conductorName + ' ' + armouredType,
         wpm: weightPerMeter.toFixed(3), length, total: totalWeight.toFixed(2)
       };
       let referenceSource = '';
@@ -265,9 +265,9 @@
           <strong>Cable length:</strong>
           <span>${length} m</span>
         </div>
-        <div style="padding-top:12px; border-top:2px solid #e0e0e0; font-size:0.9em;">
+        <div style="padding-top:12px; border-top:2px solid var(--border-light); font-size:0.9em;">
           <strong>Data Source:</strong> 
-          <a href="${referenceLink}" target="_blank" style="color:#0066cc; text-decoration:underline; font-weight:normal;">${referenceSource}</a>
+          <a href="${referenceLink}" target="_blank" style="color:var(--accent); text-decoration:underline; font-weight:normal;">${referenceSource}</a>
         </div>
       `;
       

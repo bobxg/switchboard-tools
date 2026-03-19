@@ -7,18 +7,12 @@
   <link rel="stylesheet" href="style.css" />
   <style>
     .input-row.six { grid-template-columns: repeat(6, 1fr); }
-        .calc-button.sm { font-size: 0.9em; padding: 6px 14px; }
-        .calc-button.green { background: #16a34a; }
-        .calc-button.green:hover { background: #15803d; }
-        .calc-button.red { background: #dc2626; }
-        .calc-button.red:hover { background: #b91c1c; }
         .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
-        .schedule-table th, .schedule-table td { border: 1px solid #ccc; padding: 4px 6px; }
-        .schedule-table th { background: #2563eb; color: white; font-size: 0.8em; white-space: nowrap; position: sticky; top: 0; }
-        .schedule-table input, .schedule-table select { width: 100%; border: none; padding: 3px; font-size: 0.9em; box-sizing: border-box; }
-        .schedule-table tr:nth-child(even) { background: #f8fafc; }
-        .schedule-table tr:hover { background: #eff6ff; }
-        .btn-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+        .schedule-table th, .schedule-table td { border: 1px solid var(--border-light); padding: 4px 6px; }
+        .schedule-table th { background: var(--accent); color: white; font-size: 0.8em; white-space: nowrap; position: sticky; top: 0; }
+        .schedule-table input, .schedule-table select { width: 100%; border: none; padding: 3px; font-size: 0.9em; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); }
+        .schedule-table tr:nth-child(even) { background: var(--bg-table-stripe); }
+        .schedule-table tr:hover { background: var(--bg-info); }
         @media (max-width: 768px) { .input-row.six { grid-template-columns: 1fr 1fr 1fr; } }
         @media print { .top-tabs, .calc-button, .btn-row, .input-row { display: none !important; } .schedule-table input, .schedule-table select { border: none !important; background: transparent !important; } }
   </style>
@@ -85,7 +79,7 @@
       const d = data || {};
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="text-align:center;font-weight:bold;color:#666;">${rowCount}</td>
+        <td style="text-align:center;font-weight:bold;color:var(--text-secondary);">${rowCount}</td>
         <td><input type="text" value="${d.tag || 'C' + String(rowCount).padStart(3,'0')}" /></td>
         <td><input type="text" value="${d.from || ''}" placeholder="MSB" /></td>
         <td><input type="text" value="${d.to || ''}" placeholder="DB-L01" /></td>

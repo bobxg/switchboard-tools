@@ -6,24 +6,18 @@
   <title>Load Schedule Builder - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .calc-button.sm { font-size: 0.9em; padding: 6px 14px; }
-        .calc-button.green { background: #16a34a; }
-        .calc-button.green:hover { background: #15803d; }
-        .calc-button.red { background: #dc2626; }
-        .calc-button.red:hover { background: #b91c1c; }
-        .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
-        .schedule-table th, .schedule-table td { border: 1px solid #ccc; padding: 4px 6px; }
-        .schedule-table th { background: #2563eb; color: white; font-size: 0.78em; white-space: nowrap; position: sticky; top: 0; }
-        .schedule-table input, .schedule-table select { width: 100%; border: none; padding: 3px; font-size: 0.9em; box-sizing: border-box; }
-        .schedule-table tr:nth-child(even) { background: #f8fafc; }
-        .schedule-table tr:hover { background: #eff6ff; }
-        .schedule-table .calc-cell { background: #f0fdf4; font-weight: bold; text-align: center; font-size: 0.9em; }
-        .totals-row td { background: #2563eb; color: white; font-weight: bold; font-size: 0.9em; padding: 6px; }
-        .btn-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+    .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
+        .schedule-table th, .schedule-table td { border: 1px solid var(--border-light); padding: 4px 6px; }
+        .schedule-table th { background: var(--accent); color: white; font-size: 0.78em; white-space: nowrap; position: sticky; top: 0; }
+        .schedule-table input, .schedule-table select { width: 100%; border: none; padding: 3px; font-size: 0.9em; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); }
+        .schedule-table tr:nth-child(even) { background: var(--bg-table-stripe); }
+        .schedule-table tr:hover { background: var(--bg-info); }
+        .schedule-table .calc-cell { background: var(--bg-pass); font-weight: bold; text-align: center; font-size: 0.9em; }
+        .totals-row td { background: var(--accent); color: white; font-weight: bold; font-size: 0.9em; padding: 6px; }
         .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
-        .summary-item { background: #eff6ff; border: 1px solid #2563eb; padding: 12px; text-align: center; }
-        .summary-item .value { font-size: 1.5em; font-weight: bold; color: #2563eb; }
-        .summary-item .label { font-size: 0.85em; color: #666; }
+        .summary-item { background: var(--bg-info); border: 1px solid var(--accent); padding: 12px; text-align: center; }
+        .summary-item .value { font-size: 1.5em; font-weight: bold; color: var(--accent); }
+        .summary-item .label { font-size: 0.85em; color: var(--text-secondary); }
         @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
         @media print { .top-tabs, .calc-button, .btn-row { display: none !important; } .schedule-table input, .schedule-table select { border: none !important; background: transparent !important; } }
   </style>
@@ -127,7 +121,7 @@
       const phSel = phaseOptions.map(o => `<option${o===(d.phase||'3P')?' selected':''}>${o}</option>`).join('');
       const catSel = categoryOptions.map(o => `<option${o===(d.category||'Lighting')?' selected':''}>${o}</option>`).join('');
       tr.innerHTML = `
-        <td style="text-align:center;font-weight:bold;color:#666;">${rowCount}</td>
+        <td style="text-align:center;font-weight:bold;color:var(--text-secondary);">${rowCount}</td>
         <td><input type="text" value="${d.id || ''}" placeholder="C${rowCount}" onchange="recalcAll()" /></td>
         <td><input type="text" value="${d.desc || ''}" placeholder="Description" /></td>
         <td><select onchange="recalcAll()">${phSel}</select></td>

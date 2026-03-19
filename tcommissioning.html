@@ -6,19 +6,19 @@
   <title>Testing & Commissioning Checklists - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .tabs { display: flex; gap: 0; border-bottom: 3px solid #2563eb; margin-bottom: 0; }
-        .tabs button { padding: 10px 20px; border: none; border-bottom: 3px solid transparent; background: #f1f5f9; cursor: pointer; font-size: 0.95em; font-weight: bold; color: #666; margin-bottom: -3px; }
-        .tabs button.active { background: #fff; color: #2563eb; border-bottom-color: #2563eb; }
-        .tab-content { display: none; padding: 24px; border: 2px solid #2563eb; border-top: none; background: #fff; }
+    .tabs { display: flex; gap: 0; border-bottom: 3px solid var(--accent); margin-bottom: 0; }
+        .tabs button { padding: 10px 20px; border: none; border-bottom: 3px solid transparent; background: var(--bg-input); cursor: pointer; font-size: 0.95em; font-weight: bold; color: var(--text-secondary); margin-bottom: -3px; }
+        .tabs button.active { background: var(--bg-card); color: var(--accent); border-bottom-color: var(--accent); }
+        .tab-content { display: none; padding: 24px; border: 2px solid var(--accent); border-top: none; background: var(--bg-card); }
         .tab-content.active { display: block; }
         .checklist { list-style: none; padding: 0; margin: 0; }
-        .checklist li { padding: 10px 12px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+        .checklist li { padding: 10px 12px; border-bottom: 1px solid var(--border-light); display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
         .checklist li label { cursor: pointer; display: flex; gap: 10px; align-items: flex-start; }
         .checklist input[type="checkbox"] { margin-top: 4px; width: 18px; height: 18px; flex-shrink: 0; }
-        .checklist .clause { color: #2563eb; font-weight: bold; font-size: 0.85em; white-space: nowrap; }
-        .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; margin: 12px 0; }
+        .checklist .clause { color: var(--accent); font-weight: bold; font-size: 0.85em; white-space: nowrap; }
+        .progress-bar { height: 8px; background: var(--border-light); border-radius: 4px; margin: 12px 0; }
         .progress-fill { height: 100%; background: #16a34a; border-radius: 4px; transition: width 0.3s; }
-        .progress-text { font-size: 0.9em; color: #666; margin-bottom: 8px; }
+        .progress-text { font-size: 0.9em; color: var(--text-secondary); margin-bottom: 8px; }
         @media print { .top-tabs, .calc-button, .tabs { display: none !important; } .tab-content { display: block !important; border: none; page-break-before: always; } .checklist input[type="checkbox"] { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style>
 </head>
@@ -64,7 +64,7 @@
         <li><label><input type="checkbox" onchange="updateProgress('preEnerg')"><a href="as3000viewer.html#cl-8.4" class="clause">cl 8.4</a> Certificate of Compliance (CoC) / ESM documentation prepared</label></li>
       </ul>
       <button class="calc-button" onclick="window.print()">Print Checklist</button>
-      <button class="calc-button" onclick="exportChecklist()" style="background:#217346;">&#128190; Export Checklist CSV</button>
+      <button class="calc-button green" onclick="exportChecklist()">&#128190; Export Checklist CSV</button>
     </div>
 
     <div id="testing" class="tab-content">

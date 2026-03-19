@@ -18,8 +18,8 @@
     }
     .viewer-section {
       flex: 1;
-      background: #fff;
-      border: 2px solid #2563eb;
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
       padding: 20px;
       overflow: auto;
       display: flex;
@@ -27,24 +27,24 @@
     }
     .sidebar {
       width: 380px;
-      background: #fff;
-      border: 2px solid #2563eb;
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
       padding: 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
     }
     .upload-area {
-      border: 3px dashed #2563eb;
+      border: 3px dashed var(--accent);
       padding: 40px;
       text-align: center;
-      background: #f8fafc;
+      background: var(--bg-input);
       cursor: pointer;
       transition: background 0.2s;
       margin-bottom: 20px;
     }
     .upload-area:hover {
-      background: #eff6ff;
+      background: var(--bg-info);
     }
     .upload-area.dragover {
       background: #d1e7f5;
@@ -52,10 +52,10 @@
     }
     .pdf-viewer {
       position: relative;
-      background: #f8fafc;
+      background: var(--bg-input);
       flex: 1;
       overflow: hidden;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-light);
       display: none;
     }
     .pdf-viewer-inner {
@@ -123,8 +123,8 @@
       font-size: 12px;
     }
     .defect-item {
-      background: #fff;
-      border: 1px solid #e2e8f0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
       border-left: 4px solid #d32f2f;
       padding: 14px;
       margin-bottom: 12px;
@@ -137,7 +137,7 @@
       transform: translateX(2px);
     }
     .defect-item.selected {
-      background: #fffbeb;
+      background: var(--bg-warn);
       border-left-color: #ff6f00;
       box-shadow: 0 2px 8px rgba(255,111,0,0.2);
     }
@@ -155,7 +155,7 @@
     }
     .defect-header {
       font-weight: bold;
-      color: #2563eb;
+      color: var(--accent);
       margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
@@ -186,20 +186,20 @@
       letter-spacing: 0.5px;
       margin-left: 8px;
     }
-    .status-open { background: #fef2f2; color: #dc2626; }
-    .status-in-progress { background: #fffbeb; color: #d97706; }
-    .status-resolved { background: #f0fdf4; color: #16a34a; }
-    .status-verified { background: #eff6ff; color: #1d4ed8; }
+    .status-open { background: var(--bg-fail); color: #dc2626; }
+    .status-in-progress { background: var(--bg-warn); color: #d97706; }
+    .status-resolved { background: var(--bg-pass); color: #16a34a; }
+    .status-verified { background: var(--bg-info); color: #1d4ed8; }
     .defect-comment {
       font-size: 0.9em;
-      color: #444;
+      color: var(--text-secondary);
       margin-bottom: 8px;
       word-wrap: break-word;
       line-height: 1.4;
     }
     .defect-meta {
       font-size: 0.8em;
-      color: #666;
+      color: var(--text-secondary);
       margin-top: 8px;
       display: flex;
       flex-wrap: wrap;
@@ -207,21 +207,21 @@
     }
     .defect-assignee {
       font-weight: 600;
-      color: #2563eb;
+      color: var(--accent);
     }
     .defect-photo {
       max-width: 100%;
       margin-top: 8px;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-light);
       cursor: pointer;
     }
     .defect-timestamp {
       font-size: 0.75em;
-      color: #666;
+      color: var(--text-secondary);
       font-style: italic;
     }
     .btn {
-      background: #2563eb;
+      background: var(--accent);
       color: white;
       padding: 10px 20px;
       border: none;
@@ -262,8 +262,8 @@
       gap: 10px;
       margin-bottom: 15px;
       padding: 10px;
-      background: #f8fafc;
-      border: 1px solid #ddd;
+      background: var(--bg-input);
+      border: 1px solid var(--border-light);
       border-radius: 4px;
       flex-wrap: wrap;
     }
@@ -273,7 +273,7 @@
     }
     .page-info {
       font-weight: bold;
-      color: #2563eb;
+      color: var(--accent);
       white-space: nowrap;
     }
     .modal {
@@ -292,7 +292,7 @@
       display: flex;
     }
     .modal-content {
-      background: white;
+      background: var(--bg-card);
       padding: 30px;
       max-width: 500px;
       width: 90%;
@@ -300,19 +300,19 @@
     }
     .modal-content h3 {
       margin-top: 0;
-      color: #2563eb;
+      color: var(--accent);
     }
     .modal-content label {
       display: block;
       margin-top: 12px;
       font-weight: bold;
-      color: #333;
+      color: var(--text-primary);
     }
     .modal-content textarea,
     .modal-content input[type="file"] {
       width: 100%;
       padding: 8px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--border-input);
       margin-top: 4px;
       font-family: inherit;
     }
@@ -375,7 +375,7 @@
       <h2>Observations</h2>
       
       <!-- Summary stats -->
-      <div id="summaryStats" style="display: none; margin-bottom: 15px; padding: 12px; background: #eff6ff; border: 1px solid #90caf9; border-radius: 4px;">
+      <div id="summaryStats" style="display: none; margin-bottom: 15px; padding: 12px; background: var(--bg-info); border: 1px solid var(--accent); border-radius: 4px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.85em;">
           <div><strong>Total:</strong> <span id="statTotal">0</span></div>
           <div><strong>&#128308; Open:</strong> <span id="statOpen">0</span></div>
@@ -385,9 +385,9 @@
       </div>
       
       <!-- Filter controls -->
-      <div style="margin-bottom: 15px; padding: 12px; background: #f8fafc; border: 1px solid #ddd; border-radius: 4px;">
-        <label style="font-size: 0.9em; color: #666; margin-bottom: 6px; display: block;">Filter by Status:</label>
-        <select id="filterStatus" style="width: 100%; padding: 6px; border: 1px solid #ddd; font-size: 0.9em;">
+      <div style="margin-bottom: 15px; padding: 12px; background: var(--bg-input); border: 1px solid var(--border-light); border-radius: 4px;">
+        <label style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 6px; display: block;">Filter by Status:</label>
+        <select id="filterStatus" style="width: 100%; padding: 6px; border: 1px solid var(--border-light); font-size: 0.9em;">
           <option value="all">All Statuses</option>
           <option value="open">Open</option>
           <option value="in-progress">In Progress</option>
@@ -395,8 +395,8 @@
           <option value="verified">Verified</option>
         </select>
         
-        <label style="font-size: 0.9em; color: #666; margin-top: 8px; margin-bottom: 6px; display: block;">Filter by Category:</label>
-        <select id="filterCategory" style="width: 100%; padding: 6px; border: 1px solid #ddd; font-size: 0.9em;">
+        <label style="font-size: 0.9em; color: var(--text-secondary); margin-top: 8px; margin-bottom: 6px; display: block;">Filter by Category:</label>
+        <select id="filterCategory" style="width: 100%; padding: 6px; border: 1px solid var(--border-light); font-size: 0.9em;">
           <option value="all">All Categories</option>
           <option value="electrical">Electrical</option>
           <option value="plumbing">Plumbing</option>
@@ -410,10 +410,10 @@
       <div class="controls">
         <div style="position: relative; display: inline-block;">
           <button class="btn btn-success" id="exportReport">Export Report &#9660;</button>
-          <div id="exportMenu" style="display: none; position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ccc; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; min-width: 150px; margin-top: 4px;">
-            <button class="btn" id="exportPDF" style="width: 100%; text-align: left; border: none; border-radius: 0; background: white; color: #333;">Export as PDF</button>
-            <button class="btn" id="exportWord" style="width: 100%; text-align: left; border: none; border-radius: 0; background: white; color: #333;">Export as Word</button>
-            <button class="btn" id="exportJSON" style="width: 100%; text-align: left; border: none; border-radius: 0; background: white; color: #333;">Export as JSON</button>
+          <div id="exportMenu" style="display: none; position: absolute; top: 100%; left: 0; background: var(--bg-card); border: 1px solid var(--border-light); box-shadow: var(--shadow); z-index: 1000; min-width: 150px; margin-top: 4px;">
+            <button class="btn" id="exportPDF" style="width: 100%; text-align: left; border: none; border-radius: 0; background: var(--bg-card); color: var(--text-primary);">Export as PDF</button>
+            <button class="btn" id="exportWord" style="width: 100%; text-align: left; border: none; border-radius: 0; background: var(--bg-card); color: var(--text-primary);">Export as Word</button>
+            <button class="btn" id="exportJSON" style="width: 100%; text-align: left; border: none; border-radius: 0; background: var(--bg-card); color: var(--text-primary);">Export as JSON</button>
           </div>
         </div>
         <button class="btn" id="saveInspection">Save Inspection</button>
@@ -422,7 +422,7 @@
       </div>
 
       <div id="defectsList">
-        <p style="color: #666; font-style: italic;">Click on the blueprint to add defect markers</p>
+        <p style="color: var(--text-secondary); font-style: italic;">Click on the blueprint to add defect markers</p>
       </div>
     </div>
   </div>
@@ -433,7 +433,7 @@
       <h3>Add Observation</h3>
       
       <label for="defectCategory">Category:</label>
-      <select id="defectCategory" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; font-size: 1em;">
+      <select id="defectCategory" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid var(--border-light); font-size: 1em;">
         <option value="electrical">&#9889; Electrical</option>
         <option value="plumbing">&#128688; Plumbing</option>
         <option value="structural">&#127959; Structural</option>
@@ -443,7 +443,7 @@
       </select>
       
       <label for="defectStatus">Status:</label>
-      <select id="defectStatus" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; font-size: 1em;">
+      <select id="defectStatus" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid var(--border-light); font-size: 1em;">
         <option value="open">&#128308; Open</option>
         <option value="in-progress">&#128993; In Progress</option>
         <option value="resolved">&#128994; Resolved</option>
@@ -451,7 +451,7 @@
       </select>
       
       <label for="defectAssignee">Assigned To (optional):</label>
-      <input type="text" id="defectAssignee" placeholder="Name or trade" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; font-size: 1em;" />
+      <input type="text" id="defectAssignee" placeholder="Name or trade" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid var(--border-light); font-size: 1em;" />
       
       <label for="defectComment">Description:</label>
       <textarea id="defectComment" placeholder="Describe the issue, observation, or work required..."></textarea>
@@ -845,7 +845,7 @@
       }
 
       if (defects.length === 0) {
-        list.innerHTML = '<p style="color: #666; font-style: italic;">Click on the blueprint to add observations</p>';
+        list.innerHTML = '<p style="color: var(--text-secondary); font-style: italic;">Click on the blueprint to add observations</p>';
         return;
       }
 
@@ -860,7 +860,7 @@
       });
 
       if (filteredDefects.length === 0) {
-        list.innerHTML = '<p style="color: #666; font-style: italic;">No observations match the current filters</p>';
+        list.innerHTML = '<p style="color: var(--text-secondary); font-style: italic;">No observations match the current filters</p>';
         return;
       }
 

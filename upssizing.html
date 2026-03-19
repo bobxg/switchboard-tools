@@ -32,11 +32,11 @@
       </div>
       <div class="input-row three">
         <div class="input-group"><label for="ambTemp">Battery Room Temperature (&deg;C)</label><input type="number" id="ambTemp" value="25" min="10" max="40" step="1" /></div>
-        <div class="input-group"><label for="ageingFactor">Battery Ageing Factor</label><input type="number" id="ageingFactor" value="0.8" min="0.5" max="1.0" step="0.05" /><span style="font-size:0.8em;color:#888;">0.8 typical for end-of-life capacity</span></div>
+        <div class="input-group"><label for="ageingFactor">Battery Ageing Factor</label><input type="number" id="ageingFactor" value="0.8" min="0.5" max="1.0" step="0.05" /><span style="font-size:0.8em;color:var(--text-secondary);">0.8 typical for end-of-life capacity</span></div>
         <div class="input-group"><label for="rechargeHrs">Target Recharge Time (hours)</label><input type="number" id="rechargeHrs" value="8" min="1" step="1" /></div>
       </div>
       <button class="calc-button" onclick="calculate()">Calculate UPS Size</button>
-      <button class="calc-button" style="background:#16a34a;margin-top:8px" onclick="exportUPSResult()">Export UPS Result as CSV</button>
+      <button class="calc-buttongreen" style="margin-top:8px" onclick="exportUPSResult()">Export UPS Result as CSV</button>
     </div>
     <div id="resultSection" style="display:none;">
       <div class="result-box">

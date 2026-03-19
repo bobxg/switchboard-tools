@@ -6,8 +6,8 @@
   <title>PV Sizing - Switchboard Tools</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .input-group small { margin-top: 4px; color: #64748b; font-size: 0.85em; }
-    .chart-container { background: white; padding: 20px; margin-top: 24px; }
+    .input-group small { margin-top: 4px; color: var(--text-secondary); font-size: 0.85em; }
+    .chart-container { background: var(--bg-card); padding: 20px; margin-top: 24px; }
     .chart-canvas { width: 100%; max-width: 800px; margin: 0 auto; display: block; }
   </style>
 </head>
@@ -90,7 +90,7 @@
       </div>
 
       <button class="calc-button" onclick="calculatePV()">Calculate System Size</button>
-      <button class="calc-button" style="background:#16a34a;margin-top:8px" onclick="exportPVResult()">Export PV Result as CSV</button>
+      <button class="calc-button green" style="margin-top:8px" onclick="exportPVResult()">Export PV Result as CSV</button>
 
       <div id="resultBox" style="display:none;">
         <div class="result-box">

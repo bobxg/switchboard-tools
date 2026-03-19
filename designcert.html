@@ -7,18 +7,16 @@
   <link rel="stylesheet" href="style.css" />
   <style>
     .input-group textarea { resize: vertical; min-height: 60px; }
-        .calc-button.green { background: #16a34a; }
-        .calc-button.green:hover { background: #15803d; }
-        .cert-preview { border: 2px solid #333; padding: 40px; margin: 24px 0; background: #fff; font-family: 'Times New Roman', serif; color: #333; }
-        .cert-preview h1 { text-align: center; border-bottom: 3px double #333; padding-bottom: 12px; font-size: 1.6em; }
+        .cert-preview { border: 2px solid var(--text-primary); padding: 40px; margin: 24px 0; background: var(--bg-card); font-family: 'Times New Roman', serif; color: var(--text-primary); }
+        .cert-preview h1 { text-align: center; border-bottom: 3px double var(--text-primary); padding-bottom: 12px; font-size: 1.6em; }
         .cert-preview .cert-field { margin: 12px 0; }
         .cert-preview .cert-label { font-weight: bold; display: inline-block; min-width: 200px; }
-        .cert-preview .cert-value { border-bottom: 1px solid #999; display: inline-block; min-width: 300px; padding: 2px 8px; }
+        .cert-preview .cert-value { border-bottom: 1px solid var(--text-secondary); display: inline-block; min-width: 300px; padding: 2px 8px; }
         .cert-preview .cert-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-        .cert-preview .cert-table th, .cert-preview .cert-table td { border: 1px solid #666; padding: 6px 8px; text-align: left; font-size: 0.9em; }
-        .cert-preview .cert-table th { background: #eee; }
+        .cert-preview .cert-table th, .cert-preview .cert-table td { border: 1px solid var(--text-secondary); padding: 6px 8px; text-align: left; font-size: 0.9em; }
+        .cert-preview .cert-table th { background: var(--bg-input); }
         .cert-preview .signature { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-        .cert-preview .sig-line { border-top: 1px solid #333; padding-top: 4px; margin-top: 40px; font-size: 0.9em; }
+        .cert-preview .sig-line { border-top: 1px solid var(--text-primary); padding-top: 4px; margin-top: 40px; font-size: 0.9em; }
         @media print { .top-tabs, .calc-button, .calc-section { display: none !important; } .cert-preview { border: none; padding: 20px; margin: 0; } }
   </style>
 </head>
@@ -92,7 +90,7 @@
     <div id="certOutput" style="display:none;">
       <div class="cert-preview" id="certPreview"></div>
       <button class="calc-button" onclick="window.print()">Print / Save as PDF</button>
-      <button class="calc-button" onclick="exportCertData()" style="background:#217346;">&#128190; Export CSV</button>
+      <button class="calc-button green" onclick="exportCertData()">&#128190; Export CSV</button>
     </div>
   </div>
   <script>

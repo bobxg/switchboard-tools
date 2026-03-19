@@ -6,20 +6,20 @@
   <title>Diversity Factors - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .diversity-ref { background: #fffbe6; border-left: 4px solid #eab308; padding: 12px 16px; margin: 12px 0; font-size: 0.9em; }
-        .diversity-ref strong { color: #d97706; }
+    .diversity-ref { background: var(--bg-warn); border-left: 4px solid #eab308; padding: 12px 16px; margin: 12px 0; font-size: 0.9em; }
+        .diversity-ref strong { color: var(--text-warn); }
         .ref-table td:first-child { text-align: left; }
-        .sub-tabs { display: flex; border-bottom: 3px solid #2563eb; margin-bottom: 24px; flex-wrap: wrap; }
-        .sub-tab { padding: 12px 22px; font-size: 1em; font-weight: 600; color: #555; background: #f1f5f9; border: 1px solid #ccc; border-bottom: none; cursor: pointer; margin-right: 2px; border-radius: 6px 6px 0 0; }
-        .sub-tab:hover { background: #eff6ff; color: #2563eb; }
-        .sub-tab.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+        .sub-tabs { display: flex; border-bottom: 3px solid var(--accent); margin-bottom: 24px; flex-wrap: wrap; }
+        .sub-tab { padding: 12px 22px; font-size: 1em; font-weight: 600; color: var(--text-secondary); background: var(--bg-input); border: 1px solid var(--border-light); border-bottom: none; cursor: pointer; margin-right: 2px; border-radius: 6px 6px 0 0; }
+        .sub-tab:hover { background: var(--bg-info); color: var(--accent); }
+        .sub-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
         .load-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-        .load-table th, .load-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        .load-table th { background: #2563eb; color: white; font-weight: bold; }
-        .load-table tr:nth-child(even) { background: #f8fafc; }
-        .load-table input { width: 80px; padding: 6px 8px; border: 1px solid #cbd5e1; font-size: 0.95em; text-align: right; }
+        .load-table th, .load-table td { border: 1px solid var(--border-light); padding: 10px; text-align: left; }
+        .load-table th { background: var(--accent); color: white; font-weight: bold; }
+        .load-table tr:nth-child(even) { background: var(--bg-table-stripe); }
+        .load-table input { width: 80px; padding: 6px 8px; border: 1px solid var(--border-input); font-size: 0.95em; text-align: right; background: var(--bg-input); color: var(--text-primary); }
         @media print {
           .top-tabs, .calc-button, .sub-tabs { display: none !important; }
           .tab-panel { display: block !important; }
@@ -89,7 +89,7 @@
             <div class="input-group">
               <label for="loadPerUnit">Load per Unit (A per phase)</label>
               <input type="number" id="loadPerUnit" value="40" min="1" step="1" />
-              <span style="font-size:0.8em;color:#888;">Single dwelling max demand from Table C1 Col 2</span>
+              <span style="font-size:0.8em;color:var(--text-secondary);">Single dwelling max demand from Table C1 Col 2</span>
             </div>
             <div class="input-group">
               <label for="commonArea">Common Area Load (A)</label>
@@ -101,7 +101,7 @@
             </div>
           </div>
           <button class="calc-button" onclick="calcMultiDwelling()">Calculate Diversified Demand</button>
-          <button class="calc-button" onclick="exportDiversityResult()" style="background:#217346;">&#128190; Export CSV</button>
+          <button class="calc-button green" onclick="exportDiversityResult()">&#128190; Export CSV</button>
           <div id="multiResult" style="display:none;"></div>
         </div>
       </div>

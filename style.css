@@ -38,6 +38,13 @@
   --accent-bg: rgba(96,165,250,0.12);
   --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
   --shadow-nav: 0 1px 4px rgba(0,0,0,0.2);
+  --bg-fail: #fef2f2;
+  --text-fail: #dc2626;
+  --bg-legend-on: #e8f5e9;
+  --bg-legend-off: #ffebee;
+  --bg-legend-trip: #fff3e0;
+  --bg-legend-mon: #e3f0fc;
+  --bg-legend-na: #f5f5f5;
 }
 
 [data-theme="dark"] {
@@ -74,6 +81,13 @@
   --accent-bg: rgba(59,130,246,0.2);
   --shadow-card: 0 1px 3px rgba(0,0,0,0.3);
   --shadow-nav: 0 1px 4px rgba(0,0,0,0.4);
+  --bg-fail: #450a0a;
+  --text-fail: #fca5a5;
+  --bg-legend-on: #14532d;
+  --bg-legend-off: #450a0a;
+  --bg-legend-trip: #422006;
+  --bg-legend-mon: #1e3a5f;
+  --bg-legend-na: #334155;
 }
 
 /* --- Reset & Base --- */
@@ -662,3 +676,54 @@ strong {
   margin: 16px 0;
 }
 .table-scroll table { min-width: 600px; }
+
+/* ─── Common Button Variants ──────────────────────────── */
+.calc-button.green { background: #16a34a; }
+.calc-button.green:hover { background: #15803d; }
+.calc-button.red { background: #dc2626; }
+.calc-button.red:hover { background: #b91c1c; }
+.calc-button.sm { font-size: 0.9em; padding: 6px 14px; }
+.btn-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+
+/* ─── Common Tab Component ────────────────────────────── */
+.sub-tabs { display: flex; border-bottom: 3px solid var(--accent); margin-bottom: 24px; flex-wrap: wrap; }
+.sub-tab {
+  padding: 12px 22px; font-size: 1em; font-weight: 600;
+  color: var(--text-secondary); background: var(--bg-input);
+  border: 1px solid var(--border-light); border-bottom: none;
+  cursor: pointer; transition: background 0.2s, color 0.2s;
+  margin-right: 2px; border-radius: 6px 6px 0 0;
+}
+.sub-tab:hover { background: var(--bg-info); color: var(--accent); }
+.sub-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ─── Common Data Table ───────────────────────────────── */
+.data-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+.data-table th, .data-table td { border: 1px solid var(--border-light); padding: 10px; text-align: left; }
+.data-table th { background: var(--accent); color: white; font-weight: bold; }
+.data-table tr:nth-child(even) { background: var(--bg-table-stripe); }
+.data-table input, .data-table select { width: 100%; padding: 6px 8px; border: 1px solid var(--border-input); font-size: 0.95em; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); }
+
+/* ─── Fail/Danger Box ─────────────────────────────────── */
+.fail-box { background: var(--bg-fail); border-left: 4px solid #dc2626; padding: 16px; margin: 16px 0; font-size: 1em; color: var(--text-fail); }
+
+/* ─── Diversity / Warning Reference Box ───────────────── */
+.diversity-ref { background: var(--bg-warn); border-left: 4px solid #eab308; padding: 12px 16px; margin: 12px 0; font-size: 0.9em; color: var(--text-warn); }
+.diversity-ref strong { color: var(--text-warn); }
+
+/* ─── Summary Grid ────────────────────────────────────── */
+.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 16px 0; }
+.summary-item { padding: 14px; text-align: center; border-radius: 4px; }
+.summary-item .value { font-size: 1.6em; font-weight: bold; }
+.summary-item .label { font-size: 0.85em; color: var(--text-secondary); }
+.summary-item.green { background: var(--bg-pass); border: 1px solid #16a34a; }
+.summary-item.green .value { color: #16a34a; }
+.summary-item.orange { background: var(--bg-warn); border: 1px solid #f59e0b; }
+.summary-item.orange .value { color: var(--text-warn); }
+.summary-item.red { background: var(--bg-fail); border: 1px solid #dc2626; }
+.summary-item.red .value { color: var(--text-fail); }
+.summary-item.blue { background: var(--bg-info); border: 1px solid var(--accent); }
+.summary-item.blue .value { color: var(--accent); }
+@media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr 1fr; } }

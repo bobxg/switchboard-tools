@@ -6,23 +6,23 @@
   <title>Fire Systems Interface Matrix - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .fail-box { background: #fef2f2; border-left: 4px solid #dc2626; padding: 16px; margin: 16px 0; }
+    .fail-box { background: var(--bg-fail); border-left: 4px solid #dc2626; padding: 16px; margin: 16px 0; color: var(--text-fail); }
         .matrix-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.85em; }
-        .matrix-table th, .matrix-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: center; }
-        .matrix-table th { background: #2563eb; color: white; position: sticky; top: 0; z-index: 2; }
-        .matrix-table th.row-header { background: #1d4ed8; text-align: left; min-width: 200px; }
-        .matrix-table td.cell-on { background: #f0fdf4; color: #16a34a; font-weight: bold; }
-        .matrix-table td.cell-off { background: #fef2f2; color: #dc2626; font-weight: bold; }
-        .matrix-table td.cell-na { background: #f8fafc; color: #999; }
-        .matrix-table td.cell-monitor { background: #eff6ff; color: #2563eb; font-weight: bold; }
-        .matrix-table td.cell-trip { background: #fffbeb; color: #d97706; font-weight: bold; }
-        .matrix-table tr:hover { background: #eff6ff; }
+        .matrix-table th, .matrix-table td { border: 1px solid var(--border-light); padding: 6px 8px; text-align: center; }
+        .matrix-table th { background: var(--accent); color: white; position: sticky; top: 0; z-index: 2; }
+        .matrix-table th.row-header { background: var(--accent-hover); text-align: left; min-width: 200px; }
+        .matrix-table td.cell-on { background: var(--bg-legend-on); color: #16a34a; font-weight: bold; }
+        .matrix-table td.cell-off { background: var(--bg-legend-off); color: #dc2626; font-weight: bold; }
+        .matrix-table td.cell-na { background: var(--bg-legend-na); color: var(--text-secondary); }
+        .matrix-table td.cell-monitor { background: var(--bg-legend-mon); color: var(--accent); font-weight: bold; }
+        .matrix-table td.cell-trip { background: var(--bg-legend-trip); color: #d97706; font-weight: bold; }
+        .matrix-table tr:hover { background: var(--bg-info); }
         .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; font-size: 0.9em; }
         .legend-item { display: flex; align-items: center; gap: 6px; }
-        .legend-box { width: 20px; height: 20px; border: 1px solid #ccc; }
+        .legend-box { width: 20px; height: 20px; border: 1px solid var(--border-light); }
         .filter-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
-        .filter-row label { display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 6px 12px; border: 1px solid #ddd; background: #f8fafc; font-size: 0.9em; }
-        .filter-row label:hover { background: #eff6ff; }
+        .filter-row label { display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 6px 12px; border: 1px solid var(--border-light); background: var(--bg-input); font-size: 0.9em; color: var(--text-primary); }
+        .filter-row label:hover { background: var(--bg-info); }
         .filter-row input[type="checkbox"] { margin: 0; }
         @media (max-width: 768px) { .matrix-table { font-size: 0.75em; } .matrix-table th, .matrix-table td { padding: 4px; } }
         @media print { .top-tabs, .calc-button, .filter-row { display: none !important; } .matrix-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
@@ -38,15 +38,15 @@
       <h2>Filter Systems</h2>
       <div class="filter-row" id="filterRow"></div>
       <button class="calc-button" onclick="generateMatrix()">Generate Matrix</button>
-      <button class="calc-button" onclick="exportFireMatrix()" style="background:#217346;">&#128190; Export CSV</button>
+      <button class="calc-button green" onclick="exportFireMatrix()">&#128190; Export CSV</button>
     </div>
 
     <div class="legend">
-      <div class="legend-item"><div class="legend-box" style="background:#e8f5e9;"></div> ON &mdash; Activate/Start</div>
-      <div class="legend-item"><div class="legend-box" style="background:#ffebee;"></div> OFF &mdash; Shut Down</div>
-      <div class="legend-item"><div class="legend-box" style="background:#fff3e0;"></div> TRIP &mdash; Trip/Isolate</div>
-      <div class="legend-item"><div class="legend-box" style="background:#e3f0fc;"></div> MON &mdash; Monitor/Alarm</div>
-      <div class="legend-item"><div class="legend-box" style="background:#f5f5f5;"></div> N/A &mdash; Not Applicable</div>
+      <div class="legend-item"><div class="legend-box" style="background:var(--bg-legend-on);"></div> ON &mdash; Activate/Start</div>
+      <div class="legend-item"><div class="legend-box" style="background:var(--bg-legend-off);"></div> OFF &mdash; Shut Down</div>
+      <div class="legend-item"><div class="legend-box" style="background:var(--bg-legend-trip);"></div> TRIP &mdash; Trip/Isolate</div>
+      <div class="legend-item"><div class="legend-box" style="background:var(--bg-legend-mon);"></div> MON &mdash; Monitor/Alarm</div>
+      <div class="legend-item"><div class="legend-box" style="background:var(--bg-legend-na);"></div> N/A &mdash; Not Applicable</div>
     </div>
 
     <div id="matrixContainer" style="overflow-x:auto;"></div>

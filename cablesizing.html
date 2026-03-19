@@ -79,7 +79,7 @@
       </div>
 
       <button class="calc-button" onclick="calculateCable()">Calculate Cable Size</button>
-      <button class="calc-button" style="background:#16a34a;margin-top:8px" onclick="exportCableResult()">Export Result as CSV</button>
+      <button class="calc-buttongreen" style="margin-top:8px" onclick="exportCableResult()">Export Result as CSV</button>
 
       <div id="resultBox" style="display:none;">
         <div class="result-box">
@@ -155,7 +155,7 @@
       OmniExport.toCSV(
         ['Parameter', 'Value'],
         [
-          ['Cable Size', r.size + ' mm²'],
+          ['Cable Size', r.size + ' mmï¿½'],
           ['Load Current', r.current + ' A'],
           ['Cable Length', r.length + ' m'],
           ['System Voltage', r.voltage + ' V'],
@@ -285,7 +285,7 @@
         tempFactor: tempFactor.toFixed(2), groupFactor: groupFactor.toFixed(2), sizedBy
       };
 
-      document.getElementById('cableSize').textContent = finalSize + ' mm²';
+      document.getElementById('cableSize').textContent = finalSize + ' mmï¿½';
       document.getElementById('resultDetails').innerHTML = `
         <p style="margin:8px 0;"><strong>Derated Ampacity:</strong> ${actualAmpacity.toFixed(1)} A (${(actualAmpacity/current * 100).toFixed(0)}% margin)</p>
         <p style="margin:8px 0;"><strong>Voltage Drop:</strong> ${actualVd.toFixed(2)} V (${actualVdPercent.toFixed(2)}%)</p>
@@ -295,7 +295,7 @@
       `;
       
       document.getElementById('resultBox').style.display = 'block';
-      OmniToast.show('Cable sized: ' + finalSize + ' mm²', 'success');
+      OmniToast.show('Cable sized: ' + finalSize + ' mmï¿½', 'success');
     }
   </script>
 </body>

@@ -6,13 +6,13 @@
   <title>Lux Levels Reference - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .ref-table tr:hover { background: #eff6ff; }
-        .search-box { width: 100%; padding: 12px 16px; border: 2px solid #2563eb; font-size: 1.1em; margin-bottom: 16px; box-sizing: border-box; }
-        .search-box:focus { outline: none; border-color: #1e40af; box-shadow: 0 0 8px rgba(25,118,210,0.3); }
+    .ref-table tr:hover { background: var(--bg-info); }
+        .search-box { width: 100%; padding: 12px 16px; border: 2px solid var(--accent); font-size: 1.1em; margin-bottom: 16px; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); }
+        .search-box:focus { outline: none; border-color: var(--accent-hover); box-shadow: 0 0 8px rgba(25,118,210,0.3); }
         .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 0.8em; font-weight: bold; }
-        .badge-1680 { background: #eff6ff; color: #2563eb; }
-        .badge-ncc { background: #f0fdf4; color: #16a34a; }
-        .count-label { font-size: 0.9em; color: #888; margin-bottom: 8px; }
+        .badge-1680 { background: var(--bg-info); color: var(--accent); }
+        .badge-ncc { background: var(--bg-pass); color: #16a34a; }
+        .count-label { font-size: 0.9em; color: var(--text-secondary); margin-bottom: 8px; }
         @media print { .top-tabs, .search-box { display: none !important; } }
   </style>
 </head>
@@ -45,7 +45,7 @@
         <div class="input-group">
           <label>&nbsp;</label>
           <div class="count-label" id="countLabel">Showing all entries</div>
-          <button class="calc-button" onclick="exportLuxTable()" style="background:#217346; margin-top:8px;">&#128190; Export Filtered CSV</button>
+          <button class="calc-button green" style="margin-top:8px" onclick="exportLuxTable()">&#128190; Export Filtered CSV</button>
         </div>
       </div>
       <table class="ref-table" id="luxTable">

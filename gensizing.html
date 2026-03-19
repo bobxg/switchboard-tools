@@ -77,7 +77,7 @@
       </table>
       <button class="add-row-btn" onclick="addStep()">+ Add Load Step</button>
       <button class="calc-button" onclick="calculate()">Calculate Generator Size</button>
-      <button class="calc-button" style="background:#16a34a;margin-top:8px" onclick="exportGenResult()">Export Generator Result as CSV</button>
+      <button class="calc-buttongreen" style="margin-top:8px" onclick="exportGenResult()">Export Generator Result as CSV</button>
     </div>
 
     <div id="resultSection" style="display:none;">
@@ -149,7 +149,7 @@
         </select></td>
         <td><input type="number" value="50" min="0" step="1" /></td>
         <td><input type="number" value="0.85" min="0.5" max="1.0" step="0.05" /></td>
-        <td><input type="number" value="0" min="0" step="1" /><span style="font-size:0.75em;color:#888;">0 = auto</span></td>
+        <td><input type="number" value="0" min="0" step="1" /><span style="font-size:0.75em;color:var(--text-secondary);">0 = auto</span></td>
         <td><select><option value="yes">Essential</option><option value="no">Non-essential</option></select></td>
         <td><button class="remove-btn" onclick="this.closest('tr').remove()">&#10005;</button></td>
       `;

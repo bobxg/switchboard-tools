@@ -26,7 +26,7 @@
           </select></div>
       </div>
       <div class="input-row three">
-        <div class="input-group"><label for="meterBurden">Meter Burden (VA)</label><input type="number" id="meterBurden" value="5" min="1" max="30" step="0.5" /><small style="color:#666;">Typical: 2.5-5 VA (electronic), 10-15 VA (electromechanical)</small></div>
+        <div class="input-group"><label for="meterBurden">Meter Burden (VA)</label><input type="number" id="meterBurden" value="5" min="1" max="30" step="0.5" /><small style="color:var(--text-secondary);">Typical: 2.5-5 VA (electronic), 10-15 VA (electromechanical)</small></div>
         <div class="input-group"><label for="cableLength">CT to Meter Cable Length (m)</label><input type="number" id="cableLength" value="15" min="1" max="200" /></div>
         <div class="input-group"><label for="cableSize">CT Secondary Cable (mm&sup2;)</label>
           <select id="cableSize">
@@ -36,7 +36,7 @@
           </select></div>
       </div>
       <button class="calc-button" onclick="calculate()">Size CT</button>
-      <button class="calc-button" style="background:#16a34a;margin-top:8px" onclick="exportCTResult()">Export CT Result as CSV</button>
+      <button class="calc-buttongreen" style="margin-top:8px" onclick="exportCTResult()">Export CT Result as CSV</button>
     </div>
 
     <div id="resultSection" style="display:none;">
