@@ -26,17 +26,12 @@
 
       <div class="input-row">
         <div class="input-group">
-          <label for="voltage">System Voltage (V)</label>
+          <label for="voltage">System Voltage</label>
           <select id="voltage">
-            <option value="230">230V Single Phase</option>
-            <option value="400" selected>400V Three Phase</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label for="phases">Phases</label>
-          <select id="phases">
-            <option value="1">Single Phase</option>
-            <option value="3" selected>Three Phase</option>
+            <option value="230">230 V &mdash; Single Phase</option>
+            <option value="240">240 V &mdash; Single Phase</option>
+            <option value="400" selected>400 V &mdash; Three Phase</option>
+            <option value="415">415 V &mdash; Three Phase</option>
           </select>
         </div>
       </div>
@@ -178,7 +173,7 @@
       if (current <= 0) { OmniToast.show('Load current must be > 0', 'warn'); return; }
       if (length <= 0) { OmniToast.show('Cable length must be > 0', 'warn'); return; }
       const voltage = parseFloat(document.getElementById('voltage').value);
-      const phases = parseInt(document.getElementById('phases').value);
+      const phases = voltage <= 240 ? 1 : 3;
       const method = parseInt(document.getElementById('installMethod').value);
       const ambientTemp = OmniValidate.parseNum('ambientTemp', 30);
       const grouping = parseInt(document.getElementById('grouping').value) || 1;

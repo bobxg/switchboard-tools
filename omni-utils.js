@@ -52,9 +52,9 @@ const OmniNav = {
       { label: 'T&C Checklists', href: 'tcommissioning.html' },
       { label: 'Site Inspection', href: 'inspection.html' },
       { label: 'Single Line Diagram', href: 'sld.html' },
-      { label: 'AS3000 Tips', href: 'as3000tips.html' },
-      { label: 'AS3000 Viewer', href: 'as3000viewer.html' }
+      { label: 'AS3000 Tips', href: 'as3000tips.html' }
     ]},
+    { label: 'AS/NZS 3000', href: 'as3000viewer.html' },
     { label: 'Verification', href: 'qa.html' }
   ],
 
@@ -386,7 +386,7 @@ const OmniA11y = {
       if (!el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby')) {
         const label = el.closest('.input-group')?.querySelector('label');
         if (label) {
-          if (!el.id) el.id = 'input-' + Math.random().toString(36).substr(2, 6);
+          if (!el.id) el.id = 'input-' + Math.random().toString(36).slice(2, 8);
           label.setAttribute('for', el.id);
         }
       }

@@ -6,10 +6,6 @@
   <title>Maximum Demand Calculator - Switchboard Tools</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .sub-tabs { display: flex; border-bottom: 3px solid var(--accent); margin-bottom: 24px; flex-wrap: wrap; }
-        .sub-tab { padding: 12px 22px; font-size: 1em; font-weight: 600; color: var(--text-secondary); background: var(--bg-input); border: 1px solid var(--border-light); border-bottom: none; cursor: pointer; transition: background 0.2s, color 0.2s; margin-right: 2px; border-radius: 6px 6px 0 0; }
-        .sub-tab:hover { background: var(--bg-info); color: var(--accent); }
-        .sub-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
         .load-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
@@ -912,11 +908,9 @@
 
       // (b)(ii) 15 A: +10 A if any exist
       const s15 = parseInt(document.getElementById('c1sSock15').value) || 0;
-      // (b)(iii) 20 A: +15 A if any exist. If both, increase is 15 A only.
+      // (b)(iii) 20 A: +15 A if any exist. Both apply independently.
       const s20 = parseInt(document.getElementById('c1sSock20').value) || 0;
-      let sockBoost = 0;
-      if (s20 > 0) sockBoost = 15;
-      else if (s15 > 0) sockBoost = 10;
+      const sockBoost = (s15 > 0 ? 10 : 0) + (s20 > 0 ? 15 : 0);
       const totalSockA = sockA + sockBoost;
 
       // (c) Cooking / laundry / SO >10 A: 50% connected load
@@ -954,7 +948,7 @@
       document.getElementById('c1sLightA').textContent = lightA.toFixed(1);
       document.getElementById('c1sOutdoorA').textContent = outdoorA.toFixed(1);
       document.getElementById('c1sSocketA').textContent = sockA.toFixed(1);
-      document.getElementById('c1sSock15A').textContent = (s15 > 0 && s20 === 0 ? 10 : 0).toFixed(1);
+      document.getElementById('c1sSock15A').textContent = (s15 > 0 ? 10 : 0).toFixed(1);
       document.getElementById('c1sSock20A').textContent = (s20 > 0 ? 15 : 0).toFixed(1);
       document.getElementById('c1sCookA').textContent = cookA.toFixed(1);
       document.getElementById('c1sHVACA').textContent = hvacA.toFixed(1);
@@ -977,14 +971,13 @@
       const phases = parseInt(document.getElementById('c1mPhases').value) || 3;
       const n = Math.ceil(totalUnits / phases); // units per phase (heaviest)
 
-      // Determine column
+      // Determine column (Columns 3-5 only; Col 2 applies to single dwellings only)
       let col;
-      if (n <= 1) col = 2;
-      else if (n <= 5) col = 3;
+      if (n <= 5) col = 3;
       else if (n <= 20) col = 4;
       else col = 5;
 
-      document.getElementById('c1mUPP').textContent = n + ' &#8594; Col ' + col;
+      document.getElementById('c1mUPP').innerHTML = n + ' &rarr; Col ' + col;
 
       // === Individual unit loading ===
 
@@ -999,7 +992,7 @@
       }
       lightA = roundA(lightA);
       document.getElementById('c1mLightA').textContent = lightA.toFixed(1);
-      document.getElementById('c1mLightF').textContent = lightF;
+      document.getElementById('c1mLightF').innerHTML = lightF;
 
       // (b)(i) Socket-outlets
       let sockA = 0;
@@ -1012,7 +1005,7 @@
       }
       sockA = roundA(sockA);
       document.getElementById('c1mSockA').textContent = sockA.toFixed(1);
-      document.getElementById('c1mSockF').textContent = sockF;
+      document.getElementById('c1mSockF').innerHTML = sockF;
 
       // (c) Cooking &mdash; units with cooking per phase
       const cookUnitsTotal = parseInt(document.getElementById('c1mCookUnits').value) || 0;
@@ -1046,7 +1039,7 @@
       }
       cookA = roundA(cookA);
       document.getElementById('c1mCookA').textContent = cookA.toFixed(1);
-      document.getElementById('c1mCookF').textContent = cookF;
+      document.getElementById('c1mCookF').innerHTML = cookF;
 
       // (d) HVAC: 75% connected load per unit &times; n / V
       const hvacPerUnit = parseFloat(document.getElementById('c1mHVACPerUnit').value) || 0;
@@ -1074,7 +1067,7 @@
       }
       waterA = roundA(waterA);
       document.getElementById('c1mWaterA').textContent = waterA.toFixed(1);
-      document.getElementById('c1mWaterF').textContent = waterF;
+      document.getElementById('c1mWaterF').innerHTML = waterF;
 
       const unitTotal = roundA(lightA + sockA + cookA + hvacA + waterA);
       document.getElementById('c1mUnitTotal').textContent = unitTotal.toFixed(1) + ' A';
@@ -1158,7 +1151,7 @@
         vInput.value = 230;
         vInput.disabled = true;
         vNote.textContent = 'For three-phase, per-phase conversion uses 230 V';
-        powerLabel.textContent = 'Approx. Power (3&#966; total)';
+        powerLabel.textContent = 'Approx. Power (3\u03C6 total)';
       } else {
         vInput.disabled = false;
         vNote.textContent = 'Used for single-phase load conversion';
@@ -1342,7 +1335,7 @@
       const data = C3_DATA[key];
       const density = overrideDensity > 0 ? overrideDensity : data.avg;
 
-      document.getElementById('c3RangeText').textContent =
+      document.getElementById('c3RangeText').innerHTML =
         data.label + ': Range ' + data.min + '&ndash;' + data.max + ' VA/m&sup2;, Average ' + data.avg + ' VA/m&sup2;';
 
       const totalVA = density * area;
@@ -1351,7 +1344,7 @@
       const voltage = supply === '3' ? 400 : 230;
       const current = supply === '3' ? totalVA / (Math.sqrt(3) * voltage) : totalVA / voltage;
 
-      document.getElementById('c3ResDensity').textContent = density + ' VA/m&sup2;';
+      document.getElementById('c3ResDensity').textContent = density + ' VA/m\u00B2';
       document.getElementById('c3ResVA').textContent = Math.round(totalVA).toLocaleString() + ' VA';
       document.getElementById('c3ReskW').textContent = totalKW.toFixed(1) + ' kW';
       document.getElementById('c3ReskVA').textContent = totalKVA.toFixed(1) + ' kVA';
@@ -1473,52 +1466,30 @@
 
       if (!sections) { alert('No calculations to print. Please enter load data in at least one tab.'); return; }
 
-      const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Maximum Demand Report &mdash; ' + projName + '</title>' +
-        '<style>
-    .sub-tabs { display: flex; border-bottom: 3px solid #2563eb; margin-bottom: 24px; flex-wrap: wrap; }
-        .sub-tab { padding: 12px 22px; font-size: 1em; font-weight: 600; color: #555; background: #f1f5f9; border: 1px solid #ccc; border-bottom: none; cursor: pointer; transition: background 0.2s, color 0.2s; margin-right: 2px; border-radius: 6px 6px 0 0; }
-        .sub-tab:hover { background: #eff6ff; color: #2563eb; }
-        .sub-tab.active { background: #2563eb; color: #fff; border-color: #2563eb; }
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
-        .load-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-        .load-table th, .load-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        .load-table th { background: #2563eb; color: white; font-weight: bold; }
-        .load-table tr:nth-child(even) { background: #f8fafc; }
-        .load-table input { width: 80px; padding: 6px 8px; border: 1px solid #cbd5e1; font-size: 0.95em; text-align: right; }
-        .load-table select { padding: 6px 8px; border: 1px solid #cbd5e1; font-size: 0.95em; }
-        .note-text { font-size: 0.85em; color: #666; font-style: italic; margin-top: 4px; }
-        .diversity-ref { background: #fffbe6; border-left: 4px solid #eab308; padding: 12px 16px; margin: 12px 0; font-size: 0.9em; }
-        .diversity-ref strong { color: #d97706; }
-        .export-section { margin-top: 24px; padding: 20px; background: #f8fafc; border: 1px solid #e2e8f0; }
-        .export-btn { background: #16a34a; color: white; border: none; padding: 10px 24px; font-size: 1em; cursor: pointer; transition: background 0.2s; margin-right: 8px; }
-        .export-btn:hover { background: #15803d; }
-        .summary-card { background: white; border: 2px solid #e2e8f0; padding: 20px; margin-bottom: 16px; }
-        .summary-card h3 { color: #2563eb; margin-top: 0; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
-        .summary-table { width: 100%; border-collapse: collapse; }
-        .summary-table th, .summary-table td { padding: 8px 12px; border-bottom: 1px solid #eee; text-align: left; }
-        .summary-table th { background: #f8fafc; font-weight: 600; color: #333; }
-        .summary-table td:last-child { text-align: right; font-weight: 600; }
-        .summary-total { font-size: 1.1em; font-weight: bold; color: #2563eb; }
-        .demand-breakdown { font-size: 0.9em; }
-        .demand-breakdown td { padding: 6px 10px; }
-        .demand-breakdown .row-label { padding-left: 20px; color: #555; }
-        .demand-breakdown .row-amps { text-align: right; font-weight: 600; min-width: 80px; }
-        .demand-breakdown .row-note { font-size: 0.85em; color: #888; }
-        .demand-breakdown .group-header td { font-weight: 700; color: #2563eb; padding-top: 10px; border-bottom: 1px solid #2563eb; }
-        .demand-breakdown .total-row td { font-weight: 700; font-size: 1.05em; border-top: 2px solid #2563eb; padding-top: 10px; }
-        @media print {
-          .top-tabs, .sub-tabs, .add-row-btn, .remove-btn, .reset-btn,
-          .calc-button, .export-section { display: none !important; }
-          .tab-panel { display: block !important; page-break-inside: avoid; }
-        }
-        @media (max-width: 768px) {
-          .input-row, .input-row.three { grid-template-columns: 1fr; }
-          .sub-tabs { flex-wrap: wrap; }
-          .sub-tab { padding: 10px 14px; font-size: 0.9em; }
-          .load-table input { width: 60px; }
-        }
-  </style></head><body>' +
+      const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Maximum Demand Report \u2014 ' + projName + '</title>' +
+        '<style>' +
+        'body{font-family:Arial,sans-serif;font-size:10pt;color:#1e293b;margin:20mm 18mm;}' +
+        '.header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #2563eb;padding-bottom:10px;margin-bottom:12px;}' +
+        '.header h1{margin:0;font-size:16pt;color:#2563eb;}' +
+        '.header p{margin:4px 0 0;font-size:9pt;color:#64748b;}' +
+        '.header-right{text-align:right;font-size:9pt;color:#475569;}' +
+        '.proj-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:9.5pt;}' +
+        '.proj-table td{padding:4px 8px;border:1px solid #e2e8f0;}' +
+        '.proj-table .lbl{background:#f1f5f9;font-weight:600;color:#374151;width:80px;}' +
+        '.notes{background:#fffbe6;border-left:4px solid #eab308;padding:8px 12px;margin-bottom:14px;font-size:9pt;}' +
+        '.rpt-section{margin-bottom:20px;page-break-inside:avoid;}' +
+        '.rpt-section h3{margin:0 0 8px;font-size:11pt;color:#2563eb;border-bottom:2px solid #dbeafe;padding-bottom:4px;}' +
+        '.rpt-section table{width:100%;border-collapse:collapse;font-size:9.5pt;}' +
+        '.rpt-section th,.rpt-section td{padding:5px 10px;border-bottom:1px solid #e2e8f0;text-align:left;}' +
+        '.rpt-section th{background:#f8fafc;font-weight:600;}' +
+        '.rpt-section td.r,.rpt-section th.r{text-align:right;}' +
+        '.rpt-section tfoot tr.total-row td{font-weight:700;font-size:10.5pt;border-top:2px solid #2563eb;background:#eff6ff;}' +
+        '.rpt-results{display:flex;gap:24px;margin-top:6px;padding:6px 10px;background:#f8fafc;border-radius:4px;font-size:9pt;}' +
+        '.rpt-results strong{color:#2563eb;}' +
+        '.disclaimer{margin-top:24px;font-size:8pt;color:#64748b;border-top:1px solid #e2e8f0;padding-top:8px;font-style:italic;}' +
+        '.footer{margin-top:8px;font-size:8pt;color:#94a3b8;text-align:center;}' +
+        '@media print{body{margin:10mm 12mm;}}' +
+        '</style></head><body>' +
         '<div class="header"><div class="header-left"><h1>Maximum Demand Calculation</h1><p>Per AS/NZS 3000:2018 Appendix C</p></div>' +
         '<div class="header-right">Date: ' + today + '<br>Rev: ' + projRevision + '</div></div>' +
         '<table class="proj-table"><tr><td class="lbl">Project</td><td>' + projName + '</td><td class="lbl">Job No.</td><td>' + projNumber + '</td></tr>' +
@@ -1537,9 +1508,9 @@
     function exportCSV() {
       updateSummary();
       const ts = new Date().toISOString().slice(0,19).replace(/[T:]/g, '-');
-      let csv = 'Maximum Demand Calculation &mdash; AS/NZS 3000:2018,' + new Date().toLocaleDateString() + '\n\n';
+      let csv = 'Maximum Demand Calculation - AS/NZS 3000:2018,' + new Date().toLocaleDateString() + '\n\n';
 
-      csv += 'Table C1 &mdash; Domestic (Single Dwelling)\n';
+      csv += 'Table C1 - Domestic (Single Dwelling)\n';
       csv += 'Load Group,Demand (A)\n';
       csv += 'Lighting (a),' + document.getElementById('sumC1sLight').textContent + '\n';
       csv += 'Socket-Outlets (b),' + document.getElementById('sumC1sSock').textContent + '\n';
@@ -1551,17 +1522,17 @@
       csv += 'Other (m),' + document.getElementById('c1sOtherA').textContent + '\n';
       csv += 'TOTAL,' + document.getElementById('c1sTotalA').textContent + '\n\n';
 
-      csv += 'Table C1 &mdash; Multiple Dwellings\n';
+      csv += 'Table C1 - Multiple Dwellings\n';
       csv += 'Column,' + document.getElementById('c1mUPP').textContent + '\n';
       csv += 'Units per phase,' + document.getElementById('c1mUnitTotal').textContent + '\n';
       csv += 'Communal,' + document.getElementById('c1mComTotal').textContent + '\n';
       csv += 'TOTAL,' + (document.getElementById('c1mResTotal').textContent) + '\n\n';
 
-      csv += 'Table C2 &mdash; Non-Domestic\n';
+      csv += 'Table C2 - Non-Domestic\n';
       csv += 'Type,' + document.getElementById('c2Type').selectedOptions[0].text + '\n';
       csv += 'TOTAL,' + document.getElementById('c2TotalA').textContent + '\n\n';
 
-      csv += 'Table C3 &mdash; Energy Demand\n';
+      csv += 'Table C3 - Energy Demand\n';
       csv += 'Demand,' + document.getElementById('c3ReskVA').textContent + '\n';
       csv += 'Current,' + document.getElementById('c3ResCurrent').textContent + '\n\n';
 
@@ -1576,30 +1547,30 @@
 
     function copyToClipboard() {
       updateSummary();
-      let text = '&#9552;&#9552;&#9552; MAXIMUM DEMAND &mdash; AS/NZS 3000:2018 &#9552;&#9552;&#9552;\n';
+      let text = '\u2550\u2550\u2550 MAXIMUM DEMAND \u2014 AS/NZS 3000:2018 \u2550\u2550\u2550\n';
       text += 'Date: ' + new Date().toLocaleDateString() + '\n\n';
 
-      text += '&#9472;&#9472; Table C1 &mdash; Domestic (Single) &#9472;&#9472;\n';
+      text += '\u2500\u2500 Table C1 \u2014 Domestic (Single) \u2500\u2500\n';
       text += 'Maximum Demand: ' + document.getElementById('c1sTotalA').textContent + '\n';
       text += 'Main Switch:    ' + document.getElementById('c1sMainSwitch').textContent + '\n\n';
 
-      text += '&#9472;&#9472; Table C1 &mdash; Multiple Dwellings &#9472;&#9472;\n';
+      text += '\u2500\u2500 Table C1 \u2014 Multiple Dwellings \u2500\u2500\n';
       text += 'Column:         ' + document.getElementById('c1mUPP').textContent + '\n';
       text += 'Total Demand:   ' + document.getElementById('c1mResTotal').textContent + '\n';
       text += 'Main Switch:    ' + document.getElementById('c1mResSwitch').textContent + '\n\n';
 
-      text += '&#9472;&#9472; Table C2 &mdash; Non-Domestic &#9472;&#9472;\n';
+      text += '\u2500\u2500 Table C2 \u2014 Non-Domestic \u2500\u2500\n';
       text += 'Total Demand:   ' + document.getElementById('c2TotalA').textContent + '\n';
       text += 'Main Switch:    ' + document.getElementById('c2MainSwitch').textContent + '\n\n';
 
-      text += '&#9472;&#9472; Table C3 &mdash; Energy Demand &#9472;&#9472;\n';
+      text += '\u2500\u2500 Table C3 \u2014 Energy Demand \u2500\u2500\n';
       text += 'Demand:         ' + document.getElementById('c3ReskVA').textContent + '\n';
       text += 'Current:        ' + document.getElementById('c3ResCurrent').textContent + '\n\n';
 
       navigator.clipboard.writeText(text).then(() => {
         const btn = document.querySelector('.export-btn[onclick="copyToClipboard()"]');
         const orig = btn.textContent;
-        btn.textContent = '&#10003; Copied!';
+        btn.textContent = '\u2713 Copied!';
         setTimeout(() => btn.textContent = orig, 2000);
       });
     }

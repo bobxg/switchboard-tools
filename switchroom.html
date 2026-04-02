@@ -2,459 +2,688 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Switchroom Sizer - Switchboard Tools</title>
+  <title>Switchroom Sizer - OMNI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    .equip-rect { position: absolute; display: flex; align-items: center; justify-content: center; font-size: 0.8em; font-weight: bold; color: #fff; border: 2px solid #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.3); text-align: center; padding: 4px; cursor: move; box-sizing: border-box; }
-    .equip-rect-msb { background: #2563eb; }
-    .equip-rect-mssb { background: #16a34a; }
-    .equip-rect-db { background: #0d9488; }
-    .equip-rect-meter { background: #f59e0b; color: #000; }
-    .equip-rect-ct { background: #9333ea; }
-    .clearance-zone-red { position: absolute; border: 2px solid #dc2626; background: rgba(220,38,38,0.15); pointer-events: none; box-sizing: border-box; }
-    .clearance-zone-yellow { position: absolute; border: 2px dashed #f59e0b; background: rgba(245,158,11,0.12); pointer-events: none; box-sizing: border-box; }
-    .door { position: absolute; border: 3px solid #78716c; background: #d6d3d1; box-sizing: border-box; }
-    .door-swing { position: absolute; border: 2px solid #78716c; border-radius: 0; background: transparent; pointer-events: none; }
-    .equip-controls { background: var(--bg-input); padding: 20px; border-right: 1px solid var(--border-light); min-width: 320px; max-width: 400px; }
-    .equip-controls h2 { color: var(--text-primary); margin-bottom: 18px; font-size: 1.35em; font-weight: 700; }
-    .add-equip-section { margin-bottom: 24px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 3px; }
-    .add-equip-section h3 { color: var(--text-primary); margin-bottom: 12px; font-size: 1.1em; font-weight: 600; }
-    .add-btn { width: 100%; padding: 10px; background: var(--accent); color: #fff; border: none; cursor: pointer; font-weight: 600; margin-top: 8px; border-radius: 3px; transition: background 0.15s; }
-    .add-btn:hover { background: #1d4ed8; }
-    .equipment-list { margin-top: 20px; }
-    .equipment-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; margin-bottom: 6px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 3px; }
-    .equipment-item-info { flex: 1; }
-    .remove-btn { padding: 4px 12px; background: #dc2626; color: #fff; border: none; cursor: pointer; font-size: 0.85em; border-radius: 2px; transition: background 0.15s; }
-    .remove-btn:hover { background: #b91c1c; }
-    .clearance-info { margin-top: 20px; padding: 14px; background: var(--bg-warn); border-left: 4px solid #f59e0b; font-size: 0.9em; border-radius: 0 2px 2px 0; }
-    .clearance-info h4 { color: #d97706; margin-bottom: 8px; }
-    @media (max-width: 900px) { .main-content { flex-direction: column !important; } .equip-controls { max-width: 100%; border-right: none; border-bottom: 1px solid var(--border-light); } }
+    .sr-wrap { display: flex; gap: 40px; align-items: flex-start; }
+
+    /* ── Controls panel ── */
+    .sr-controls { width: 360px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; position: relative; z-index: 1; }
+    .sr-controls .calc-section { padding: 18px; }
+
+    /* Compact add-form */
+    .eq-form { display: grid; grid-template-columns: 1fr 90px 90px; gap: 8px; align-items: flex-end; }
+    .eq-form .input-group { margin: 0; }
+    .eq-form label { font-size: 0.8em; }
+    .eq-form .eq-add-btn { grid-column: 1 / -1; }
+
+    /* Equipment table */
+    .eq-list { width: 100%; border-collapse: collapse; font-size: 0.88em; }
+    .eq-list thead th { background: var(--bg-table-header); color: #fff; padding: 6px 8px; text-align: left; font-weight: 600; font-size: 0.82em; text-transform: uppercase; letter-spacing: 0.3px; }
+    .eq-list tbody td { padding: 5px 7px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+    .eq-list tbody tr:hover td { background: var(--bg-info); }
+    .eq-list .eq-w-input { width: 72px; padding: 3px 5px; border: 1px solid var(--border-input); border-radius: 4px; background: var(--bg-input); color: var(--text-primary); font-size: 0.9em; text-align: right; }
+    .rm-btn { padding: 2px 8px; background: #dc2626; color: #fff; border: none; border-radius: 3px; cursor: pointer; font-size: 0.78em; line-height: 1.6; }
+    .rm-btn:hover { background: #b91c1c; }
+
+    /* Dimensions output */
+    .dim-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; padding: 14px; font-size: 0.9em; line-height: 1.85; }
+    .dim-card strong { color: var(--accent); }
+
+    /* Warnings */
+    .warn-box { border-radius: 6px; padding: 10px 14px; font-size: 0.88em; line-height: 1.5; }
+    .warn-box.danger  { background: rgba(220,38,38,0.1);  border-left: 4px solid #dc2626; }
+    .warn-box.caution { background: var(--bg-warn);       border-left: 4px solid #f59e0b; }
+    .warn-box.info    { background: var(--bg-info);       border-left: 4px solid var(--accent); }
+
+    /* Clearance legend */
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 0.82em; margin-top: 4px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-swatch { width: 13px; height: 13px; border-radius: 2px; flex-shrink: 0; }
+
+    /* ── Canvas area ── */
+    .sr-canvas-wrap { flex: 1; min-width: 0; overflow: auto; position: relative; }
+    .canvas-meta { font-size: 0.82em; color: var(--text-secondary); margin-bottom: 8px; }
+
+    /* Canvas itself */
+    #srCanvas {
+      position: relative;
+      display: inline-block;
+      overflow: visible;
+      min-width: fit-content;
+      padding-left: 4px;
+    }
+
+    /* Room outline */
+    .room-outline {
+      position: absolute;
+      border: 2.5px solid var(--text-primary);
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+
+    /* Board blocks */
+    .eq-block {
+      position: absolute;
+      box-sizing: border-box;
+      border: 3px solid #000;
+      border-radius: 2px;
+      overflow: visible;
+    }
+
+    /* Clearance zones */
+    .clr-red  { position: absolute; background: rgba(220,38,38,0.18); border: 1.5px solid #dc2626; box-sizing: border-box; pointer-events: none; }
+    .clr-yel  { position: absolute; background: rgba(245,158,11,0.14); border: 1.5px dashed #d97706; box-sizing: border-box; pointer-events: none; }
+
+    /* Scale bar */
+    .scale-bar { position: absolute; display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text-secondary); }
+
+    /* Label connector */
+    .lbl-line { position: absolute; pointer-events: none; }
+    .eq-ext-label {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .eq-ext-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Arrow head on label lines */
+    .arrow-head { position: absolute; width: 0; height: 0; }
+
+    @media (max-width: 960px) {
+      .sr-wrap { flex-direction: column; }
+      .sr-controls { width: 100%; }
+    }
+
+    /* Save/load */
+    .sr-save-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .sr-save-btns + .sr-save-btns { margin-top: 6px; }
+    .sl-btn { padding: 7px 10px; font-size: 0.88em; font-weight: 600; border-radius: 4px; cursor: pointer; border: 1px solid var(--border-light); background: var(--bg-input); color: var(--text-primary); text-align: center; transition: background 0.15s; line-height: 1.4; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .sl-btn:hover { background: var(--border-light); }
+    .sl-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .sl-btn.primary:hover { filter: brightness(1.1); }
+    .sr-save-info { font-size: 0.78em; color: var(--text-secondary); margin-top: 8px; min-height: 1.1em; }
+    .sr-toast { position: fixed; bottom: 28px; right: 28px; padding: 10px 18px; border-radius: 6px; font-size: 0.9em; font-weight: 500; color: #fff; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 9999; max-width: 280px; }
+    .sr-toast.show { opacity: 1; }
   </style>
 </head>
 <body>
   <div class="top-tabs"></div>
-  <div class="main-content" style="display:flex;flex-direction:row;align-items:flex-start;gap:32px;max-width:1400px;">
-    <div class="equip-controls">
-      <h2>Add Equipment</h2>
-      
-      <div class="add-equip-section">
-        <h3>Equipment Type</h3>
-        <div class="input-group">
-          <label for="equipType">Type</label>
-          <select id="equipType" onchange="updateEquipmentInputs()">
-            <option value="MSB">Main Switchboard (MSB)</option>
-            <option value="MSSB">Mechanical Services Switchboard (MSSB)</option>
-            <option value="DB">Distribution Board (DB)</option>
-            <option value="Meter">Meter Panel</option>
-            <option value="CT">CT Meters (2x CT allocation)</option>
-          </select>
+  <div id="srToast" class="sr-toast"></div>
+  <div class="main-content">
+    <h1>Switchroom Sizer</h1>
+    <p>Add equipment to calculate the minimum switchroom size per <strong>AS/NZS 3000:2018 Cl.&nbsp;2.10</strong>. The floor plan updates automatically.</p>
+
+    <div class="sr-wrap">
+
+      <!-- ═══ Controls ═══ -->
+      <div class="sr-controls">
+
+        <div class="calc-section">
+          <h3 style="margin-top:0;margin-bottom:14px;">Add Equipment</h3>
+
+          <div class="eq-form">
+            <div class="input-group">
+              <label for="eqType">Type</label>
+              <select id="eqType" onchange="applyDefaults()">
+                <option value="MSB">MSB</option>
+                <option value="MSSB">MSSB</option>
+                <option value="DB">DB</option>
+                <option value="Meter">Meter Panel</option>
+                <option value="CT">CT Meter</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="eqW">Width (mm)</label>
+              <input type="number" id="eqW" value="3000" min="100" max="10000" />
+            </div>
+            <div class="input-group">
+              <label for="eqD">Depth (mm)</label>
+              <input type="number" id="eqD" value="600" min="100" max="2000" />
+            </div>
+            <div class="input-group eq-add-btn" style="align-self:flex-end;">
+              <button class="calc-button" style="margin:0;padding:8px 14px;font-size:0.95em;width:100%;" onclick="addEquip()">+ Add</button>
+            </div>
+            <div class="input-group" id="panelsOpt" style="grid-column:1/-1;display:none;">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.88em;">
+                <input type="checkbox" id="eqPanels" /> 800 mm Panels
+              </label>
+            </div>
+          </div>
+
+          <table class="eq-list" id="eqTable" style="margin-top:14px;">
+            <thead>
+              <tr>
+                <th style="width:36px;"></th>
+                <th>Type</th>
+                <th style="text-align:right;">W (mm)</th>
+                <th style="text-align:right;">D (mm)</th>
+                <th style="width:34px;"></th>
+              </tr>
+            </thead>
+            <tbody id="eqBody">
+              <tr><td colspan="5" style="color:var(--text-secondary);font-style:italic;text-align:center;padding:14px;">No equipment &mdash; click Add to begin</td></tr>
+            </tbody>
+          </table>
         </div>
-        
-        <div class="input-group">
-          <label for="equipWidth">Width (mm)</label>
-          <input type="number" id="equipWidth" value="3000" min="100" max="5000" />
+
+        <!-- Clearance reference -->
+        <div class="calc-section">
+          <h3 style="margin-top:0;margin-bottom:10px;">AS/NZS 3000 Clearances</h3>
+          <ul style="margin:0 0 10px 18px;line-height:2;font-size:0.89em;">
+            <li><span style="color:#dc2626;">&#9632;</span> <strong>Primary zone:</strong> 600 mm (maintenance access)</li>
+            <li><span style="color:#d97706;">&#9632;</span> <strong>Secondary zone:</strong> 600&ndash;1200 mm (operation)</li>
+            <li><strong>Min. front clearance:</strong> 1200 mm total</li>
+            <li><strong>Side clearance:</strong> 200 mm</li>
+            <li><strong>Min. room dimensions:</strong> 2000 &times; 2000 mm</li>
+          </ul>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-swatch" style="background:#2563eb;border:1.5px solid rgba(0,0,0,0.3);"></div>MSB</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#16a34a;border:1.5px solid rgba(0,0,0,0.3);"></div>MSSB</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#0d9488;border:1.5px solid rgba(0,0,0,0.3);"></div>DB</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#f59e0b;border:1.5px solid rgba(0,0,0,0.3);"></div>Meter</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#9333ea;border:1.5px solid rgba(0,0,0,0.3);"></div>CT</div>
+          </div>
         </div>
-        
-        <div class="input-group">
-          <label for="equipDepth">Depth (mm)</label>
-          <input type="number" id="equipDepth" value="600" min="100" max="3000" />
+
+        <!-- Results & warnings -->
+        <div class="dim-card" id="srDims">Room dimensions will appear here once equipment is added.</div>
+        <div id="srWarnings" style="display:flex;flex-direction:column;gap:8px;"></div>
+
+        <!-- Save / Load -->
+        <div class="calc-section">
+          <h3 style="margin-top:0;margin-bottom:10px;">Save / Load</h3>
+          <div class="sr-save-btns">
+            <button class="sl-btn primary" onclick="saveLayout()">&#128190; Save</button>
+            <button class="sl-btn" onclick="loadLayout()">&#128194; Load</button>
+          </div>
+          <div class="sr-save-btns" style="margin-top:6px;">
+            <button class="sl-btn" onclick="exportJSON()">&#8595; Export JSON</button>
+            <label class="sl-btn">&#8593; Import JSON<input type="file" accept=".json" onchange="importJSON(event)" style="display:none;"></label>
+          </div>
+          <div id="srSaveInfo" class="sr-save-info"></div>
         </div>
-        
-        <div class="input-group">
-          <label for="equipHeight">Height (mm)</label>
-          <input type="number" id="equipHeight" value="2200" min="100" max="4000" />
-        </div>
-        
-        <button class="add-btn" onclick="addEquipment()">+ Add Equipment</button>
+
       </div>
 
-      <div class="equipment-list">
-        <h3>Equipment List</h3>
-        <div id="equipmentListContainer"></div>
+      <!-- ═══ Canvas ═══ -->
+      <div class="sr-canvas-wrap">
+        <div class="canvas-meta">
+          Top-down floor plan &nbsp;&bull;&nbsp; Scale: <span id="scaleLabel">80 px = 1 m</span>
+        </div>
+        <div style="overflow:auto;padding-bottom:32px;">
+          <div id="srCanvas"></div>
+        </div>
       </div>
 
-      <div class="clearance-info">
-        <h4>AS/NZS 3000 Clearances</h4>
-        <ul style="margin:8px 0 0 20px;line-height:1.8;">
-          <li><strong>Front access:</strong> 1200mm minimum</li>
-          <li><strong>Rear access:</strong> 1000mm (if required)</li>
-          <li><strong>Side clearance:</strong> 200mm minimum</li>
-          <li><strong>Door swing:</strong> Considered in layout</li>
-        </ul>
-      </div>
-    </div>
-
-    <button class="calc-button green" onclick="exportSwitchroom()" style="margin-bottom:16px;">&#128190; Export Equipment CSV</button>
-
-    <div class="room-container">
-      <div class="room-label">Switchroom Layout (Top View - To Scale)</div>
-      <div id="roomBox" class="room-box"></div>
-      <div class="room-dims" id="roomDims"></div>
-      <div style="margin-top:12px;font-size:0.9em;color:var(--text-secondary);">
-        <strong>Scale:</strong> <span id="scaleInfo">60px = 1m</span>
-      </div>
     </div>
   </div>
-  
+
   <script>
-    // AS3000 Clearance requirements (in mm)
-    const CLEARANCES = {
-      FRONT_ACCESS: 1200,      // Front of switchboard
-      REAR_ACCESS: 1000,       // Rear access if required
-      SIDE_CLEARANCE: 200,     // Side clearances
-      ROOM_MIN_WIDTH: 2000,    // Minimum room width
-      ROOM_MIN_DEPTH: 2000,    // Minimum room depth
-      DOOR_SWING: 900          // Standard door swing clearance
+    /* ─── Constants ─────────────────────────────────────── */
+    const SCALE      = 80;   // px per metre
+    const SIDE_CLR   = 200;  // mm — side clearance between boards and walls
+    const FRONT_CLR  = 1200; // mm — minimum front clearance (AS/NZS 3000 Cl. 2.10)
+    const MIN_ROOM   = 2000; // mm — minimum room dimension
+    const LBL_GAP    = 14;   // px gap between room edge and labels
+
+    const TYPE_COLORS = {
+      MSB: '#2563eb', MSSB: '#16a34a', DB: '#0d9488', Meter: '#f59e0b', CT: '#9333ea'
+    };
+    const TYPE_DEFAULTS = {
+      MSB:   { w: 3000, d: 800 },
+      MSSB:  { w: 1400, d: 350 },
+      DB:    { w: 600,  d: 250 },
+      Meter: { w: 800,  d: 350 },
+      CT:    { w: 400,  d: 200 }
     };
 
-    const SCALE = 60; // 60px = 1m (1px = 16.67mm)
-    let equipmentList = [];
-    let nextEquipId = 1;
+    let equipment = [];
+    let nextId = 1;
 
-    // Default dimensions for equipment types
-    const EQUIPMENT_DEFAULTS = {
-      MSB: { width: 3000, depth: 600, height: 2200 },
-      MSSB: { width: 1400, depth: 600, height: 2200 },
-      DB: { width: 600, depth: 250, height: 1800 },
-      Meter: { width: 800, depth: 350, height: 1800 },
-      CT: { width: 400, depth: 200, height: 600 }
-    };
-
-    function updateEquipmentInputs() {
-      const type = document.getElementById('equipType').value;
-      const defaults = EQUIPMENT_DEFAULTS[type];
-      document.getElementById('equipWidth').value = defaults.width;
-      document.getElementById('equipDepth').value = defaults.depth;
-      document.getElementById('equipHeight').value = defaults.height;
+    /* ─── Input helpers ──────────────────────────────────── */
+    function applyDefaults() {
+      const t = document.getElementById('eqType').value;
+      const d = TYPE_DEFAULTS[t];
+      document.getElementById('eqW').value = d.w;
+      document.getElementById('eqD').value = d.d;
+      document.getElementById('panelsOpt').style.display = (t === 'MSB') ? '' : 'none';
+      if (t !== 'MSB') document.getElementById('eqPanels').checked = false;
     }
 
-    function addEquipment() {
-      const type = document.getElementById('equipType').value;
-      const width = parseInt(document.getElementById('equipWidth').value) || 800;
-      const depth = parseInt(document.getElementById('equipDepth').value) || 600;
-      const height = parseInt(document.getElementById('equipHeight').value) || 2200;
-
-      const equipment = {
-        id: nextEquipId++,
-        type: type,
-        width: width,
-        depth: depth,
-        height: height,
-        x: 0,
-        y: 0
-      };
-
-      equipmentList.push(equipment);
-      updateEquipmentListDisplay();
-      renderRoom();
+    function addEquip() {
+      const type = document.getElementById('eqType').value;
+      const w = Math.max(100, parseInt(document.getElementById('eqW').value) || TYPE_DEFAULTS[type].w);
+      const d = Math.max(100, parseInt(document.getElementById('eqD').value) || TYPE_DEFAULTS[type].d);
+      const panels = (type === 'MSB' && document.getElementById('eqPanels').checked);
+      equipment.push({ id: nextId++, type, w, d, panels });
+      refreshAll();
     }
 
-    function removeEquipment(id) {
-      equipmentList = equipmentList.filter(eq => eq.id !== id);
-      updateEquipmentListDisplay();
-      renderRoom();
+    function removeEquip(id) {
+      equipment = equipment.filter(e => e.id !== id);
+      refreshAll();
     }
 
-    function updateEquipmentListDisplay() {
-      const container = document.getElementById('equipmentListContainer');
-      if (equipmentList.length === 0) {
-        container.innerHTML = '<div style="color:var(--text-secondary);font-style:italic;padding:8px;">No equipment added</div>';
+    function updateField(id, field, val) {
+      const eq = equipment.find(e => e.id === id);
+      if (eq) { eq[field] = Math.max(100, parseInt(val) || eq[field]); renderCanvas(); }
+    }
+
+    function refreshAll() { renderList(); renderCanvas(); }
+
+    /* ─── Equipment list ─────────────────────────────────── */
+    function renderList() {
+      const tbody = document.getElementById('eqBody');
+      if (equipment.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-secondary);font-style:italic;text-align:center;padding:14px;">No equipment &mdash; click Add to begin</td></tr>';
         return;
       }
-
-      container.innerHTML = equipmentList.map(eq => `
-        <div class="equipment-item">
-          <div class="equipment-item-info">
-            <strong>${eq.type}</strong><br>
-            <small>${eq.width}W &times; ${eq.depth}D &times; ${eq.height}H mm</small>
-          </div>
-          <button class="remove-btn" onclick="removeEquipment(${eq.id})">Remove</button>
-        </div>
+      tbody.innerHTML = equipment.map(eq => `
+        <tr>
+          <td><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:${TYPE_COLORS[eq.type]};vertical-align:middle;"></span></td>
+          <td style="font-weight:600;">${eq.type}</td>
+          <td style="text-align:right;">
+            <input class="eq-w-input" type="number" value="${eq.w}" min="100" max="10000"
+              onchange="updateField(${eq.id},'w',this.value)" />
+          </td>
+          <td style="text-align:right;">
+            <input class="eq-w-input" type="number" value="${eq.d}" min="100" max="2000"
+              onchange="updateField(${eq.id},'d',this.value)" />
+          </td>
+          <td><button class="rm-btn" onclick="removeEquip(${eq.id})" title="Remove">&#10005;</button></td>
+        </tr>
       `).join('');
     }
 
-    function calculateRoomDimensions() {
-      if (equipmentList.length === 0) {
-        return {
-          width: CLEARANCES.ROOM_MIN_WIDTH,
-          depth: CLEARANCES.ROOM_MIN_DEPTH,
-          layout: 'single'
-        };
+    /* ─── Room sizing ────────────────────────────────────── */
+    function calcRoom() {
+      if (equipment.length === 0) {
+        return { wallW: MIN_ROOM, roomD: MIN_ROOM, layout: 'single', wall1: [], wall2: [] };
       }
 
-      // First, try single wall layout
-      const totalEquipWidth = equipmentList.reduce((sum, eq) => sum + eq.width, 0);
-      const numEquipment = equipmentList.length;
-      const sideClears = CLEARANCES.SIDE_CLEARANCE * (numEquipment + 1);
-      const singleWallWidth = totalEquipWidth + sideClears;
-      
-      // If single wall width exceeds 3400mm, use double wall layout
-      if (singleWallWidth > 3400) {
-        // Find optimal split to minimize room width
-        let bestSplit = findOptimalSplit(equipmentList);
-        
-        const wall1Equipment = bestSplit.wall1;
-        const wall2Equipment = bestSplit.wall2;
-        
-        const wall1MaxDepth = wall1Equipment.length > 0 ? Math.max(...wall1Equipment.map(eq => eq.depth)) : 0;
-        const wall2MaxDepth = wall2Equipment.length > 0 ? Math.max(...wall2Equipment.map(eq => eq.depth)) : 0;
-        // When boards face each other, only 1800mm total spacing needed (900mm each side)
-        const roomDepth = wall1MaxDepth + wall2MaxDepth + 1800;
-        
-        return {
-          width: Math.max(bestSplit.width, CLEARANCES.ROOM_MIN_WIDTH),
-          depth: Math.max(roomDepth, CLEARANCES.ROOM_MIN_DEPTH),
-          layout: 'double',
-          wall1Equipment,
-          wall2Equipment,
-          wall1MaxDepth,
-          wall2MaxDepth
-        };
-      }
-      
-      // Single wall layout
-      const maxEquipDepth = Math.max(...equipmentList.map(eq => eq.depth));
-      const calculatedWidth = singleWallWidth;
-      const calculatedDepth = maxEquipDepth + CLEARANCES.FRONT_ACCESS;
+      const totalW   = equipment.reduce((s, e) => s + e.w, 0) + SIDE_CLR * (equipment.length + 1);
+      const maxDepth = Math.max(...equipment.map(e => e.d));
+      const maxFrontClr = Math.max(...equipment.map(e => (e.type === 'MSB' && e.panels) ? 1400 : FRONT_CLR));
 
-      return {
-        width: Math.max(calculatedWidth, CLEARANCES.ROOM_MIN_WIDTH),
-        depth: Math.max(calculatedDepth, CLEARANCES.ROOM_MIN_DEPTH),
-        layout: 'single'
-      };
-    }
-
-    function findOptimalSplit(equipment) {
-      // Try all possible splits and find the one with minimum width
-      let minWidth = Infinity;
-      let bestWall1 = [];
-      let bestWall2 = [];
-      
-      const numEquipment = equipment.length;
-      
-      // If only 1 equipment, can't split - put it on wall 1
-      if (numEquipment === 1) {
+      if (totalW <= 3400) {
+        // Single-wall layout
         return {
+          wallW: Math.max(totalW, MIN_ROOM),
+          roomD: Math.max(maxDepth + maxFrontClr, MIN_ROOM),
+          layout: 'single',
           wall1: equipment,
-          wall2: [],
-          width: equipment[0].width + CLEARANCES.SIDE_CLEARANCE * 2
+          wall2: []
         };
       }
-      
-      // Try splits from 1 to n-1 equipment on wall 1
-      for (let i = 1; i < numEquipment; i++) {
-        const wall1 = equipment.slice(0, i);
-        const wall2 = equipment.slice(i);
-        
-        const wall1Width = wall1.reduce((sum, eq) => sum + eq.width, 0) + CLEARANCES.SIDE_CLEARANCE * (wall1.length + 1);
-        const wall2Width = wall2.reduce((sum, eq) => sum + eq.width, 0) + CLEARANCES.SIDE_CLEARANCE * (wall2.length + 1);
-        const maxWidth = Math.max(wall1Width, wall2Width);
-        
-        if (maxWidth < minWidth) {
-          minWidth = maxWidth;
-          bestWall1 = wall1;
-          bestWall2 = wall2;
-        }
+
+      // Double-wall: optimal split to minimise room width
+      let best = null, bestMax = Infinity;
+      for (let i = 1; i < equipment.length; i++) {
+        const w1 = equipment.slice(0, i);
+        const w2 = equipment.slice(i);
+        const ew1 = w1.reduce((s, e) => s + e.w, 0) + SIDE_CLR * (w1.length + 1);
+        const ew2 = w2.reduce((s, e) => s + e.w, 0) + SIDE_CLR * (w2.length + 1);
+        const mx  = Math.max(ew1, ew2);
+        if (mx < bestMax) { bestMax = mx; best = { w1, w2 }; }
       }
-      
+
+      const d1 = Math.max(...best.w1.map(e => e.d));
+      const d2 = Math.max(...best.w2.map(e => e.d));
+      const p1 = Math.max(...best.w1.map(e => (e.type === 'MSB' && e.panels) ? 800 : 600));
+      const p2 = Math.max(...best.w2.map(e => (e.type === 'MSB' && e.panels) ? 800 : 600));
       return {
-        wall1: bestWall1,
-        wall2: bestWall2,
-        width: minWidth
+        wallW:  Math.max(bestMax, MIN_ROOM),
+        roomD:  Math.max(d1 + d2 + p1 + 600 + p2, MIN_ROOM),
+        layout: 'double',
+        wall1:  best.w1,
+        wall2:  best.w2,
+        wall1D: d1,
+        wall2D: d2
       };
     }
 
-    function renderRoom() {
-      const roomBox = document.getElementById('roomBox');
-      const dimensions = calculateRoomDimensions();
-      
-      const roomWidthPx = (dimensions.width / 1000) * SCALE;
-      const roomDepthPx = (dimensions.depth / 1000) * SCALE;
+    /* ─── Canvas render ──────────────────────────────────── */
+    function px(mm) { return (mm / 1000) * SCALE; }
 
-      roomBox.style.width = roomWidthPx + 'px';
-      roomBox.style.height = roomDepthPx + 'px';
-      roomBox.innerHTML = '';
+    function renderCanvas() {
+      const room   = calcRoom();
+      const canvas = document.getElementById('srCanvas');
 
-      if (equipmentList.length === 0) {
-        roomBox.innerHTML = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--text-secondary);font-style:italic;">Add equipment to see layout</div>';
-        updateDimensionsDisplay(dimensions);
-        return;
+      /*
+       * ROTATED LAYOUT — board wall on the LEFT:
+       *   Canvas X  →  room DEPTH (perpendicular to boards; left = board wall)
+       *   Canvas Y  ↓  room WIDTH  (along the board wall; top = clearance side)
+       *
+       *   Board drawn as:
+       *     canvas-width  = board.d  (depth, horizontal)
+       *     canvas-height = board.w  (width, vertical)
+       */
+
+      const roomW_px = px(room.roomD);   // canvas width of the room outline
+      const roomH_px = px(room.wallW);   // canvas height of the room outline
+
+      // Reserve space to the right for labels
+      const totalW_px = roomW_px + LBL_GAP + 200;
+
+      canvas.style.width  = totalW_px + 'px';
+      canvas.style.height = (roomH_px + 40) + 'px'; // +40 for scale bar below
+      canvas.innerHTML    = '';
+
+      // ── Room outline ──
+      el('div', canvas, {
+        class: 'room-outline',
+        style: `left:0;top:0;width:${roomW_px}px;height:${roomH_px}px;`
+      });
+
+      // ── Draw boards + clearances ──
+      const labelEntries = [];
+
+      function drawWall(wallEquip, wallPosMM) {
+        // wallPosMM: position (mm) of the wall surface boards sit against
+        //   0 = left room wall; room.roomD = right room wall
+        // Each board is positioned so its back edge touches the wall.
+        // Items < 600 mm deep hang off the wall (surface-mounted).
+        const rightWall = (wallPosMM > 0);
+        let yOffMM = SIDE_CLR;
+
+        wallEquip.forEach((eq) => {
+          const bx = rightWall ? px(wallPosMM - eq.d) : 0;  // board left in canvas
+          const by = px(yOffMM);
+          const bw = px(eq.d);   // board depth → canvas width
+          const bh = px(eq.w);   // board width → canvas height
+
+          // Board
+          const useColor = (eq.type === 'MSB' || eq.type === 'MSSB' || eq.type === 'DB') ? 'transparent' : TYPE_COLORS[eq.type];
+          const block = el('div', canvas, {
+            class: 'eq-block',
+            title: `${eq.type}  ${eq.w} W × ${eq.d} D mm`,
+            style: `left:${bx}px;top:${by}px;width:${bw}px;height:${bh}px;background:${useColor};`
+          });
+
+          // MSB gets diagonal cross (X) with filled triangles, MSSB gets single diagonal
+          if (eq.type === 'MSB' || eq.type === 'MSSB') {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', `0 0 ${bw} ${bh}`);
+            svg.setAttribute('preserveAspectRatio', 'none');
+            svg.style.cssText = 'position:absolute;left:-3px;top:-3px;width:calc(100% + 6px);height:calc(100% + 6px);pointer-events:none;';
+            const l1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            l1.setAttribute('x1', '0'); l1.setAttribute('y1', '0');
+            l1.setAttribute('x2', bw); l1.setAttribute('y2', bh);
+            l1.setAttribute('stroke', '#000'); l1.setAttribute('stroke-width', '2.88');
+            svg.appendChild(l1);
+            if (eq.type === 'MSB') {
+              const l2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+              l2.setAttribute('x1', bw); l2.setAttribute('y1', '0');
+              l2.setAttribute('x2', '0'); l2.setAttribute('y2', bh);
+              l2.setAttribute('stroke', '#000'); l2.setAttribute('stroke-width', '2.88');
+              svg.appendChild(l2);
+              // Fill top and bottom triangles black
+              const cx = bw / 2, cy = bh / 2;
+              const triTop = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+              triTop.setAttribute('points', `0,0 ${bw},0 ${cx},${cy}`);
+              triTop.setAttribute('fill', '#000');
+              const triBot = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+              triBot.setAttribute('points', `0,${bh} ${bw},${bh} ${cx},${cy}`);
+              triBot.setAttribute('fill', '#000');
+              svg.appendChild(triTop);
+              svg.appendChild(triBot);
+            }
+            block.appendChild(svg);
+          }
+          // DB gets wall-side filled triangle (no diagonal line)
+          if (eq.type === 'DB') {
+            const svg2 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg2.setAttribute('viewBox', `0 0 ${bw} ${bh}`);
+            svg2.setAttribute('preserveAspectRatio', 'none');
+            svg2.style.cssText = 'position:absolute;left:-3px;top:-3px;width:calc(100% + 6px);height:calc(100% + 6px);pointer-events:none;';
+            const triWall = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            if (rightWall) {
+              triWall.setAttribute('points', `${bw},0 ${bw},${bh} 0,${bh}`);
+            } else {
+              triWall.setAttribute('points', `0,0 0,${bh} ${bw},${bh}`);
+            }
+            triWall.setAttribute('fill', '#000');
+            svg2.appendChild(triWall);
+            block.appendChild(svg2);
+          }
+
+          // Clearance direction: 1 = extends right (+X), -1 = extends left (–X)
+          const dir = rightWall ? -1 : 1;
+          const faceX = dir === 1 ? bx + bw : bx;
+
+          // Primary zone: 800 mm for MSB with panels, 600 mm otherwise
+          const primaryClr = (eq.type === 'MSB' && eq.panels) ? 800 : 600;
+          const secondaryClr = 600;
+
+          // Red zone (primary)
+          el('div', canvas, {
+            class: 'clr-red',
+            style: dir === 1
+              ? `left:${faceX}px;top:${by}px;width:${px(primaryClr)}px;height:${bh}px;`
+              : `left:${faceX - px(primaryClr)}px;top:${by}px;width:${px(primaryClr)}px;height:${bh}px;`
+          });
+
+          // Yellow zone (secondary)
+          if (secondaryClr > 0) {
+            el('div', canvas, {
+              class: 'clr-yel',
+              style: dir === 1
+                ? `left:${faceX + px(primaryClr)}px;top:${by}px;width:${px(secondaryClr)}px;height:${bh}px;`
+                : `left:${faceX - px(primaryClr + secondaryClr)}px;top:${by}px;width:${px(secondaryClr)}px;height:${bh}px;`
+            });
+          }
+
+          // Collect for labels (anchor at vertical mid-centre of board)
+          labelEntries.push({
+            anchorX: bx + bw / 2,   // horizontal mid of board
+            anchorY: by + bh / 2,   // vertical centre of board
+            color:   TYPE_COLORS[eq.type],
+            text:    `${eq.type}  ${(eq.w/1000).toFixed(1)} m \u00D7 ${(eq.d/1000).toFixed(1)} m`
+          });
+
+          yOffMM += eq.w + SIDE_CLR;
+        });
       }
 
-      if (dimensions.layout === 'double') {
-        // Double wall layout - equipment on top and bottom walls
-        renderDoubleWallLayout(roomBox, dimensions);
+      if (room.layout === 'single') {
+        drawWall(room.wall1, 0);
       } else {
-        // Single wall layout - equipment on top wall only
-        renderSingleWallLayout(roomBox, dimensions);
+        // Wall 1: boards at X=0 (left wall)
+        drawWall(room.wall1, 0);
+        // Wall 2: boards aligned back-to-wall at right side
+        drawWall(room.wall2, room.roomD);
       }
 
-      updateDimensionsDisplay(dimensions);
-    }
+      // ── Labels with arrows ──
+      // Arrow goes from the RIGHT side of the room to a label column
+      const lblX = roomW_px + LBL_GAP;
 
-    function renderSingleWallLayout(roomBox, dimensions) {
-      let currentX = CLEARANCES.SIDE_CLEARANCE;
-      const equipY = 0; // Equipment against the wall (top edge)
+      // Sort labels by Y so they don't overlap
+      labelEntries.sort((a, b) => a.anchorY - b.anchorY);
+      const LBL_H = 18; // min vertical spacing between labels (px)
+      let lastLblY = -999;
+      labelEntries.forEach((lbl) => {
+        const rawY = lbl.anchorY - 8;
+        const lblY = Math.max(rawY, lastLblY + LBL_H);
+        lastLblY = lblY;
 
-      equipmentList.forEach((eq, idx) => {
-        // Update equipment position
-        eq.x = currentX;
-        eq.y = equipY;
+        // Horizontal connector line from board anchor to label
+        const lineY = lbl.anchorY;
+        const lineStartX = Math.min(lbl.anchorX + px(lbl.anchorX < roomW_px / 2 ? room.roomD - (lbl.anchorX / SCALE * 1000) : 0), roomW_px);
+        el('div', canvas, {
+          class: 'lbl-line',
+          style: `left:${lbl.anchorX}px;top:${lineY}px;width:${roomW_px - lbl.anchorX + LBL_GAP - 2}px;height:1px;background:${lbl.color};opacity:0.7;`
+        });
 
-        // Draw equipment rectangle (against the back wall)
-        const eqDiv = document.createElement('div');
-        eqDiv.className = `equip-rect equip-rect-${eq.type.toLowerCase()}`;
-        
-        const eqWidthPx = (eq.width / 1000) * SCALE;
-        const eqDepthPx = (eq.depth / 1000) * SCALE;
-        
-        eqDiv.style.width = eqWidthPx + 'px';
-        eqDiv.style.height = eqDepthPx + 'px';
-        eqDiv.style.left = ((eq.x / 1000) * SCALE) + 'px';
-        eqDiv.style.top = ((eq.y / 1000) * SCALE) + 'px';
-        eqDiv.innerHTML = `${eq.type}<br>${eq.width}&times;${eq.depth}mm`;
-        
-        roomBox.appendChild(eqDiv);
+        // Arrow head pointing left (towards board)
+        el('div', canvas, {
+          class: 'arrow-head',
+          style: `left:${lbl.anchorX + 2}px;top:${lineY - 3}px;border-top:4px solid transparent;border-bottom:4px solid transparent;border-right:6px solid ${lbl.color};opacity:0.7;`
+        });
 
-        // Red clearance zone (600mm) - directly in front of equipment
-        const redZone = document.createElement('div');
-        redZone.className = 'clearance-zone-red';
-        redZone.style.width = eqWidthPx + 'px';
-        redZone.style.height = ((600 / 1000) * SCALE) + 'px';
-        redZone.style.left = ((eq.x / 1000) * SCALE) + 'px';
-        redZone.style.top = (((eq.y + eq.depth) / 1000) * SCALE) + 'px';
-        roomBox.appendChild(redZone);
-
-        // Yellow clearance zone (600mm) - beyond red zone
-        const yellowZone = document.createElement('div');
-        yellowZone.className = 'clearance-zone-yellow';
-        yellowZone.style.width = eqWidthPx + 'px';
-        yellowZone.style.height = ((600 / 1000) * SCALE) + 'px';
-        yellowZone.style.left = ((eq.x / 1000) * SCALE) + 'px';
-        yellowZone.style.top = (((eq.y + eq.depth + 600) / 1000) * SCALE) + 'px';
-        roomBox.appendChild(yellowZone);
-
-        currentX += eq.width + CLEARANCES.SIDE_CLEARANCE;
-      });
-    }
-
-    function renderDoubleWallLayout(roomBox, dimensions) {
-      // Wall 1 (top) - equipment at y=0
-      let currentX1 = CLEARANCES.SIDE_CLEARANCE;
-      const wall1Y = 0;
-
-      dimensions.wall1Equipment.forEach((eq) => {
-        eq.x = currentX1;
-        eq.y = wall1Y;
-
-        const eqDiv = document.createElement('div');
-        eqDiv.className = `equip-rect equip-rect-${eq.type.toLowerCase()}`;
-        
-        const eqWidthPx = (eq.width / 1000) * SCALE;
-        const eqDepthPx = (eq.depth / 1000) * SCALE;
-        
-        eqDiv.style.width = eqWidthPx + 'px';
-        eqDiv.style.height = eqDepthPx + 'px';
-        eqDiv.style.left = ((eq.x / 1000) * SCALE) + 'px';
-        eqDiv.style.top = ((eq.y / 1000) * SCALE) + 'px';
-        eqDiv.innerHTML = `${eq.type}<br>${eq.width}&times;${eq.depth}mm`;
-        
-        roomBox.appendChild(eqDiv);
-
-        // Red clearance zone for wall 1 (600mm, extends downward)
-        const redZone1 = document.createElement('div');
-        redZone1.className = 'clearance-zone-red';
-        redZone1.style.width = eqWidthPx + 'px';
-        redZone1.style.height = ((600 / 1000) * SCALE) + 'px';
-        redZone1.style.left = ((eq.x / 1000) * SCALE) + 'px';
-        redZone1.style.top = (((eq.y + eq.depth) / 1000) * SCALE) + 'px';
-        roomBox.appendChild(redZone1);
-
-        // Yellow clearance zone for wall 1 (600mm, beyond red zone, may overlap)
-        const yellowZone1 = document.createElement('div');
-        yellowZone1.className = 'clearance-zone-yellow';
-        yellowZone1.style.width = eqWidthPx + 'px';
-        yellowZone1.style.height = ((600 / 1000) * SCALE) + 'px';
-        yellowZone1.style.left = ((eq.x / 1000) * SCALE) + 'px';
-        yellowZone1.style.top = (((eq.y + eq.depth + 600) / 1000) * SCALE) + 'px';
-        roomBox.appendChild(yellowZone1);
-
-        currentX1 += eq.width + CLEARANCES.SIDE_CLEARANCE;
+        // Label text
+        const lblDiv = el('div', canvas, { class: 'eq-ext-label', style: `left:${lblX}px;top:${lblY}px;` });
+        el('span', lblDiv, { class: 'eq-ext-dot', style: `background:${lbl.color};` });
+        lblDiv.appendChild(document.createTextNode(lbl.text));
       });
 
-      // Wall 2 (bottom) - equipment facing upward
-      let currentX2 = CLEARANCES.SIDE_CLEARANCE;
-      // Position wall 2 equipment at the bottom, accounting for their depth
-      const wall2YBase = dimensions.depth; // Bottom edge of room
+      // ── Scale bar ──
+      const scaleBar = el('div', canvas, { class: 'scale-bar', style: `left:0;top:${roomH_px + 10}px;` });
+      el('div', scaleBar, { style: `width:${SCALE}px;height:2px;background:var(--text-secondary);` });
+      scaleBar.appendChild(document.createTextNode('\u00A01 m'));
 
-      dimensions.wall2Equipment.forEach((eq) => {
-        eq.x = currentX2;
-        eq.y = wall2YBase - eq.depth; // Position so bottom edge is at room bottom
+      updateInfo(room);
+    }
 
-        const eqDiv = document.createElement('div');
-        eqDiv.className = `equip-rect equip-rect-${eq.type.toLowerCase()}`;
-        
-        const eqWidthPx = (eq.width / 1000) * SCALE;
-        const eqDepthPx = (eq.depth / 1000) * SCALE;
-        
-        eqDiv.style.width = eqWidthPx + 'px';
-        eqDiv.style.height = eqDepthPx + 'px';
-        eqDiv.style.left = ((eq.x / 1000) * SCALE) + 'px';
-        eqDiv.style.top = (((eq.y) / 1000) * SCALE) + 'px';
-        eqDiv.innerHTML = `${eq.type}<br>${eq.width}&times;${eq.depth}mm`;
-        
-        roomBox.appendChild(eqDiv);
-
-        // Red clearance zone for wall 2 (600mm, extends upward)
-        const redZone2 = document.createElement('div');
-        redZone2.className = 'clearance-zone-red';
-        redZone2.style.width = eqWidthPx + 'px';
-        redZone2.style.height = ((600 / 1000) * SCALE) + 'px';
-        redZone2.style.left = ((eq.x / 1000) * SCALE) + 'px';
-        redZone2.style.top = (((eq.y - 600) / 1000) * SCALE) + 'px';
-        roomBox.appendChild(redZone2);
-
-        // Yellow clearance zone for wall 2 (600mm, beyond red zone, may overlap)
-        const yellowZone2 = document.createElement('div');
-        yellowZone2.className = 'clearance-zone-yellow';
-        yellowZone2.style.width = eqWidthPx + 'px';
-        yellowZone2.style.height = ((600 / 1000) * SCALE) + 'px';
-        yellowZone2.style.left = ((eq.x / 1000) * SCALE) + 'px';
-        yellowZone2.style.top = (((eq.y - 1200) / 1000) * SCALE) + 'px';
-        roomBox.appendChild(yellowZone2);
-
-        currentX2 += eq.width + CLEARANCES.SIDE_CLEARANCE;
+    /* ─── Helper: create element ────────────────────────── */
+    function el(tag, parent, attrs = {}) {
+      const d = document.createElement(tag);
+      Object.entries(attrs).forEach(([k, v]) => {
+        if (k === 'class') d.className = v;
+        else d.setAttribute(k, v);
       });
+      if (parent) parent.appendChild(d);
+      return d;
     }
 
-    function updateDimensionsDisplay(dimensions) {
-      const roomDims = document.getElementById('roomDims');
-      const totalArea = (dimensions.width * dimensions.depth) / 1000000;
-      const layoutType = dimensions.layout === 'double' ? 'Double Wall Layout' : 'Single Wall Layout';
-      
-      roomDims.innerHTML = `
-        <strong>Room Dimensions:</strong><br>
-        Width: ${(dimensions.width / 1000).toFixed(2)}m (${dimensions.width}mm)<br>
-        Depth: ${(dimensions.depth / 1000).toFixed(2)}m (${dimensions.depth}mm)<br>
-        Area: ${totalArea.toFixed(2)}m&sup2;<br>
-        <strong>Layout:</strong> ${layoutType}<br>
-        <em style="color:var(--text-secondary);font-size:0.9em;">Includes AS/NZS 3000 required clearances</em>
-      `;
+    /* ─── Info panel ─────────────────────────────────────── */
+    function updateInfo(room) {
+      const dimEl  = document.getElementById('srDims');
+      const warnEl = document.getElementById('srWarnings');
+      const area   = ((room.wallW / 1000) * (room.roomD / 1000)).toFixed(2);
+
+      dimEl.innerHTML =
+        `<strong>Minimum room dimensions</strong><br>` +
+        `Width (along boards):&nbsp; <strong>${(room.wallW/1000).toFixed(2)} m</strong> (${room.wallW} mm)<br>` +
+        `Depth (front to back):&nbsp; <strong>${(room.roomD/1000).toFixed(2)} m</strong> (${room.roomD} mm)<br>` +
+        `Floor area:&nbsp; <strong>${area} m\u00B2</strong><br>` +
+        `Layout:&nbsp; <strong>${room.layout === 'double' ? 'Double-wall (facing boards)' : 'Single-wall'}</strong>`;
+
+      const warnings = [];
+
+      // Two-exits check — any single MSB > 3 m OR total MSB wall > 3 m
+      const msbs = equipment.filter(e => e.type === 'MSB');
+      const msbTotalW = msbs.reduce((s, e) => s + e.w, 0);
+      if (msbs.some(e => e.w > 3000) || msbTotalW > 3000) {
+        warnings.push(
+          `<div class="warn-box danger">` +
+          `<strong>&#9888;&nbsp; Two exits required</strong><br>` +
+          `The MSB exceeds 3 m &mdash; the switchroom must have <strong>two exits</strong> ` +
+          `(AS/NZS&nbsp;3000:2018 Cl.&nbsp;2.10.6). Position exits so no worker can be trapped ` +
+          `at either end of the switchboard.` +
+          `</div>`
+        );
+      }
+
+      // Narrow room advisory
+      if (room.wallW > 0 && room.wallW < 2400 && equipment.length > 0) {
+        warnings.push(
+          `<div class="warn-box caution">` +
+          `<strong>&#8505;&nbsp; Tight room width</strong><br>` +
+          `Room width is ${(room.wallW/1000).toFixed(2)} m &mdash; consider 2.4 m minimum for comfortable equipment access.` +
+          `</div>`
+        );
+      }
+
+      warnEl.innerHTML = warnings.join('');
     }
 
-    // Initialize
-    updateEquipmentListDisplay();
-    renderRoom();
-    function exportSwitchroom() {
-      var rows = [];
-      equipment.forEach(function(eq) {
-        rows.push([eq.type, eq.width + 'mm', eq.depth + 'mm', eq.height + 'mm']);
-      });
-      var dims = document.getElementById('roomDims');
-      if (dims) rows.push(['Room Dimensions', dims.textContent.trim(), '', '']);
-      OmniExport.toCSV(['Type','Width','Depth','Height'], rows, 'switchroom-layout');
+    /* ─── Save / Load ───────────────────────────────────── */
+    const SR_KEY = 'switchroomLayout';
+
+    function setCookie(name, value, days) {
+      const exp = new Date(Date.now() + days * 864e5).toUTCString();
+      document.cookie = `${name}=${encodeURIComponent(value)};expires=${exp};path=/;SameSite=Lax`;
     }
+    function getCookie(name) {
+      const m = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
+      return m ? decodeURIComponent(m[1]) : null;
+    }
+
+    function showToast(msg, isError) {
+      const t = document.getElementById('srToast');
+      t.textContent = msg;
+      t.style.background = isError ? '#7a3535' : '#1e3a5f';
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    function updateSaveInfo() {
+      const el = document.getElementById('srSaveInfo');
+      const raw = getCookie(SR_KEY);
+      if (!raw) { el.textContent = 'No saved layout.'; return; }
+      try {
+        const data = JSON.parse(raw);
+        const d = new Date(data.savedAt);
+        el.textContent = `Saved ${d.toLocaleString()} \u2014 ${data.equipment.length} item(s)`;
+      } catch(e) { el.textContent = ''; }
+    }
+
+    function saveLayout() {
+      setCookie(SR_KEY, JSON.stringify({ equipment, savedAt: Date.now() }), 365);
+      updateSaveInfo();
+      showToast('Layout saved.');
+    }
+
+    function loadLayout() {
+      const raw = getCookie(SR_KEY);
+      if (!raw) { showToast('No saved layout found.', true); return; }
+      try {
+        const data = JSON.parse(raw);
+        equipment = data.equipment || [];
+        nextId = equipment.length ? Math.max(...equipment.map(e => e.id)) + 1 : 1;
+        refreshAll();
+        showToast(`Loaded ${equipment.length} item(s).`);
+      } catch(e) {
+        showToast('Failed to load \u2014 saved data may be corrupted.', true);
+      }
+    }
+
+    function exportJSON() {
+      const blob = new Blob(
+        [JSON.stringify({ equipment, exportedAt: new Date().toISOString() }, null, 2)],
+        { type: 'application/json' }
+      );
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'switchroom-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = JSON.parse(e.target.result);
+          equipment = data.equipment || [];
+          nextId = equipment.length ? Math.max(...equipment.map(e => e.id)) + 1 : 1;
+          refreshAll();
+          showToast(`Imported ${equipment.length} item(s).`);
+        } catch(err) {
+          showToast('Import failed \u2014 invalid JSON file.', true);
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    /* ─── Initialise ─────────────────────────────────────── */
+    applyDefaults();
+    renderList();
+    renderCanvas();
+    updateSaveInfo();
   </script>
-  <script src="omni-utils.js"></script></body>
+  <script src="omni-utils.js"></script>
+</body>
 </html>

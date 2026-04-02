@@ -328,96 +328,66 @@
   var pendingClause = null;
 
   iframe.addEventListener('load', function () {
-    try {
-      injectAnchors();
-      iframeReady = true;
-      statusMsg.textContent = 'Document loaded.';
+    iframeReady = true;
+    statusMsg.textContent = 'Document loaded.';
 
-      // If there was a pending clause from the URL hash, navigate now
-      if (pendingClause) {
-        scrollToClause(pendingClause);
-        pendingClause = null;
-      } else {
-        // Check URL hash
-        var hash = window.location.hash;
-        if (hash && hash.indexOf('#cl-') === 0) {
-          scrollToClause(hash.substring(4));
-        }
+    // If there was a pending clause queued before load, navigate now
+    if (pendingClause) {
+      scrollToClause(pendingClause);
+      pendingClause = null;
+    } else {
+      var hash = window.location.hash;
+      if (hash && hash.indexOf('#cl-') === 0) {
+        scrollToClause(hash.substring(4));
       }
-    } catch (err) {
-      statusMsg.textContent = 'Document loaded (cross-origin &mdash; use Go to clause).';
-      console.warn('Cannot access iframe:', err);
     }
   });
-
-  /* Inject id="cl-X.Y.Z" on every <li data-list-text="X.Y.Z"> in the body content area */
-  function injectAnchors() {
-    var doc = iframe.contentDocument || iframe.contentWindow.document;
-    var items = doc.querySelectorAll('li[data-list-text]');
-    var count = 0;
-    // We only want body content &mdash; skip the first occurrences that are in the TOC.
-    // Strategy: the body clauses have <p> children with class containing "s17" or "s16"
-    // or they have <a name="bookmark..."> children. We'll just tag all of them &mdash;
-    // the last occurrence wins for duplicate clause numbers (body comes after TOC).
-    var seen = {};
-    // First pass: collect all, last occurrence wins
-    for (var i = 0; i < items.length; i++) {
-      var cl = items[i].getAttribute('data-list-text');
-      if (/^\d/.test(cl)) {
-        seen[cl] = items[i];
-      }
-    }
-    for (var cl in seen) {
-      seen[cl].id = 'cl-' + cl;
-      count++;
-    }
-    console.log('Injected ' + count + ' clause anchors');
-  }
 
   function scrollToClause(clause) {
     if (!iframeReady) {
       pendingClause = clause;
-      statusMsg.textContent = 'Waiting for document to load...';
+      statusMsg.textContent = 'Loading\u2026 will jump to clause ' + clause;
       return;
     }
 
-    var doc;
+    var id = 'cl-' + clause;
+
+    // Primary: postMessage (works cross-origin — IDs are pre-injected in the HTM file)
     try {
-      doc = iframe.contentDocument || iframe.contentWindow.document;
-    } catch (e) {
-      statusMsg.textContent = 'Cannot access document (cross-origin).';
-      return;
-    }
-
-    // Try exact clause ID first
-    var el = doc.getElementById('cl-' + clause);
-
-    if (!el) {
-      // Try searching via data-list-text attribute (body content &mdash; last match)
-      var all = doc.querySelectorAll('li[data-list-text="' + clause + '"]');
-      if (all.length > 0) {
-        el = all[all.length - 1]; // last one = body content
-      }
-    }
-
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Briefly highlight
-      var orig = el.style.backgroundColor;
-      el.style.backgroundColor = '#fff3cd';
-      el.style.transition = 'background-color 0.3s';
-      setTimeout(function () {
-        el.style.backgroundColor = '#ffffaa';
-        setTimeout(function () {
-          el.style.backgroundColor = orig || '';
-        }, 2000);
-      }, 300);
+      iframe.contentWindow.postMessage({ omniScrollTo: id }, '*');
       statusMsg.textContent = 'Showing clause ' + clause;
       highlightTocItem(clause);
-      // Update URL hash without reload
       history.replaceState(null, '', '#cl-' + clause);
-    } else {
-      statusMsg.textContent = 'Clause ' + clause + ' not found in document.';
+      return;
+    } catch (e) {
+      // postMessage itself shouldn't throw, but guard anyway
+    }
+
+    // Fallback: direct DOM access (works if same-origin / served via local server)
+    try {
+      var doc = iframe.contentDocument || iframe.contentWindow.document;
+      var el = doc.getElementById(id)
+             || (function () {
+                   var all = doc.querySelectorAll('li[data-list-text="' + clause + '"]');
+                   return all.length ? all[all.length - 1] : null;
+                 })();
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var orig = el.style.backgroundColor;
+        el.style.transition = 'background-color 0.3s';
+        el.style.backgroundColor = '#fff3cd';
+        setTimeout(function () {
+          el.style.backgroundColor = '#ffffaa';
+          setTimeout(function () { el.style.backgroundColor = orig || ''; }, 2000);
+        }, 300);
+        statusMsg.textContent = 'Showing clause ' + clause;
+        highlightTocItem(clause);
+        history.replaceState(null, '', '#cl-' + clause);
+      } else {
+        statusMsg.textContent = 'Clause ' + clause + ' not found in document.';
+      }
+    } catch (e) {
+      statusMsg.textContent = 'Clause ' + clause + ' not found \u2014 try the Go toolbar above.';
     }
   }
 
