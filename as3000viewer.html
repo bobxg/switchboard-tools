@@ -302,30 +302,71 @@
       tree.appendChild(div);
     });
 
-    /* ── Navigate iframe to a page ── */
+    /* ── Navigation state ── */
     var iframeReady = false;
+    var pendingPageId = null;
 
+    /* ── Navigate the iframe to a specific page number ── */
     function goToPage(page) {
       page = parseInt(page, 10);
       if (!page || page < 1) return;
       pageInput.value = page;
-
       var targetId = 'pf' + page;
-
       if (iframeReady) {
-        try {
-          var win = frame.contentWindow;
-          var el = win.document.getElementById(targetId);
-          if (el) {
-            /* Use hash navigation — browser scrolls to the anchor in the iframe */
-            win.location.hash = '#' + targetId;
-            return;
-          }
-        } catch (e) {}
+        navigateToPage(targetId);
+      } else {
+        pendingPageId = targetId; /* queued — will fire in load handler */
       }
+    }
 
-      /* Iframe not ready or element not found — load with hash */
-      frame.src = HTML_URL + '#' + targetId;
+    /* Scroll the pdf2htmlEX #page-container to the target page and flash it */
+    function navigateToPage(targetId) {
+      try {
+        var win = frame.contentWindow;
+        var doc = win.document;
+        var el  = doc.getElementById(targetId);
+        if (!el) { showToast('Page not found: ' + targetId); return; }
+
+        /* pdf2htmlEX uses #page-container as the scrollable viewport */
+        var pc = doc.getElementById('page-container');
+        if (pc) {
+          var newTop = pc.scrollTop +
+                       el.getBoundingClientRect().top -
+                       pc.getBoundingClientRect().top;
+          pc.scrollTo ? pc.scrollTo({ top: newTop, behavior: 'smooth' })
+                       : (pc.scrollTop = newTop);
+        } else {
+          el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        }
+
+        flashPage(el, doc);
+        return;
+      } catch (e) { /* cross-origin or structural change — fall through */ }
+
+      /* Fallback: reload iframe with anchor hash */
+      iframeReady  = false;
+      pendingPageId = targetId;
+      frame.src    = HTML_URL + '#' + targetId;
+    }
+
+    /* Inject flash CSS once, then animate the page element yellow */
+    function flashPage(el, doc) {
+      if (!doc.getElementById('omni-flash-css')) {
+        var s = doc.createElement('style');
+        s.id   = 'omni-flash-css';
+        s.textContent =
+          '@keyframes omniFlash{' +
+          '  0%  {box-shadow:inset 0 0 0 8px rgba(253,224,71,1),0 0 60px 20px rgba(253,224,71,.65)}' +
+          '  55% {box-shadow:inset 0 0 0 5px rgba(253,224,71,.9),0 0 35px 10px rgba(253,224,71,.35)}' +
+          '  100%{box-shadow:none}' +
+          '}' +
+          '.omni-flash{animation:omniFlash 2s ease-out forwards}';
+        doc.head.appendChild(s);
+      }
+      el.classList.remove('omni-flash');
+      void el.offsetWidth;           /* force reflow so animation restarts */
+      el.classList.add('omni-flash');
+      setTimeout(function () { el.classList.remove('omni-flash'); }, 2100);
     }
 
     function tocNav(cl, rowEl) {
@@ -383,17 +424,16 @@
       toastTmr = setTimeout(function () { el.classList.remove('show'); }, 3000);
     }
 
-    /* ── Handle inbound #cl-X.X hash on page load ── */
-    function handleInboundHash() {
-      var hash = window.location.hash;
-      var m = hash.match(/^#cl-(.+)$/);
+    /* ── Handle inbound #cl-X.X hash (from other pages linking to a clause) ── */
+    function parseInboundHash() {
+      var m = window.location.hash.match(/^#cl-(.+)$/);
       if (!m) return;
-      var cl = m[1];
+      var cl   = m[1];
       var page = lookupClause(cl);
       if (page) {
-        goToPage(page);
+        pendingPageId = 'pf' + page;
         setStatus('Clause ' + cl + ' \u2014 page ' + page, 'ok');
-        /* Highlight matching sidebar row */
+        /* Highlight the closest sidebar row */
         var topCl = cl.split('.').slice(0, 2).join('.');
         document.querySelectorAll('.cl-row').forEach(function (row) {
           if (row.dataset.cl === topCl) {
@@ -410,7 +450,16 @@
     frame.addEventListener('load', function () {
       iframeReady = true;
       setStatus('Document ready \u2014 click a clause to navigate', 'ok');
-      handleInboundHash();
+
+      /* Resolve inbound hash on first load */
+      parseInboundHash();
+
+      /* Execute any queued navigation */
+      if (pendingPageId) {
+        var pid = pendingPageId;
+        pendingPageId = null;
+        setTimeout(function () { navigateToPage(pid); }, 200);
+      }
     });
 
     setStatus('Loading AS/NZS 3000:2018\u2026', 'busy');
