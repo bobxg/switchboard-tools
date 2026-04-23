@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -90,7 +90,7 @@
     <div id="certOutput" style="display:none;">
       <div class="cert-preview" id="certPreview"></div>
       <button class="calc-button" onclick="window.print()">Print / Save as PDF</button>
-      <button class="calc-button green" onclick="exportCertData()">&#128190; Export CSV</button>
+      <button class="btn-export" onclick="exportCertData()">Export CSV</button>
     </div>
   </div>
   <script>
@@ -146,7 +146,7 @@
         <p>${assumptions}</p>
         <h3>Certification Statement</h3>
         <p>I certify that the electrical design for the above project has been prepared in accordance with the standards listed above and is suitable for its intended purpose at the <strong>${proj.stage}</strong> stage of design. This certificate is issued subject to the assumptions and exclusions noted above.</p>
-        <p>This certificate relates to the electrical <em>design</em> only. Compliance of the completed electrical installation must be verified by a licensed electrical contractor and certified separately per AS/NZS 3000 <a href="as3000viewer.html#cl-8.1" class="clause">Section 8</a>.</p>
+        <p>This certificate relates to the electrical <em>design</em> only. Compliance of the completed electrical installation must be verified by a licensed electrical contractor and certified separately per AS/NZS 3000 <a href="as3000viewer.html#cl-8.1" class="clause" target="_blank">Section 8</a>.</p>
         <div class="signature">
           <div>
             <div class="sig-line"><strong>Designer:</strong> ${designer.name}</div>

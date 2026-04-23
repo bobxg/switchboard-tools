@@ -70,13 +70,8 @@
       color: var(--text-secondary); border: 1px dashed var(--border-input);
       cursor: pointer; white-space: nowrap;
     }
-    .cl-badge.exact { border-style: solid; border-color: #22c55e; color: #15803d; font-weight: 600; }
+    .cl-badge { border-style: solid; border-color: #22c55e; color: #15803d; font-weight: 600; }
     .cl-badge:hover { border-color: var(--accent); color: var(--accent); }
-    .cl-cal-input {
-      width: 40px; padding: 1px 4px; font-size: 0.8em; text-align: center;
-      border: 1px solid var(--accent); border-radius: 3px;
-      background: var(--bg-input); color: var(--text-primary); outline: none;
-    }
 
     /* ── Main ── */
     .as-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
@@ -104,7 +99,7 @@
     #statusMsg.ok { color: #15803d; font-style: normal; }
     #statusMsg.busy { color: var(--accent); font-style: normal; }
 
-    /* ── PDF iframe ── */
+    /* ── HTML viewer iframe ── */
     .pdf-wrap { flex: 1; position: relative; }
     #pdfFrame { width: 100%; height: 100%; border: none; display: block; }
 
@@ -140,13 +135,13 @@
         <input type="number" id="pageInput" class="tb-input" min="1" value="1" />
         <button id="btnGo" class="tb-btn">Go</button>
         <span class="sep">|</span>
-        <span class="tb-label" style="font-size:0.82em;">Ctrl+F to search in document</span>
+        <span class="tb-label" style="font-size:0.82em;">Use Ctrl+F to search in document</span>
         <span class="sep">|</span>
         <span id="statusMsg">Loading…</span>
       </div>
 
       <div class="pdf-wrap">
-        <iframe id="pdfFrame" src="AS3000/AS3000-2018-Clean-Purple-cover.pdf"
+        <iframe id="pdfFrame" src="AS3000/AS3000-2018-Clean-Purple-cover.html"
                 title="AS/NZS 3000:2018 Wiring Rules"></iframe>
       </div>
     </div>
@@ -154,23 +149,17 @@
 
   <div id="toast"></div>
 
-  <!-- PDF.js — used only for background text scan to find exact clause pages -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
   (function () {
     'use strict';
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-    const PDF_URL  = 'AS3000/AS3000-2018-Clean-Purple-cover.pdf';
-    const LS_KEY   = 'as3000-pages-v4';
+    const HTML_URL = 'AS3000/AS3000-2018-Clean-Purple-cover.html';
 
     const frame     = document.getElementById('pdfFrame');
     const pageInput = document.getElementById('pageInput');
     const statusMsg = document.getElementById('statusMsg');
 
-    /* Exact physical PDF page numbers extracted from the official AS3000:2018 TOC.
+    /* Exact physical page numbers from the official AS3000:2018 TOC.
        Physical page = document page + 3 (3-page front matter offset). */
     const EXACT_PAGES = {
       '1.1':36, '1.2':36, '1.3':37, '1.4':37, '1.5':57,
@@ -191,9 +180,18 @@
       '8.1':419,'8.2':420,'8.3':422,'8.4':432
     };
 
-    /* Page map — starts from exact pages, user can override via badge click */
-    let pageMap    = Object.assign({}, EXACT_PAGES);
-    let exactFlags = {};
+    /* Resolve a clause (including sub-clauses) to a page number.
+       Falls back to progressively shorter parent clauses if exact match not found. */
+    function lookupClause(cl) {
+      if (EXACT_PAGES[cl]) return EXACT_PAGES[cl];
+      var parts = cl.split('.');
+      while (parts.length > 1) {
+        parts.pop();
+        var parent = parts.join('.');
+        if (EXACT_PAGES[parent]) return EXACT_PAGES[parent];
+      }
+      return null;
+    }
 
     /* ── TOC data ── */
     const TOC = [
@@ -286,15 +284,12 @@
         clBtn.textContent = c.cl + '\u2002' + c.t;
 
         var badge = document.createElement('span');
-        badge.className = 'cl-badge';
+        badge.className = 'cl-badge exact';
         badge.dataset.cl = c.cl;
-        badge.title = 'Click to enter correct page number';
+        badge.title = 'Page number';
+        badge.textContent = EXACT_PAGES[c.cl] ? 'p' + EXACT_PAGES[c.cl] : '?';
 
         clBtn.addEventListener('click', function () { tocNav(c.cl, row); });
-        badge.addEventListener('click', function (e) {
-          e.stopPropagation();
-          calibrate(c.cl, badge);
-        });
 
         row.appendChild(clBtn);
         row.appendChild(badge);
@@ -307,31 +302,30 @@
       tree.appendChild(div);
     });
 
-    /* Pre-mark all built-in pages as exact */
-    Object.keys(EXACT_PAGES).forEach(function (cl) { exactFlags[cl] = true; });
+    /* ── Navigate iframe to a page ── */
+    var iframeReady = false;
 
-    /* ── Restore any user overrides from localStorage ── */
-    try {
-      var saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
-      if (saved && saved.pages) Object.assign(pageMap, saved.pages);
-      if (saved && saved.exact) Object.assign(exactFlags, saved.exact);
-    } catch (e) {}
-    refreshBadges();
-
-    /* ── Navigate via iframe ── */
     function goToPage(page) {
       page = parseInt(page, 10);
       if (!page || page < 1) return;
       pageInput.value = page;
-      /*
-       * To guarantee Chrome's PDF viewer jumps to the right page every time,
-       * briefly load about:blank then set the real URL with #page=N.
-       * This forces a clean navigation rather than a same-document hash change.
-       */
-      frame.src = 'about:blank';
-      setTimeout(function () {
-        frame.src = PDF_URL + '#page=' + page;
-      }, 30);
+
+      var targetId = 'pf' + page;
+
+      if (iframeReady) {
+        try {
+          var win = frame.contentWindow;
+          var el = win.document.getElementById(targetId);
+          if (el) {
+            /* Use hash navigation — browser scrolls to the anchor in the iframe */
+            win.location.hash = '#' + targetId;
+            return;
+          }
+        } catch (e) {}
+      }
+
+      /* Iframe not ready or element not found — load with hash */
+      frame.src = HTML_URL + '#' + targetId;
     }
 
     function tocNav(cl, rowEl) {
@@ -339,13 +333,13 @@
       rowEl.classList.add('active');
       rowEl.scrollIntoView({ block: 'nearest' });
 
-      var page = pageMap[cl];
+      var page = EXACT_PAGES[cl];
       if (!page) {
-        showToast('Page unknown for ' + cl + ' — click the badge to set it');
+        showToast('Page unknown for clause ' + cl);
         return;
       }
       goToPage(page);
-      setStatus('Clause ' + cl + ' — page ' + page, exactFlags[cl] ? 'ok' : '');
+      setStatus('Clause ' + cl + ' \u2014 page ' + page, 'ok');
     }
 
     /* ── Toolbar page input ── */
@@ -373,92 +367,6 @@
       });
     });
 
-    /* ── Manual calibration (click badge) ── */
-    function calibrate(cl, badge) {
-      var inp = document.createElement('input');
-      inp.type = 'number'; inp.min = 1;
-      inp.className = 'cl-cal-input';
-      inp.value = pageMap[cl] || '';
-      inp.placeholder = '?';
-      badge.replaceWith(inp);
-      inp.focus(); inp.select();
-
-      function save() {
-        var v = parseInt(inp.value, 10);
-        if (v > 0) {
-          pageMap[cl] = v; exactFlags[cl] = true;
-          persist();
-          badge.textContent = 'p' + v;
-          badge.classList.add('exact');
-          showToast(cl + ' → page ' + v + ' saved');
-        }
-        inp.replaceWith(badge);
-      }
-      inp.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter')  save();
-        if (e.key === 'Escape') inp.replaceWith(badge);
-      });
-      inp.addEventListener('blur', function () { setTimeout(save, 80); });
-    }
-
-    /* ── Refresh all badges ── */
-    function refreshBadges() {
-      document.querySelectorAll('.cl-badge[data-cl]').forEach(function (b) {
-        var pg = pageMap[b.dataset.cl];
-        b.textContent = pg ? 'p' + pg : '?';
-        b.classList.toggle('exact', !!exactFlags[b.dataset.cl]);
-      });
-    }
-
-    function persist() {
-      try { localStorage.setItem(LS_KEY, JSON.stringify({ pages: pageMap, exact: exactFlags })); }
-      catch (e) {}
-    }
-
-    /* ── Background PDF.js scan (works when served via http://, e.g. Live Server) ── */
-    async function tryScan() {
-      setStatus('Scanning PDF for clause pages…', 'busy');
-      var pdf;
-      try {
-        pdf = await pdfjsLib.getDocument(PDF_URL).promise;
-      } catch (e) {
-        setStatus(Object.keys(exactFlags).length
-          ? Object.keys(exactFlags).length + ' pages calibrated'
-          : 'Click a page badge to set its page', '');
-        return;
-      }
-
-      var allCl  = TOC.flatMap(function (s) { return s.clauses.map(function (c) { return c.cl; }); });
-      var found  = {};
-
-      for (var p = 5; p <= pdf.numPages; p++) {
-        try {
-          var page = await pdf.getPage(p);
-          var tc   = await page.getTextContent();
-          var text = tc.items.map(function (i) { return i.str; }).join(' ');
-          allCl.forEach(function (cl) {
-            if (found[cl] != null) return;
-            var esc = cl.replace(/\./g, '\\.');
-            if (new RegExp('(?:^|[\\s(])' + esc + '(?=[\\s\\n.)]|$)').test(text)) {
-              found[cl] = p;
-            }
-          });
-        } catch (e) { /* skip unreadable page */ }
-        if (Object.keys(found).length >= allCl.length) break;
-      }
-
-      var n = Object.keys(found).length;
-      if (n > 0) {
-        Object.assign(pageMap, found);
-        Object.keys(found).forEach(function (cl) { exactFlags[cl] = true; });
-        persist();
-        refreshBadges();
-        setStatus(n + ' clauses located automatically', 'ok');
-      } else {
-        setStatus('Could not auto-locate clauses — click badges to set pages', '');
-      }
-    }
-
     /* ── Status helper ── */
     function setStatus(msg, cls) {
       statusMsg.textContent = msg;
@@ -475,12 +383,37 @@
       toastTmr = setTimeout(function () { el.classList.remove('show'); }, 3000);
     }
 
+    /* ── Handle inbound #cl-X.X hash on page load ── */
+    function handleInboundHash() {
+      var hash = window.location.hash;
+      var m = hash.match(/^#cl-(.+)$/);
+      if (!m) return;
+      var cl = m[1];
+      var page = lookupClause(cl);
+      if (page) {
+        goToPage(page);
+        setStatus('Clause ' + cl + ' \u2014 page ' + page, 'ok');
+        /* Highlight matching sidebar row */
+        var topCl = cl.split('.').slice(0, 2).join('.');
+        document.querySelectorAll('.cl-row').forEach(function (row) {
+          if (row.dataset.cl === topCl) {
+            row.classList.add('active');
+            row.scrollIntoView({ block: 'nearest' });
+          }
+        });
+      } else {
+        showToast('Clause ' + cl + ' not found in page map');
+      }
+    }
+
     /* ── Start ── */
     frame.addEventListener('load', function () {
-      if (frame.src !== 'about:blank') setStatus('Document ready — click a clause to navigate', 'ok');
+      iframeReady = true;
+      setStatus('Document ready \u2014 click a clause to navigate', 'ok');
+      handleInboundHash();
     });
 
-    setStatus(Object.keys(exactFlags).length + ' clauses mapped from official TOC', 'ok');
+    setStatus('Loading AS/NZS 3000:2018\u2026', 'busy');
 
   })();
   </script>

@@ -585,7 +585,7 @@ strong { font-weight: 600; }
   .input-row, .input-row.three { grid-template-columns: 1fr; }
 }
 @media print {
-  .top-tabs, .calc-button, .search-input, .omni-action-bar, .theme-toggle { display: none !important; }
+  .top-tabs, .calc-button, .btn-export, .search-input, .omni-action-bar, .theme-toggle { display: none !important; }
   .result-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body { background: #fff; color: #000; }
   .main-content { box-shadow: none; margin: 0; padding: 20px; background: #fff; border: none; }
@@ -722,6 +722,44 @@ strong { font-weight: 600; }
 .calc-button.red:hover { background: #b91c1c; box-shadow: 0 4px 12px rgba(220,38,38,0.35); }
 .calc-button.sm { font-size: 0.9em; padding: 6px 16px; }
 .btn-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+
+/* ─── Export Button ───────────────────────────────────── */
+.btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #16a34a;
+  color: #fff;
+  padding: 9px 20px;
+  border: none;
+  border-radius: var(--radius-btn);
+  font-size: 0.93em;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  box-shadow: 0 1px 3px rgba(22,163,74,0.3);
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  margin-top: 14px;
+  text-decoration: none;
+}
+.btn-export::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' y1='15' x2='12' y2='3'/%3E%3C/svg%3E") no-repeat center / contain;
+  flex-shrink: 0;
+}
+.btn-export:hover {
+  background: #15803d;
+  box-shadow: 0 4px 12px rgba(22,163,74,0.35);
+  transform: translateY(-1px);
+}
+.btn-export:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
 
 /* ─── Common Tab Component ────────────────────────────── */
 .sub-tabs {

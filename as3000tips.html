@@ -266,10 +266,10 @@
     function linkClause(cl) {
       // "Clause 3.3.3" &#8594; link to as3000viewer.html#cl-3.3.3
       var m = cl.match(/^Clause\s+(\d[\d.]+)/i);
-      if (m) return '<a href="as3000viewer.html#cl-' + m[1] + '">' + cl + '</a>';
+      if (m) return '<a href="as3000viewer.html#cl-' + m[1] + '" target="_blank">' + cl + '</a>';
       // "Section 6" &#8594; link to as3000viewer.html#cl-6.1
       var s = cl.match(/^Section\s+(\d+)/i);
-      if (s) return '<a href="as3000viewer.html#cl-' + s[1] + '.1">' + cl + '</a>';
+      if (s) return '<a href="as3000viewer.html#cl-' + s[1] + '.1" target="_blank">' + cl + '</a>';
       return cl; // Table refs, other standards &mdash; leave unlinked
     }
 

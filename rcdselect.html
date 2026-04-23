@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -10,7 +10,7 @@
   <div class="top-tabs"></div>
   <div class="main-content">
     <h1>RCD Type Selector</h1>
-    <p>Select the correct RCD type per <strong>AS/NZS 3000:2018</strong> clauses <a href="as3000viewer.html#cl-2.6.3" class="clause">2.6.3</a> and <a href="as3000viewer.html#cl-2.6.4" class="clause">2.6.4</a>. Covers Type I (AC), Type II (A), Type III (B/B+), sensitivity, and application rules.</p>
+    <p>Select the correct RCD type per <strong>AS/NZS 3000:2018</strong> clauses <a href="as3000viewer.html#cl-2.6.3" class="clause" target="_blank">2.6.3</a> and <a href="as3000viewer.html#cl-2.6.4" class="clause" target="_blank">2.6.4</a>. Covers Type I (AC), Type II (A), Type III (B/B+), sensitivity, and application rules.</p>
     <div class="calc-section">
       <h2>Application Details</h2>
       <div class="input-row three">
@@ -53,7 +53,7 @@
           </select></div>
       </div>
       <button class="calc-button" onclick="selectRCD()">Determine RCD Requirements</button>
-      <button class="calc-button green" onclick="exportRCDResult()">&#128190; Export CSV</button>
+      <button class="btn-export" onclick="exportRCDResult()">Export CSV</button>
     </div>
     <div id="resultSection" style="display:none;"></div>
     <div class="calc-section">
@@ -61,17 +61,17 @@
       <table class="ref-table">
         <thead><tr><th>Application</th><th>RCD Required?</th><th>Max I&#916;n (mA)</th><th>AS/NZS 3000 Clause</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>All socket outlets &#8804; 20 A (residential)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All final subcircuits in domestic installations</td></tr>
-          <tr><td>All socket outlets &#8804; 20 A (commercial)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All GPO circuits &#8804; 20A</td></tr>
-          <tr><td>Lighting final subcircuits (residential)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.3" class="clause">2.6.3.3</a></td><td>All lighting circuits in domestic</td></tr>
-          <tr><td>Socket outlets > 20 A</td><td>No (unless wet area)</td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>Recommended for additional protection</td></tr>
-          <tr><td>Outdoor / exposed circuits</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>Any circuit supplying outdoor equipment</td></tr>
-          <tr><td>Wet areas (bathroom, pool zone)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.4" class="clause">2.6.3.4</a></td><td>Zone 0-2: mandatory 30 mA</td></tr>
-          <tr><td>Construction sites</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>All circuits</td></tr>
-          <tr><td>EV charging (Mode 3)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a> + AS/NZS 3001</td><td>Type A or B per charger requirements</td></tr>
-          <tr><td>VSD/Inverter circuits</td><td>If required by above</td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause">2.6.3.2</a></td><td>Type B/B+ required (DC fault current detection)</td></tr>
+          <tr><td>All socket outlets &#8804; 20 A (residential)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause" target="_blank">2.6.3.2</a></td><td>All final subcircuits in domestic installations</td></tr>
+          <tr><td>All socket outlets &#8804; 20 A (commercial)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause" target="_blank">2.6.3.2</a></td><td>All GPO circuits &#8804; 20A</td></tr>
+          <tr><td>Lighting final subcircuits (residential)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.3" class="clause" target="_blank">2.6.3.3</a></td><td>All lighting circuits in domestic</td></tr>
+          <tr><td>Socket outlets > 20 A</td><td>No (unless wet area)</td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause" target="_blank">2.6.3.2</a></td><td>Recommended for additional protection</td></tr>
+          <tr><td>Outdoor / exposed circuits</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause" target="_blank">2.6.3.2</a></td><td>Any circuit supplying outdoor equipment</td></tr>
+          <tr><td>Wet areas (bathroom, pool zone)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.4" class="clause" target="_blank">2.6.3.4</a></td><td>Zone 0-2: mandatory 30 mA</td></tr>
+          <tr><td>Construction sites</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause" target="_blank">2.6.3.2</a></td><td>All circuits</td></tr>
+          <tr><td>EV charging (Mode 3)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause" target="_blank">2.6.3.2</a> + AS/NZS 3001</td><td>Type A or B per charger requirements</td></tr>
+          <tr><td>VSD/Inverter circuits</td><td>If required by above</td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause" target="_blank">2.6.3.2</a></td><td>Type B/B+ required (DC fault current detection)</td></tr>
           <tr><td>Medical &mdash; Body-protected</td><td><strong>YES &mdash; Mandatory</strong></td><td>10</td><td>AS/NZS 3003</td><td>Type A minimum, all patient care areas</td></tr>
-          <tr><td>Fire/Essential services</td><td>Generally exempt</td><td>&mdash;</td><td><a href="as3000viewer.html#cl-2.6.3.5" class="clause">2.6.3.5</a></td><td>RCD may cause nuisance trip; dedicated circuits</td></tr>
+          <tr><td>Fire/Essential services</td><td>Generally exempt</td><td>&mdash;</td><td><a href="as3000viewer.html#cl-2.6.3.5" class="clause" target="_blank">2.6.3.5</a></td><td>RCD may cause nuisance trip; dedicated circuits</td></tr>
         </tbody>
       </table>
       <div class="info-box"><strong>RCD Types per AS/NZS 3190:</strong><br>
@@ -113,7 +113,7 @@
           else { required = false; priority = 'recommended'; notes.push('Lighting in commercial: RCD recommended for personal protection, not mandatory unless specific risk.'); }
           break;
         case 'fixed_appliance':
-          if (location === 'residential') { required = true; notes.push('Residential fixed appliances on dedicated circuits still require RCD per <a href="as3000viewer.html#cl-2.6.3" class="clause">cl. 2.6.3</a>.'); }
+          if (location === 'residential') { required = true; notes.push('Residential fixed appliances on dedicated circuits still require RCD per <a href="as3000viewer.html#cl-2.6.3" class="clause" target="_blank">cl. 2.6.3</a>.'); }
           else { priority = 'recommended'; notes.push('Commercial fixed appliances: RCD recommended.'); }
           break;
         case 'hot_water':

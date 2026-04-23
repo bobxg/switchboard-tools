@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -11,12 +11,12 @@
 
   <div class="main-content">
     <h1>Earth Fault Loop Impedance Calculator</h1>
-    <p>Verify that earth fault loop impedance (Zs) satisfies automatic disconnection times per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.6.2">cl. 2.6.2&ndash;2.6.3</a></strong> and Tables 8.1/8.2.</p>
+    <p>Verify that earth fault loop impedance (Zs) satisfies automatic disconnection times per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.6.2" target="_blank">cl. 2.6.2&ndash;2.6.3</a></strong> and Tables 8.1/8.2.</p>
 
     <div class="calc-section">
       <h2>Circuit Parameters</h2>
       <div class="info-box">
-        <strong>AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.3.2">cl. 2.6.3.2</a>:</strong> For circuits not protected by an RCD, the earth fault loop impedance shall be low enough that the protective device operates within the required disconnection time (0.4 s for final subcircuits, 5 s for distribution circuits).
+        <strong>AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.3.2" target="_blank">cl. 2.6.3.2</a>:</strong> For circuits not protected by an RCD, the earth fault loop impedance shall be low enough that the protective device operates within the required disconnection time (0.4 s for final subcircuits, 5 s for distribution circuits).
       </div>
       <div class="input-row three">
         <div class="input-group">
@@ -142,7 +142,7 @@
         </div>
       </div>
       <button class="calc-button" onclick="calculate()">Check Loop Impedance</button>
-      <button class="calc-buttongreen" style="margin-top:8px" onclick="exportLoopResult()">Export Loop Result as CSV</button>
+      <button class="btn-export" onclick="exportLoopResult()">Export Loop Result as CSV</button>
     </div>
 
     <div id="resultSection" style="display:none;">
@@ -261,7 +261,7 @@
 
       const verdict = document.getElementById('verdict');
       if (Zs <= designZs) {
-        verdict.innerHTML = `<div class="pass-box">&#10003; PASS &mdash; Calculated Zs (${Zs.toFixed(3)} &#937;) &#8804; 80% of maximum (${designZs.toFixed(3)} &#937;). Automatic disconnection compliance achieved per AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.3">cl. 2.6.3</a>.</div>`;
+        verdict.innerHTML = `<div class="pass-box">&#10003; PASS &mdash; Calculated Zs (${Zs.toFixed(3)} &#937;) &#8804; 80% of maximum (${designZs.toFixed(3)} &#937;). Automatic disconnection compliance achieved per AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.3" target="_blank">cl. 2.6.3</a>.</div>`;
       } else if (Zs <= maxZs) {
         verdict.innerHTML = `<div class="warn-box">&#9888; MARGINAL &mdash; Calculated Zs (${Zs.toFixed(3)} &#937;) exceeds 80% design limit (${designZs.toFixed(3)} &#937;) but within absolute maximum (${maxZs.toFixed(3)} &#937;). Consider increasing earth conductor size, shorter run, or adding RCD protection.</div>`;
       } else {
