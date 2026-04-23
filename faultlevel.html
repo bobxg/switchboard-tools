@@ -6,20 +6,23 @@
   <title>Fault Level Calculator - OMNI</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .node-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-        .node-table th, .node-table td { border: 1px solid var(--border-light); padding: 10px; text-align: left; }
-        .node-table th { background: var(--accent); color: white; font-weight: bold; }
-        .node-table tr:nth-child(even) { background: var(--bg-table-stripe); }
-        .node-table input, .node-table select { width: 100%; padding: 6px 8px; border: 1px solid var(--border-input); font-size: 0.95em; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); }
-        .add-row-btn { background: #16a34a; color: white; border: none; padding: 8px 20px; font-size: 0.95em; cursor: pointer; margin-top: 8px; }
-        .add-row-btn:hover { background: #15803d; }
-        .remove-btn { background: #dc2626; color: white; border: none; padding: 4px 12px; cursor: pointer; font-size: 0.85em; }
-        .remove-btn:hover { background: #b91c1c; }
-        .pass { color: #16a34a; font-weight: bold; }
-        .fail { color: #dc2626; font-weight: bold; }
-        @media print {
-          .top-tabs, .calc-button, .add-row-btn, .remove-btn { display: none !important; }
-        }
+    .fl-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.93em; }
+    .fl-table th, .fl-table td { border: 1px solid var(--border-light); padding: 8px 10px; text-align: left; vertical-align: middle; }
+    .fl-table th { background: var(--accent); color: white; font-weight: bold; white-space: nowrap; }
+    .fl-table tr:nth-child(even) { background: var(--bg-table-stripe); }
+    .fl-table input, .fl-table select { width: 100%; padding: 5px 7px; border: 1px solid var(--border-input); font-size: 0.9em; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); min-width: 70px; }
+    .add-row-btn { background: #16a34a; color: white; border: none; padding: 8px 22px; font-size: 0.95em; cursor: pointer; margin-top: 8px; border-radius: 4px; }
+    .add-row-btn:hover { background: #15803d; }
+    .remove-btn { background: #dc2626; color: white; border: none; padding: 4px 12px; cursor: pointer; font-size: 0.85em; border-radius: 3px; white-space: nowrap; }
+    .remove-btn:hover { background: #b91c1c; }
+    .pass { color: #16a34a; font-weight: bold; }
+    .fail { color: #dc2626; font-weight: bold; }
+    .msb-highlight { background: rgba(59,130,246,0.08) !important; font-weight: bold; }
+    .input-hint { font-size: 0.8em; color: var(--text-secondary); display: block; margin-top: 3px; }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    @media print {
+      .top-tabs, .calc-button, .add-row-btn, .remove-btn, .no-print { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -27,18 +30,22 @@
 
   <div class="main-content">
     <h1>Fault Level Calculator</h1>
-    <p>Calculate prospective fault currents from supply transformer through to downstream sub-circuits per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.5.4">cl. 2.5.4&ndash;2.5.5</a></strong> and <strong>IEC 60909</strong> simplified method.</p>
+    <p>Calculate prospective short-circuit fault currents from the supply transformer through to downstream distribution boards.
+       Protective device selection per <strong>AS/NZS 3000:2018 cl.&nbsp;2.5.4&ndash;2.5.5</strong>; impedance method per <strong>IEC&nbsp;60909</strong>.</p>
 
+    <!-- ===== SUPPLY & TRANSFORMER ===== -->
     <div class="calc-section">
-      <h2>Supply / Transformer Data</h2>
+      <h2>Supply &amp; Transformer Data</h2>
       <div class="info-box">
-        <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.5.4">cl. 2.5.4</a>:</strong> Protective devices shall have a rated short-circuit capacity not less than the prospective fault current at the point of installation.
+        <strong>AS/NZS 3000:2018 cl.&nbsp;2.5.4:</strong> Protective devices must have a rated short-circuit capacity not less than the prospective fault current at the point of installation.
       </div>
+
       <div class="input-row three">
         <div class="input-group">
           <label for="txKVA">Transformer Rating (kVA)</label>
-          <select id="txKVA">
+          <select id="txKVA" onchange="toggleCustomKVA()">
             <option value="100">100 kVA</option>
+            <option value="160">160 kVA</option>
             <option value="200">200 kVA</option>
             <option value="315">315 kVA</option>
             <option value="500" selected>500 kVA</option>
@@ -47,272 +54,459 @@
             <option value="1500">1500 kVA</option>
             <option value="2000">2000 kVA</option>
             <option value="2500">2500 kVA</option>
-            <option value="custom">Custom&#8230;</option>
+            <option value="custom">Custom&hellip;</option>
           </select>
         </div>
-        <div class="input-group">
-          <label for="txKVAcustom">Custom kVA (if selected)</label>
-          <input type="number" id="txKVAcustom" value="500" min="10" step="1" />
+        <div class="input-group" id="customKVAGroup" style="display:none;">
+          <label for="txKVAcustom">Custom kVA</label>
+          <input type="number" id="txKVAcustom" value="500" min="1" step="1" />
         </div>
         <div class="input-group">
           <label for="txImpedance">TX Impedance (%Z)</label>
-          <input type="number" id="txImpedance" value="5" min="1" max="15" step="0.1" />
+          <input type="number" id="txImpedance" value="5" min="0.5" max="20" step="0.1" />
+          <span class="input-hint">Typical 4%&ndash;6%; obtain from transformer nameplate.</span>
+        </div>
+        <div class="input-group">
+          <label for="txXR">TX Winding X/R Ratio</label>
+          <input type="number" id="txXR" value="4" min="0.5" max="30" step="0.5" />
+          <span class="input-hint">Typical LV distribution TX: 3&ndash;6. Use 4 if unknown.</span>
         </div>
       </div>
+
       <div class="input-row three">
         <div class="input-group">
-          <label for="supplyVoltage">Secondary Voltage (V L-L)</label>
+          <label for="supplyVoltage">TX Secondary Voltage (V L-L)</label>
           <select id="supplyVoltage">
             <option value="400" selected>400 V</option>
             <option value="415">415 V</option>
             <option value="433">433 V</option>
-            <option value="230">230 V (1-phase)</option>
           </select>
         </div>
         <div class="input-group">
-          <label for="supplyPhases">Supply Phases</label>
-          <select id="supplyPhases">
-            <option value="3" selected>Three Phase</option>
-            <option value="1">Single Phase</option>
-          </select>
+          <label for="upstreamMVA">HV Network Fault Level (MVA)</label>
+          <input type="number" id="upstreamMVA" value="150" min="10" step="10" />
+          <span class="input-hint">Request from network provider. Use 150&nbsp;MVA if unknown.</span>
         </div>
         <div class="input-group">
-          <label for="upstreamFault">Upstream Fault Level (MVA)</label>
-          <input type="number" id="upstreamFault" value="150" min="10" step="1" />
-          <span style="font-size:0.8em;color:var(--text-secondary);">HV network &mdash; use 150 MVA if unknown</span>
+          <label for="netXR">HV Network X/R Ratio</label>
+          <input type="number" id="netXR" value="10" min="1" max="50" step="1" />
+          <span class="input-hint">Typical: 10&ndash;15. Use 10 if unknown.</span>
         </div>
       </div>
 
-      <div id="txResult" class="result-box" style="display:none;">
-        <h3>Transformer Secondary Fault Level</h3>
+      <div class="btn-row">
+        <button class="calc-button" onclick="calculate()">&#9654; Calculate Fault Levels</button>
+        <button class="calc-button green no-print" onclick="exportFaultResult()">&#128190; Export CSV</button>
+      </div>
+
+      <div id="msbResult" class="result-box" style="display:none; margin-top:16px;">
+        <h3>Results at Transformer Secondary (MSB)</h3>
         <div class="result-grid">
           <div class="result-item">
-            <div class="result-label">3-Phase Fault (kA sym)</div>
-            <div class="result-value" id="txFault3ph">&mdash;</div>
+            <div class="result-label">Source Z<sub>src</sub> (m&Omega;)</div>
+            <div class="result-value" id="resSrcZ">&mdash;</div>
           </div>
           <div class="result-item">
-            <div class="result-label">1-Phase-to-Earth Fault (kA)</div>
-            <div class="result-value" id="txFault1ph">&mdash;</div>
+            <div class="result-label">R<sub>src</sub> (m&Omega;)</div>
+            <div class="result-value" id="resSrcR">&mdash;</div>
           </div>
           <div class="result-item">
-            <div class="result-label">TX Full Load Current (A)</div>
-            <div class="result-value" id="txFLC">&mdash;</div>
+            <div class="result-label">X<sub>src</sub> (m&Omega;)</div>
+            <div class="result-value" id="resSrcX">&mdash;</div>
           </div>
           <div class="result-item">
-            <div class="result-label">TX Secondary Z (m&#937;)</div>
-            <div class="result-value" id="txZmOhm">&mdash;</div>
+            <div class="result-label">I<sub>sc</sub> 3&phi; Symmetrical (kA rms)</div>
+            <div class="result-value" id="resI3ph">&mdash;</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">I<sub>p</sub> 3&phi; Peak (kA)</div>
+            <div class="result-value" id="resIpeak">&mdash;</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Peak Factor &kappa;</div>
+            <div class="result-value" id="resKappa">&mdash;</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">TX Full-Load Current (A)</div>
+            <div class="result-value" id="resFLC">&mdash;</div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- ===== DOWNSTREAM CABLE NODES ===== -->
     <div class="calc-section">
       <h2>Downstream Cable Nodes</h2>
       <div class="info-box">
-        Add cable segments from the transformer secondary (MSB) to downstream distribution boards. The tool calculates cumulative impedance and prospective fault current at each node.
-        Cable impedance data per <strong>AS/NZS 3008.1.1</strong> Tables 30&ndash;42.
+        Add cable runs from the MSB or any previously defined node. Set <strong>From&nbsp;Node</strong> to model radial or branched topologies.
+        <br>Conductor resistance from <strong>AS/NZS&nbsp;3008.1.1</strong> at 75&deg;C. 3&phi; fault uses the phase-conductor path only (one-way); 1&phi;-E fault uses the phase&nbsp;+&nbsp;CPC return loop.
       </div>
-      <table class="node-table" id="nodeTable">
-        <thead>
-          <tr>
-            <th>Node Label</th>
-            <th>Cable Type</th>
-            <th>Size (mm&sup2;)</th>
-            <th>Length (m)</th>
-            <th>Cores / Config</th>
-            <th>Ipsc 3&#966; (kA)</th>
-            <th>Ipsc 1&#966; (kA)</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="nodeBody">
-        </tbody>
-      </table>
-      <button class="add-row-btn" onclick="addNode()">+ Add Cable Node</button>
-      <button class="calc-button" onclick="calculate()" style="margin-top:16px;">Calculate Fault Levels</button>
-      <button class="calc-button green" onclick="exportFaultResult()" style="margin-top:16px;">&#128190; Export CSV</button>
+      <div style="overflow-x:auto;">
+        <table class="fl-table" id="nodeTable">
+          <thead>
+            <tr>
+              <th>Node Label</th>
+              <th>From Node</th>
+              <th>Conductor</th>
+              <th>Phase Size (mm&sup2;)</th>
+              <th>Length (m)</th>
+              <th>Parallel Runs</th>
+              <th>CPC/Earth (mm&sup2;)</th>
+              <th>Device Rating (kA)</th>
+              <th class="no-print"></th>
+            </tr>
+          </thead>
+          <tbody id="nodeBody"></tbody>
+        </table>
+      </div>
+      <button class="add-row-btn no-print" onclick="addNode()">+ Add Cable Node</button>
     </div>
 
+    <!-- ===== RESULTS SUMMARY ===== -->
     <div class="calc-section" id="summarySection" style="display:none;">
       <h2>Fault Level Summary</h2>
-      <table class="node-table" id="summaryTable">
-        <thead>
-          <tr>
-            <th>Node</th>
-            <th>Cumulative Z (m&#937;)</th>
-            <th>Ipsc 3&#966; (kA sym)</th>
-            <th>Ipsc 1&#966;&ndash;E (kA)</th>
-            <th>Device kA Rating Check</th>
-          </tr>
-        </thead>
-        <tbody id="summaryBody"></tbody>
-      </table>
-      <div class="warn-box">
-        <strong>Important:</strong> This is a simplified impedance method calculation. For complex networks, motor infeed contribution, or where arc-flash assessment is required, a full IEC 60909 study using specialist software is recommended. Peak (Ip) values can be estimated using a factor of 1.5&ndash;2.0 &times; Isc (sym) depending on X/R ratio.
+      <div style="overflow-x:auto;">
+        <table class="fl-table" id="summaryTable">
+          <thead>
+            <tr>
+              <th>Node</th>
+              <th>R<sub>cum</sub> (m&Omega;)</th>
+              <th>X<sub>cum</sub> (m&Omega;)</th>
+              <th>Z<sub>cum</sub> (m&Omega;)</th>
+              <th>I<sub>sc</sub> 3&phi; sym (kA rms)</th>
+              <th>I<sub>p</sub> 3&phi; peak (kA)</th>
+              <th>I<sub>sc</sub> 1&phi;-E (kA)</th>
+              <th>Device Rating</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="summaryBody"></tbody>
+        </table>
+      </div>
+      <div class="warn-box" style="margin-top:12px;">
+        <strong>Notes:</strong>
+        <ul style="margin:6px 0 0 18px; padding:0;">
+          <li>3&phi; symmetrical fault: I<sub>sc</sub> = V<sub>LL</sub>&nbsp;/&nbsp;(&#8730;3&nbsp;&times;&nbsp;Z<sub>cum</sub>), where Z<sub>cum</sub> accumulates source&nbsp;+ phase-conductor impedances (one-way, positive-sequence).</li>
+          <li>1&phi;-E fault: I<sub>sc</sub> = V<sub>LN</sub>&nbsp;/&nbsp;Z<sub>loop</sub>, where Z<sub>loop</sub> = source&nbsp;+ phase conductor&nbsp;+ CPC/earth conductor (one-way each). Assumes TN earthing system.</li>
+          <li>Peak factor &kappa; = 1.02 + 0.98 &times; e<sup>&minus;3R/X</sup> per IEC&nbsp;60909. Computed from cumulative R/X at each node.</li>
+          <li>Device Status checks I<sub>sc</sub> 3&phi; sym against the specified kA breaking rating.</li>
+          <li>Results are indicative. Motor infeed, arc-flash, and IEC&nbsp;60909 voltage-factor c adjustments require specialist software.</li>
+        </ul>
       </div>
     </div>
   </div>
 
   <script>
-    // Cable impedance data (m&#937;/m per conductor) &mdash; simplified from AS/NZS 3008.1.1 Tables
-    // Format: { size: [R at 75&deg;C (m&#937;/m), X (m&#937;/m)] } for Cu XLPE/PVC single-core
-    const cableData = {
-      '1.5':   [14.50, 0.110],
-      '2.5':   [8.70,  0.105],
-      '4':     [5.43,  0.100],
-      '6':     [3.62,  0.095],
-      '10':    [2.17,  0.090],
-      '16':    [1.36,  0.085],
-      '25':    [0.868, 0.082],
-      '35':    [0.628, 0.080],
-      '50':    [0.464, 0.078],
-      '70':    [0.321, 0.075],
-      '95':    [0.236, 0.073],
-      '120':   [0.188, 0.072],
-      '150':   [0.153, 0.071],
-      '185':   [0.123, 0.070],
-      '240':   [0.0943,0.069],
-      '300':   [0.0767,0.068],
-      '400':   [0.0601,0.067],
-      '500':   [0.0483,0.066],
-      '630':   [0.0391,0.065]
+    // ── Cable impedance data ─────────────────────────────────────────────────
+    // { 'size_mm2': [R_Cu_XLPE (mΩ/m at 75°C), X (mΩ/m)] }
+    // Source: AS/NZS 3008.1.1. Al resistance = Cu × 1.64 (conductivity ratio).
+    const CABLE = {
+      '1.5':  [14.48, 0.110],
+      '2.5':  [ 8.87, 0.107],
+      '4':    [ 5.52, 0.100],
+      '6':    [ 3.68, 0.096],
+      '10':   [ 2.21, 0.090],
+      '16':   [ 1.38, 0.086],
+      '25':   [ 0.882,0.083],
+      '35':   [ 0.632,0.081],
+      '50':   [ 0.465,0.079],
+      '70':   [ 0.322,0.076],
+      '95':   [ 0.237,0.074],
+      '120':  [ 0.188,0.073],
+      '150':  [ 0.153,0.072],
+      '185':  [ 0.124,0.071],
+      '240':  [ 0.0941,0.070],
+      '300':  [ 0.0762,0.069],
+      '400':  [ 0.0602,0.068],
+      '500':  [ 0.0482,0.067],
+      '630':  [ 0.0387,0.066]
     };
+    const SIZES = Object.keys(CABLE);
+    const AL_FACTOR = 1.64;
 
-    const cableSizes = Object.keys(cableData);
-    let nodeCount = 0;
+    // Returns [R (mΩ/m), X (mΩ/m)] adjusted for conductor material
+    function cableRX(size, material) {
+      const base = CABLE[size] || [0.1, 0.1];
+      const r = (material === 'al_xlpe' || material === 'al_pvc') ? base[0] * AL_FACTOR : base[0];
+      return [r, base[1]];
+    }
 
-    function addNode() {
-      nodeCount++;
-      const tbody = document.getElementById('nodeBody');
+    // ── Row management ────────────────────────────────────────────────────────
+    let rowCount = 0;
+
+    function sizeOptions(selected) {
+      return SIZES.map(s => `<option value="${s}"${s === selected ? ' selected' : ''}>${s}&nbsp;mm&sup2;</option>`).join('');
+    }
+    function earthSizeOptions() {
+      return '<option value="same">Same as phase</option>' +
+             SIZES.map(s => `<option value="${s}">${s}&nbsp;mm&sup2;</option>`).join('');
+    }
+
+    function refreshFromDropdowns() {
+      const labels = ['MSB'];
+      document.querySelectorAll('#nodeBody .label-input').forEach(inp => {
+        const v = inp.value.trim();
+        if (v) labels.push(v);
+      });
+      document.querySelectorAll('#nodeBody .from-select').forEach(sel => {
+        const cur = sel.value;
+        sel.innerHTML = labels.map(l => `<option value="${l}"${l === cur ? ' selected' : ''}>${l}</option>`).join('');
+        if (!labels.includes(cur)) sel.value = 'MSB';
+      });
+    }
+
+    function addNode(fromLabel) {
+      rowCount++;
+      const label = 'DB-' + rowCount;
       const tr = document.createElement('tr');
-      tr.id = 'node-' + nodeCount;
-      const sizeOpts = cableSizes.map(s => `<option value="${s}" ${s==='95'?'selected':''}>${s} mm&sup2;</option>`).join('');
+      tr.dataset.rowid = rowCount;
       tr.innerHTML = `
-        <td><input type="text" value="DB-${nodeCount}" /></td>
-        <td><select><option value="cu_xlpe" selected>Cu XLPE</option><option value="cu_pvc">Cu PVC</option><option value="al_xlpe">Al XLPE</option></select></td>
-        <td><select>${sizeOpts}</select></td>
-        <td><input type="number" value="30" min="1" step="1" /></td>
-        <td><select><option value="1" selected>Single per phase</option><option value="2">2 parallel</option><option value="3">3 parallel</option><option value="4">4 parallel</option></select></td>
-        <td class="fault3ph" style="font-weight:bold;">&mdash;</td>
-        <td class="fault1ph" style="font-weight:bold;">&mdash;</td>
-        <td><button class="remove-btn" onclick="this.closest('tr').remove()">&#10005;</button></td>
+        <td><input type="text" class="label-input" value="${label}" oninput="refreshFromDropdowns()" style="min-width:75px;" /></td>
+        <td><select class="from-select" style="min-width:75px;"></select></td>
+        <td>
+          <select class="cond-select" style="min-width:90px;">
+            <option value="cu_xlpe" selected>Cu XLPE</option>
+            <option value="cu_pvc">Cu PVC</option>
+            <option value="al_xlpe">Al XLPE</option>
+            <option value="al_pvc">Al PVC</option>
+          </select>
+        </td>
+        <td><select class="phase-size" style="min-width:80px;">${sizeOptions('95')}</select></td>
+        <td><input type="number" class="length-input" value="30" min="1" step="1" style="min-width:65px;" /></td>
+        <td>
+          <select class="parallel-select" style="min-width:55px;">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </td>
+        <td><select class="earth-size" style="min-width:80px;">${earthSizeOptions()}</select></td>
+        <td><input type="number" class="device-ka" value="10" min="0.1" step="0.1" style="min-width:65px;" /></td>
+        <td class="no-print"><button class="remove-btn" onclick="removeNode(this)">&#10005;</button></td>
       `;
-      tbody.appendChild(tr);
+      document.getElementById('nodeBody').appendChild(tr);
+      refreshFromDropdowns();
+      if (fromLabel) tr.querySelector('.from-select').value = fromLabel;
     }
 
+    function removeNode(btn) {
+      btn.closest('tr').remove();
+      refreshFromDropdowns();
+    }
+
+    function toggleCustomKVA() {
+      document.getElementById('customKVAGroup').style.display =
+        document.getElementById('txKVA').value === 'custom' ? '' : 'none';
+    }
     function getTxKVA() {
-      const sel = document.getElementById('txKVA').value;
-      return sel === 'custom' ? parseFloat(document.getElementById('txKVAcustom').value) : parseFloat(sel);
+      const v = document.getElementById('txKVA').value;
+      return v === 'custom' ? parseFloat(document.getElementById('txKVAcustom').value) : parseFloat(v);
     }
 
-    function exportFaultResult() {
-      var tx = document.getElementById('txResult');
-      var sum = document.getElementById('summarySection');
-      if ((!tx || tx.style.display === 'none') && (!sum || sum.style.display === 'none')) { OmniToast.show('Calculate first', 'warn'); return; }
-      var rows = [];
-      rows.push(['Parameter', 'Value']);
-      rows.push(['3-Phase Fault (kA sym)', document.getElementById('txFault3ph').textContent]);
-      rows.push(['1-Phase-to-Earth Fault (kA)', document.getElementById('txFault1ph').textContent]);
-      rows.push(['TX Full Load Current (A)', document.getElementById('txFLC').textContent]);
-      rows.push(['TX Secondary Z (mohm)', document.getElementById('txZmOhm').textContent]);
-      var st = document.getElementById('summaryTable');
-      if (st) {
-        rows.push([]);
-        st.querySelectorAll('tr').forEach(function(tr) {
-          var cells = [];
-          tr.querySelectorAll('th, td').forEach(function(td) { cells.push(td.textContent.trim()); });
-          if (cells.length) rows.push(cells);
-        });
-      }
-      OmniExport.toCSV(rows[0], rows.slice(1), 'fault-level');
-    }
-
+    // ── Calculation ───────────────────────────────────────────────────────────
     function calculate() {
-      const kva = getTxKVA();
-      const zPct = parseFloat(document.getElementById('txImpedance').value);
-      const vLL = parseFloat(document.getElementById('supplyVoltage').value);
-      const phases = parseInt(document.getElementById('supplyPhases').value);
-      const upMVA = parseFloat(document.getElementById('upstreamFault').value);
+      const kVA   = getTxKVA();
+      const zPct  = parseFloat(document.getElementById('txImpedance').value);
+      const txXR  = parseFloat(document.getElementById('txXR').value);
+      const vLL   = parseFloat(document.getElementById('supplyVoltage').value);
+      const upMVA = parseFloat(document.getElementById('upstreamMVA').value);
+      const netXR = parseFloat(document.getElementById('netXR').value);
 
-      const vLN = phases === 3 ? vLL / Math.sqrt(3) : vLL;
+      if (!kVA || kVA <= 0 || !zPct || !vLL || !upMVA) {
+        OmniToast.show('Check supply inputs — all fields are required.', 'warn');
+        return;
+      }
 
-      // TX impedance (m&#937;) referred to secondary
-      const txZ = (zPct / 100) * (vLL * vLL) / (kva) ; // &#937;
-      const txZmOhm = txZ * 1000; // m&#937;
+      const vLN = vLL / Math.sqrt(3);
 
-      // Upstream (HV network) impedance referred to secondary
-      const upZ = (vLL * vLL) / (upMVA * 1000) * 1000; // m&#937;
+      // Transformer impedance (Ω):  Z = (%Z/100) × V_LL² / S_VA
+      const Z_tx = (zPct / 100) * (vLL * vLL) / (kVA * 1000);
+      const R_tx = Z_tx / Math.sqrt(1 + txXR * txXR);
+      const X_tx = txXR * R_tx;
 
-      // Total source impedance
-      const sourceZ = txZmOhm + upZ;
+      // Upstream HV network impedance referred to LV (Ω):  Z = V_LL² / S_sc_VA
+      const Z_net = (vLL * vLL) / (upMVA * 1e6);
+      const R_net = Z_net / Math.sqrt(1 + netXR * netXR);
+      const X_net = netXR * R_net;
 
-      // 3-phase fault at TX secondary: I = V / (&#8730;3 &times; Z)
-      const txI3ph = (vLL * 1000) / (Math.sqrt(3) * sourceZ);
-      // 1-phase fault (simplified): I &#8776; V_LN / (Z_source &times; 2/3) &mdash; conservative
-      const txI1ph = (vLN * 1000) / (sourceZ * 0.667 + sourceZ * 0.5);
+      // Combined source at MSB
+      const R_src = R_tx + R_net;
+      const X_src = X_tx + X_net;
+      const Z_src = Math.sqrt(R_src * R_src + X_src * X_src);
 
-      const flc = phases === 3 ? (kva * 1000) / (Math.sqrt(3) * vLL) : (kva * 1000) / vLL;
+      // 3-phase symmetrical fault (A rms):  I = V_LL / (√3 × Z_src)
+      const I3ph_msb = vLL / (Math.sqrt(3) * Z_src);
 
-      document.getElementById('txFault3ph').textContent = (txI3ph / 1000).toFixed(2);
-      document.getElementById('txFault1ph').textContent = (txI1ph / 1000).toFixed(2);
-      document.getElementById('txFLC').textContent = flc.toFixed(1);
-      document.getElementById('txZmOhm').textContent = sourceZ.toFixed(2);
-      document.getElementById('txResult').style.display = 'block';
+      // Peak factor κ (IEC 60909 eq. 29)
+      const kappa_msb = kappaFactor(R_src, X_src);
+      const Ipeak_msb = kappa_msb * Math.sqrt(2) * I3ph_msb;
 
-      // Calculate downstream nodes
-      const rows = document.getElementById('nodeBody').querySelectorAll('tr');
+      // TX full-load current (A)
+      const FLC = (kVA * 1000) / (Math.sqrt(3) * vLL);
+
+      document.getElementById('resSrcZ').textContent  = fmt3(Z_src * 1000);
+      document.getElementById('resSrcR').textContent  = fmt3(R_src * 1000);
+      document.getElementById('resSrcX').textContent  = fmt3(X_src * 1000);
+      document.getElementById('resI3ph').textContent  = fmt3(I3ph_msb / 1000);
+      document.getElementById('resIpeak').textContent = fmt3(Ipeak_msb / 1000);
+      document.getElementById('resKappa').textContent = fmt3(kappa_msb);
+      document.getElementById('resFLC').textContent   = FLC.toFixed(1);
+      document.getElementById('msbResult').style.display = 'block';
+
+      // ── Downstream nodes ────────────────────────────────────────────────────
+      // cumNode[label] = { R3, X3 } — 3-phase path (phase conductor only, one-way)
+      //                  { R1, X1 } — earth-fault loop (phase + CPC, one-way each)
+      const cumNode = {
+        MSB: { R3: R_src, X3: X_src, R1: R_src, X1: X_src }
+      };
+
       const summaryBody = document.getElementById('summaryBody');
       summaryBody.innerHTML = '';
 
-      // Add TX secondary row
-      let sr = document.createElement('tr');
-      sr.innerHTML = `<td><strong>TX Secondary / MSB</strong></td><td>${sourceZ.toFixed(2)}</td><td><strong>${(txI3ph/1000).toFixed(2)}</strong></td><td><strong>${(txI1ph/1000).toFixed(2)}</strong></td><td>&mdash;</td>`;
-      summaryBody.appendChild(sr);
+      // MSB row in summary table
+      const msbRow = document.createElement('tr');
+      msbRow.className = 'msb-highlight';
+      msbRow.innerHTML = `
+        <td>TX Secondary&nbsp;/ MSB</td>
+        <td>${fmt2(R_src * 1000)}</td>
+        <td>${fmt2(X_src * 1000)}</td>
+        <td>${fmt2(Z_src * 1000)}</td>
+        <td>${fmt3(I3ph_msb / 1000)}</td>
+        <td>${fmt3(Ipeak_msb / 1000)}</td>
+        <td>&mdash;</td>
+        <td>&mdash;</td>
+        <td>&mdash;</td>
+      `;
+      summaryBody.appendChild(msbRow);
 
-      let cumZ = sourceZ;
-      rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const label = cells[0].querySelector('input').value;
-        const cableType = cells[1].querySelector('select').value;
-        const size = cells[2].querySelector('select').value;
-        const length = parseFloat(cells[3].querySelector('input').value) || 0;
-        const parallel = parseInt(cells[4].querySelector('select').value) || 1;
+      // Topological resolution — process rows whose parent is already resolved
+      let pending = [...document.querySelectorAll('#nodeBody tr')];
+      let maxPass = pending.length + 1;
 
-        let [r, x] = cableData[size] || [1, 0.1];
-        // Adjust for Al (1.6&times; resistance) or PVC temperature
-        if (cableType === 'al_xlpe') r *= 1.6;
-        if (cableType === 'cu_pvc') r *= 1.1;
+      while (pending.length > 0 && maxPass-- > 0) {
+        let progress = false;
+        const nextPending = [];
 
-        // Impedance for this segment (both active + neutral return)
-        const segR = (r * length * 2) / parallel; // m&#937; &mdash; go + return
-        const segX = (x * length * 2) / parallel;
-        const segZ = Math.sqrt(segR * segR + segX * segX);
+        for (const row of pending) {
+          const fromLabel = row.querySelector('.from-select').value;
+          if (!(fromLabel in cumNode)) { nextPending.push(row); continue; }
 
-        cumZ += segZ;
+          const label    = row.querySelector('.label-input').value.trim() || ('Node-' + row.dataset.rowid);
+          const material = row.querySelector('.cond-select').value;
+          const phSize   = row.querySelector('.phase-size').value;
+          const length   = Math.max(0, parseFloat(row.querySelector('.length-input').value) || 0);
+          const parallel = parseInt(row.querySelector('.parallel-select').value) || 1;
+          const earthSel = row.querySelector('.earth-size').value;
+          const devKA    = parseFloat(row.querySelector('.device-ka').value) || 0;
 
-        const i3ph = (vLL * 1000) / (Math.sqrt(3) * cumZ);
-        const i1ph = (vLN * 1000) / (cumZ * 0.667 + cumZ * 0.5);
+          // Phase conductor (Ω, one-way, per-phase divided by parallel runs)
+          const [r_ph, x_ph] = cableRX(phSize, material);
+          const R_ph = (r_ph / 1000) * length / parallel;
+          const X_ph = (x_ph / 1000) * length / parallel;
 
-        cells[5].textContent = (i3ph / 1000).toFixed(2);
-        cells[6].textContent = (i1ph / 1000).toFixed(2);
+          // CPC/Earth conductor (Ω, one-way, single run — CPCs are not paralleled)
+          const eSize      = earthSel === 'same' ? phSize : earthSel;
+          const [r_e, x_e] = cableRX(eSize, material);
+          const R_cpc = (r_e / 1000) * length;
+          const X_cpc = (x_e / 1000) * length;
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${label}</td>
-          <td>${cumZ.toFixed(2)}</td>
-          <td><strong>${(i3ph/1000).toFixed(2)}</strong></td>
-          <td><strong>${(i1ph/1000).toFixed(2)}</strong></td>
-          <td><span class="${(i3ph/1000) > 25 ? 'fail' : 'pass'}">${(i3ph/1000) > 25 ? '&#9888; >25kA &mdash; verify device rating' : '&#10003; &#8804;25kA typical rating OK'}</span></td>
-        `;
-        summaryBody.appendChild(tr);
-      });
+          const parent = cumNode[fromLabel];
+
+          // 3-phase cumulative (positive-sequence: phase conductor only)
+          const R3 = parent.R3 + R_ph;
+          const X3 = parent.X3 + X_ph;
+          const Z3 = Math.sqrt(R3 * R3 + X3 * X3);
+
+          // Earth-fault loop cumulative (phase + CPC)
+          const R1 = parent.R1 + R_ph + R_cpc;
+          const X1 = parent.X1 + X_ph + X_cpc;
+          const Z1 = Math.sqrt(R1 * R1 + X1 * X1);
+
+          // Fault currents
+          const I3ph    = vLL / (Math.sqrt(3) * Z3);         // A sym rms
+          const kappa3  = kappaFactor(R3, X3);
+          const Ipeak3  = kappa3 * Math.sqrt(2) * I3ph;      // A peak
+          const I1ph    = vLN / Z1;                           // A earth fault
+
+          cumNode[label] = { R3, X3, R1, X1 };
+
+          // Device status
+          const I3phKA = I3ph / 1000;
+          let statusHtml = '&mdash;';
+          if (devKA > 0) {
+            statusHtml = (I3phKA <= devKA)
+              ? `<span class="pass">&#10003; PASS</span>`
+              : `<span class="fail">&#9888; FAIL &mdash; ${fmt2(I3phKA)}&nbsp;kA exceeds ${devKA}&nbsp;kA rated</span>`;
+          }
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${label}</td>
+            <td>${fmt2(R3 * 1000)}</td>
+            <td>${fmt2(X3 * 1000)}</td>
+            <td>${fmt2(Z3 * 1000)}</td>
+            <td><strong>${fmt3(I3ph / 1000)}</strong></td>
+            <td><strong>${fmt3(Ipeak3 / 1000)}</strong></td>
+            <td>${fmt3(I1ph / 1000)}</td>
+            <td>${devKA > 0 ? devKA + '&nbsp;kA' : '&mdash;'}</td>
+            <td>${statusHtml}</td>
+          `;
+          summaryBody.appendChild(tr);
+          progress = true;
+        }
+
+        pending = nextPending;
+        if (!progress) break;
+      }
+
+      if (pending.length > 0) {
+        OmniToast.show(
+          pending.length + ' node(s) could not be resolved — check "From Node" for unknown labels or circular references.',
+          'warn'
+        );
+      }
 
       document.getElementById('summarySection').style.display = 'block';
     }
 
-    // Initialise with 2 nodes
-    addNode();
-    addNode();
+    // Peak factor κ per IEC 60909 Equation 29:  κ = 1.02 + 0.98 × e^(−3 R/X)
+    function kappaFactor(R, X) {
+      if (X < 1e-12) return 1.02;
+      return 1.02 + 0.98 * Math.exp(-3 * (R / X));
+    }
+
+    function fmt2(v) { return isFinite(v) ? v.toFixed(2) : '—'; }
+    function fmt3(v) { return isFinite(v) ? v.toFixed(3) : '—'; }
+
+    // ── Export ────────────────────────────────────────────────────────────────
+    function exportFaultResult() {
+      if (document.getElementById('msbResult').style.display === 'none') {
+        OmniToast.show('Calculate first.', 'warn');
+        return;
+      }
+      const hdr = ['Node', 'R_cum (mΩ)', 'X_cum (mΩ)', 'Z_cum (mΩ)',
+                   'Isc 3ph sym (kA rms)', 'Ip 3ph peak (kA)', 'Isc 1ph-E (kA)',
+                   'Device Rating (kA)', 'Status'];
+      const rows = [['TX Secondary / MSB',
+        document.getElementById('resSrcR').textContent,
+        document.getElementById('resSrcX').textContent,
+        document.getElementById('resSrcZ').textContent,
+        document.getElementById('resI3ph').textContent,
+        document.getElementById('resIpeak').textContent,
+        '—', '—', '—']];
+      document.querySelectorAll('#summaryTable tbody tr').forEach(tr => {
+        if (tr.classList.contains('msb-highlight')) return;
+        const cells = [...tr.querySelectorAll('td')].map(td => td.textContent.trim());
+        if (cells.length) rows.push(cells);
+      });
+      OmniExport.toCSV(hdr, rows, 'fault-level');
+    }
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    addNode('MSB');   // DB-1 from MSB
+    addNode('DB-1');  // DB-2 from DB-1 (demonstrates branching)
   </script>
-  <script src="omni-utils.js"></script></body>
+  <script src="omni-utils.js"></script>
+</body>
 </html>

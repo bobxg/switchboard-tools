@@ -10,6 +10,7 @@ const OmniNav = {
   structure: [
     { label: 'Home', href: 'index.html' },
     { label: 'Switchboard Sizer', href: 'switchboard.html' },
+    { label: 'Meter Panel Sizer', href: 'meterpanel.html' },
     { label: 'Switchroom Sizer', href: 'switchroom.html' },
     { label: 'Cable Tray Sizer', href: 'cabletraysizing.html' },
     { label: 'Lighting Search', href: 'lightingsearch.html' },
@@ -55,6 +56,7 @@ const OmniNav = {
       { label: 'AS3000 Tips', href: 'as3000tips.html' }
     ]},
     { label: 'AS/NZS 3000', href: 'as3000viewer.html' },
+    { label: 'NSW IR', href: 'nswirviewer.html' },
     { label: 'Verification', href: 'qa.html' }
   ],
 
@@ -169,9 +171,9 @@ const OmniStore = {
       const bar = document.createElement('div');
       bar.className = 'omni-action-bar';
       bar.innerHTML = `
-        <button class="omni-btn omni-btn-save" onclick="OmniStore.saveCurrentForm()" title="Save to browser (Ctrl+S)">💾 Save</button>
-        <button class="omni-btn omni-btn-load" onclick="OmniStore.loadCurrentForm()" title="Load saved data">📂 Load</button>
-        <button class="omni-btn omni-btn-clear" onclick="if(confirm('Clear saved data?')) OmniStore.clear()" title="Clear saved data">🗑️ Clear</button>
+        <button class="omni-btn omni-btn-save" onclick="OmniStore.saveCurrentForm()" title="Save to browser (Ctrl+S)">Save</button>
+        <button class="omni-btn omni-btn-load" onclick="OmniStore.loadCurrentForm()" title="Load saved data">Load</button>
+        <button class="omni-btn omni-btn-clear" onclick="if(confirm('Clear saved data?')) OmniStore.clear()" title="Clear saved data">Clear</button>
       `;
       firstSection.parentNode.insertBefore(bar, firstSection);
     }
@@ -419,7 +421,7 @@ const OmniPrint = {
     if (existing) return;
     const btn = document.createElement('button');
     btn.className = 'omni-btn omni-print-btn';
-    btn.innerHTML = '🖨️ Print';
+    btn.innerHTML = 'Print';
     btn.title = 'Print this page (Ctrl+P)';
     btn.addEventListener('click', () => window.print());
     const bar = target.closest('.main-content, .calculator-container')?.querySelector('.omni-action-bar');

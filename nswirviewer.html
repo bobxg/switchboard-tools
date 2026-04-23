@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NSW Installation Rules Viewer - OMNI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { margin: 0; overflow: hidden; }
+    .viewer-wrap { display: flex; height: calc(100vh - 51px); }
+
+    .as-sidebar {
+      width: 300px; min-width: 180px;
+      background: var(--bg-input);
+      border-right: 2px solid var(--border-light);
+      display: flex; flex-direction: column;
+      overflow: hidden; resize: horizontal;
+    }
+    .as-sidebar-header {
+      padding: 12px 14px 8px; background: var(--bg-table-header); flex-shrink: 0;
+    }
+    .as-sidebar-header h2 { margin: 0 0 2px; font-size: 1.0em; color: #fff; }
+    .as-sidebar-header p  { margin: 0 0 8px; font-size: 0.75em; color: rgba(255,255,255,0.6); }
+    #tocSearch {
+      width: 100%; box-sizing: border-box; padding: 6px 10px;
+      border: 1px solid var(--accent-light); border-radius: 4px;
+      font-size: 0.92em; background: var(--bg-input); color: var(--text-primary); outline: none;
+    }
+    #tocSearch:focus { border-color: var(--accent); }
+
+    .toc-tree { flex: 1; overflow-y: auto; padding: 4px 0 16px; }
+    .toc-tree::-webkit-scrollbar { width: 6px; }
+    .toc-tree::-webkit-scrollbar-thumb { background: var(--text-secondary); border-radius: 3px; }
+
+    .toc-section { margin: 0; }
+    .toc-section-title {
+      font-weight: bold; font-size: 0.84em; padding: 7px 10px 4px;
+      color: var(--text-heading); cursor: pointer;
+      display: flex; align-items: flex-start; gap: 5px;
+      user-select: none; background: none; border: none;
+      width: 100%; text-align: left; font-family: inherit; line-height: 1.35;
+    }
+    .toc-section-title:hover { background: var(--bg-info); }
+    .toc-section-title .arrow {
+      display: inline-block; transition: transform 0.18s;
+      font-size: 0.75em; flex-shrink: 0; margin-top: 2px;
+    }
+    .toc-section-title.collapsed .arrow { transform: rotate(-90deg); }
+
+    .toc-clauses { list-style: none; margin: 0; padding: 0 0 4px 12px; }
+    .toc-clauses.hidden { display: none; }
+
+    .cl-row {
+      display: flex; align-items: center; gap: 3px;
+      padding: 1px 4px 1px 2px; border-radius: 3px;
+    }
+    .cl-row:hover { background: var(--bg-info); }
+    .cl-row.active { background: var(--accent); }
+    .cl-row.active .cl-btn   { color: #fff; }
+    .cl-row.active .cl-badge { color: rgba(255,255,255,0.75); border-color: rgba(255,255,255,0.35); }
+
+    .cl-btn {
+      flex: 1; text-align: left; font-family: inherit; font-size: 0.83em;
+      color: var(--accent); background: none; border: none;
+      cursor: pointer; padding: 3px 4px; line-height: 1.4;
+    }
+    .cl-badge {
+      font-size: 0.7em; min-width: 28px; text-align: center;
+      padding: 1px 4px; border-radius: 3px; flex-shrink: 0;
+      color: var(--text-secondary); border: 1px dashed var(--border-input);
+      cursor: pointer; white-space: nowrap;
+    }
+    .cl-badge.exact { border-style: solid; border-color: #22c55e; color: #15803d; font-weight: 600; }
+    .cl-badge:hover { border-color: var(--accent); color: var(--accent); }
+    .cl-cal-input {
+      width: 40px; padding: 1px 4px; font-size: 0.8em; text-align: center;
+      border: 1px solid var(--accent); border-radius: 3px;
+      background: var(--bg-input); color: var(--text-primary); outline: none;
+    }
+
+    .as-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .as-toolbar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px; background: var(--bg-input);
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.88em; flex-wrap: wrap; flex-shrink: 0;
+    }
+    .sep      { color: var(--border-input); user-select: none; padding: 0 2px; }
+    .tb-label { color: var(--text-secondary); }
+    .tb-input {
+      padding: 3px 7px; border: 1px solid var(--border-input); border-radius: 4px;
+      background: var(--bg-input); color: var(--text-primary); font-size: 0.92em; outline: none;
+    }
+    .tb-input:focus { border-color: var(--accent); }
+    .tb-btn {
+      padding: 3px 9px; background: var(--bg-table-header); color: #fff;
+      border: none; border-radius: 4px; cursor: pointer; font-size: 0.88em;
+    }
+    .tb-btn:hover { background: var(--accent); }
+    #pageInput  { width: 48px; text-align: center; }
+    #statusMsg  { color: var(--text-secondary); font-style: italic; font-size: 0.83em; }
+    #statusMsg.ok   { color: #15803d; font-style: normal; }
+    #statusMsg.busy { color: var(--accent); font-style: normal; }
+
+    .pdf-wrap { flex: 1; position: relative; }
+    #pdfFrame { width: 100%; height: 100%; border: none; display: block; }
+
+    #toast {
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: #1e293b; color: #fff; padding: 8px 18px;
+      border-radius: 20px; font-size: 0.87em;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s; z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="top-tabs"></div>
+  <div class="viewer-wrap">
+
+    <div class="as-sidebar">
+      <div class="as-sidebar-header">
+        <h2>NSW Service &amp; Installation Rules</h2>
+        <p>November 2018 &mdash; green badges = verified page</p>
+        <input type="text" id="tocSearch" placeholder="Search clauses…" autocomplete="off" />
+      </div>
+      <div class="toc-tree" id="tocTree"></div>
+    </div>
+
+    <div class="as-content">
+      <div class="as-toolbar">
+        <span class="tb-label">Page</span>
+        <input type="number" id="pageInput" class="tb-input" min="1" value="1" />
+        <button id="btnGo" class="tb-btn">Go</button>
+        <span class="sep">|</span>
+        <span class="tb-label" style="font-size:0.82em;">Ctrl+F to search in document</span>
+        <span class="sep">|</span>
+        <span id="statusMsg">Loading…</span>
+      </div>
+      <div class="pdf-wrap">
+        <iframe id="pdfFrame"
+                src="NSWIR/2018_11_NSW_ServiceAndInstallationRulesOfNSW_unmarked.pdf"
+                title="NSW Service and Installation Rules of NSW (2018)"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const PDF_URL = 'NSWIR/2018_11_NSW_ServiceAndInstallationRulesOfNSW_unmarked.pdf';
+    const LS_KEY  = 'nswir-pages-v2';
+
+    const frame     = document.getElementById('pdfFrame');
+    const pageInput = document.getElementById('pageInput');
+    const statusMsg = document.getElementById('statusMsg');
+
+    /* Verified physical PDF page numbers (from document scan). */
+    const EXACT_PAGES = {
+      '1.1':15,  '1.2':15,  '1.3':16,  '1.4':16,  '1.5':16,
+      '1.6':17,  '1.7':17,  '1.8':19,  '1.9':22,
+      '1.10':30, '1.11':32, '1.12':32, '1.13':36, '1.14':37,
+      '1.15':38, '1.16':38, '1.17':41,
+
+      '2.1':46,  '2.2':46,  '2.3':47,  '2.4':47,  '2.5':49,
+      '2.6':53,  '2.7':54,  '2.8':54,  '2.9':57,  '2.10':58,
+
+      '3.1':63,  '3.2':65,  '3.3':66,  '3.4':67,  '3.5':68,
+      '3.6':72,  '3.7':72,  '3.8':79,  '3.9':79,  '3.10':81,
+
+      '4.1':93,  '4.2':93,  '4.3':96,  '4.4':96,  '4.5':97,
+      '4.6':98,  '4.7':98,  '4.8':102, '4.9':102, '4.10':102,
+      '4.11':103,'4.12':104,'4.13':106,'4.14':106,
+      '4.15':107,'4.16':109,'4.17':110,
+
+      '5.1':113, '5.2':113, '5.3':114, '5.4':114, '5.5':114,
+
+      '6.1':123, '6.2':124, '6.3':126, '6.4':127, '6.5':128,
+      '6.6':129, '6.7':130, '6.8':131, '6.9':131,
+
+      '7.1':133, '7.2':133, '7.3':133, '7.4':134,
+
+      '8.1':138, '8.2':138, '8.3':138,
+      '8.4':140, '8.5':141, '8.6':142, '8.7':147
+    };
+
+    let pageMap    = Object.assign({}, EXACT_PAGES);
+    let exactFlags = {};
+
+    const TOC = [
+      { sec:'1', title:'GENERAL REQUIREMENTS', clauses:[
+        {cl:'1.1',  t:'Purpose of these Rules'},
+        {cl:'1.2',  t:'Application'},
+        {cl:'1.3',  t:'Alternative Methods'},
+        {cl:'1.4',  t:'Non-compliance'},
+        {cl:'1.5',  t:'Dispute Resolution'},
+        {cl:'1.6',  t:'Safety and Environmental Risk Management'},
+        {cl:'1.7',  t:'Legislation and Standards'},
+        {cl:'1.8',  t:'NSW Electricity Distributor Areas'},
+        {cl:'1.9',  t:'Definitions'},
+        {cl:'1.10', t:'General'},
+        {cl:'1.11', t:'Electricity Supply'},
+        {cl:'1.12', t:'Provision for Services and Service Equipment'},
+        {cl:'1.13', t:'Payments for Equipment and Services'},
+        {cl:'1.14', t:'Accreditation and Authorisation for Level 2 ASPs'},
+        {cl:'1.15', t:'Notification of Service Work (NOSW)'},
+        {cl:'1.16', t:'Connection and Disconnection of Electrical Installations'},
+        {cl:'1.17', t:'Provision for Customers Installation'}
+      ]},
+      { sec:'2', title:'UNDERGROUND SERVICES', clauses:[
+        {cl:'2.1',  t:'Introduction'},
+        {cl:'2.2',  t:'Service Route'},
+        {cl:'2.3',  t:'Underground Consumers Mains'},
+        {cl:'2.4',  t:'Installation Requirements'},
+        {cl:'2.5',  t:'Conduit Requirements'},
+        {cl:'2.6',  t:'Cable Requirements'},
+        {cl:'2.7',  t:'Connection Point Enclosure'},
+        {cl:'2.8',  t:'Service Cable Connection Requirements'},
+        {cl:'2.9',  t:'Temporary Support in a Permanent Position'},
+        {cl:'2.10', t:'Underground Supply from Overhead System (UGOH)'}
+      ]},
+      { sec:'3', title:'OVERHEAD SERVICES', clauses:[
+        {cl:'3.1',  t:'Introduction'},
+        {cl:'3.2',  t:'Service Route and Point of Attachment'},
+        {cl:'3.3',  t:'Aerial Consumers Mains'},
+        {cl:'3.4',  t:'Cable Requirements'},
+        {cl:'3.5',  t:'Spans, Tensions and Clearances'},
+        {cl:'3.6',  t:'Access to Service and Point of Attachment'},
+        {cl:'3.7',  t:'Facilities to be Provided by the Customer'},
+        {cl:'3.8',  t:'Builders Service'},
+        {cl:'3.9',  t:'Underground Supply from Overhead System (UGOH)'},
+        {cl:'3.10', t:'Minimum Sizes of Posts, Poles and Struts'}
+      ]},
+      { sec:'4', title:'SERVICE EQUIPMENT', clauses:[
+        {cl:'4.1',  t:'Introduction'},
+        {cl:'4.2',  t:'Location and Accessibility of Service Equipment'},
+        {cl:'4.3',  t:'Unsuitable Locations'},
+        {cl:'4.4',  t:'Hazards of Existing Panels Containing Asbestos'},
+        {cl:'4.5',  t:'Facilities for Installation of Service Equipment'},
+        {cl:'4.6',  t:'Locking of Service Enclosures'},
+        {cl:'4.7',  t:'Service Protection and Metering Protection Devices'},
+        {cl:'4.8',  t:'Rewireable Fuses'},
+        {cl:'4.9',  t:'Mounting Provisions for Service Equipment'},
+        {cl:'4.10', t:'Service Neutral Links'},
+        {cl:'4.11', t:'Connections at Service Equipment'},
+        {cl:'4.12', t:'Provision of Isolation of Customer Installations'},
+        {cl:'4.13', t:'Multiple Installations'},
+        {cl:'4.14', t:'Sealing of Service Equipment'},
+        {cl:'4.15', t:'LV Services > 100 A'},
+        {cl:'4.16', t:'Controlled Load for CT Metering'},
+        {cl:'4.17', t:'Labelling'}
+      ]},
+      { sec:'5', title:'SPECIAL SMALL SERVICES', clauses:[
+        {cl:'5.1',  t:'Introduction'},
+        {cl:'5.2',  t:'Connection to the Distribution System'},
+        {cl:'5.3',  t:"Customer's Structure"},
+        {cl:'5.4',  t:'Concrete and Steel Poles'},
+        {cl:'5.5',  t:'Electrical Installation'},
+        {cl:'5.6',  t:'Labelling'}
+      ]},
+      { sec:'6', title:'CAPACITOR INSTALLATIONS', clauses:[
+        {cl:'6.1',  t:'Introduction'},
+        {cl:'6.2',  t:'Equipment Requirements'},
+        {cl:'6.3',  t:'Existing Installations'},
+        {cl:'6.4',  t:'Ripple Control and Harmonic Blocking'},
+        {cl:'6.5',  t:'Labelling'},
+        {cl:'6.6',  t:'Blocker Circuits'},
+        {cl:'6.7',  t:'Rejecter Circuits'},
+        {cl:'6.8',  t:'Stopper Circuits'},
+        {cl:'6.9',  t:'Power Factor Correction Equipment Installation'}
+      ]},
+      { sec:'7', title:'HIGH VOLTAGE CUSTOMER INSTALLATIONS', clauses:[
+        {cl:'7.1',  t:'Introduction'},
+        {cl:'7.2',  t:'General Information'},
+        {cl:'7.3',  t:'Submission of Proposal'},
+        {cl:'7.4',  t:"Customer's High Voltage Installation"}
+      ]},
+      { sec:'8', title:'ALTERNATIVE SOURCES OF SUPPLY', clauses:[
+        {cl:'8.1',  t:'Introduction'},
+        {cl:'8.2',  t:'Costs'},
+        {cl:'8.3',  t:'Stand-By Generating Plant — General'},
+        {cl:'8.4',  t:'Requirements for Stand-By Generator Synchronise with Supply'},
+        {cl:'8.5',  t:'Requirements for Generator Parallel Operation'},
+        {cl:'8.6',  t:'Small Scale Parallel Customer Generation'},
+        {cl:'8.7',  t:'Labelling'}
+      ]}
+    ];
+
+    /* ── Build sidebar ── */
+    var tree = document.getElementById('tocTree');
+    TOC.forEach(function (section) {
+      var div = document.createElement('div');
+      div.className = 'toc-section';
+
+      var btn = document.createElement('button');
+      btn.className = 'toc-section-title';
+      btn.innerHTML = '<span class="arrow">&#9660;</span>&ensp;Section ' +
+                      section.sec + ' &mdash; ' + section.title;
+      var ul = document.createElement('ul');
+      ul.className = 'toc-clauses';
+      btn.addEventListener('click', function () {
+        btn.classList.toggle('collapsed');
+        ul.classList.toggle('hidden');
+      });
+
+      section.clauses.forEach(function (c) {
+        var li  = document.createElement('li');
+        var row = document.createElement('div');
+        row.className = 'cl-row';
+        row.dataset.cl = c.cl;
+
+        var clBtn = document.createElement('button');
+        clBtn.className = 'cl-btn';
+        clBtn.textContent = c.cl + ' ' + c.t;
+
+        var badge = document.createElement('span');
+        badge.className = 'cl-badge';
+        badge.dataset.cl = c.cl;
+        badge.title = 'Click to set page number';
+
+        clBtn.addEventListener('click', function () { tocNav(c.cl, row); });
+        badge.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calibrate(c.cl, badge);
+        });
+
+        row.appendChild(clBtn);
+        row.appendChild(badge);
+        li.appendChild(row);
+        ul.appendChild(li);
+      });
+
+      div.appendChild(btn);
+      div.appendChild(ul);
+      tree.appendChild(div);
+    });
+
+    Object.keys(EXACT_PAGES).forEach(function (cl) { exactFlags[cl] = true; });
+
+    try {
+      var saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+      if (saved && saved.pages) Object.assign(pageMap, saved.pages);
+      if (saved && saved.exact) Object.assign(exactFlags, saved.exact);
+    } catch (e) {}
+    refreshBadges();
+
+    /* ── Navigate ── */
+    function goToPage(page) {
+      page = parseInt(page, 10);
+      if (!page || page < 1) return;
+      pageInput.value = page;
+      frame.src = 'about:blank';
+      setTimeout(function () { frame.src = PDF_URL + '#page=' + page; }, 30);
+    }
+
+    function tocNav(cl, rowEl) {
+      document.querySelectorAll('.cl-row.active').forEach(function (r) { r.classList.remove('active'); });
+      rowEl.classList.add('active');
+      rowEl.scrollIntoView({ block: 'nearest' });
+      var page = pageMap[cl];
+      if (!page) { showToast('Page unknown for ' + cl + ' — click the badge to set it'); return; }
+      goToPage(page);
+      setStatus('Clause ' + cl + ' — page ' + page, exactFlags[cl] ? 'ok' : '');
+    }
+
+    document.getElementById('btnGo').addEventListener('click', function () { goToPage(pageInput.value); });
+    pageInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') goToPage(this.value); });
+
+    /* ── TOC search ── */
+    document.getElementById('tocSearch').addEventListener('input', function () {
+      var q = this.value.toLowerCase().trim();
+      document.querySelectorAll('.toc-section').forEach(function (sec) {
+        var sb = sec.querySelector('.toc-section-title');
+        var ul = sec.querySelector('.toc-clauses');
+        var any = false;
+        sec.querySelectorAll('.cl-row').forEach(function (row) {
+          var show = !q || row.textContent.toLowerCase().includes(q);
+          row.parentElement.style.display = show ? '' : 'none';
+          if (show) any = true;
+        });
+        sec.style.display = any || !q ? '' : 'none';
+        if (q && any) { sb.classList.remove('collapsed'); ul.classList.remove('hidden'); }
+      });
+    });
+
+    /* ── Manual calibration ── */
+    function calibrate(cl, badge) {
+      var inp = document.createElement('input');
+      inp.type = 'number'; inp.min = 1;
+      inp.className = 'cl-cal-input';
+      inp.value = pageMap[cl] || '';
+      inp.placeholder = '?';
+      badge.replaceWith(inp);
+      inp.focus(); inp.select();
+
+      function save() {
+        var v = parseInt(inp.value, 10);
+        if (v > 0) {
+          pageMap[cl] = v; exactFlags[cl] = true;
+          persist();
+          badge.textContent = 'p' + v;
+          badge.classList.add('exact');
+          showToast(cl + ' → page ' + v + ' saved');
+        }
+        inp.replaceWith(badge);
+      }
+      inp.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter')  save();
+        if (e.key === 'Escape') inp.replaceWith(badge);
+      });
+      inp.addEventListener('blur', function () { setTimeout(save, 80); });
+    }
+
+    function refreshBadges() {
+      document.querySelectorAll('.cl-badge[data-cl]').forEach(function (b) {
+        var pg = pageMap[b.dataset.cl];
+        b.textContent = pg ? 'p' + pg : '?';
+        b.classList.toggle('exact', !!exactFlags[b.dataset.cl]);
+      });
+    }
+
+    function persist() {
+      try { localStorage.setItem(LS_KEY, JSON.stringify({ pages: pageMap, exact: exactFlags })); }
+      catch (e) {}
+    }
+
+    function setStatus(msg, cls) {
+      statusMsg.textContent = msg;
+      statusMsg.className   = cls || '';
+    }
+
+    var toastTmr;
+    function showToast(msg) {
+      var el = document.getElementById('toast');
+      clearTimeout(toastTmr);
+      el.textContent = msg;
+      el.classList.add('show');
+      toastTmr = setTimeout(function () { el.classList.remove('show'); }, 3000);
+    }
+
+    frame.addEventListener('load', function () {
+      if (frame.src !== 'about:blank')
+        setStatus('Document ready — click a clause to navigate', 'ok');
+    });
+
+    setStatus(Object.keys(EXACT_PAGES).length + ' clauses mapped from document scan', 'ok');
+
+  })();
+  </script>
+  <script src="omni-utils.js"></script>
+</body>
+</html>

@@ -59,6 +59,7 @@
     .room-outline {
       position: absolute;
       border: 2.5px solid var(--text-primary);
+      background: var(--bg-input);
       box-sizing: border-box;
       pointer-events: none;
     }
@@ -67,7 +68,7 @@
     .eq-block {
       position: absolute;
       box-sizing: border-box;
-      border: 3px solid #000;
+      border: 3px solid var(--text-primary);
       border-radius: 2px;
       overflow: visible;
     }
@@ -351,6 +352,7 @@
 
     /* ─── Canvas render ──────────────────────────────────── */
     function px(mm) { return (mm / 1000) * SCALE; }
+    function drawColor() { return document.documentElement.getAttribute('data-theme') === 'dark' ? '#c8d0dc' : '#000'; }
 
     function renderCanvas() {
       const room   = calcRoom();
@@ -416,22 +418,22 @@
             const l1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             l1.setAttribute('x1', '0'); l1.setAttribute('y1', '0');
             l1.setAttribute('x2', bw); l1.setAttribute('y2', bh);
-            l1.setAttribute('stroke', '#000'); l1.setAttribute('stroke-width', '2.88');
+            l1.setAttribute('stroke', drawColor()); l1.setAttribute('stroke-width', '2.88');
             svg.appendChild(l1);
             if (eq.type === 'MSB') {
               const l2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
               l2.setAttribute('x1', bw); l2.setAttribute('y1', '0');
               l2.setAttribute('x2', '0'); l2.setAttribute('y2', bh);
-              l2.setAttribute('stroke', '#000'); l2.setAttribute('stroke-width', '2.88');
+              l2.setAttribute('stroke', drawColor()); l2.setAttribute('stroke-width', '2.88');
               svg.appendChild(l2);
-              // Fill top and bottom triangles black
+              // Fill top and bottom triangles
               const cx = bw / 2, cy = bh / 2;
               const triTop = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
               triTop.setAttribute('points', `0,0 ${bw},0 ${cx},${cy}`);
-              triTop.setAttribute('fill', '#000');
+              triTop.setAttribute('fill', drawColor());
               const triBot = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
               triBot.setAttribute('points', `0,${bh} ${bw},${bh} ${cx},${cy}`);
-              triBot.setAttribute('fill', '#000');
+              triBot.setAttribute('fill', drawColor());
               svg.appendChild(triTop);
               svg.appendChild(triBot);
             }
@@ -449,7 +451,7 @@
             } else {
               triWall.setAttribute('points', `0,0 0,${bh} ${bw},${bh}`);
             }
-            triWall.setAttribute('fill', '#000');
+            triWall.setAttribute('fill', drawColor());
             svg2.appendChild(triWall);
             block.appendChild(svg2);
           }

@@ -1,0 +1,638 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meter Panel Sizer - OMNI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .mp-wrap { display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap; }
+    .mp-controls { width: 380px; flex-shrink: 0; }
+    .mp-diagram { flex: 1; min-width: 320px; }
+    .slider-row { display: flex; align-items: center; gap: 12px; }
+    .slider-row input[type=range] { flex: 1; accent-color: var(--accent); }
+    .slider-val { width: 60px; padding: 5px 8px; border: 1px solid var(--border-input); background: var(--bg-input); color: var(--text-primary); font-size: 1em; text-align: center; border-radius: 4px; }
+    .phase-toggle { display: flex; gap: 0; border: 1px solid var(--border-input); border-radius: 6px; overflow: hidden; }
+    .phase-toggle label { padding: 8px 20px; cursor: pointer; font-size: 0.92em; user-select: none; transition: background 0.15s; flex: 1; text-align: center; }
+    .phase-toggle input[type=radio] { display: none; }
+    .phase-toggle input[type=radio]:checked + label { background: var(--accent); color: #fff; }
+    .chk-row { display: flex; align-items: center; gap: 8px; font-size: 0.93em; flex-wrap: wrap; }
+    .chk-row input[type=checkbox] { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+    .mini-num { width: 58px; padding: 4px 7px; border: 1px solid var(--border-input); background: var(--bg-input); color: var(--text-primary); border-radius: 4px; font-size: 0.92em; }
+    .sel-full { width: 100%; padding: 7px 10px; border: 1px solid var(--border-input); background: var(--bg-input); color: var(--text-primary); border-radius: 4px; }
+    .dim-table { width: 100%; border-collapse: collapse; font-size: 0.89em; }
+    .dim-table th { background: var(--accent); color: #fff; padding: 7px 10px; text-align: left; font-weight: 600; }
+    .dim-table td { padding: 6px 10px; border-bottom: 1px solid var(--border-light); }
+    .dim-table .val { font-weight: 700; color: var(--accent); }
+    .dim-table .subhead td { background: var(--bg-table-stripe); font-weight: 600; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.3px; color: var(--text-secondary); padding-top: 10px; }
+    .svg-scroll { overflow: auto; background: var(--bg-input); border: 1px solid var(--border-light); border-radius: 6px; padding: 16px 16px 10px 16px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 7px 16px; font-size: 0.82em; margin-top: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 14px; height: 14px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.18); flex-shrink: 0; }
+    .spec-table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin-top: 10px; }
+    .spec-table th { background: var(--bg-table-header,#334155); color: #fff; padding: 6px 10px; text-align: left; font-size: 0.82em; text-transform: uppercase; letter-spacing: 0.3px; }
+    .spec-table td { padding: 5px 10px; border-bottom: 1px solid var(--border-light); }
+    .spec-table tr:nth-child(even) td { background: var(--bg-table-stripe); }
+    @media (max-width: 820px) { .mp-controls { width: 100%; } }
+    @media print { .top-tabs, .calc-button, .no-print { display: none !important; } .mp-wrap { flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <div class="top-tabs"></div>
+  <div class="main-content">
+    <h1>Meter Panel Sizer</h1>
+    <p>Size a multi-occupancy metering cubicle for residential or commercial developments. Dimensions are based on
+       <strong>Ausgrid NUS 080</strong> / <strong>Endeavour Energy / Essential Energy</strong> metering cubicle standards (NSW) and <strong>AS/NZS&nbsp;61439</strong>.</p>
+
+    <div class="mp-wrap">
+
+      <!-- ════ CONTROLS ════ -->
+      <div class="mp-controls">
+        <div class="calc-section">
+          <h2>Configuration</h2>
+
+          <div class="input-group" style="margin-bottom:16px;">
+            <label for="dnsp">DNSP / Network Provider</label>
+            <select id="dnsp" class="sel-full" onchange="draw()">
+              <option value="ausgrid" selected>Ausgrid (Sydney, Newcastle, Central Coast)</option>
+              <option value="endeavour">Endeavour Energy (Greater Western Sydney, Wollongong)</option>
+              <option value="essential">Essential Energy (Regional NSW)</option>
+            </select>
+          </div>
+
+          <div class="input-group" style="margin-bottom:16px;">
+            <label>Phase per Tenancy</label>
+            <div class="phase-toggle">
+              <input type="radio" name="phase" id="ph1" value="1" checked onchange="draw()" />
+              <label for="ph1">Single-Phase (230 V)</label>
+              <input type="radio" name="phase" id="ph3" value="3" onchange="draw()" />
+              <label for="ph3">Three-Phase (400 V)</label>
+            </div>
+          </div>
+
+          <div class="input-group" style="margin-bottom:16px;">
+            <label for="numUnits">Number of Metered Tenancies</label>
+            <div class="slider-row">
+              <input type="range" id="unitsSlider" min="1" max="100" value="12" oninput="syncUnits(this.value)" />
+              <input type="number" class="slider-val" id="numUnits" value="12" min="1" max="500" oninput="syncUnits(this.value)" />
+            </div>
+          </div>
+
+          <div class="input-group" style="margin-bottom:16px;">
+            <label>Common Area / Building Services Meters</label>
+            <div class="chk-row">
+              <input type="checkbox" id="hasCommon" onchange="draw()" />
+              <span>Include</span>
+              <input type="number" class="mini-num" id="numCommon" value="2" min="1" max="20" oninput="draw()" />
+              <span>common area position(s)</span>
+            </div>
+            <span style="font-size:0.8em;color:var(--text-secondary);display:block;margin-top:4px;">Common area meters use same position size as tenancy meters.</span>
+          </div>
+
+          <div class="input-group" style="margin-bottom:16px;">
+            <label>Incoming Supply Compartment</label>
+            <div class="chk-row">
+              <input type="checkbox" id="hasIncoming" checked onchange="draw()" />
+              <span>Include incoming isolator / main switch section</span>
+            </div>
+          </div>
+
+          <div class="input-group" style="margin-bottom:16px;">
+            <label for="install">Installation Type</label>
+            <select id="install" class="sel-full" onchange="draw()">
+              <option value="outdoor" selected>Outdoor — weatherproof cubicle / pillar</option>
+              <option value="indoor">Indoor — wall-mounted enclosure</option>
+            </select>
+          </div>
+
+          <div class="btn-row" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="calc-button no-print" onclick="draw()" style="flex:1;">&#9654; Size Panel</button>
+            <button class="calc-button green no-print" onclick="exportResult()" style="flex:1;">&#128190; Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div class="calc-section">
+          <h2>Panel Dimensions</h2>
+          <table class="dim-table">
+            <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+            <tbody id="dimBody"></tbody>
+          </table>
+          <div id="warnArea" style="margin-top:10px;"></div>
+        </div>
+
+        <!-- Legend -->
+        <div class="calc-section">
+          <h2>Legend</h2>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-swatch" style="background:rgba(59,130,246,0.18);border-color:#3b82f6;"></div>Tenancy meter position (MP.svg)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:rgba(34,197,94,0.18);border-color:#22c55e;"></div>Common area position (MP.svg)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#e0e7ef;border-color:#6b7280;"></div>Incoming supply / isolator</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:repeating-linear-gradient(45deg,#d1d5db,#d1d5db 2px,#f9fafb 2px,#f9fafb 8px);border-color:#9ca3af;"></div>Cable duct (100 mm)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#fef9c3;border-color:#ca8a04;"></div>Cable gland / entry zone</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:rgba(34,197,94,0.12);border-color:#22c55e;border-style:dashed;"></div>Accessible working zone (300–1800 mm AGL)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:rgba(239,68,68,0.07);border-color:#ef4444;border-style:dashed;"></div>50 mm buffer zone around position</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ DIAGRAM ════ -->
+      <div class="mp-diagram">
+        <div class="calc-section" style="padding:16px;">
+          <h2>Front Elevation <span id="diagramSubtitle" style="font-size:0.72em;font-weight:400;color:var(--text-secondary);"></span></h2>
+          <div class="svg-scroll">
+            <svg id="panelSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+          <div style="font-size:0.78em;color:var(--text-secondary);margin-top:6px;">
+            Diagram is schematic only — not to scale. Confirm all dimensions with the switchboard manufacturer and your DNSP metering cubicle specification.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DNSP Specs Reference Table -->
+    <div class="calc-section" style="margin-top:8px;">
+      <h2>NSW DNSP Metering Position Standards</h2>
+      <div class="info-box" style="margin-bottom:10px;">
+        Position dimensions and arrangement rules sourced from <strong>Ausgrid NUS 080</strong>, <strong>Endeavour Energy Metering Cubicle Standard</strong>, and <strong>Essential Energy Customer Installation Requirements</strong>.
+        These standards specify minimum requirements — the metering cubicle manufacturer must provide type-tested enclosures to <strong>AS/NZS 61439.1</strong>.
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Ausgrid</th>
+              <th>Endeavour Energy</th>
+              <th>Essential Energy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1-phase position W × H</td><td>173 × 263 mm</td><td>173 × 263 mm</td><td>173 × 263 mm</td></tr>
+            <tr><td>3-phase position W × H</td><td>173 × 263 mm</td><td>173 × 263 mm</td><td>173 × 263 mm</td></tr>
+            <tr><td>Max positions per column (1ph)</td><td>5</td><td>5</td><td>4</td></tr>
+            <tr><td>Max positions per column (3ph)</td><td>3</td><td>3</td><td>3</td></tr>
+            <tr><td>Max columns per panel section</td><td>2</td><td>2</td><td>2</td></tr>
+            <tr><td>Max positions per section (1ph)</td><td>10</td><td>10</td><td>8</td></tr>
+            <tr><td>Max positions per section (3ph)</td><td>6</td><td>6</td><td>6</td></tr>
+            <tr><td>Cable duct width (per section)</td><td>100 mm</td><td>100 mm</td><td>100 mm</td></tr>
+            <tr><td>Incoming isolator compartment height</td><td>400 mm</td><td>400 mm</td><td>350 mm</td></tr>
+            <tr><td>Underground cable gland zone (base)</td><td>300 mm</td><td>300 mm</td><td>300 mm</td></tr>
+            <tr><td>Min. height of lowest meter AGL</td><td>300 mm</td><td>300 mm</td><td>300 mm</td></tr>
+            <tr><td>Max. height of highest meter AGL</td><td>1800 mm</td><td>1800 mm</td><td>1700 mm</td></tr>
+            <tr><td>Working zone height (usable)</td><td>1500 mm</td><td>1500 mm</td><td>1400 mm</td></tr>
+            <tr><td>Outdoor enclosure IP rating (min.)</td><td>IP54</td><td>IP55</td><td>IP54</td></tr>
+            <tr><td>Indoor enclosure IP rating (min.)</td><td>IP31</td><td>IP31</td><td>IP31</td></tr>
+            <tr><td>Panel depth — outdoor</td><td>300 mm</td><td>300 mm</td><td>300 mm</td></tr>
+            <tr><td>Panel depth — indoor</td><td>250 mm</td><td>250 mm</td><td>250 mm</td></tr>
+            <tr><td>Min. working clearance in front</td><td>1000 mm</td><td>1000 mm</td><td>1000 mm</td></tr>
+            <tr><td>Smart meter model (typical)</td><td>Landis+Gyr E350 / Itron ACE9000</td><td>Landis+Gyr E350</td><td>Landis+Gyr E350</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warn-box" style="margin-top:12px;">
+        <strong>Always verify with your DNSP.</strong> Standards are updated periodically. Contact Ausgrid (1300 137 078), Endeavour Energy (02 9853 6000), or Essential Energy (132 391) for current requirements before finalising design drawings.
+        Underground cable entry requires watertight glands and conduit seal rated to the outdoor IP classification.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ══════════════════════════════════════════════════════════════
+    // DNSP specification data (based on published DNSP standards)
+    // ══════════════════════════════════════════════════════════════
+    const DNSP_SPECS = {
+      ausgrid: {
+        name: 'Ausgrid',
+        pos1ph:  { w: 173, h: 263 },
+        pos3ph:  { w: 173, h: 263 },
+        maxRows1ph: 5,
+        maxRows3ph: 3,
+        maxCols:    2,
+        ductW:     100,
+        incomingH: 400,
+        glandH:    300,
+        minAGL:    300,
+        maxAGL:   1800,
+        depthOut:  300,
+        depthIn:   250,
+        ipOut:    'IP54',
+        ipIn:     'IP31',
+        sectionGap: 20
+      },
+      endeavour: {
+        name: 'Endeavour Energy',
+        pos1ph:  { w: 173, h: 263 },
+        pos3ph:  { w: 173, h: 263 },
+        maxRows1ph: 5,
+        maxRows3ph: 3,
+        maxCols:    2,
+        ductW:     100,
+        incomingH: 400,
+        glandH:    300,
+        minAGL:    300,
+        maxAGL:   1800,
+        depthOut:  300,
+        depthIn:   250,
+        ipOut:    'IP55',
+        ipIn:     'IP31',
+        sectionGap: 20
+      },
+      essential: {
+        name: 'Essential Energy',
+        pos1ph:  { w: 173, h: 263 },
+        pos3ph:  { w: 173, h: 263 },
+        maxRows1ph: 4,
+        maxRows3ph: 3,
+        maxCols:    2,
+        ductW:     100,
+        incomingH: 350,
+        glandH:    300,
+        minAGL:    300,
+        maxAGL:   1700,
+        depthOut:  300,
+        depthIn:   250,
+        ipOut:    'IP54',
+        ipIn:     'IP31',
+        sectionGap: 20
+      }
+    };
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    function syncUnits(v) {
+      const n = Math.max(1, Math.min(500, parseInt(v) || 1));
+      document.getElementById('numUnits').value = n;
+      document.getElementById('unitsSlider').value = Math.min(n, 100);
+      draw();
+    }
+
+    function getSpec() {
+      return DNSP_SPECS[document.getElementById('dnsp').value];
+    }
+
+    // ── Layout computation ─────────────────────────────────────────────────────
+    function computeLayout() {
+      const sp         = getSpec();
+      const ph         = parseInt(document.querySelector('input[name=phase]:checked').value);
+      const numUnits   = Math.max(1, parseInt(document.getElementById('numUnits').value) || 1);
+      const hasCommon  = document.getElementById('hasCommon').checked;
+      const numCommon  = hasCommon ? Math.max(0, parseInt(document.getElementById('numCommon').value) || 0) : 0;
+      const hasInc     = document.getElementById('hasIncoming').checked;
+      const install    = document.getElementById('install').value;
+      const totalPos   = numUnits + numCommon;
+
+      // Position dimensions from spec
+      const posW = ph === 1 ? sp.pos1ph.w : sp.pos3ph.w;
+      const posH = ph === 1 ? sp.pos1ph.h : sp.pos3ph.h;
+      const maxRows = ph === 1 ? sp.maxRows1ph : sp.maxRows3ph;
+      const maxCols = sp.maxCols;
+      const maxPerSection = maxRows * maxCols;
+
+      // How many sections (each section = maxCols columns × maxRows rows)
+      const numSections = Math.ceil(totalPos / maxPerSection);
+
+      // Fill sections
+      let sections = [];
+      let idx = 0;
+      for (let s = 0; s < numSections; s++) {
+        const posInSection = Math.min(maxPerSection, totalPos - s * maxPerSection);
+        const colsNeeded   = Math.min(maxCols, Math.ceil(posInSection / maxRows));
+        // Distribute positions across columns (fill column-by-column top-to-bottom)
+        const cols = [];
+        let remaining = posInSection;
+        for (let c = 0; c < colsNeeded; c++) {
+          const inThisCol = Math.min(maxRows, remaining);
+          const col = [];
+          for (let r = 0; r < inThisCol; r++, idx++) {
+            col.push({
+              type:  idx < numUnits ? 'unit' : 'common',
+              label: idx < numUnits ? ('Unit ' + (idx + 1)) : ('CA-' + (idx - numUnits + 1)),
+              n:     idx + 1
+            });
+          }
+          cols.push(col);
+          remaining -= inThisCol;
+        }
+        sections.push({ cols, colsNeeded, posInSection });
+      }
+
+      // Panel structural heights (mm) — from floor/ground level (AGL)
+      // Layout from bottom up:
+      //   0               → glandH      : cable gland zone (below working zone, at/below minAGL)
+      //   glandH (=minAGL)→ glandH + workH : meter working zone  (maxRows * posH)
+      //   glandH + workH  → + incomingH : incoming isolator (above working zone if selected)
+      // Then the enclosure cap above that
+
+      const workH    = maxRows * posH;              // actual meter grid height
+      const workZoneH = sp.maxAGL - sp.minAGL;      // available zone per DNSP spec
+
+      // Section width = maxCols × posW + ductW
+      const secW = maxCols * posW + sp.ductW;
+      // Total panel width (all sections side by side with gaps)
+      const totalPanelW = numSections * secW + (numSections - 1) * sp.sectionGap;
+
+      // Total structural height (from ground):
+      //   glandH (base cable zone) + workH (meters) + incomingH (if selected) + top cap 50
+      const TOP_CAP = 50;
+      const structH = sp.glandH + workH + (hasInc ? sp.incomingH : 0) + TOP_CAP;
+
+      const panelDepth = install === 'outdoor' ? sp.depthOut : sp.depthIn;
+      const ip         = install === 'outdoor' ? sp.ipOut : sp.ipIn;
+
+      return {
+        sp, ph, posW, posH, maxRows, maxCols, maxPerSection,
+        numUnits, numCommon, totalPos, hasCommon, hasInc, install,
+        numSections, sections, secW, totalPanelW,
+        workH, workZoneH, structH, panelDepth, ip, TOP_CAP
+      };
+    }
+
+    // ── Dimension table ────────────────────────────────────────────────────────
+    function updateDimTable(L) {
+      const sp = L.sp;
+      const tb = document.getElementById('dimBody');
+      tb.innerHTML = '';
+
+      function row(param, val, isHead) {
+        const tr = document.createElement('tr');
+        if (isHead) { tr.className = 'subhead'; tr.innerHTML = `<td colspan="2">${param}</td>`; }
+        else tr.innerHTML = `<td>${param}</td><td class="val">${val}</td>`;
+        tb.appendChild(tr);
+      }
+
+      row('Overall Assembly', '', true);
+      row('Total width (all sections)',   L.totalPanelW + ' mm  (' + L.numSections + ' section' + (L.numSections > 1 ? 's' : '') + ')');
+      row('Total height (ground to top)', L.structH + ' mm');
+      row('Panel depth',                  L.panelDepth + ' mm  (' + L.install + ', ' + L.ip + ' min.)');
+      row('Number of sections (bays)',    '' + L.numSections);
+
+      row('Per Section', '', true);
+      row('Section width',  L.secW + ' mm  (' + L.maxCols + ' col × ' + L.posW + ' mm + ' + sp.ductW + ' mm duct)');
+      row('Columns / rows per section', L.maxCols + ' cols × ' + L.maxRows + ' rows = ' + L.maxPerSection + ' positions');
+      row('Position size (' + (L.ph === 1 ? '1ph' : '3ph') + ')', L.posW + ' × ' + L.posH + ' mm  (W × H)');
+      row('Cable duct width', sp.ductW + ' mm');
+
+      row('Height Breakdown (per section)', '', true);
+      row('Ground to bottom of lowest meter',    sp.minAGL + ' mm AGL  (cable gland zone)');
+      row('Bottom to top of meter working zone', L.workH + ' mm  (' + L.maxRows + ' × ' + L.posH + ' mm)');
+      row('Top of highest meter AGL',            (sp.minAGL + L.workH) + ' mm AGL  (spec. max ' + sp.maxAGL + ' mm)');
+      if (L.hasInc) row('Incoming isolator compartment', sp.incomingH + ' mm  (above working zone)');
+      row('Top cap / busbar zone',               L.TOP_CAP + ' mm');
+      row('Total structural height (AGL)',       L.structH + ' mm');
+
+      row('Metering Summary', '', true);
+      row('Tenancy positions', '' + L.numUnits);
+      row('Common area positions', '' + L.numCommon);
+      row('Total meter positions', '' + L.totalPos);
+
+      const wa = document.getElementById('warnArea');
+      wa.innerHTML = '';
+      if (L.numSections > 1) {
+        wa.innerHTML += `<div class="warn-box"><strong>${L.numSections} separate panel sections required.</strong> Each section is ${L.secW}&nbsp;mm wide. Sections are typically mounted side-by-side in a row on a common base frame. Confirm with your DNSP that a multi-section arrangement is acceptable for the connection point.</div>`;
+      }
+      if (sp.minAGL + L.workH > sp.maxAGL) {
+        wa.innerHTML += `<div class="warn-box" style="margin-top:8px;"><strong>Working zone overflow.</strong> ${L.maxRows} rows × ${L.posH}&nbsp;mm = ${L.workH}&nbsp;mm. Top of highest meter = ${sp.minAGL + L.workH}&nbsp;mm AGL, which exceeds the ${sp.sp ? '' : sp.name} maximum of ${sp.maxAGL}&nbsp;mm. Reduce positions per column or contact ${sp.name}.</div>`;
+      }
+    }
+
+    // ── SVG Drawing ────────────────────────────────────────────────────────────
+    function svgNS(tag, attrs) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+    function rect(p, x, y, w, h, fill, stroke, sw, rx) {
+      p.appendChild(svgNS('rect', { x, y, width: w, height: h, fill, stroke, 'stroke-width': sw || 1.5, rx: rx || 0 }));
+    }
+    function txt(p, x, y, s, fs, fill, anchor, bold, rotate) {
+      const attrs = { x, y, 'font-size': fs || 10, fill: fill || '#1e293b', 'text-anchor': anchor || 'middle',
+        'font-family': 'Arial,sans-serif', 'font-weight': bold ? 'bold' : 'normal', 'dominant-baseline': 'central' };
+      if (rotate) attrs.transform = rotate;
+      const t = svgNS('text', attrs);
+      t.textContent = s;
+      p.appendChild(t);
+    }
+    function line(p, x1, y1, x2, y2, stroke, sw) {
+      p.appendChild(svgNS('line', { x1, y1, x2, y2, stroke: stroke || '#374151', 'stroke-width': sw || 1.2 }));
+    }
+    function dimH(p, x1, y, x2, label) {
+      const col = '#4b5563', tick = 7;
+      line(p, x1, y, x2, y, col, 1);
+      line(p, x1, y - tick, x1, y + tick, col, 1);
+      line(p, x2, y - tick, x2, y + tick, col, 1);
+      txt(p, (x1 + x2) / 2, y - 11, label, 9.5, col, 'middle');
+    }
+    function dimV(p, x, y1, y2, label) {
+      const col = '#4b5563', tick = 7;
+      line(p, x, y1, x, y2, col, 1);
+      line(p, x - tick, y1, x + tick, y1, col, 1);
+      line(p, x - tick, y2, x + tick, y2, col, 1);
+      const mx = x, my = (y1 + y2) / 2;
+      txt(p, mx, my, label, 9.5, col, 'middle', false, `rotate(-90,${mx},${my})`);
+    }
+    function addDefs(svg) {
+      let defs = svg.querySelector('defs') || svg.insertBefore(svgNS('defs', {}), svg.firstChild);
+      if (!defs.querySelector('#duct-hatch')) {
+        const pat = svgNS('pattern', { id: 'duct-hatch', width: 7, height: 7, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
+        pat.appendChild(svgNS('line', { x1: 0, y1: 0, x2: 0, y2: 7, stroke: '#9ca3af', 'stroke-width': 1.5 }));
+        defs.appendChild(pat);
+      }
+    }
+
+    function draw() {
+      const L = computeLayout();
+      updateDimTable(L);
+      document.getElementById('diagramSubtitle').textContent =
+        '— ' + L.sp.name + '  |  ' + L.numSections + ' section' + (L.numSections > 1 ? 's' : '') +
+        '  |  ' + L.totalPanelW + ' mm W × ' + L.structH + ' mm H';
+      drawSVG(L);
+    }
+
+    function drawSVG(L) {
+      const svg = document.getElementById('panelSvg');
+      svg.innerHTML = '';
+      addDefs(svg);
+
+      const sp     = L.sp;
+      const BUF_MM = 50;                          // 50 mm buffer zone each side
+      const pitchW = L.posW + 2 * BUF_MM;        // 273 mm: buffer + panel + buffer (horizontal)
+      const pitchH = L.posH + 2 * BUF_MM;        // 363 mm: buffer + panel + buffer (vertical)
+
+      // Diagram dimensions — schematic only, not to scale.
+      // Each meter cell is pitched at pitchW × pitchH so buffer zones never overlap.
+      const dSecW   = L.maxCols * pitchW + sp.ductW;
+      const dWorkH  = L.maxRows * pitchH;
+      const dStructH = sp.glandH + dWorkH + (L.hasInc ? sp.incomingH : 0) + L.TOP_CAP;
+      const dTotalW  = L.numSections * dSecW + (L.numSections - 1) * sp.sectionGap;
+
+      // Scale: fit within viewport
+      const MAX_W = 660, MAX_H = 720;
+      const LEFT_ANN = 70, TOP_ANN = 36, BOT_ANN = 30, RIGHT_ANN = 20;
+      const sc = Math.min(
+        (MAX_W - LEFT_ANN - RIGHT_ANN) / dTotalW,
+        (MAX_H - TOP_ANN - BOT_ANN)   / dStructH,
+        1.2
+      );
+
+      const ow = LEFT_ANN, oy = TOP_ANN;
+      const svgH_content = dStructH * sc;
+      const totalSvgW = dTotalW * sc + LEFT_ANN + RIGHT_ANN + 10;
+      const totalSvgH = svgH_content + TOP_ANN + BOT_ANN + 10;
+      svg.setAttribute('width',   totalSvgW);
+      svg.setAttribute('height',  totalSvgH);
+      svg.setAttribute('viewBox', `0 0 ${totalSvgW} ${totalSvgH}`);
+
+      // Map diagram-mm AGL → SVG px  (higher AGL = higher on screen = smaller Y)
+      function mmToY(agl) { return oy + (dStructH - agl) * sc; }
+
+      const groundY      = mmToY(0);
+      const panelTotalPx = dTotalW * sc;
+
+      // Ground line
+      line(svg, ow - 20, groundY, ow + panelTotalPx + 20, groundY, '#374151', 2);
+      txt(svg, ow - 16, groundY + 14, 'GL', 9, '#374151', 'middle');
+
+      // Working-zone shaded band
+      const wzTop = mmToY(sp.glandH + dWorkH);
+      const wzBot = mmToY(sp.glandH);
+      rect(svg, ow, wzTop, panelTotalPx, wzBot - wzTop, 'rgba(34,197,94,0.08)', '#22c55e', 0.7);
+
+      // Draw each section side by side
+      let sxOff = 0;
+      for (let s = 0; s < L.numSections; s++) {
+        const sec  = L.sections[s];
+        const sx   = ow + sxOff * sc;
+        const sWpx = dSecW * sc;
+
+        // Section outer border
+        rect(svg, sx, oy, sWpx, svgH_content, '#f8fafc', '#374151', 2);
+
+        // ── INCOMING isolator ──
+        if (L.hasInc) {
+          const iy1 = mmToY(dStructH - L.TOP_CAP);
+          const iy2 = mmToY(dStructH - L.TOP_CAP - sp.incomingH);
+          rect(svg, sx, iy1, sWpx, iy2 - iy1, '#e0e7ef', '#4b5563', 1.5);
+          txt(svg, sx + sWpx / 2, (iy1 + iy2) / 2, 'INCOMING SUPPLY / MAIN SWITCH',
+            Math.max(7, Math.min(10, sWpx / 22)), '#1e293b', 'middle', true);
+        }
+
+        // ── METER WORKING ZONE ──
+        const meterY_top = mmToY(sp.glandH + dWorkH);
+        const meterY_bot = mmToY(sp.glandH);
+        const gridX      = sx;
+
+        // Cable duct (right of all columns)
+        const ductX   = sx + L.maxCols * pitchW * sc;
+        const ductWpx = sp.ductW * sc;
+        rect(svg, ductX, meterY_top, ductWpx, meterY_bot - meterY_top, 'url(#duct-hatch)', '#9ca3af', 1);
+        if (ductWpx > 18) {
+          const dm = (meterY_top + meterY_bot) / 2;
+          txt(svg, ductX + ductWpx / 2, dm, sp.ductW + ' mm DUCT', 7.5, '#6b7280',
+            'middle', false, `rotate(-90,${ductX + ductWpx / 2},${dm})`);
+        }
+
+        // Meter positions — each panel centred in its pitchW × pitchH cell
+        for (let c = 0; c < sec.cols.length; c++) {
+          const col = sec.cols[c];
+          for (let r = 0; r < col.length; r++) {
+            const cell  = col[r];
+            // Top-left corner of the pitch cell (includes buffer on all sides)
+            const cellX = gridX + c * pitchW * sc;
+            const cellY = meterY_top + r * pitchH * sc;
+            // Red dashed buffer zone — full pitch cell
+            svg.appendChild(svgNS('rect', {
+              x: cellX, y: cellY,
+              width: pitchW * sc, height: pitchH * sc,
+              fill: 'rgba(239,68,68,0.07)', stroke: '#ef4444',
+              'stroke-width': 1.2, 'stroke-dasharray': '4 3'
+            }));
+            // Panel face (173 × 263 mm) offset by BUF_MM inside the cell
+            const px   = cellX + BUF_MM * sc;
+            const py   = cellY + BUF_MM * sc;
+            const cWpx = L.posW * sc;
+            const cHpx = L.posH * sc;
+            svg.appendChild(svgNS('image', {
+              href: 'MP.svg', x: px, y: py, width: cWpx, height: cHpx,
+              preserveAspectRatio: 'xMidYMid meet'
+            }));
+            // Colour tint overlay
+            const tint   = cell.type === 'unit' ? 'rgba(59,130,246,0.18)' : 'rgba(34,197,94,0.18)';
+            const stroke = cell.type === 'unit' ? '#3b82f6' : '#22c55e';
+            rect(svg, px, py, cWpx, cHpx, tint, stroke, 1.5);
+            // Labels
+            const fs = Math.max(6, Math.min(9.5, cWpx / 11));
+            txt(svg, px + cWpx / 2, py + cHpx * 0.36, cell.label, fs, '#1e293b', 'middle', true);
+            txt(svg, px + cWpx / 2, py + cHpx * 0.68, (L.ph === 1 ? '1φ' : '3φ'), fs - 1, '#64748b', 'middle');
+          }
+        }
+
+        // ── CABLE GLAND ZONE (base) ──
+        const glandY_top = mmToY(sp.glandH);
+        const glandY_bot = mmToY(0);
+        rect(svg, sx, glandY_top, sWpx, glandY_bot - glandY_top, '#fef9c3', '#ca8a04', 0.8);
+        txt(svg, sx + sWpx / 2, (glandY_top + glandY_bot) / 2, '▼ CABLE GLAND / ENTRY ZONE',
+          Math.max(7, Math.min(9, sWpx / 18)), '#92400e');
+
+        sxOff += dSecW + sp.sectionGap;
+      }
+
+      // ── Working zone label ──
+      const wzLabelX = ow + panelTotalPx + 10;
+      txt(svg, wzLabelX + 8, (wzTop + wzBot) / 2, 'Working zone', 8, '#16a34a', 'start',
+        false, `rotate(-90,${wzLabelX + 8},${(wzTop + wzBot) / 2})`);
+
+      // ── Dimension callouts (physical dimensions as labels) ──
+      dimH(svg, ow, oy - 18, ow + panelTotalPx, L.totalPanelW + ' mm');
+
+      // Height (vertical) — left of panel
+      dimV(svg, ow - 42, oy, oy + svgH_content, L.structH + ' mm');
+
+      // Working zone height (left, inner)
+      dimV(svg, ow - 22, wzTop, wzBot, (sp.maxAGL - sp.minAGL) + ' mm');
+
+      // Panel face width callout (173 mm, positioned above first panel face in section 0)
+      if (L.posW * sc > 20) {
+        const panelFaceLeft  = ow + BUF_MM * sc;
+        const panelFaceRight = panelFaceLeft + L.posW * sc;
+        dimH(svg, panelFaceLeft, wzTop + BUF_MM * sc - 14, panelFaceRight, L.posW + ' mm');
+      }
+    }
+
+    // ── Export ─────────────────────────────────────────────────────────────────
+    function exportResult() {
+      const L = computeLayout();
+      const sp = L.sp;
+      const hdr = ['Parameter', 'Value'];
+      const rows = [
+        ['DNSP',                         sp.name],
+        ['Phase per tenancy',             L.ph === 1 ? 'Single-phase' : 'Three-phase'],
+        ['Tenancy positions',             L.numUnits],
+        ['Common area positions',         L.numCommon],
+        ['Total meter positions',         L.totalPos],
+        ['Position size (W x H mm)',      L.posW + ' x ' + L.posH],
+        ['Max rows per column',           L.maxRows],
+        ['Max columns per section',       L.maxCols],
+        ['Max positions per section',     L.maxPerSection],
+        ['Number of sections',            L.numSections],
+        ['Section width (mm)',            L.secW],
+        ['Total panel width (mm)',        L.totalPanelW],
+        ['Total structural height (mm)',  L.structH],
+        ['Panel depth (mm)',              L.panelDepth],
+        ['Installation type',            L.install],
+        ['IP rating',                    L.ip],
+        ['Cable gland zone height (mm)', sp.glandH],
+        ['Meter working zone (mm)',       L.workH],
+        ['Min AGL of lowest meter (mm)', sp.minAGL],
+        ['Max AGL of highest meter (mm)', sp.minAGL + L.workH],
+        ['Incoming compartment height (mm)', L.hasInc ? sp.incomingH : 'Not included'],
+        ['Cable duct width per section (mm)', sp.ductW]
+      ];
+      OmniExport.toCSV(hdr, rows, 'meter-panel');
+    }
+
+    // ── Init ───────────────────────────────────────────────────────────────────
+    draw();
+  </script>
+  <script src="omni-utils.js"></script>
+</body>
+</html>
