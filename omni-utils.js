@@ -10,11 +10,11 @@ const OmniNav = {
   structure: [
     { label: 'Home', href: 'index.html' },
     { label: 'Switchboard Sizer', href: 'switchboard.html' },
-    { label: 'Meter Panel Sizer', href: 'meterpanel.html' },
     { label: 'Switchroom Sizer', href: 'switchroom.html' },
     { label: 'Cable Tray Sizer', href: 'cabletraysizing.html' },
     { label: 'Lighting Search', href: 'lightingsearch.html' },
     { label: 'Power Systems', children: [
+      { label: 'Meter Panel Sizer', href: 'meterpanel.html' },
       { label: 'Cable Sizing', href: 'cablesizing.html' },
       { label: 'Cable Weight', href: 'cableweight.html' },
       { label: 'Maximum Demand', href: 'maxdemand.html' },

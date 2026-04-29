@@ -273,11 +273,11 @@
       div.className = 'toc-section';
 
       var btn = document.createElement('button');
-      btn.className = 'toc-section-title';
+      btn.className = 'toc-section-title collapsed';
       btn.innerHTML = '<span class="arrow">&#9660;</span>&ensp;Section ' +
                       section.sec + ' &mdash; ' + section.title;
       var ul = document.createElement('ul');
-      ul.className = 'toc-clauses';
+      ul.className = 'toc-clauses hidden';
       btn.addEventListener('click', function () {
         btn.classList.toggle('collapsed');
         ul.classList.toggle('hidden');
@@ -296,10 +296,11 @@
         var badge = document.createElement('span');
         badge.className = 'cl-badge exact';
         badge.dataset.cl = c.cl;
-        badge.title = 'Page number';
+        badge.title = 'Click to navigate to page ' + (EXACT_PAGES[c.cl] || '?');
         badge.textContent = EXACT_PAGES[c.cl] ? 'p' + EXACT_PAGES[c.cl] : '?';
 
         clBtn.addEventListener('click', function () { tocNav(c.cl, row); });
+        badge.addEventListener('click', function () { tocNav(c.cl, row); });
 
         row.appendChild(clBtn);
         row.appendChild(badge);
