@@ -5,16 +5,205 @@
   <title>Home - Switchboard Tools</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .links-section { margin-bottom: 32px; }
+    .links-section h3 {
+      font-size: 0.82em; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; color: var(--text-secondary);
+      margin: 18px 0 8px;
+    }
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 8px;
+    }
+    .link-card {
+      display: flex; flex-direction: column;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      text-decoration: none;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
+    .link-card:hover {
+      border-color: var(--accent-light);
+      box-shadow: 0 2px 10px rgba(25,118,210,0.10);
+      transform: translateY(-1px);
+    }
+    .link-card strong { color: var(--accent); font-size: 0.93em; margin-bottom: 2px; display: block; }
+    .link-card span { color: var(--text-secondary); font-size: 0.80em; line-height: 1.4; }
+    .supplier-tier-label {
+      font-size: 0.78em; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; margin: 14px 0 6px; padding: 3px 0;
+    }
+    .supplier-links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 5px;
+    }
+    .supplier-link-card {
+      display: block;
+      padding: 7px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 0.86em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+    .supplier-link-card:hover { border-color: var(--accent-light); background: var(--bg-info); color: var(--accent); }
+    @media (max-width: 600px) { .link-grid, .supplier-links-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
 </head>
 <body>
   <div class="top-tabs"></div>
   <div class="main-content">
     <h1>Electrical Engineering Tools</h1>
     <p>
-      Professional calculators and tools for electrical design, compliant with Australian and New Zealand standards. 
+      Professional calculators and tools for electrical design, compliant with Australian and New Zealand standards.
       Select a tool from the navigation above or explore the features below.
     </p>
-    
+
+    <!-- ===== USEFUL LINKS ===== -->
+    <div class="links-section">
+      <h2>Useful Links</h2>
+
+      <h3>Codes &amp; Standards</h3>
+      <div class="link-grid">
+        <a href="https://ncc.abcb.gov.au/editions/ncc-2022" target="_blank" rel="noopener" class="link-card">
+          <strong>NCC 2022</strong><span>National Construction Code — 2022 edition (ABCB)</span>
+        </a>
+        <a href="https://ncc.abcb.gov.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>NCC 2025</strong><span>National Construction Code — current edition (ABCB)</span>
+        </a>
+        <a href="https://www.standards.org.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>Standards Australia</strong><span>Purchase and access Australian Standards online</span>
+        </a>
+        <a href="https://www.erac.gov.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>ERAC</strong><span>Electrical Regulatory Authorities Council</span>
+        </a>
+        <a href="nswirviewer.html" class="link-card">
+          <strong>NSW Installation Rules</strong><span>NSW Service &amp; Installation Rules — built-in viewer</span>
+        </a>
+        <a href="as3000viewer.html" class="link-card">
+          <strong>AS/NZS 3000 Viewer</strong><span>Wiring Rules — browse and deep-link to clauses</span>
+        </a>
+      </div>
+
+      <h3>NSW Networks &amp; Utilities</h3>
+      <div class="link-grid">
+        <a href="https://www.byda.com.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>BYDA</strong><span>Before You Dig Australia — dial before you dig</span>
+        </a>
+        <a href="https://www.ausgrid.com.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>Ausgrid</strong><span>Sydney, Hunter &amp; Central Coast distribution network</span>
+        </a>
+        <a href="https://www.endeavourenergy.com.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>Endeavour Energy</strong><span>Western Sydney, Wollongong &amp; Blue Mountains</span>
+        </a>
+        <a href="https://www.essentialenergy.com.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>Essential Energy</strong><span>Regional &amp; rural NSW distribution network</span>
+        </a>
+        <a href="https://www.aemo.com.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>AEMO</strong><span>Australian Energy Market Operator</span>
+        </a>
+        <a href="https://www.service.nsw.gov.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>Service NSW</strong><span>Electrician &amp; contractor licence applications</span>
+        </a>
+      </div>
+
+      <h3>Industry Bodies</h3>
+      <div class="link-grid">
+        <a href="https://www.neca.asn.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>NECA</strong><span>National Electrical &amp; Communications Association</span>
+        </a>
+        <a href="https://www.cleanenergycouncil.org.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>Clean Energy Council</strong><span>Solar, battery &amp; renewable energy industry body</span>
+        </a>
+        <a href="https://www.engineersaustralia.org.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>Engineers Australia</strong><span>National professional engineering association</span>
+        </a>
+        <a href="https://www.energyrating.gov.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>Energy Rating</strong><span>Equipment energy efficiency labels &amp; comparative data</span>
+        </a>
+        <a href="https://www.airah.org.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>AIRAH</strong><span>Australian Institute of Refrigeration, Air Conditioning &amp; Heating</span>
+        </a>
+        <a href="https://www.acma.gov.au/" target="_blank" rel="noopener" class="link-card">
+          <strong>ACMA</strong><span>Australian Communications &amp; Media Authority (comms wiring)</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- ===== SUPPLIERS ===== -->
+    <div class="links-section">
+      <h2>Suppliers</h2>
+      <p style="color:var(--text-secondary);font-size:0.93em;margin:-4px 0 10px;">Lighting manufacturers &amp; distributors. Use <a href="lightingsearch.html">Lighting Search</a> to query products across multiple suppliers at once.</p>
+
+      <div class="supplier-tier-label" style="color:#7b1fa2;">Premium / Architectural</div>
+      <div class="supplier-links-grid">
+        <a href="https://austube.com.au" target="_blank" rel="noopener" class="supplier-link-card">Austube (Schréder)</a>
+        <a href="https://brightgreen.com" target="_blank" rel="noopener" class="supplier-link-card">Brightgreen</a>
+        <a href="https://buckford.com.au" target="_blank" rel="noopener" class="supplier-link-card">Buckford (ERCO/PROLICHT)</a>
+        <a href="https://darkon.com.au" target="_blank" rel="noopener" class="supplier-link-card">Darkon</a>
+        <a href="https://estlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Est Lighting</a>
+        <a href="https://iguzzini.com.au" target="_blank" rel="noopener" class="supplier-link-card">iGuzzini</a>
+        <a href="https://inlite.com.au" target="_blank" rel="noopener" class="supplier-link-card">Inlite (Artemide)</a>
+        <a href="https://jadecross.com.au" target="_blank" rel="noopener" class="supplier-link-card">Jadecross (ERCO/Arkoslight)</a>
+        <a href="https://kkdc.com.au" target="_blank" rel="noopener" class="supplier-link-card">KKDC</a>
+        <a href="https://kodalighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Koda Lighting (Occhio/Brokis)</a>
+        <a href="https://lexilighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lexi Lighting</a>
+        <a href="https://lumascape.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lumascape</a>
+        <a href="https://phosforma.com.au" target="_blank" rel="noopener" class="supplier-link-card">Phosforma</a>
+        <a href="https://trendlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Trend Lighting</a>
+        <a href="https://unios.com.au" target="_blank" rel="noopener" class="supplier-link-card">Unios</a>
+        <a href="https://we-ef.com" target="_blank" rel="noopener" class="supplier-link-card">WE-EF</a>
+        <a href="https://zumtobelgroup.com" target="_blank" rel="noopener" class="supplier-link-card">Zumtobel</a>
+      </div>
+
+      <div class="supplier-tier-label" style="color:#1976d2;">Mid-Range / Commercial</div>
+      <div class="supplier-links-grid">
+        <a href="https://atomlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Atom Lighting</a>
+        <a href="https://azoogi.com.au" target="_blank" rel="noopener" class="supplier-link-card">Azoogi</a>
+        <a href="https://clevertronics.com.au" target="_blank" rel="noopener" class="supplier-link-card">Clevertronics</a>
+        <a href="https://domuslighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Domus Lighting</a>
+        <a href="https://gentechlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Gentech Lighting</a>
+        <a href="https://gerardlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Gerard Lighting</a>
+        <a href="https://havit.com.au" target="_blank" rel="noopener" class="supplier-link-card">Havit Lighting</a>
+        <a href="https://ligman.com.au" target="_blank" rel="noopener" class="supplier-link-card">Ligman</a>
+        <a href="https://litesource.com.au" target="_blank" rel="noopener" class="supplier-link-card">LiTEsource &amp; Controls</a>
+        <a href="https://lucianlight.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lucian Light</a>
+        <a href="https://luminos.com.au" target="_blank" rel="noopener" class="supplier-link-card">Luminos</a>
+        <a href="https://luxlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lux Lighting</a>
+        <a href="https://mlight.com.au" target="_blank" rel="noopener" class="supplier-link-card">mLight</a>
+        <a href="https://mlplighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">MLP Lighting</a>
+        <a href="https://nerlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">NER Lighting</a>
+        <a href="https://osram.com.au" target="_blank" rel="noopener" class="supplier-link-card">Osram</a>
+        <a href="https://lighting.philips.com.au" target="_blank" rel="noopener" class="supplier-link-card">Philips Lighting (Signify)</a>
+        <a href="https://pierlite.com.au" target="_blank" rel="noopener" class="supplier-link-card">Pierlite</a>
+        <a href="https://proluxlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Prolux</a>
+        <a href="https://spartanlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Spartan Lighting</a>
+        <a href="https://superlux.com.au" target="_blank" rel="noopener" class="supplier-link-card">Superlux</a>
+        <a href="https://sylvania-lighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Sylvania</a>
+        <a href="https://thornlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Thorn Lighting</a>
+      </div>
+
+      <div class="supplier-tier-label" style="color:#388e3c;">Value / Volume</div>
+      <div class="supplier-links-grid">
+        <a href="https://beaconlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Beacon Lighting</a>
+        <a href="https://brilliantlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Brilliant Lighting</a>
+        <a href="https://cromptonlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Crompton Lighting</a>
+        <a href="https://eglo.com.au" target="_blank" rel="noopener" class="supplier-link-card">Eglo</a>
+        <a href="https://hpm.com.au" target="_blank" rel="noopener" class="supplier-link-card">HPM Legrand</a>
+        <a href="https://martec.com.au" target="_blank" rel="noopener" class="supplier-link-card">Martec</a>
+        <a href="https://mercatorlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Mercator</a>
+        <a href="https://ventair.com.au" target="_blank" rel="noopener" class="supplier-link-card">Ventair</a>
+      </div>
+    </div>
+
     <h2>Main Tools</h2>
     <ul class="tool-list">
       <li>
@@ -87,31 +276,6 @@
       <li><a href="sld.html"><strong>Single Line Diagram</strong></a> <span class="tool-desc">Interactive single line diagram builder for electrical distribution systems.</span></li>
       <li><a href="as3000tips.html"><strong>AS3000 Tips</strong></a> <span class="tool-desc">Quick reference tips and common requirements from AS/NZS 3000.</span></li>
     </ul>
-    <div class="useful-links">
-      <h2>Standards & Resources</h2>
-      <ul class="useful-links-list">
-        <li>
-          <a href="https://chromewebstore.google.com/detail/ncc-2022-building-standar/lefoipmnhicbngomhidbfmhohegkjnpg" target="_blank" rel="noopener noreferrer">NCC 2022 Chrome Extension</a>
-          <span class="tool-desc">Quick access to National Construction Code</span>
-        </li>
-        <li>
-          <a href="https://www.standards.org.au/" target="_blank" rel="noopener noreferrer">Standards Australia</a>
-          <span class="tool-desc">Official Australian Standards</span>
-        </li>
-        <li>
-          <a href="https://www.standards.govt.nz/" target="_blank" rel="noopener noreferrer">Standards New Zealand</a>
-          <span class="tool-desc">Official New Zealand Standards</span>
-        </li>
-        <li>
-          <a href="https://ncc.abcb.gov.au/" target="_blank" rel="noopener noreferrer">National Construction Code</a>
-          <span class="tool-desc">Australian Building Codes Board</span>
-        </li>
-        <li>
-          <a href="https://www.energyrating.gov.au/" target="_blank" rel="noopener noreferrer">Energy Rating</a>
-          <span class="tool-desc">Equipment Energy Efficiency Program</span>
-        </li>
-      </ul>
-    </div>
   </div>
     <script src="omni-utils.js"></script><script src="script.js"></script>
 </body>
