@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Single Line Diagram Generator - Switchboard Tools</title>
+  <title>Single Line Diagram Generator - OMNI</title>
   <link rel="stylesheet" href="style.css">
   <!-- Professional Drawing Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js"></script>
@@ -1537,6 +1537,42 @@
       a.download = 'single-line-diagram.svg';
       a.click();
       URL.revokeObjectURL(url);
+    }
+
+    function exportPNG() {
+      const svg = document.getElementById('sldCanvas');
+      const width = parseInt(svg.getAttribute('width')) || svg.clientWidth;
+      const height = parseInt(svg.getAttribute('height')) || svg.clientHeight;
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svg);
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      const img = new Image();
+      img.onload = function() {
+        const scale = 2; // 2x resolution for crisp output
+        const canvas = document.createElement('canvas');
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0, width, height);
+        URL.revokeObjectURL(url);
+        canvas.toBlob(function(blob) {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'single-line-diagram.png';
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }, 'image/png');
+      };
+      img.onerror = function() {
+        URL.revokeObjectURL(url);
+        alert('PNG export failed - try Export SVG instead.');
+      };
+      img.src = url;
     }
 
     function exportA1() {

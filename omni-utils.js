@@ -13,7 +13,7 @@ const OmniNav = {
     { label: 'Switchroom Sizer', href: 'switchroom.html' },
     { label: 'Cable Tray Sizer', href: 'cabletraysizing.html' },
     { label: 'Lighting Search', href: 'lightingsearch.html' },
-    { label: 'Power Systems', children: [
+    { label: 'Power', children: [
       { label: 'Meter Panel Sizer', href: 'meterpanel.html' },
       { label: 'Cable Sizing', href: 'cablesizing.html' },
       { label: 'Cable Weight', href: 'cableweight.html' },
@@ -30,15 +30,13 @@ const OmniNav = {
       { label: 'Harmonics Analysis', href: 'harmonics.html' },
       { label: 'Busbar Sizing', href: 'busbarsizing.html' },
       { label: 'CT Sizing', href: 'ctsizing.html' },
-      { label: 'Earthing Calculator', href: 'earthing.html' }
-    ]},
-    { label: 'Protection & Containment', children: [
+      { label: 'Earthing Calculator', href: 'earthing.html' },
       { label: 'RCD Selector', href: 'rcdselect.html' },
       { label: 'SPD Sizing', href: 'spdsizing.html' },
       { label: 'IP/IK Rating Guide', href: 'iprating.html' },
       { label: 'Conduit Sizer', href: 'conduit.html' }
     ]},
-    { label: 'Lighting & Fire', children: [
+    { label: 'Lighting', children: [
       { label: 'Lux Calculator', href: 'luxcalc.html' },
       { label: 'Lux Levels Reference', href: 'luxlevels.html' },
       { label: 'Emergency Lighting', href: 'emergencylighting.html' },
@@ -53,11 +51,11 @@ const OmniNav = {
       { label: 'T&C Checklists', href: 'tcommissioning.html' },
       { label: 'Site Inspection', href: 'inspection.html' },
       { label: 'Single Line Diagram', href: 'sld.html' },
-      { label: 'AS3000 Tips', href: 'as3000tips.html' }
+      { label: 'AS3000 Tips', href: 'as3000tips.html' },
+      { label: 'Verification', href: 'qa.html' }
     ]},
     { label: 'AS/NZS 3000', href: 'as3000viewer.html' },
-    { label: 'NSW IR', href: 'nswirviewer.html' },
-    { label: 'Verification', href: 'qa.html' }
+    { label: 'NSW IR', href: 'nswirviewer.html' }
   ],
 
   init() {

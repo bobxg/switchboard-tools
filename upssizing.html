@@ -10,10 +10,10 @@
   <div class="top-tabs"></div>
   <div class="main-content">
     <h1>UPS Sizing Calculator</h1>
-    <p>Calculate UPS kVA rating and battery capacity per <strong>AS 4044:2019</strong> (UPS systems) and <strong>AS/NZS 3000</strong>.</p>
+    <p>Calculate UPS kVA rating and battery capacity per <strong>AS 62040 series</strong> (UPS systems) and <strong>AS/NZS 3000</strong>.</p>
     <div class="calc-section">
       <h2>Critical Load Data</h2>
-      <div class="info-box"><strong>AS 4044:2019:</strong> UPS shall be rated for the total critical load including future growth. Battery autonomy shall meet the operational requirement for safe shutdown or generator transfer.</div>
+      <div class="info-box"><strong>AS 62040.3:</strong> UPS shall be rated for the total critical load including future growth. Battery autonomy shall meet the operational requirement for safe shutdown or generator transfer.</div>
       <div class="input-row three">
         <div class="input-group"><label for="loadKW">Critical Load (kW)</label><input type="number" id="loadKW" value="50" min="1" step="1" /></div>
         <div class="input-group"><label for="loadPF">Load Power Factor</label><input type="number" id="loadPF" value="0.9" min="0.5" max="1.0" step="0.05" /></div>
@@ -141,7 +141,7 @@
         &#8226; Battery: ${battType.toUpperCase()} &mdash; ${requiredAh.toFixed(0)} Ah at ${dcV} VDC, ${numStrings} string(s), ${mins} min autonomy<br>
         &#8226; Estimated battery weight: ${weight.toFixed(0)} kg &mdash; verify floor loading capacity<br>
         &#8226; Recharge time: ${rechargeHrs} hours at ${rechargeCurrent.toFixed(1)} A<br>
-        <em>Refer to AS 4044:2019 for detailed UPS installation requirements. Battery room ventilation per AS 2676.</em>
+        <em>Refer to the AS 62040 series for detailed UPS requirements. Battery room ventilation per AS 2676.</em>
       `;
       document.getElementById('resultSection').style.display = 'block';
     }

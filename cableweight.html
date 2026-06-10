@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cable Weight - Switchboard Tools</title>
+  <title>Cable Weight - OMNI</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -118,7 +118,7 @@
     </div>
   </div>
 
-    <script src="omni-utils.js"></script><script src="script.js"></script>
+    <script src="omni-utils.js"></script>
   <script>
     // Approximate cable weights (kg/m) for armoured cables
     const CABLE_WEIGHTS = {
@@ -233,7 +233,7 @@
       const conductorName = conductor === 'cu' ? 'Copper' : 'Aluminium';
       const armouredType = isArmoured ? 'SWA (Steel Wire Armoured)' : 'Unarmoured';
       lastWeightResult = {
-        spec: cores + 'C x ' + size + 'mm� ' + conductorName + ' ' + armouredType,
+        spec: cores + 'C x ' + size + 'mm² ' + conductorName + ' ' + armouredType,
         wpm: weightPerMeter.toFixed(3), length, total: totalWeight.toFixed(2)
       };
       let referenceSource = '';
