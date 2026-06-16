@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,7 +6,177 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    .links-section { margin-bottom: 32px; }
+    /* ===== Hero ===== */
+    .main-content { padding-top: 0; overflow: hidden; }
+    .home-hero {
+      margin: 0 -52px 30px;
+      padding: 46px 52px 40px;
+      background: linear-gradient(135deg, #0b1121 0%, #16224a 60%, #1d3a8a 100%);
+      color: #fff;
+      position: relative;
+    }
+    .home-hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 85% 15%, rgba(96,165,250,0.18), transparent 50%),
+        radial-gradient(ellipse at 10% 90%, rgba(37,99,235,0.12), transparent 45%);
+      pointer-events: none;
+    }
+    .home-hero h1 {
+      color: #fff;
+      margin: 0 0 6px;
+      font-size: 2.1em;
+      position: relative; z-index: 1;
+    }
+    .home-hero p {
+      color: rgba(255,255,255,0.72);
+      margin: 0 0 22px;
+      max-width: 640px;
+      position: relative; z-index: 1;
+    }
+    .hero-search {
+      position: relative; z-index: 1;
+      max-width: 520px;
+    }
+    .hero-search .oi {
+      position: absolute; left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.45);
+    }
+    .hero-search input {
+      width: 100%;
+      padding: 13px 44px 13px 42px;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-size: 1.02em;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    }
+    .hero-search input::placeholder { color: rgba(255,255,255,0.45); }
+    .hero-search input:focus {
+      border-color: var(--accent-light);
+      background: rgba(255,255,255,0.12);
+      box-shadow: 0 0 0 3px rgba(96,165,250,0.25);
+    }
+    .hero-search kbd {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Consolas', monospace;
+      font-size: 0.72em;
+      color: rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      padding: 2px 6px;
+      pointer-events: none;
+    }
+    .hero-stats {
+      display: flex; gap: 22px; flex-wrap: wrap;
+      margin-top: 18px;
+      position: relative; z-index: 1;
+      font-size: 0.84em;
+      color: rgba(255,255,255,0.55);
+    }
+    .hero-stats span { display: inline-flex; align-items: center; gap: 6px; }
+    .hero-stats .oi { color: var(--accent-light); }
+
+    /* ===== Favourites / recents chips ===== */
+    .chip-section { margin: 0 0 22px; }
+    .chip-section h3 {
+      font-size: 0.78em; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.7px; color: var(--text-secondary);
+      margin: 0 0 8px; display: flex; align-items: center; gap: 6px;
+    }
+    .chip-section h3 .oi { color: #f59e0b; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tool-chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 0.88em;
+      font-weight: 600;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s, color 0.15s;
+    }
+    .tool-chip .oi { color: var(--accent); }
+    .tool-chip:hover {
+      border-color: var(--accent-light);
+      color: var(--accent);
+      box-shadow: 0 2px 10px rgba(37,99,235,0.12);
+      transform: translateY(-1px);
+    }
+
+    /* ===== Featured cards ===== */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .feature-card {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: border-color 0.18s, box-shadow 0.2s, transform 0.15s;
+    }
+    .feature-card:hover {
+      border-color: var(--accent-light);
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-2px);
+    }
+    .feature-ico {
+      display: flex; align-items: center; justify-content: center;
+      width: 42px; height: 42px; flex-shrink: 0;
+      border-radius: 10px;
+      background: var(--accent-bg);
+      color: var(--accent);
+    }
+    .feature-tx { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .feature-tx strong { color: var(--text-heading); font-size: 0.98em; }
+    .feature-tx span { color: var(--text-secondary); font-size: 0.82em; line-height: 1.5; }
+
+    /* ===== Tool lists with icons ===== */
+    .tool-list li { display: flex; gap: 12px; align-items: flex-start; }
+    .tool-ico {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; flex-shrink: 0;
+      border-radius: 8px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      margin-top: 1px;
+    }
+    .tool-body { min-width: 0; }
+    .tool-section h2 {
+      display: flex; align-items: center; gap: 9px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .tool-section h2 .sec-count {
+      font-size: 0.62em; font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-input);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 2px 9px;
+      letter-spacing: 0.3px;
+    }
+    #noToolResults {
+      text-align: center;
+      color: var(--text-secondary);
+      padding: 40px 0 24px;
+      font-size: 1.05em;
+    }
+
+    /* ===== Useful links / suppliers ===== */
+    .links-section { margin: 44px 0 0; }
     .links-section h3 {
       font-size: 0.82em; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.6px; color: var(--text-secondary);
@@ -55,17 +225,162 @@
       transition: border-color 0.2s, background 0.2s, color 0.2s;
     }
     .supplier-link-card:hover { border-color: var(--accent-light); background: var(--bg-info); color: var(--accent); }
-    @media (max-width: 600px) { .link-grid, .supplier-links-grid { grid-template-columns: 1fr 1fr; } }
+
+    .suppliers-details { margin-top: 34px; }
+    .suppliers-details summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 18px;
+      background: var(--bg-useful);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+    .suppliers-details summary::-webkit-details-marker { display: none; }
+    .suppliers-details summary:hover { border-color: var(--accent-light); }
+    .suppliers-details summary h2 { margin: 0; font-size: 1.1em; }
+    .suppliers-details summary .sum-note { color: var(--text-secondary); font-size: 0.86em; flex: 1; }
+    .suppliers-details summary .sum-arrow {
+      color: var(--text-secondary);
+      transition: transform 0.2s;
+      font-size: 0.8em;
+    }
+    .suppliers-details[open] summary { border-radius: 10px 10px 0 0; }
+    .suppliers-details[open] summary .sum-arrow { transform: rotate(180deg); }
+    .suppliers-body {
+      border: 1px solid var(--border-light);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      padding: 6px 18px 18px;
+      background: var(--bg-card);
+    }
+
+    @media (max-width: 900px) {
+      .home-hero { margin: 0 -20px 24px; padding: 32px 20px 28px; }
+    }
+    @media (max-width: 600px) {
+      .link-grid, .supplier-links-grid { grid-template-columns: 1fr 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <div class="top-tabs"></div>
   <div class="main-content">
-    <h1>Electrical Engineering Tools</h1>
-    <p>
-      Professional calculators and tools for electrical design, compliant with Australian and New Zealand standards.
-      Select a tool from the navigation above or explore the features below.
-    </p>
+
+    <!-- ===== HERO ===== -->
+    <div class="home-hero">
+      <h1>Electrical Engineering Tools</h1>
+      <p>Professional calculators, references and documentation builders for electrical design &mdash; aligned with Australian &amp; New Zealand standards.</p>
+      <div class="hero-search">
+        <svg class="oi" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="toolSearch" placeholder="Search tools&hellip; (cable, demand, lux, RCD)" autocomplete="off" aria-label="Search tools" />
+        <kbd>/</kbd>
+      </div>
+      <div class="hero-stats">
+        <span id="statTools"></span>
+        <span id="statStd"></span>
+        <span id="statCalc"></span>
+      </div>
+    </div>
+
+    <!-- ===== FAVOURITES / RECENTS (populated by script) ===== -->
+    <div id="favRow" class="chip-section" hidden>
+      <h3 id="favHead">Favourites</h3>
+      <div class="chip-row"></div>
+    </div>
+    <div id="recentRow" class="chip-section" hidden>
+      <h3>Recently used</h3>
+      <div class="chip-row"></div>
+    </div>
+
+    <!-- ===== TOOLS ===== -->
+    <section class="tool-section">
+      <h2>Featured <span class="sec-count"></span></h2>
+      <div class="feature-grid">
+        <a class="feature-card" href="switchboard.html">
+          <span class="feature-ico" data-icon="grid"></span>
+          <span class="feature-tx"><strong>Switchboard Sizer</strong><span>Design and visualise MSB layouts with drag-and-drop modules, dimensions and printable schematics.</span></span>
+        </a>
+        <a class="feature-card" href="switchroom.html">
+          <span class="feature-ico" data-icon="box"></span>
+          <span class="feature-tx"><strong>Switchroom Sizer</strong><span>Visual switchroom layout with working clearances, equipment placement and dimensional checks.</span></span>
+        </a>
+        <a class="feature-card" href="cabletraysizing.html">
+          <span class="feature-ico" data-icon="layers"></span>
+          <span class="feature-tx"><strong>Cable Tray Sizer</strong><span>Tray width and depth selection per AS/NZS 3000 cl. 3.9 and AS 3013, with derating factors.</span></span>
+        </a>
+        <a class="feature-card" href="lightingsearch.html">
+          <span class="feature-ico" data-icon="search"></span>
+          <span class="feature-tx"><strong>Lighting Search</strong><span>Search lighting products across approved Australian manufacturers and suppliers simultaneously.</span></span>
+        </a>
+      </div>
+    </section>
+
+    <section class="tool-section">
+      <h2>Power <span class="sec-count"></span></h2>
+      <ul class="tool-list">
+        <li><span class="tool-ico" data-icon="gauge"></span><div class="tool-body"><a href="meterpanel.html"><strong>Meter Panel Sizer</strong></a> <span class="tool-desc">Meter panel layout and sizing per NSW Service &amp; Installation Rules.</span></div></li>
+        <li><span class="tool-ico" data-icon="cable"></span><div class="tool-body"><a href="cablesizing.html"><strong>Cable Sizing</strong></a> <span class="tool-desc">Cable selection per AS/NZS 3008.1.1 with current capacity, voltage drop, and earth fault ratings.</span></div></li>
+        <li><span class="tool-ico" data-icon="layers"></span><div class="tool-body"><a href="cableweight.html"><strong>Cable Weight</strong></a> <span class="tool-desc">Calculate cable weights for structural and containment sizing.</span></div></li>
+        <li><span class="tool-ico" data-icon="chart"></span><div class="tool-body"><a href="maxdemand.html"><strong>Maximum Demand</strong></a> <span class="tool-desc">Maximum demand calculator per AS/NZS 3000 Appendix C for domestic and commercial installations.</span></div></li>
+        <li><span class="tool-ico" data-icon="sliders"></span><div class="tool-body"><a href="diversity.html"><strong>Diversity Factors</strong></a> <span class="tool-desc">AS/NZS 3000 Appendix C diversity factor lookup for domestic, commercial, and industrial loads.</span></div></li>
+        <li><span class="tool-ico" data-icon="alert"></span><div class="tool-body"><a href="faultlevel.html"><strong>Fault Level Calculator</strong></a> <span class="tool-desc">Prospective fault current from transformer to downstream nodes per IEC 60909 / AS/NZS 3000.</span></div></li>
+        <li><span class="tool-ico" data-icon="loop"></span><div class="tool-body"><a href="loopimpedance.html"><strong>Loop Impedance</strong></a> <span class="tool-desc">Earth fault loop impedance Zs calculator per AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.2" target="_blank">cl. 2.6.2&ndash;2.6.3</a>.</span></div></li>
+        <li><span class="tool-ico" data-icon="filter"></span><div class="tool-body"><a href="discrimination.html"><strong>Discrimination Check</strong></a> <span class="tool-desc">Selectivity verification between upstream and downstream protective devices.</span></div></li>
+        <li><span class="tool-ico" data-icon="transformer"></span><div class="tool-body"><a href="txsizing.html"><strong>Transformer Sizing</strong></a> <span class="tool-desc">Transformer kVA selection with losses, impedance, and fault current estimation per AS 2374.</span></div></li>
+        <li><span class="tool-ico" data-icon="power"></span><div class="tool-body"><a href="gensizing.html"><strong>Generator Sizing</strong></a> <span class="tool-desc">Generator kVA sizing with step-loading sequence per AS/NZS 3010:2017.</span></div></li>
+        <li><span class="tool-ico" data-icon="battery"></span><div class="tool-body"><a href="upssizing.html"><strong>UPS Sizing</strong></a> <span class="tool-desc">UPS kVA and battery Ah calculator per AS 62040.</span></div></li>
+        <li><span class="tool-ico" data-icon="capacitor"></span><div class="tool-body"><a href="pfcsizing.html"><strong>PFC Sizing</strong></a> <span class="tool-desc">Power factor correction capacitor bank sizing with harmonic resonance check.</span></div></li>
+        <li><span class="tool-ico" data-icon="wave"></span><div class="tool-body"><a href="harmonics.html"><strong>Harmonics Analysis</strong></a> <span class="tool-desc">THD estimation for LED/VSD-heavy installations per AS/NZS 61000.3 series.</span></div></li>
+        <li><span class="tool-ico" data-icon="busbar"></span><div class="tool-body"><a href="busbarsizing.html"><strong>Busbar Sizing</strong></a> <span class="tool-desc">Copper/aluminium busbar current capacity and short-circuit withstand per AS/NZS 61439.</span></div></li>
+        <li><span class="tool-ico" data-icon="ct"></span><div class="tool-body"><a href="ctsizing.html"><strong>CT Sizing</strong></a> <span class="tool-desc">Current transformer ratio, accuracy class, and burden calculation per AS 1284.1 / AS 61869.2.</span></div></li>
+        <li><span class="tool-ico" data-icon="earth"></span><div class="tool-body"><a href="earthing.html"><strong>Earthing Calculator</strong></a> <span class="tool-desc">Earth electrode resistance for rods, strips, grids, and plates using Laurent-Niemann formulas.</span></div></li>
+        <li><span class="tool-ico" data-icon="sun"></span><div class="tool-body"><a href="pvsizing.html"><strong>PV Sizing</strong></a> <span class="tool-desc">Solar PV system sizing and inverter selection per AS/NZS 5033.</span></div></li>
+        <li><span class="tool-ico" data-icon="shield"></span><div class="tool-body"><a href="rcdselect.html"><strong>RCD Selector</strong></a> <span class="tool-desc">RCD type and sensitivity selection per AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.3" target="_blank">cl. 2.6.3&ndash;2.6.4</a>.</span></div></li>
+        <li><span class="tool-ico" data-icon="bolt"></span><div class="tool-body"><a href="spdsizing.html"><strong>SPD Sizing</strong></a> <span class="tool-desc">Surge protection device risk assessment and selection per AS/NZS 1768:2021.</span></div></li>
+        <li><span class="tool-ico" data-icon="droplet"></span><div class="tool-body"><a href="iprating.html"><strong>IP/IK Rating Guide</strong></a> <span class="tool-desc">IP and IK rating decoder with environment-based recommendations per AS 60529 / AS 62262.</span></div></li>
+        <li><span class="tool-ico" data-icon="conduit"></span><div class="tool-body"><a href="conduit.html"><strong>Conduit Sizer</strong></a> <span class="tool-desc">Conduit fill calculations for various cable types and configurations.</span></div></li>
+      </ul>
+    </section>
+
+    <section class="tool-section">
+      <h2>Lighting <span class="sec-count"></span></h2>
+      <ul class="tool-list">
+        <li><span class="tool-ico" data-icon="bulb"></span><div class="tool-body"><a href="luxcalc.html"><strong>Lux Calculator</strong></a> <span class="tool-desc">Lumen method illuminance calculator per AS/NZS 1680.1.</span></div></li>
+        <li><span class="tool-ico" data-icon="book"></span><div class="tool-body"><a href="luxlevels.html"><strong>Lux Levels Reference</strong></a> <span class="tool-desc">Searchable database of required illuminance levels per AS/NZS 1680.</span></div></li>
+        <li><span class="tool-ico" data-icon="alertCircle"></span><div class="tool-body"><a href="emergencylighting.html"><strong>Emergency Lighting</strong></a> <span class="tool-desc">Emergency and exit lighting design per AS 2293.</span></div></li>
+        <li><span class="tool-ico" data-icon="flame"></span><div class="tool-body"><a href="fireinterface.html"><strong>Fire Interface Matrix</strong></a> <span class="tool-desc">Fire cause-and-effect matrix per AS 1670.1, AS 1668.1, and NCC.</span></div></li>
+        <li><span class="tool-ico" data-icon="wind"></span><div class="tool-body"><a href="smokecontrol.html"><strong>Smoke Control</strong></a> <span class="tool-desc">Smoke control electrical requirements and power estimation per AS 1668.1.</span></div></li>
+        <li><span class="tool-ico" data-icon="clipboard"></span><div class="tool-body"><a href="essentialservices.html"><strong>Essential Services</strong></a> <span class="tool-desc">Essential safety measures register with maintenance schedules per NCC Section E.</span></div></li>
+      </ul>
+    </section>
+
+    <section class="tool-section">
+      <h2>Documentation <span class="sec-count"></span></h2>
+      <ul class="tool-list">
+        <li><span class="tool-ico" data-icon="table"></span><div class="tool-body"><a href="loadschedule.html"><strong>Load Schedule</strong></a> <span class="tool-desc">Interactive load schedule builder with automatic demand and diversity calculations.</span></div></li>
+        <li><span class="tool-ico" data-icon="fileText"></span><div class="tool-body"><a href="cableschedule.html"><strong>Cable Schedule</strong></a> <span class="tool-desc">Cable schedule table builder with export to CSV and print formatting.</span></div></li>
+        <li><span class="tool-ico" data-icon="award"></span><div class="tool-body"><a href="designcert.html"><strong>Design Certificate</strong></a> <span class="tool-desc">Generate design compliance certificates with standards references and print/PDF output.</span></div></li>
+        <li><span class="tool-ico" data-icon="checkSquare"></span><div class="tool-body"><a href="tcommissioning.html"><strong>T&amp;C Checklists</strong></a> <span class="tool-desc">Testing and commissioning checklists per AS/NZS 3000 <a href="as3000viewer.html#cl-8.1" target="_blank">Section 8</a> and AS/NZS 3017.</span></div></li>
+        <li><span class="tool-ico" data-icon="eye"></span><div class="tool-body"><a href="inspection.html"><strong>Site Inspection</strong></a> <span class="tool-desc">Site inspection checklists and reporting tools.</span></div></li>
+        <li><span class="tool-ico" data-icon="sld"></span><div class="tool-body"><a href="sld.html"><strong>Single Line Diagram</strong></a> <span class="tool-desc">Interactive single line diagram builder for electrical distribution systems.</span></div></li>
+        <li><span class="tool-ico" data-icon="info"></span><div class="tool-body"><a href="as3000tips.html"><strong>AS3000 Tips</strong></a> <span class="tool-desc">Quick reference tips and common requirements from AS/NZS 3000.</span></div></li>
+        <li><span class="tool-ico" data-icon="checkCircle"></span><div class="tool-body"><a href="qa.html"><strong>Verification</strong></a> <span class="tool-desc">Mathematical formulas, standards references, and validation methods for all calculators.</span></div></li>
+      </ul>
+    </section>
+
+    <section class="tool-section">
+      <h2>Reference <span class="sec-count"></span></h2>
+      <ul class="tool-list">
+        <li><span class="tool-ico" data-icon="bookOpen"></span><div class="tool-body"><a href="as3000viewer.html"><strong>AS/NZS 3000 Viewer</strong></a> <span class="tool-desc">Browse the Wiring Rules with clause-level navigation and deep links.</span></div></li>
+        <li><span class="tool-ico" data-icon="book"></span><div class="tool-body"><a href="nswirviewer.html"><strong>NSW Installation Rules</strong></a> <span class="tool-desc">NSW Service &amp; Installation Rules built-in viewer.</span></div></li>
+      </ul>
+    </section>
+
+    <div id="noToolResults" hidden>No tools match your search.</div>
 
     <!-- ===== USEFUL LINKS ===== -->
     <div class="links-section">
@@ -74,10 +389,10 @@
       <h3>Codes &amp; Standards</h3>
       <div class="link-grid">
         <a href="https://ncc.abcb.gov.au/editions/ncc-2022" target="_blank" rel="noopener" class="link-card">
-          <strong>NCC 2022</strong><span>National Construction Code — 2022 edition (ABCB)</span>
+          <strong>NCC 2022</strong><span>National Construction Code &mdash; 2022 edition (ABCB)</span>
         </a>
         <a href="https://ncc.abcb.gov.au/" target="_blank" rel="noopener" class="link-card">
-          <strong>NCC 2025</strong><span>National Construction Code — current edition (ABCB)</span>
+          <strong>NCC 2025</strong><span>National Construction Code &mdash; current edition (ABCB)</span>
         </a>
         <a href="https://www.standards.org.au/" target="_blank" rel="noopener" class="link-card">
           <strong>Standards Australia</strong><span>Purchase and access Australian Standards online</span>
@@ -86,17 +401,17 @@
           <strong>ERAC</strong><span>Electrical Regulatory Authorities Council</span>
         </a>
         <a href="nswirviewer.html" class="link-card">
-          <strong>NSW Installation Rules</strong><span>NSW Service &amp; Installation Rules — built-in viewer</span>
+          <strong>NSW Installation Rules</strong><span>NSW Service &amp; Installation Rules &mdash; built-in viewer</span>
         </a>
         <a href="as3000viewer.html" class="link-card">
-          <strong>AS/NZS 3000 Viewer</strong><span>Wiring Rules — browse and deep-link to clauses</span>
+          <strong>AS/NZS 3000 Viewer</strong><span>Wiring Rules &mdash; browse and deep-link to clauses</span>
         </a>
       </div>
 
       <h3>NSW Networks &amp; Utilities</h3>
       <div class="link-grid">
         <a href="https://www.byda.com.au/" target="_blank" rel="noopener" class="link-card">
-          <strong>BYDA</strong><span>Before You Dig Australia — dial before you dig</span>
+          <strong>BYDA</strong><span>Before You Dig Australia &mdash; dial before you dig</span>
         </a>
         <a href="https://www.ausgrid.com.au/" target="_blank" rel="noopener" class="link-card">
           <strong>Ausgrid</strong><span>Sydney, Hunter &amp; Central Coast distribution network</span>
@@ -138,139 +453,165 @@
       </div>
     </div>
 
-    <!-- ===== SUPPLIERS ===== -->
-    <div class="links-section">
-      <h2>Suppliers</h2>
-      <p style="color:var(--text-secondary);font-size:0.93em;margin:-4px 0 10px;">Lighting manufacturers &amp; distributors. Use <a href="lightingsearch.html">Lighting Search</a> to query products across multiple suppliers at once.</p>
+    <!-- ===== SUPPLIERS (collapsible) ===== -->
+    <details class="suppliers-details">
+      <summary>
+        <h2>Suppliers</h2>
+        <span class="sum-note">48 lighting manufacturers &amp; distributors &mdash; or query them all at once with <a href="lightingsearch.html" onclick="event.stopPropagation()">Lighting Search</a></span>
+        <span class="sum-arrow">&#9660;</span>
+      </summary>
+      <div class="suppliers-body">
 
-      <div class="supplier-tier-label" style="color:#7b1fa2;">Premium / Architectural</div>
-      <div class="supplier-links-grid">
-        <a href="https://austube.com.au" target="_blank" rel="noopener" class="supplier-link-card">Austube (Schréder)</a>
-        <a href="https://brightgreen.com" target="_blank" rel="noopener" class="supplier-link-card">Brightgreen</a>
-        <a href="https://buckford.com.au" target="_blank" rel="noopener" class="supplier-link-card">Buckford (ERCO/PROLICHT)</a>
-        <a href="https://darkon.com.au" target="_blank" rel="noopener" class="supplier-link-card">Darkon</a>
-        <a href="https://estlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Est Lighting</a>
-        <a href="https://iguzzini.com.au" target="_blank" rel="noopener" class="supplier-link-card">iGuzzini</a>
-        <a href="https://inlite.com.au" target="_blank" rel="noopener" class="supplier-link-card">Inlite (Artemide)</a>
-        <a href="https://jadecross.com.au" target="_blank" rel="noopener" class="supplier-link-card">Jadecross (ERCO/Arkoslight)</a>
-        <a href="https://kkdc.com.au" target="_blank" rel="noopener" class="supplier-link-card">KKDC</a>
-        <a href="https://kodalighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Koda Lighting (Occhio/Brokis)</a>
-        <a href="https://lexilighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lexi Lighting</a>
-        <a href="https://lumascape.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lumascape</a>
-        <a href="https://phosforma.com.au" target="_blank" rel="noopener" class="supplier-link-card">Phosforma</a>
-        <a href="https://trendlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Trend Lighting</a>
-        <a href="https://unios.com.au" target="_blank" rel="noopener" class="supplier-link-card">Unios</a>
-        <a href="https://we-ef.com" target="_blank" rel="noopener" class="supplier-link-card">WE-EF</a>
-        <a href="https://zumtobelgroup.com" target="_blank" rel="noopener" class="supplier-link-card">Zumtobel</a>
+        <div class="supplier-tier-label" style="color:#7b1fa2;">Premium / Architectural</div>
+        <div class="supplier-links-grid">
+          <a href="https://austube.com.au" target="_blank" rel="noopener" class="supplier-link-card">Austube (Schr&eacute;der)</a>
+          <a href="https://brightgreen.com" target="_blank" rel="noopener" class="supplier-link-card">Brightgreen</a>
+          <a href="https://buckford.com.au" target="_blank" rel="noopener" class="supplier-link-card">Buckford (ERCO/PROLICHT)</a>
+          <a href="https://darkon.com.au" target="_blank" rel="noopener" class="supplier-link-card">Darkon</a>
+          <a href="https://estlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Est Lighting</a>
+          <a href="https://iguzzini.com.au" target="_blank" rel="noopener" class="supplier-link-card">iGuzzini</a>
+          <a href="https://inlite.com.au" target="_blank" rel="noopener" class="supplier-link-card">Inlite (Artemide)</a>
+          <a href="https://jadecross.com.au" target="_blank" rel="noopener" class="supplier-link-card">Jadecross (ERCO/Arkoslight)</a>
+          <a href="https://kkdc.com.au" target="_blank" rel="noopener" class="supplier-link-card">KKDC</a>
+          <a href="https://kodalighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Koda Lighting (Occhio/Brokis)</a>
+          <a href="https://lexilighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lexi Lighting</a>
+          <a href="https://lumascape.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lumascape</a>
+          <a href="https://phosforma.com.au" target="_blank" rel="noopener" class="supplier-link-card">Phosforma</a>
+          <a href="https://trendlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Trend Lighting</a>
+          <a href="https://unios.com.au" target="_blank" rel="noopener" class="supplier-link-card">Unios</a>
+          <a href="https://we-ef.com" target="_blank" rel="noopener" class="supplier-link-card">WE-EF</a>
+          <a href="https://zumtobelgroup.com" target="_blank" rel="noopener" class="supplier-link-card">Zumtobel</a>
+        </div>
+
+        <div class="supplier-tier-label" style="color:#1976d2;">Mid-Range / Commercial</div>
+        <div class="supplier-links-grid">
+          <a href="https://atomlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Atom Lighting</a>
+          <a href="https://azoogi.com.au" target="_blank" rel="noopener" class="supplier-link-card">Azoogi</a>
+          <a href="https://clevertronics.com.au" target="_blank" rel="noopener" class="supplier-link-card">Clevertronics</a>
+          <a href="https://domuslighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Domus Lighting</a>
+          <a href="https://gentechlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Gentech Lighting</a>
+          <a href="https://gerardlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Gerard Lighting</a>
+          <a href="https://havit.com.au" target="_blank" rel="noopener" class="supplier-link-card">Havit Lighting</a>
+          <a href="https://ligman.com.au" target="_blank" rel="noopener" class="supplier-link-card">Ligman</a>
+          <a href="https://litesource.com.au" target="_blank" rel="noopener" class="supplier-link-card">LiTEsource &amp; Controls</a>
+          <a href="https://lucianlight.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lucian Light</a>
+          <a href="https://luminos.com.au" target="_blank" rel="noopener" class="supplier-link-card">Luminos</a>
+          <a href="https://luxlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lux Lighting</a>
+          <a href="https://mlight.com.au" target="_blank" rel="noopener" class="supplier-link-card">mLight</a>
+          <a href="https://mlplighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">MLP Lighting</a>
+          <a href="https://nerlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">NER Lighting</a>
+          <a href="https://osram.com.au" target="_blank" rel="noopener" class="supplier-link-card">Osram</a>
+          <a href="https://lighting.philips.com.au" target="_blank" rel="noopener" class="supplier-link-card">Philips Lighting (Signify)</a>
+          <a href="https://pierlite.com.au" target="_blank" rel="noopener" class="supplier-link-card">Pierlite</a>
+          <a href="https://proluxlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Prolux</a>
+          <a href="https://spartanlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Spartan Lighting</a>
+          <a href="https://superlux.com.au" target="_blank" rel="noopener" class="supplier-link-card">Superlux</a>
+          <a href="https://sylvania-lighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Sylvania</a>
+          <a href="https://thornlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Thorn Lighting</a>
+        </div>
+
+        <div class="supplier-tier-label" style="color:#388e3c;">Value / Volume</div>
+        <div class="supplier-links-grid">
+          <a href="https://beaconlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Beacon Lighting</a>
+          <a href="https://brilliantlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Brilliant Lighting</a>
+          <a href="https://cromptonlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Crompton Lighting</a>
+          <a href="https://eglo.com.au" target="_blank" rel="noopener" class="supplier-link-card">Eglo</a>
+          <a href="https://hpm.com.au" target="_blank" rel="noopener" class="supplier-link-card">HPM Legrand</a>
+          <a href="https://martec.com.au" target="_blank" rel="noopener" class="supplier-link-card">Martec</a>
+          <a href="https://mercatorlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Mercator</a>
+          <a href="https://ventair.com.au" target="_blank" rel="noopener" class="supplier-link-card">Ventair</a>
+        </div>
+
       </div>
-
-      <div class="supplier-tier-label" style="color:#1976d2;">Mid-Range / Commercial</div>
-      <div class="supplier-links-grid">
-        <a href="https://atomlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Atom Lighting</a>
-        <a href="https://azoogi.com.au" target="_blank" rel="noopener" class="supplier-link-card">Azoogi</a>
-        <a href="https://clevertronics.com.au" target="_blank" rel="noopener" class="supplier-link-card">Clevertronics</a>
-        <a href="https://domuslighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Domus Lighting</a>
-        <a href="https://gentechlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Gentech Lighting</a>
-        <a href="https://gerardlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Gerard Lighting</a>
-        <a href="https://havit.com.au" target="_blank" rel="noopener" class="supplier-link-card">Havit Lighting</a>
-        <a href="https://ligman.com.au" target="_blank" rel="noopener" class="supplier-link-card">Ligman</a>
-        <a href="https://litesource.com.au" target="_blank" rel="noopener" class="supplier-link-card">LiTEsource &amp; Controls</a>
-        <a href="https://lucianlight.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lucian Light</a>
-        <a href="https://luminos.com.au" target="_blank" rel="noopener" class="supplier-link-card">Luminos</a>
-        <a href="https://luxlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Lux Lighting</a>
-        <a href="https://mlight.com.au" target="_blank" rel="noopener" class="supplier-link-card">mLight</a>
-        <a href="https://mlplighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">MLP Lighting</a>
-        <a href="https://nerlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">NER Lighting</a>
-        <a href="https://osram.com.au" target="_blank" rel="noopener" class="supplier-link-card">Osram</a>
-        <a href="https://lighting.philips.com.au" target="_blank" rel="noopener" class="supplier-link-card">Philips Lighting (Signify)</a>
-        <a href="https://pierlite.com.au" target="_blank" rel="noopener" class="supplier-link-card">Pierlite</a>
-        <a href="https://proluxlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Prolux</a>
-        <a href="https://spartanlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Spartan Lighting</a>
-        <a href="https://superlux.com.au" target="_blank" rel="noopener" class="supplier-link-card">Superlux</a>
-        <a href="https://sylvania-lighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Sylvania</a>
-        <a href="https://thornlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Thorn Lighting</a>
-      </div>
-
-      <div class="supplier-tier-label" style="color:#388e3c;">Value / Volume</div>
-      <div class="supplier-links-grid">
-        <a href="https://beaconlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Beacon Lighting</a>
-        <a href="https://brilliantlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Brilliant Lighting</a>
-        <a href="https://cromptonlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Crompton Lighting</a>
-        <a href="https://eglo.com.au" target="_blank" rel="noopener" class="supplier-link-card">Eglo</a>
-        <a href="https://hpm.com.au" target="_blank" rel="noopener" class="supplier-link-card">HPM Legrand</a>
-        <a href="https://martec.com.au" target="_blank" rel="noopener" class="supplier-link-card">Martec</a>
-        <a href="https://mercatorlighting.com.au" target="_blank" rel="noopener" class="supplier-link-card">Mercator</a>
-        <a href="https://ventair.com.au" target="_blank" rel="noopener" class="supplier-link-card">Ventair</a>
-      </div>
-    </div>
-
-    <h2>Main Tools</h2>
-    <ul class="tool-list">
-      <li>
-        <a href="switchboard.html"><strong>Switchboard Sizer</strong></a>
-        <span class="tool-desc">Design and visualize MSB layouts with drag-and-drop modules. Calculates dimensions and generates printable schematics.</span>
-      </li>
-      <li>
-        <a href="switchroom.html"><strong>Switchroom Sizer</strong></a>
-        <span class="tool-desc">Visual switchroom layout with working clearances, equipment placement, and dimensional checks.</span>
-      </li>
-      <li>
-        <a href="cabletraysizing.html"><strong>Cable Tray Sizer</strong></a>
-        <span class="tool-desc">Cable tray width and depth selection per AS/NZS 3000 cl. 3.9 and AS 3013, with derating factors.</span>
-      </li>
-      <li>
-        <a href="lightingsearch.html"><strong>Lighting Search</strong></a>
-        <span class="tool-desc">Search lighting products from approved Australian manufacturers. Filter by multiple suppliers simultaneously.</span>
-      </li>
-    </ul>
-
-    <h2>Power</h2>
-    <ul class="tool-list">
-      <li><a href="meterpanel.html"><strong>Meter Panel Sizer</strong></a> <span class="tool-desc">Meter panel layout and sizing per NSW Service &amp; Installation Rules.</span></li>
-      <li><a href="cablesizing.html"><strong>Cable Sizing</strong></a> <span class="tool-desc">Cable selection per AS/NZS 3008.1.1 with current capacity, voltage drop, and earth fault ratings.</span></li>
-      <li><a href="cableweight.html"><strong>Cable Weight</strong></a> <span class="tool-desc">Calculate cable weights for structural and containment sizing.</span></li>
-      <li><a href="maxdemand.html"><strong>Maximum Demand</strong></a> <span class="tool-desc">Maximum demand calculator per AS/NZS 3000 Appendix C for domestic and commercial installations.</span></li>
-      <li><a href="diversity.html"><strong>Diversity Factors</strong></a> <span class="tool-desc">AS/NZS 3000 Appendix C diversity factor lookup for domestic, commercial, and industrial loads.</span></li>
-      <li><a href="faultlevel.html"><strong>Fault Level Calculator</strong></a> <span class="tool-desc">Prospective fault current from transformer to downstream nodes per IEC 60909 / AS/NZS 3000.</span></li>
-      <li><a href="loopimpedance.html"><strong>Loop Impedance</strong></a> <span class="tool-desc">Earth fault loop impedance Zs calculator per AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.2" target="_blank">cl. 2.6.2&ndash;2.6.3</a>.</span></li>
-      <li><a href="discrimination.html"><strong>Discrimination Check</strong></a> <span class="tool-desc">Selectivity verification between upstream and downstream protective devices.</span></li>
-      <li><a href="txsizing.html"><strong>Transformer Sizing</strong></a> <span class="tool-desc">Transformer kVA selection with losses, impedance, and fault current estimation per AS 2374.</span></li>
-      <li><a href="gensizing.html"><strong>Generator Sizing</strong></a> <span class="tool-desc">Generator kVA sizing with step-loading sequence per AS/NZS 3010:2017.</span></li>
-      <li><a href="upssizing.html"><strong>UPS Sizing</strong></a> <span class="tool-desc">UPS kVA and battery Ah calculator per AS 4044:2019.</span></li>
-      <li><a href="pfcsizing.html"><strong>PFC Sizing</strong></a> <span class="tool-desc">Power factor correction capacitor bank sizing with harmonic resonance check.</span></li>
-      <li><a href="harmonics.html"><strong>Harmonics Analysis</strong></a> <span class="tool-desc">THD estimation for LED/VSD-heavy installations per AS/NZS 61000.3 series.</span></li>
-      <li><a href="busbarsizing.html"><strong>Busbar Sizing</strong></a> <span class="tool-desc">Copper/aluminium busbar current capacity and short-circuit withstand per AS/NZS 61439.</span></li>
-      <li><a href="ctsizing.html"><strong>CT Sizing</strong></a> <span class="tool-desc">Current transformer ratio, accuracy class, and burden calculation per AS 1284.1 / AS 60044-1.</span></li>
-      <li><a href="earthing.html"><strong>Earthing Calculator</strong></a> <span class="tool-desc">Earth electrode resistance for rods, strips, grids, and plates using Laurent-Niemann formulas.</span></li>
-      <li><a href="pvsizing.html"><strong>PV Sizing</strong></a> <span class="tool-desc">Solar PV system sizing and inverter selection per AS/NZS 5033.</span></li>
-      <li><a href="rcdselect.html"><strong>RCD Selector</strong></a> <span class="tool-desc">RCD type and sensitivity selection per AS/NZS 3000 <a href="as3000viewer.html#cl-2.6.3" target="_blank">cl. 2.6.3&ndash;2.6.4</a>.</span></li>
-      <li><a href="spdsizing.html"><strong>SPD Sizing</strong></a> <span class="tool-desc">Surge protection device risk assessment and selection per AS/NZS 1768:2021.</span></li>
-      <li><a href="iprating.html"><strong>IP/IK Rating Guide</strong></a> <span class="tool-desc">IP and IK rating decoder with environment-based recommendations per AS 60529 / AS 62262.</span></li>
-      <li><a href="conduit.html"><strong>Conduit Sizer</strong></a> <span class="tool-desc">Conduit fill calculations for various cable types and configurations.</span></li>
-    </ul>
-
-    <h2>Lighting</h2>
-    <ul class="tool-list">
-      <li><a href="luxcalc.html"><strong>Lux Calculator</strong></a> <span class="tool-desc">Lumen method illuminance calculator per AS/NZS 1680.1.</span></li>
-      <li><a href="luxlevels.html"><strong>Lux Levels Reference</strong></a> <span class="tool-desc">Searchable database of required illuminance levels per AS/NZS 1680.</span></li>
-      <li><a href="emergencylighting.html"><strong>Emergency Lighting</strong></a> <span class="tool-desc">Emergency and exit lighting design per AS 2293.</span></li>
-      <li><a href="fireinterface.html"><strong>Fire Interface Matrix</strong></a> <span class="tool-desc">Fire cause-and-effect matrix per AS 1670.1, AS 1668.1, and NCC.</span></li>
-      <li><a href="smokecontrol.html"><strong>Smoke Control</strong></a> <span class="tool-desc">Smoke control electrical requirements and power estimation per AS 1668.1.</span></li>
-      <li><a href="essentialservices.html"><strong>Essential Services</strong></a> <span class="tool-desc">Essential safety measures register with maintenance schedules per NCC Section E.</span></li>
-    </ul>
-
-    <h2>Documentation</h2>
-    <ul class="tool-list">
-      <li><a href="loadschedule.html"><strong>Load Schedule</strong></a> <span class="tool-desc">Interactive load schedule builder with automatic demand and diversity calculations.</span></li>
-      <li><a href="cableschedule.html"><strong>Cable Schedule</strong></a> <span class="tool-desc">Cable schedule table builder with export to CSV and print formatting.</span></li>
-      <li><a href="designcert.html"><strong>Design Certificate</strong></a> <span class="tool-desc">Generate design compliance certificates with standards references and print/PDF output.</span></li>
-      <li><a href="tcommissioning.html"><strong>T&C Checklists</strong></a> <span class="tool-desc">Testing and commissioning checklists per AS/NZS 3000 <a href="as3000viewer.html#cl-8.1" target="_blank">Section 8</a> and AS/NZS 3017.</span></li>
-      <li><a href="inspection.html"><strong>Site Inspection</strong></a> <span class="tool-desc">Site inspection checklists and reporting tools.</span></li>
-      <li><a href="sld.html"><strong>Single Line Diagram</strong></a> <span class="tool-desc">Interactive single line diagram builder for electrical distribution systems.</span></li>
-      <li><a href="as3000tips.html"><strong>AS3000 Tips</strong></a> <span class="tool-desc">Quick reference tips and common requirements from AS/NZS 3000.</span></li>
-      <li><a href="qa.html"><strong>Verification</strong></a> <span class="tool-desc">Mathematical formulas, standards references, and validation methods for all calculators.</span></li>
-    </ul>
+    </details>
   </div>
-    <script src="omni-utils.js"></script>
+
+  <script src="omni-utils.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      /* ── Fill icon placeholders from the shared icon set ── */
+      document.querySelectorAll('[data-icon]').forEach(function (el) {
+        el.innerHTML = OmniIcons.get(el.dataset.icon, el.classList.contains('feature-ico') ? 22 : 18);
+      });
+
+      /* ── Hero stats ── */
+      var toolCount = document.querySelectorAll('.tool-list li, .feature-card').length;
+      document.getElementById('statTools').innerHTML = OmniIcons.get('grid', 13) + ' ' + toolCount + ' tools';
+      document.getElementById('statStd').innerHTML = OmniIcons.get('checkCircle', 13) + ' AS/NZS aligned';
+      document.getElementById('statCalc').innerHTML = OmniIcons.get('calc', 13) + ' Ctrl+K quick calc';
+
+      /* ── Section counters ── */
+      document.querySelectorAll('.tool-section').forEach(function (sec) {
+        var n = sec.querySelectorAll('.tool-list li, .feature-card').length;
+        var badge = sec.querySelector('.sec-count');
+        if (badge) badge.textContent = n;
+      });
+
+      /* ── Favourites & recently used chips ── */
+      var info = OmniNav.flatMap();
+      function chip(href) {
+        var meta = info[href];
+        if (!meta) return '';
+        return '<a class="tool-chip" href="' + href + '">' +
+               OmniIcons.get(meta.icon || 'bolt', 14) + meta.label + '</a>';
+      }
+      function renderChips(rowId, hrefs) {
+        var row = document.getElementById(rowId);
+        var html = hrefs.map(chip).join('');
+        if (html) {
+          row.querySelector('.chip-row').innerHTML = html;
+          row.hidden = false;
+        }
+      }
+      renderChips('favRow', OmniFav.list());
+      renderChips('recentRow', OmniFav.recents().filter(function (h) {
+        return OmniFav.list().indexOf(h) === -1; // don't repeat favourites
+      }).slice(0, 6));
+      var favHead = document.getElementById('favHead');
+      favHead.innerHTML = OmniIcons.get('star', 13) + ' Favourites';
+
+      /* ── Live tool search ── */
+      var input = document.getElementById('toolSearch');
+      var sections = Array.prototype.slice.call(document.querySelectorAll('.tool-section'));
+      var noRes = document.getElementById('noToolResults');
+
+      function applyFilter() {
+        var q = input.value.toLowerCase().trim();
+        var any = false;
+        sections.forEach(function (sec) {
+          var items = sec.querySelectorAll('.tool-list li, .feature-card');
+          var secHit = false;
+          items.forEach(function (it) {
+            var show = !q || it.textContent.toLowerCase().indexOf(q) !== -1;
+            it.style.display = show ? '' : 'none';
+            if (show) secHit = true;
+          });
+          sec.style.display = secHit ? '' : 'none';
+          if (secHit) any = true;
+        });
+        noRes.hidden = any;
+        // hide favourites/recents while searching
+        document.getElementById('favRow').style.display = q ? 'none' : '';
+        document.getElementById('recentRow').style.display = q ? 'none' : '';
+      }
+      input.addEventListener('input', applyFilter);
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { input.value = ''; applyFilter(); input.blur(); }
+        if (e.key === 'Enter') {
+          // open the first visible tool
+          var first = document.querySelector('.tool-section .feature-card:not([style*="none"]), .tool-section .tool-list li:not([style*="none"]) a');
+          if (first && input.value.trim()) location.href = first.getAttribute('href') || first.href;
+        }
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === '/' && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) {
+          e.preventDefault();
+          input.focus();
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -28,7 +28,9 @@ Load Schedule, Cable Schedule, Design Certificate, T&C Checklists (AS/NZS 3000 S
 
 ## Architecture
 
-- `omni-utils.js` — shared module: centralised navigation (`OmniNav.structure` — add new pages there), dark mode, localStorage save/load, toasts, validation, CSV export, keyboard shortcuts (Ctrl+S save, Ctrl+Enter calculate, Ctrl+P print)
+- `omni-utils.js` — shared module: centralised navigation (`OmniNav.structure` — add new pages there), SVG icon set, dark mode, breadcrumb header band with per-tool favourites, site footer, favicon injection, back-to-top, localStorage save/load, toasts, validation, CSV export, keyboard shortcuts (Ctrl+K Quick Calc, Ctrl+S save, Ctrl+Enter calculate, Ctrl+P print)
+- **Quick Calc** (Ctrl+K or the floating button, any page) — power triangle solver (kW/kVA/kVAr/A at any V/pf, 1-ph or 3-ph), quick voltage-drop estimate, and kW↔HP / °C↔°F / mm²↔AWG converter
+- Home page: live tool search (`/` to focus), favourites and recently-used rows, icon tool cards
 - `style.css` — shared stylesheet with light/dark themes via CSS variables
 - Each tool is a self-contained HTML page with inline JavaScript
 
