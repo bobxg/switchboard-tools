@@ -5,311 +5,144 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Single Line Diagram Generator - OMNI</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Professional Drawing Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.2.0/svg.min.js"></script>
+  <!-- jsPDF for A1 export (raster placed into a vector page) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-  <script>
-    // Load and parse Bluebeam symbols from symbols.btx file
-    window.customBluebeamSymbols = [];
-    
-    fetch('symbols.btx')
-      .then(response => response.text())
-      .then(xmlText => {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-        const toolItems = xmlDoc.getElementsByTagName('ToolChestItem');
-        
-        console.log(`Found ${toolItems.length} symbols in symbols.btx`);
-        
-        const symbols = {
-          'Circuit Breaker': [],
-          'RCD Circuit Breaker': [],
-          'Isolator Switch': []
-        };
-        
-        for (let item of toolItems) {
-          const nameElem = item.getElementsByTagName('Name')[0];
-          const typeElem = item.getElementsByTagName('Type')[0];
-          const rawElem = item.getElementsByTagName('Raw')[0];
-          
-          if (!nameElem || !typeElem || !rawElem) continue;
-          
-          const type = typeElem.textContent;
-          const hasChildren = item.getElementsByTagName('Child').length > 0;
-          
-          // Parse the compressed data to get actual geometry
-          try {
-            const rawData = rawElem.textContent;
-            const binaryString = atob(rawData.split(',')[0]); // Base64 decode
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-              bytes[i] = binaryString.charCodeAt(i);
-            }
-            
-            // Decompress using pako (zlib)
-            const decompressed = pako.inflate(bytes, { to: 'string' });
-            const geometry = parseBluebeamGeometry(decompressed, type, item);
-            
-            if (hasChildren && symbols['RCD Circuit Breaker'].length === 0) {
-              symbols['RCD Circuit Breaker'].push(geometry);
-            } else if (type.includes('Square') && symbols['Isolator Switch'].length === 0) {
-              symbols['Isolator Switch'].push(geometry);
-            } else if (symbols['Circuit Breaker'].length === 0) {
-              symbols['Circuit Breaker'].push(geometry);
-            }
-          } catch (e) {
-            // Skip symbols we can't parse
-            console.log('Could not parse symbol:', e);
-          }
-        }
-        
-        // Use first valid symbol of each type, or fallback to simple SVG
-        window.customBluebeamSymbols = [
-          {
-            name: 'Circuit Breaker',
-            svg: symbols['Circuit Breaker'][0] || createFallbackCircuitBreaker()
-          },
-          {
-            name: 'RCD Circuit Breaker',
-            svg: symbols['RCD Circuit Breaker'][0] || createFallbackRCD()
-          },
-          {
-            name: 'Isolator Switch',
-            svg: symbols['Isolator Switch'][0] || createFallbackIsolator()
-          }
-        ];
-        
-        console.log('Loaded Bluebeam symbols:', window.customBluebeamSymbols.map(s => s.name));
-      })
-      .catch(err => {
-        console.error('Failed to load symbols.btx, using fallback symbols:', err);
-        // Use fallback symbols if file can't be loaded
-        window.customBluebeamSymbols = [
-          { name: 'Circuit Breaker', svg: createFallbackCircuitBreaker() },
-          { name: 'RCD Circuit Breaker', svg: createFallbackRCD() },
-          { name: 'Isolator Switch', svg: createFallbackIsolator() }
-        ];
-      });
-    
-    function parseBluebeamGeometry(data, type, item) {
-      // Extract X, Y coordinates from item
-      const xElem = item.getElementsByTagName('X')[0];
-      const yElem = item.getElementsByTagName('Y')[0];
-      const x = xElem ? parseFloat(xElem.textContent) : 0;
-      const y = yElem ? parseFloat(yElem.textContent) : 0;
-      
-      // For now, return scaled standard symbols
-      // The decompressed data contains PDF annotation parameters which need complex parsing
-      if (item.getElementsByTagName('Child').length > 0) {
-        return createFallbackRCD();
-      } else if (type.includes('Square')) {
-        return createFallbackIsolator();
-      } else {
-        return createFallbackCircuitBreaker();
-      }
-    }
-    
-    function createFallbackCircuitBreaker() {
-      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100" width="60" height="100">
-        <line x1="25" y1="35" x2="35" y2="45" stroke="black" stroke-width="2"/>
-        <line x1="35" y1="35" x2="25" y2="45" stroke="black" stroke-width="2"/>
-        <!-- Circle -->
-        <circle cx="30" cy="75" r="5" fill="none" stroke="black" stroke-width="2"/>
-        
-        <!-- Angled line from circle to right of X -->
-        <line x1="33" y1="70" x2="45" y2="40" stroke="black" stroke-width="2"/>
-      </svg>`;
-    }
-    
-    function createFallbackRCD() {
-      return createFallbackCircuitBreaker();
-    }
-    
-    function createFallbackIsolator() {
-      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100" width="60" height="100">
-        <!-- Circle -->
-        <circle cx="30" cy="75" r="5" fill="none" stroke="black" stroke-width="2"/>
-        
-        <!-- Angled line from circle to right -->
-        <line x1="33" y1="70" x2="45" y2="40" stroke="black" stroke-width="2"/>
-      </svg>`;
-    }
-  </script>
   <style>
-    .input-section {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background: var(--bg-input);
-      border-radius: 8px;
+    .sld-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 18px 0;
     }
+    .sld-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .sld-card h3 {
+      margin: 0 0 12px;
+      font-size: 0.95rem;
+      letter-spacing: .3px;
+      color: var(--accent);
+    }
+    .sld-field { margin-bottom: 12px; }
+    .sld-field:last-child { margin-bottom: 0; }
+    .sld-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .sld-field input[type="text"],
+    .sld-field input[type="number"],
+    .sld-field select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border-input);
+      border-radius: 6px;
+      background: var(--bg-input);
+      color: var(--text-primary);
+    }
+    .sld-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .sld-check input { width: 16px; height: 16px; cursor: pointer; }
+    .sld-hint { font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px; }
+
     .load-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 15px;
+      margin: 8px 0 12px;
+      font-size: 0.85rem;
     }
     .load-table th {
       background: var(--accent);
-      color: white;
-      padding: 10px;
+      color: #fff;
+      padding: 8px 6px;
       text-align: left;
       font-weight: 600;
+      white-space: nowrap;
     }
     .load-table td {
-      padding: 8px;
+      padding: 5px 6px;
       border-bottom: 1px solid var(--border-light);
     }
-    .load-table input[type="text"],
-    .load-table input[type="number"],
-    .load-table select {
+    .load-table input, .load-table select {
       width: 100%;
-      padding: 6px;
+      padding: 5px 6px;
       border: 1px solid var(--border-input);
-      border-radius: 4px;
-    }
-    .load-table input[type="number"] {
-      width: 80px;
-    }
-    .load-table select {
-      width: auto;
-      min-width: 80px;
-    }
-    .load-table .small-select {
-      width: 60px;
-    }
-    .load-table .type-select {
-      width: 120px;
-    }
-    .add-row-btn, .remove-row-btn {
-      padding: 4px 8px;
-      font-size: 12px;
-      cursor: pointer;
-      border: none;
-      border-radius: 3px;
-      font-weight: 600;
-    }
-    .add-row-btn {
-      background: #4caf50;
-      color: white;
-    }
-    .add-row-btn:hover {
-      background: #45a049;
-    }
-    .remove-row-btn {
-      background: #f44336;
-      color: white;
-    }
-    .remove-row-btn:hover {
-      background: #da190b;
-    }
-    .settings-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-    .setting-item label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 5px;
-      color: var(--text-primary);
-    }
-    .setting-item input, .setting-item select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid var(--border-input);
-      border-radius: 4px;
-    }
-    .symbol-legend {
-      margin: 20px 0;
-      padding: 15px;
+      border-radius: 5px;
       background: var(--bg-input);
-      border: 1px solid var(--border-light);
-      border-radius: 4px;
-    }
-    .symbol-legend h4 {
-      margin-top: 0;
-      margin-bottom: 10px;
       color: var(--text-primary);
+      box-sizing: border-box;
     }
-    .legend-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 8px;
+    .load-table .col-rating input { width: 70px; }
+    .remove-row-btn {
+      border: none; background: #e74c3c; color: #fff;
+      width: 26px; height: 26px; border-radius: 5px; cursor: pointer; font-size: 13px;
     }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 13px;
-    }
-    .legend-symbol {
-      width: 40px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .button-group {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .btn-primary {
+    .remove-row-btn:hover { background: #c0392b; }
+    .table-scroll { overflow-x: auto; }
+
+    .sld-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+    .omni-btn-primary {
       background: var(--accent);
-      color: white;
+      color: #fff;
+      border-color: var(--accent);
     }
-    .btn-primary:hover {
-      background: #1a3a52;
-    }
-    .btn-secondary {
-      background: var(--text-secondary);
-      color: white;
-    }
-    .btn-secondary:hover {
-      background: #444;
-    }
+    .omni-btn-primary:hover { filter: brightness(1.08); }
+
     .diagram-container {
-      margin: 20px auto;
-      padding: 20px;
+      margin: 22px 0;
+      padding: 14px;
       background: var(--bg-card);
-      border: 2px solid var(--border-light);
-      border-radius: 8px;
-      max-width: 1200px;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
       overflow-x: auto;
     }
-    #sldCanvas {
-      display: block;
-      margin: 0 auto;
+    #sldCanvas { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+    .symbol-legend {
+      margin: 18px 0;
+      padding: 14px 16px;
+      background: var(--bg-card);
       border: 1px solid var(--border-light);
+      border-radius: 10px;
     }
-    .example-text {
-      font-size: 12px;
+    .symbol-legend h4 { margin: 0 0 10px; color: var(--text-primary); font-size: 0.9rem; }
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px 16px;
+      font-size: 0.8rem;
       color: var(--text-secondary);
-      font-style: italic;
-      margin-top: 5px;
     }
-    .load-type-legend {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      font-size: 12px;
-    }
-    .legend-color {
-      width: 20px;
-      height: 20px;
-      border: 1px solid var(--text-primary);
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .legend-item svg { flex: none; }
+    .legend-item svg [class^="sld-"] { stroke: var(--text-primary); }
+    .legend-item .lg-line { stroke: var(--text-primary); stroke-width: 1.6; fill: none; }
+    .legend-item .lg-sym  { stroke: var(--text-primary); stroke-width: 1.6; fill: none; }
+    .legend-item .lg-fill { fill: var(--text-primary); }
+
+    .schedule-wrap { display: flex; gap: 26px; flex-wrap: wrap; }
+    .schedule-wrap > div { flex: 1; min-width: 320px; }
+    .sched-table { border-collapse: collapse; width: 100%; font-size: 0.82rem; }
+    .sched-table th { background: var(--accent); color: #fff; padding: 7px 8px; text-align: left; }
+    .sched-table td { padding: 6px 8px; border-bottom: 1px solid var(--border-light); }
+    .sched-table tr.total td { font-weight: 700; background: var(--bg-input); }
+
+    @media print {
+      .top-tabs, .input-section, .symbol-legend, #circuitScheduleContainer,
+      .page-band, .omni-footer, .omni-fab, .omni-backtop { display: none !important; }
+      .diagram-container { border: none; padding: 0; overflow: visible; }
+      body { background: #fff; }
     }
   </style>
 </head>
@@ -318,225 +151,153 @@
 
   <div class="container">
     <h1>Single Line Diagram Generator</h1>
-    <p>Generate AS/NZS compliant single line diagrams. Breakers automatically sized: MCB (&#8804;100A), MCCB (100-800A), ACB (>800A)</p>
+    <p>Builds an AS/NZS switchboard single line diagram as a bottom-fed riser: supply and
+       busbar at the base, outgoing ways rising into floor bands. Breakers auto-size:
+       MCB (&le;100A), MCCB (100&ndash;800A), ACB (&gt;800A).</p>
 
     <div class="input-section">
-      <h3>Main Switch Configuration</h3>
-      <div class="settings-grid" style="grid-template-columns: 1fr 1fr 2fr; margin-bottom: 20px;">
-        <div class="setting-item">
-          <label for="mainSwitchRating">Main Switch Rating (A)</label>
-          <input type="number" id="mainSwitchRating" value="400" min="63" step="1">
+      <div class="sld-cards">
+        <div class="sld-card">
+          <h3>Board</h3>
+          <div class="sld-field">
+            <label for="boardName">Board name</label>
+            <input type="text" id="boardName" value="Main Switchboard" placeholder="MSB, DB1, …">
+          </div>
+          <div class="sld-field">
+            <label for="mainSwitchRating">Main switch rating (A)</label>
+            <input type="number" id="mainSwitchRating" value="400" min="63" step="1">
+          </div>
+          <div class="sld-field">
+            <label for="mainSwitchType">Main switch type</label>
+            <select id="mainSwitchType">
+              <option value="breaker" selected>Circuit breaker</option>
+              <option value="isolator">Isolator</option>
+            </select>
+          </div>
         </div>
-        <div class="setting-item">
-          <label for="mainSwitchType">Main Switch Type</label>
-          <select id="mainSwitchType">
-            <option value="breaker" selected>Circuit Breaker</option>
-            <option value="isolator">Isolator</option>
-          </select>
-        </div>
-        <div class="setting-item">
-          <label for="boardName">Board Name</label>
-          <input type="text" id="boardName" value="Main Switchboard" placeholder="MSB, DB1, etc.">
-        </div>
-      </div>
-      
-      <div style="margin-bottom: 20px;">
-        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
-          <input type="checkbox" id="safetyServices" style="width: 18px; height: 18px; cursor: pointer;">
-          <span>Add Safety Services Section</span>
-        </label>
-        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 5px; margin-left: 26px;">
-          Adds a separate section for safety loads on the same busbar
-        </p>
-      </div>
 
-      <h3>Load Input</h3>
-      <table class="load-table" id="loadTable">
-        <thead>
-          <tr>
-            <th style="width: 40%;">Circuit Name</th>
-            <th style="width: 20%;">Rating</th>
-            <th style="width: 15%;">Unit</th>
-            <th style="width: 20%;">Breaker Type</th>
-            <th style="width: 5%;"></th>
-          </tr>
-        </thead>
-        <tbody id="loadTableBody">
-          <tr>
-            <td><input type="text" class="load-name" value="Main Pump" placeholder="Circuit name"></td>
-            <td><input type="number" class="load-rating" value="15" min="0" step="0.1"></td>
-            <td>
-              <select class="load-unit small-select">
-                <option value="kW" selected>kW</option>
-                <option value="A">A</option>
-              </select>
-            </td>
-            <td>
-              <select class="breaker-type type-select">
-                <option value="standard" selected>MCB</option>
-                <option value="air">MCCB</option>
-              </select>
-            </td>
-            <td><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td>
-          </tr>
-        </tbody>
-      </table>
-      <button class="add-row-btn" onclick="addRow()">+ Add Circuit</button>
+        <div class="sld-card">
+          <h3>Supply</h3>
+          <div class="sld-field">
+            <label for="supplyVoltage">Supply voltage</label>
+            <select id="supplyVoltage">
+              <option value="230">230 V single phase</option>
+              <option value="400" selected>400 V three phase</option>
+            </select>
+          </div>
+          <div class="sld-field">
+            <label for="powerFactor">Power factor</label>
+            <input type="number" id="powerFactor" value="0.9" min="0.5" max="1" step="0.05">
+          </div>
+          <div class="sld-field">
+            <label for="floorsInput">Floors / levels (lowest first)</label>
+            <input type="text" id="floorsInput" value="GF, L1, L2, L3" placeholder="B1, GF, L1, L2 …">
+            <div class="sld-hint">Comma-separated; first = nearest the busbar.</div>
+          </div>
+        </div>
 
-      <div class="symbol-legend">
-        <h4>Schematics Legend</h4>
-        <div class="legend-grid">
-          <div class="legend-item">
-            <div class="legend-symbol">
-              <svg width="50" height="40">
-                <!-- Line from top -->
-                <line x1="25" y1="2" x2="25" y2="8" stroke="black" stroke-width="1.5"/>
-                <!-- Top circle -->
-                <circle cx="25" cy="14" r="6" fill="none" stroke="black" stroke-width="1.5"/>
-                <!-- Line -->
-                <line x1="25" y1="20" x2="25" y2="24" stroke="black" stroke-width="1.5"/>
-                <!-- X symbol -->
-                <line x1="20" y1="26" x2="30" y2="32" stroke="black" stroke-width="1.5"/>
-                <line x1="20" y1="32" x2="30" y2="26" stroke="black" stroke-width="1.5"/>
-                <!-- Line -->
-                <line x1="25" y1="33" x2="25" y2="37" stroke="black" stroke-width="1.5"/>
-                <!-- Bottom circle -->
-                <circle cx="25" cy="42" r="6" fill="none" stroke="black" stroke-width="1.5"/>
-              </svg>
-            </div>
-            <span>CIRCUIT BREAKER</span>
+        <div class="sld-card">
+          <h3>Incomer</h3>
+          <label class="sld-check"><input type="checkbox" id="optMeter" checked> kWh + CT metering</label>
+          <label class="sld-check"><input type="checkbox" id="optSpd" checked> Surge diverter (SPD)</label>
+          <label class="sld-check"><input type="checkbox" id="optEarth" checked> Earth bar + neutral link</label>
+          <div class="sld-hint">Main switch is always shown.</div>
+        </div>
+
+        <div class="sld-card">
+          <h3>Essential supply</h3>
+          <div class="sld-field">
+            <label for="essRating">Essential main switch (A)</label>
+            <input type="number" id="essRating" value="250" min="40" step="1">
           </div>
-          <div class="legend-item">
-            <div class="legend-symbol">
-              <svg width="50" height="60">
-                <!-- Top circle -->
-                <circle cx="25" cy="8" r="6" fill="none" stroke="black" stroke-width="1.5"/>
-                <!-- Line -->
-                <line x1="25" y1="14" x2="25" y2="18" stroke="black" stroke-width="1.5"/>
-                <!-- X symbol -->
-                <line x1="20" y1="20" x2="30" y2="26" stroke="black" stroke-width="1.5"/>
-                <line x1="20" y1="26" x2="30" y2="20" stroke="black" stroke-width="1.5"/>
-                <!-- Line -->
-                <line x1="25" y1="27" x2="25" y2="31" stroke="black" stroke-width="1.5"/>
-                <!-- Circle with X inside (RCD) -->
-                <circle cx="25" cy="37" r="6" fill="none" stroke="black" stroke-width="1.5"/>
-                <line x1="21" y1="33" x2="29" y2="41" stroke="black" stroke-width="1.5"/>
-                <line x1="21" y1="41" x2="29" y2="33" stroke="black" stroke-width="1.5"/>
-                <!-- Line -->
-                <line x1="25" y1="43" x2="25" y2="47" stroke="black" stroke-width="1.5"/>
-                <!-- X symbol -->
-                <line x1="20" y1="49" x2="30" y2="55" stroke="black" stroke-width="1.5"/>
-                <line x1="20" y1="55" x2="30" y2="49" stroke="black" stroke-width="1.5"/>
-                <!-- Line -->
-                <line x1="25" y1="56" x2="25" y2="60" stroke="black" stroke-width="1.5"/>
-                <!-- Bottom circle -->
-                <circle cx="25" cy="66" r="6" fill="none" stroke="black" stroke-width="1.5"/>
-              </svg>
-            </div>
-            <span>RCD CIRCUIT BREAKER</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-symbol">
-              <svg width="40" height="25">
-                <line x1="5" y1="12" x2="15" y2="12" stroke="black" stroke-width="2"/>
-                <line x1="15" y1="8" x2="15" y2="16" stroke="black" stroke-width="2"/>
-                <line x1="25" y1="12" x2="35" y2="12" stroke="black" stroke-width="2"/>
-                <line x1="25" y1="8" x2="25" y2="16" stroke="black" stroke-width="2"/>
-              </svg>
-            </div>
-            <span>ISOLATOR SWITCH</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-symbol">
-              <svg width="40" height="25">
-                <rect x="10" y="7" width="20" height="10" fill="none" stroke="black" stroke-width="1.5"/>
-              </svg>
-            </div>
-            <span>FUSE</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-symbol">
-              <svg width="40" height="25">
-                <rect x="8" y="6" width="24" height="12" fill="none" stroke="black" stroke-width="1.5"/>
-                <text x="20" y="14" font-size="7" text-anchor="middle" font-weight="bold">EA</text>
-              </svg>
-            </div>
-            <span>ENERGY ANALYSER</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-symbol">
-              <svg width="40" height="25">
-                <rect x="8" y="6" width="24" height="12" fill="none" stroke="black" stroke-width="1.5"/>
-                <text x="20" y="14" font-size="7" text-anchor="middle" font-weight="bold">kWh</text>
-              </svg>
-            </div>
-            <span>SUPPLY AUTHORITY METER</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-symbol">
-              <svg width="40" height="25">
-                <rect x="8" y="6" width="24" height="12" fill="none" stroke="black" stroke-width="1.5"/>
-                <text x="20" y="14" font-size="7" text-anchor="middle" font-weight="bold">MP</text>
-              </svg>
-            </div>
-            <span>METER PANEL</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-symbol">
-              <svg width="40" height="25">
-                <rect x="8" y="8" width="24" height="10" fill="none" stroke="black" stroke-width="1.5"/>
-                <path d="M 15 13 Q 20 8, 25 13" fill="none" stroke="black" stroke-width="1.5"/>
-              </svg>
-            </div>
-            <span>SURGE DIVERTER</span>
-          </div>
+          <label class="sld-check"><input type="checkbox" id="optGen"> Standby generator + changeover (ATS)</label>
+          <div class="sld-hint">A second busbar is drawn automatically when any circuit
+            below is set to <strong>Essential</strong>. Tick above only if a standby
+            generator feeds it via an ATS.</div>
         </div>
       </div>
 
-      <div class="settings-grid">
-        <div class="setting-item">
-          <label for="supplyVoltage">Supply Voltage (V)</label>
-          <select id="supplyVoltage">
-            <option value="230">230V Single Phase</option>
-            <option value="400" selected>400V Three Phase</option>
-          </select>
-        </div>
-        <div class="setting-item">
-          <label for="powerFactor">Power Factor</label>
-          <input type="number" id="powerFactor" value="0.9" min="0.5" max="1" step="0.05">
-        </div>
+      <h3>Circuits</h3>
+      <div class="table-scroll">
+        <table class="load-table" id="loadTable">
+          <thead>
+            <tr>
+              <th style="min-width:150px;">Circuit name</th>
+              <th class="col-rating">Rating</th>
+              <th>Unit</th>
+              <th>Protection</th>
+              <th>Section</th>
+              <th>Floor</th>
+              <th>Destination</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="loadTableBody"></tbody>
+        </table>
       </div>
+      <button class="omni-btn" type="button" onclick="addRow()">+ Add circuit</button>
 
-      <div class="button-group">
-        <button class="btn btn-primary" onclick="generateDiagram()">Generate Diagram</button>
-        <button class="btn btn-secondary" onclick="exportSVG()">Export SVG</button>
-        <button class="btn btn-secondary" onclick="exportPNG()">Export PNG</button>
-        <button class="btn btn-secondary" onclick="exportA1()">Export A1 PDF</button>
-        <button class="btn btn-secondary" onclick="exportBluebeamToolset()">Export Bluebeam Toolset</button>
+      <div class="sld-actions">
+        <button class="omni-btn omni-btn-primary" type="button" onclick="generateDiagram()">Generate diagram</button>
+        <button class="omni-btn" type="button" onclick="saveConfig()">Save</button>
+        <button class="omni-btn" type="button" onclick="loadConfig()">Load</button>
+        <button class="omni-btn" type="button" onclick="window.print()">Print</button>
+        <button class="omni-btn" type="button" onclick="exportSVG()">Export SVG</button>
+        <button class="omni-btn" type="button" onclick="exportPNG()">Export PNG</button>
+        <button class="omni-btn" type="button" onclick="exportA1()">Export A1 PDF</button>
       </div>
-      
-      <!-- Bluebeam symbols automatically loaded from BLUEBEAM ELECTRICAL SYMBOLS.btx -->
+    </div>
 
-      <div class="load-type-legend">
+    <div class="symbol-legend">
+      <h4>Legend</h4>
+      <div class="legend-grid">
         <div class="legend-item">
-          <div class="legend-color" style="background: #ffcccc;"></div>
+          <svg width="30" height="44"><line class="lg-line" x1="15" y1="2" x2="15" y2="10"/><rect class="lg-sym" x="11" y="10" width="8" height="8"/><line class="lg-line" x1="15" y1="34" x2="24" y2="16"/><circle class="lg-fill" cx="15" cy="34" r="2"/><line class="lg-line" x1="15" y1="34" x2="15" y2="42"/></svg>
+          <span>Circuit breaker (MCB/MCCB/ACB)</span>
+        </div>
+        <div class="legend-item">
+          <svg width="34" height="52"><line class="lg-line" x1="15" y1="2" x2="15" y2="6"/><circle class="lg-sym" cx="15" cy="12" r="6"/><rect class="lg-sym" x="11" y="20" width="8" height="8"/><line class="lg-line" x1="15" y1="44" x2="24" y2="26"/><circle class="lg-fill" cx="15" cy="44" r="2"/><line class="lg-line" x1="15" y1="44" x2="15" y2="50"/></svg>
+          <span>RCD circuit breaker</span>
+        </div>
+        <div class="legend-item">
+          <svg width="30" height="40"><line class="lg-line" x1="15" y1="2" x2="15" y2="10"/><circle class="lg-fill" cx="15" cy="10" r="2"/><line class="lg-line" x1="15" y1="30" x2="24" y2="12"/><circle class="lg-fill" cx="15" cy="30" r="2"/><line class="lg-line" x1="15" y1="30" x2="15" y2="38"/></svg>
+          <span>Isolator</span>
+        </div>
+        <div class="legend-item">
+          <svg width="44" height="30"><rect class="lg-sym" x="6" y="5" width="32" height="20"/><polygon class="lg-fill" points="6,25 16,25 6,15"/></svg>
+          <span>Distribution board</span>
+        </div>
+        <div class="legend-item">
+          <svg width="34" height="30"><circle class="lg-sym" cx="16" cy="15" r="13"/><text x="16" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">M</text></svg>
           <span>Motor</span>
         </div>
         <div class="legend-item">
-          <div class="legend-color" style="background: #fff9c4;"></div>
-          <span>Lighting</span>
+          <svg width="44" height="30"><rect class="lg-sym" x="6" y="8" width="32" height="16"/></svg>
+          <span>Load</span>
         </div>
         <div class="legend-item">
-          <div class="legend-color" style="background: #cce5ff;"></div>
-          <span>Power</span>
+          <svg width="32" height="30"><circle class="lg-sym" cx="15" cy="15" r="13"/><text x="15" y="18" text-anchor="middle" font-size="8" font-weight="700" fill="currentColor">kWh</text></svg>
+          <span>Supply meter</span>
         </div>
         <div class="legend-item">
-          <div class="legend-color" style="background: #ffe0cc;"></div>
-          <span>Heating</span>
+          <svg width="32" height="30"><circle class="lg-sym" cx="15" cy="15" r="13"/><text x="15" y="18" text-anchor="middle" font-size="8" font-weight="700" fill="currentColor">EA</text></svg>
+          <span>CT metering / energy analyser</span>
         </div>
         <div class="legend-item">
-          <div class="legend-color" style="background: #e0e0e0;"></div>
-          <span>Other</span>
+          <svg width="34" height="26"><rect class="lg-sym" x="7" y="4" width="20" height="18"/><line class="lg-line" x1="11" y1="18" x2="23" y2="8"/><polygon class="lg-fill" points="23,8 18,9 22,13"/></svg>
+          <span>Surge diverter (SPD)</span>
+        </div>
+        <div class="legend-item">
+          <svg width="34" height="28"><line class="lg-line" x1="17" y1="2" x2="17" y2="10"/><line class="lg-line" x1="6" y1="10" x2="28" y2="10"/><line class="lg-line" x1="10" y1="15" x2="24" y2="15"/><line class="lg-line" x1="13" y1="20" x2="21" y2="20"/></svg>
+          <span>Main earth</span>
+        </div>
+        <div class="legend-item">
+          <svg width="34" height="30"><circle class="lg-sym" cx="16" cy="15" r="13"/><text x="16" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">G</text></svg>
+          <span>Generator</span>
+        </div>
+        <div class="legend-item">
+          <svg width="44" height="28"><rect class="lg-sym" x="6" y="6" width="32" height="16"/><text x="22" y="18" text-anchor="middle" font-size="9" font-weight="700" fill="currentColor">ATS</text></svg>
+          <span>Changeover (ATS)</span>
         </div>
       </div>
     </div>
@@ -544,10 +305,10 @@
     <div class="diagram-container">
       <svg id="sldCanvas" width="1000" height="600"></svg>
     </div>
-    
-    <div id="circuitScheduleContainer" style="margin-top: 30px; display: none;">
-      <h2>Circuit Schedule</h2>
-      <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+
+    <div id="circuitScheduleContainer" style="margin-top: 24px; display: none;">
+      <h2>Circuit schedule</h2>
+      <div class="schedule-wrap">
         <div id="normalSchedule"></div>
         <div id="safetySchedule"></div>
       </div>
@@ -555,1235 +316,517 @@
   </div>
 
   <script>
-    const loadTypeColors = {
-      motor: '#ffcccc',
-      lighting: '#fff9c4',
-      power: '#cce5ff',
-      heating: '#ffe0cc',
-      safety: '#ffe0f0',
-      other: '#e0e0e0'
+  /* ════════════════════════════════════════════════════════════════
+     Single Line Diagram — bottom-fed riser renderer
+     ════════════════════════════════════════════════════════════════ */
+
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  // ── theme-aware schematic styles (resolved on screen; swapped for export) ──
+  const SCREEN_CSS = `
+    .sld-line{stroke:var(--text-primary);stroke-width:1.4;fill:none;vector-effect:non-scaling-stroke;}
+    .sld-sym{stroke:var(--text-primary);stroke-width:1.4;fill:none;vector-effect:non-scaling-stroke;stroke-linejoin:round;}
+    .sld-fill{fill:var(--text-primary);stroke:none;}
+    .sld-bus{stroke:var(--accent);stroke-width:6;stroke-linecap:round;fill:none;}
+    .sld-band{stroke:var(--border-light);stroke-width:1;stroke-dasharray:7 7;fill:none;}
+    .sld-mask{fill:var(--bg-card);stroke:none;}
+    .sld-arrow{fill:var(--text-primary);stroke:none;}
+    text{font-family:'Segoe UI',Arial,sans-serif;}
+    .sld-label{fill:var(--text-primary);font-size:12px;font-weight:600;}
+    .sld-small{fill:var(--text-secondary);font-size:10px;}
+    .sld-floor{fill:var(--text-secondary);font-size:12px;font-weight:700;letter-spacing:.5px;}
+    .sld-section{fill:var(--accent);font-size:15px;font-weight:700;}
+    .sld-symlabel{fill:var(--text-primary);font-size:11px;font-weight:700;}
+    .sld-metertext{fill:var(--text-primary);font-size:8px;font-weight:700;}
+    .sld-title{fill:var(--text-primary);font-size:20px;font-weight:700;}`;
+  const EXPORT_CSS = SCREEN_CSS
+    .replace(/var\(--text-primary\)/g, '#111')
+    .replace(/var\(--text-secondary\)/g, '#444')
+    .replace(/var\(--accent\)/g, '#0D47A1')
+    .replace(/var\(--border-light\)/g, '#bbb')
+    .replace(/var\(--bg-card\)/g, '#ffffff');
+
+  // ── layout constants (px) ──
+  const PAD = 40, LABEL_COL = 96, WAY_PITCH = 162, SECTION_GAP = 130;
+  const BAND_H = 132, DEV_H = 30, TITLE_H = 56, TOP_PAD = 48;
+  const BUS_GAP = 82, INCOMER_H = 250, BOTTOM_PAD = 28, DEST_HALF = 16;
+
+  // ── string-building SVG helpers ──
+  const ax = e => e ? ' ' + e : '';
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const line = (x1,y1,x2,y2,c,e) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${c}"${ax(e)}/>`;
+  const rect = (x,y,w,h,c,e) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" class="${c}"${ax(e)}/>`;
+  const circ = (cx,cy,r,c,e) => `<circle cx="${cx}" cy="${cy}" r="${r}" class="${c}"${ax(e)}/>`;
+  const poly = (pts,c,e) => `<polygon points="${pts}" class="${c}"${ax(e)}/>`;
+  const txt  = (x,y,s,c,e) => `<text x="${x}" y="${y}" class="${c}"${ax(e)}>${esc(s)}</text>`;
+  const grp  = (inner,e) => `<g${ax(e)}>${inner}</g>`;
+  const MID = 'text-anchor="middle"', END = 'text-anchor="end"';
+
+  /* ── input rows ─────────────────────────────────────────────── */
+  function getFloors() {
+    const raw = (document.getElementById('floorsInput').value || '').split(',')
+      .map(s => s.trim()).filter(Boolean);
+    return raw.length ? raw : ['GF'];
+  }
+  function floorOptions(selected) {
+    return getFloors().map(f =>
+      `<option value="${esc(f)}"${f === selected ? ' selected' : ''}>${esc(f)}</option>`).join('');
+  }
+  function rowHTML(v) {
+    v = v || {};
+    const floors = getFloors();
+    const floor = v.floor && floors.includes(v.floor) ? v.floor : floors[0];
+    const sel = (val, opt) => val === opt ? ' selected' : '';
+    return `<tr>
+      <td><input type="text" class="load-name" value="${esc(v.name || '')}" placeholder="Circuit name"></td>
+      <td class="col-rating"><input type="number" class="load-rating" value="${v.rating != null ? v.rating : 10}" min="0" step="0.1"></td>
+      <td><select class="load-unit">
+        <option value="kW"${sel(v.unit,'kW')}>kW</option>
+        <option value="A"${sel(v.unit,'A')}>A</option></select></td>
+      <td><select class="load-prot">
+        <option value="mcb"${sel(v.prot,'mcb')}>MCB</option>
+        <option value="mccb"${sel(v.prot,'mccb')}>MCCB</option>
+        <option value="rcd"${sel(v.prot,'rcd')}>RCD</option>
+        <option value="isolator"${sel(v.prot,'isolator')}>Isolator</option></select></td>
+      <td><select class="load-section">
+        <option value="normal"${sel(v.section,'normal')}>Normal</option>
+        <option value="essential"${sel(v.section,'essential')}>Essential</option></select></td>
+      <td><select class="load-floor">${floorOptions(floor)}</select></td>
+      <td><select class="load-dest">
+        <option value="db"${sel(v.dest,'db')}>Sub-board</option>
+        <option value="motor"${sel(v.dest,'motor')}>Motor</option>
+        <option value="load"${sel(v.dest,'load')}>Load</option></select></td>
+      <td><button class="remove-row-btn" type="button" onclick="removeRow(this)" title="Remove">&#10005;</button></td>
+    </tr>`;
+  }
+  function addRow(v) {
+    document.getElementById('loadTableBody').insertAdjacentHTML('beforeend', rowHTML(v));
+  }
+  function removeRow(btn) {
+    const tb = document.getElementById('loadTableBody');
+    if (tb.children.length > 1) { btn.closest('tr').remove(); generateDiagram(); }
+    else toast('At least one circuit is required.', 'warn');
+  }
+  function refreshFloorSelects() {
+    document.querySelectorAll('.load-floor').forEach(sel => {
+      const cur = sel.value;
+      sel.innerHTML = floorOptions(cur);
+      const floors = getFloors();
+      sel.value = floors.includes(cur) ? cur : floors[0];
+    });
+  }
+
+  /* ── calculations ───────────────────────────────────────────── */
+  function calcCurrent(powerKW, V, pf) {
+    return V === 230 ? (powerKW * 1000) / (V * pf) : (powerKW * 1000) / (Math.sqrt(3) * V * pf);
+  }
+  function calcPower(current, V, pf) {
+    return V === 230 ? (current * V * pf) / 1000 : (current * Math.sqrt(3) * V * pf) / 1000;
+  }
+  function selectCBSize(current, isMotor) {
+    const design = isMotor ? current * 1.5 : current;
+    const sizes = [6,10,16,20,25,32,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3200,4000];
+    return sizes.find(s => s >= design) || sizes[sizes.length - 1];
+  }
+  function breakerClass(rating) { return rating > 800 ? 'ACB' : rating > 100 ? 'MCCB' : 'MCB'; }
+
+  function parseLoads() {
+    const V = parseInt(document.getElementById('supplyVoltage').value);
+    const pf = parseFloat(document.getElementById('powerFactor').value) || 0.9;
+    const out = [];
+    document.querySelectorAll('#loadTableBody tr').forEach(row => {
+      const name = row.querySelector('.load-name').value.trim();
+      const rating = parseFloat(row.querySelector('.load-rating').value);
+      if (!name || isNaN(rating) || rating <= 0) return;
+      const unit = row.querySelector('.load-unit').value;
+      const prot = row.querySelector('.load-prot').value;
+      const section = row.querySelector('.load-section').value;
+      const floor = row.querySelector('.load-floor').value;
+      const dest = row.querySelector('.load-dest').value;
+      let power, current;
+      if (unit === 'kW') { power = rating; current = calcCurrent(rating, V, pf); }
+      else { current = rating; power = calcPower(rating, V, pf); }
+      const isMotor = dest === 'motor';
+      const cb = selectCBSize(current, isMotor);
+      out.push({ name, power, current, prot, section, floor, dest, cb });
+    });
+    return out;
+  }
+
+  /* ── symbols (each centred at x; helpers return markup strings) ──
+     Single-line convention (IEC 60617): a device is a switch — fixed-contact
+     dot at the bottom, an open diagonal blade — with a small square at the top
+     contact marking a circuit breaker. Isolator = switch with no square. */
+  function switchBlade(x, cy) {
+    const t = cy - DEV_H/2, b = cy + DEV_H/2;
+    return circ(x, b, 2.2, 'sld-fill')           // fixed contact
+         + line(x, b, x + 10, t + 4, 'sld-line') // open blade
+         + circ(x, t, 2.2, 'sld-fill');          // top contact
+  }
+  function deviceSym(prot, rating, x, cy) {
+    const t = cy - DEV_H/2;
+    let s = '';
+    if (prot === 'rcd') s += circ(x, t - 10, 6, 'sld-sym');          // toroid above
+    s += switchBlade(x, cy);
+    if (prot !== 'isolator') s += rect(x - 4, t - 4, 8, 8, 'sld-sym'); // breaker square
+    if (prot !== 'isolator' && breakerClass(rating) === 'ACB') {       // draw-out chevrons
+      s += poly(`${x-12},${cy-5} ${x-6},${cy} ${x-12},${cy+5}`, 'sld-sym');
+      s += poly(`${x+12},${cy-5} ${x+6},${cy} ${x+12},${cy+5}`, 'sld-sym');
+    }
+    return grp(s);
+  }
+  function destSym(kind, x, cy, name) {
+    let s = rect(x - 28, cy - DEST_HALF - 2, 56, DEST_HALF*2 + 4, 'sld-mask'); // hide band line
+    if (kind === 'motor') {
+      s += circ(x, cy, 15, 'sld-sym') + txt(x, cy + 5, 'M', 'sld-symlabel', MID);
+    } else if (kind === 'load') {
+      s += rect(x - 22, cy - 12, 44, 24, 'sld-sym');
+    } else {                                                // distribution board: outline + corner marker
+      s += rect(x - 24, cy - 15, 48, 30, 'sld-sym');
+      s += poly(`${x-24},${cy+15} ${x-12},${cy+15} ${x-24},${cy+3}`, 'sld-fill');
+    }
+    s += txt(x, cy - DEST_HALF - 9, name, 'sld-label', MID);
+    return grp(s);
+  }
+  function meterSym(x, cy, label) {                         // instrument circle
+    return grp(circ(x, cy, 13, 'sld-sym') + txt(x, cy + 3, label, 'sld-metertext', MID));
+  }
+  function boxSym(x, cy, w, label) {
+    return grp(rect(x - w/2, cy - 10, w, 20, 'sld-sym') + txt(x, cy + 4, label, 'sld-symlabel', MID));
+  }
+  function spdSym(x, cy) {                                  // surge arrester: box + diagonal arrow
+    const w = 20, h = 18, l = x - w/2, t = cy - h/2;
+    return grp(
+      rect(l, t, w, h, 'sld-sym') +
+      line(l + 4, t + h - 4, l + w - 4, t + 4, 'sld-line') +
+      poly(`${l+w-4},${t+4} ${l+w-9},${t+5} ${l+w-5},${t+9}`, 'sld-fill'));
+  }
+  function genSym(x, cy) {
+    return grp(circ(x, cy, 14, 'sld-sym') + txt(x, cy + 5, 'G', 'sld-symlabel', MID));
+  }
+  function earthSym(x, y) {                                 // y = top of stem
+    return grp(
+      line(x, y, x, y + 8, 'sld-line') +
+      line(x - 9, y + 8, x + 9, y + 8, 'sld-line') +
+      line(x - 5.5, y + 12, x + 5.5, y + 12, 'sld-line') +
+      line(x - 2.5, y + 16, x + 2.5, y + 16, 'sld-line'));
+  }
+
+  /* ── main render ────────────────────────────────────────────── */
+  function generateDiagram() {
+    const svg = document.getElementById('sldCanvas');
+    const boardName = document.getElementById('boardName').value || 'Switchboard';
+    const V = parseInt(document.getElementById('supplyVoltage').value);
+    const mainRating = parseInt(document.getElementById('mainSwitchRating').value) || 0;
+    const mainType = document.getElementById('mainSwitchType').value;
+    const essRating = parseInt(document.getElementById('essRating').value) || 0;
+    const optMeter = document.getElementById('optMeter').checked;
+    const optSpd = document.getElementById('optSpd').checked;
+    const optEarth = document.getElementById('optEarth').checked;
+    const optGen = document.getElementById('optGen').checked;
+
+    const loads = parseLoads();
+    const normal = loads.filter(l => l.section !== 'essential');
+    const essential = loads.filter(l => l.section === 'essential');
+    const floors = getFloors();
+    const nF = floors.length;
+    const phaseLabel = V === 230 ? '230V 1Ph' : '400V 3Ph';
+
+    // vertical anchors
+    const busbarY = TITLE_H + TOP_PAD + nF * BAND_H + BUS_GAP;
+    const breakerY = busbarY - 48;
+    const totalH = busbarY + INCOMER_H + BOTTOM_PAD;
+    const floorY = i => busbarY - BUS_GAP - i * BAND_H;     // i=0 -> ground (nearest bus)
+
+    // horizontal section layout
+    const sections = [{ key: 'normal', label: 'NORMAL', rating: mainRating, ways: normal }];
+    if (essential.length) sections.push({ key: 'essential', label: 'ESSENTIAL', rating: essRating, ways: essential });
+    let cx = PAD + LABEL_COL;
+    sections.forEach(sec => {
+      const n = Math.max(1, sec.ways.length);
+      sec.startX = cx;
+      sec.endX = cx + n * WAY_PITCH;
+      sec.wayX = j => sec.startX + (j + 0.5) * WAY_PITCH;
+      cx = sec.endX + SECTION_GAP;
+    });
+    const lastSec = sections[sections.length - 1];
+    const totalW = Math.max(lastSec.endX + PAD, PAD + LABEL_COL + WAY_PITCH + PAD);
+
+    const P = [];
+    P.push(txt(totalW / 2, 32, boardName + ' — Single Line Diagram', 'sld-title', MID));
+
+    // floor band guide lines + labels (full width, behind everything)
+    const bandL = PAD, bandR = totalW - PAD;
+    for (let i = 0; i < nF; i++) {
+      const y = floorY(i);
+      P.push(line(bandL, y, bandR, y, 'sld-band'));
+      P.push(txt(PAD + LABEL_COL - 12, y + 4, floors[i], 'sld-floor', END));
+    }
+
+    sections.forEach(sec => {
+      const busL = sec.startX - 24;
+      const busR = sec.ways.length ? sec.wayX(sec.ways.length - 1) + 44 : sec.startX + 100;
+      const incX = sec.startX + 36;
+
+      // busbar
+      P.push(line(busL, busbarY, busR, busbarY, 'sld-bus'));
+      P.push(txt((sec.startX + sec.endX) / 2, busbarY + 22, `${sec.label} BUSBAR — ${sec.rating}A TPN`, 'sld-section', MID));
+
+      // outgoing ways (rise upward into their floor band)
+      sec.ways.forEach((w, j) => {
+        const x = sec.wayX(j);
+        const fy = floorY(Math.max(0, floors.indexOf(w.floor)));
+        const devTop = breakerY - DEV_H/2, devBot = breakerY + DEV_H/2;
+        P.push(line(x, busbarY, x, devBot, 'sld-line'));            // bus -> device
+        P.push(deviceSym(w.prot, w.cb, x, breakerY));
+        P.push(line(x, devTop, x, fy + DEST_HALF, 'sld-line'));     // device -> destination
+        const lbl = w.prot === 'isolator' ? 'ISOL'
+                  : (w.prot === 'rcd' ? 'RCD ' : '') + breakerClass(w.cb);
+        P.push(txt(x + 16, breakerY - 1, `${w.cb}A`, 'sld-symlabel'));
+        P.push(txt(x + 16, breakerY + 11, lbl, 'sld-small'));
+        P.push(destSym(w.dest, x, fy, w.name));
+      });
+
+      // incomer spine below the busbar
+      P.push(txt(incX, busbarY + 44, 'MAIN', 'sld-small', MID));
+      const msY = busbarY + 70;
+      P.push(line(incX, busbarY, incX, msY - DEV_H/2, 'sld-line'));
+      P.push(deviceSym(mainType === 'isolator' ? 'isolator' : 'mccb', sec.rating, incX, msY));
+      P.push(txt(incX + 18, msY + 2, `${sec.rating}A ${breakerClass(sec.rating)}`, 'sld-symlabel'));
+
+      let y = msY + DEV_H/2;
+      if (sec.key === 'normal') {
+        if (optMeter) {
+          const ctY = busbarY + 126, kY = busbarY + 176;
+          P.push(line(incX, y, incX, ctY - 13, 'sld-line'));
+          P.push(meterSym(incX, ctY, 'EA'));
+          P.push(line(incX, ctY + 13, incX, kY - 13, 'sld-line'));
+          P.push(meterSym(incX, kY, 'kWh'));
+          y = kY + 13;
+        }
+        const supY = busbarY + INCOMER_H - 14;
+        P.push(line(incX, y, incX, supY, 'sld-line'));
+        P.push(poly(`${incX-6},${supY-12} ${incX+6},${supY-12} ${incX},${supY-2}`, 'sld-arrow'));
+        P.push(txt(incX + 14, supY - 4, `CONSUMER MAINS · ${phaseLabel}`, 'sld-small'));
+
+        if (optEarth) {
+          const eX = PAD + 22, eY = busbarY + 96;
+          P.push(line(incX, busbarY + 8, eX, busbarY + 8, 'sld-line'));
+          P.push(line(eX, busbarY + 8, eX, eY, 'sld-line'));
+          P.push(line(eX - 16, eY, eX + 16, eY, 'sld-bus'));        // earth bar
+          P.push(earthSym(eX, eY));
+          P.push(txt(eX, eY + 34, 'MEN', 'sld-small', MID));
+          P.push(circ(eX + 30, busbarY + 8, 3, 'sld-sym'));         // neutral link
+          P.push(txt(eX + 30, busbarY - 4, 'N', 'sld-small', MID));
+        }
+      } else {
+        const supY = busbarY + INCOMER_H - 14;
+        if (optGen) {
+          // essential fed via changeover (ATS) from normal supply + standby generator
+          const atsY = busbarY + 142;
+          P.push(line(incX, y, incX, atsY - 10, 'sld-line'));
+          P.push(boxSym(incX, atsY, 46, 'ATS'));
+          const gX = incX + 84, gY = atsY;
+          P.push(genSym(gX, gY));
+          P.push(line(gX - 14, gY, incX + 23, gY, 'sld-line'));
+          P.push(txt(gX, gY + 26, 'STANDBY GEN', 'sld-small', MID));
+          P.push(line(incX, atsY + 10, incX, supY, 'sld-line'));
+          P.push(txt(incX + 14, supY - 4, `NORMAL SUPPLY · ${phaseLabel}`, 'sld-small'));
+        } else {
+          // essential busbar fed from its own essential main switch only (no generator)
+          P.push(line(incX, y, incX, supY, 'sld-line'));
+          P.push(txt(incX + 14, supY - 4, `ESSENTIAL SUPPLY · ${phaseLabel}`, 'sld-small'));
+        }
+        P.push(poly(`${incX-6},${supY-12} ${incX+6},${supY-12} ${incX},${supY-2}`, 'sld-arrow'));
+      }
+
+      // SPD tapped off busbar near the right end
+      if (optSpd) {
+        const sX = Math.max(busR - 6, sec.startX + 100), sY = busbarY + 64;
+        P.push(line(sX, busbarY, sX, sY - 9, 'sld-line'));
+        P.push(spdSym(sX, sY));
+        P.push(txt(sX + 14, sY + 3, 'SPD', 'sld-small'));
+        P.push(earthSym(sX, sY + 9));
+      }
+    });
+
+    svg.setAttribute('viewBox', `0 0 ${Math.round(totalW)} ${Math.round(totalH)}`);
+    svg.setAttribute('width', Math.round(totalW));
+    svg.setAttribute('height', Math.round(totalH));
+    svg.innerHTML = `<style class="sld-style">${SCREEN_CSS}</style>` + P.join('');
+
+    buildSchedules(normal, essential);
+  }
+
+  /* ── schedules ──────────────────────────────────────────────── */
+  function scheduleTable(title, loads) {
+    if (!loads.length) return '';
+    let pw = 0, pc = 0;
+    let rows = loads.map(l => {
+      pw += l.power; pc += l.current;
+      const lbl = l.prot === 'isolator' ? 'Isolator'
+        : (l.prot === 'rcd' ? 'RCD ' : '') + breakerClass(l.cb);
+      return `<tr><td>${esc(l.name)}</td><td>${esc(l.floor)}</td><td style="text-align:center">${l.cb}</td>
+        <td>${lbl}</td><td style="text-align:right">${l.power.toFixed(1)}</td>
+        <td style="text-align:right">${l.current.toFixed(1)}</td></tr>`;
+    }).join('');
+    return `<div><h3>${esc(title)}</h3><table class="sched-table">
+      <thead><tr><th>Circuit</th><th>Floor</th><th>CB (A)</th><th>Type</th><th>kW</th><th>A</th></tr></thead>
+      <tbody>${rows}
+        <tr class="total"><td colspan="4">TOTAL</td>
+        <td style="text-align:right">${pw.toFixed(1)}</td>
+        <td style="text-align:right">${pc.toFixed(1)}</td></tr>
+      </tbody></table></div>`;
+  }
+  function buildSchedules(normal, essential) {
+    document.getElementById('circuitScheduleContainer').style.display = 'block';
+    document.getElementById('normalSchedule').innerHTML = scheduleTable('Normal supply', normal);
+    document.getElementById('safetySchedule').innerHTML = scheduleTable('Essential supply', essential);
+  }
+
+  /* ── persistence ────────────────────────────────────────────── */
+  function gatherConfig() {
+    return {
+      boardName: document.getElementById('boardName').value,
+      mainRating: document.getElementById('mainSwitchRating').value,
+      mainType: document.getElementById('mainSwitchType').value,
+      voltage: document.getElementById('supplyVoltage').value,
+      pf: document.getElementById('powerFactor').value,
+      floors: document.getElementById('floorsInput').value,
+      essRating: document.getElementById('essRating').value,
+      optMeter: document.getElementById('optMeter').checked,
+      optSpd: document.getElementById('optSpd').checked,
+      optEarth: document.getElementById('optEarth').checked,
+      optGen: document.getElementById('optGen').checked,
+      rows: [...document.querySelectorAll('#loadTableBody tr')].map(r => ({
+        name: r.querySelector('.load-name').value,
+        rating: r.querySelector('.load-rating').value,
+        unit: r.querySelector('.load-unit').value,
+        prot: r.querySelector('.load-prot').value,
+        section: r.querySelector('.load-section').value,
+        floor: r.querySelector('.load-floor').value,
+        dest: r.querySelector('.load-dest').value
+      }))
     };
+  }
+  function saveConfig() {
+    localStorage.setItem('sldConfig', JSON.stringify(gatherConfig()));
+    toast('Diagram configuration saved.', 'success');
+  }
+  function loadConfig() {
+    const raw = localStorage.getItem('sldConfig');
+    if (!raw) { toast('No saved configuration found.', 'warn'); return; }
+    try {
+      const c = JSON.parse(raw);
+      document.getElementById('boardName').value = c.boardName || '';
+      document.getElementById('mainSwitchRating').value = c.mainRating || 400;
+      document.getElementById('mainSwitchType').value = c.mainType || 'breaker';
+      document.getElementById('supplyVoltage').value = c.voltage || '400';
+      document.getElementById('powerFactor').value = c.pf || 0.9;
+      document.getElementById('floorsInput').value = c.floors || 'GF, L1, L2, L3';
+      document.getElementById('essRating').value = c.essRating || 250;
+      document.getElementById('optMeter').checked = c.optMeter !== false;
+      document.getElementById('optSpd').checked = c.optSpd !== false;
+      document.getElementById('optEarth').checked = c.optEarth !== false;
+      document.getElementById('optGen').checked = c.optGen === true;
+      const tb = document.getElementById('loadTableBody');
+      tb.innerHTML = '';
+      (c.rows && c.rows.length ? c.rows : [{}]).forEach(addRow);
+      generateDiagram();
+      toast('Configuration loaded.', 'success');
+    } catch (e) { toast('Saved configuration is corrupt.', 'error'); }
+  }
+  function toast(msg, type) {
+    if (window.OmniToast && OmniToast.show) OmniToast.show(msg, type);
+    else console.log('[' + (type || 'info') + '] ' + msg);
+  }
 
-    function addRow() {
-      const tbody = document.getElementById('loadTableBody');
-      const newRow = document.createElement('tr');
-      newRow.innerHTML = `
-        <td><input type="text" class="load-name" placeholder="Circuit name"></td>
-        <td><input type="number" class="load-rating" value="10" min="0" step="0.1"></td>
-        <td>
-          <select class="load-unit small-select">
-            <option value="kW" selected>kW</option>
-            <option value="A">A</option>
-          </select>
-        </td>
-        <td>
-          <select class="breaker-type type-select">
-            <option value="standard" selected>MCB</option>
-            <option value="air">MCCB</option>
-          </select>
-        </td>
-        <td><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td>
-      `;
-      tbody.appendChild(newRow);
-    }
-
-    function removeRow(btn) {
-      const tbody = document.getElementById('loadTableBody');
-      if (tbody.children.length > 1) {
-        btn.closest('tr').remove();
-      } else {
-        alert('At least one circuit is required.');
-      }
-    }
-
-    function parseLoads() {
-      const rows = document.querySelectorAll('#loadTableBody tr');
-      const loads = [];
-      const voltage = parseInt(document.getElementById('supplyVoltage').value);
-      const powerFactor = parseFloat(document.getElementById('powerFactor').value);
-      
-      rows.forEach(row => {
-        const name = row.querySelector('.load-name').value.trim();
-        const rating = parseFloat(row.querySelector('.load-rating').value);
-        const unit = row.querySelector('.load-unit').value;
-        const breakerType = row.querySelector('.breaker-type').value;
-        
-        if (name && !isNaN(rating) && rating > 0) {
-          let powerKW, current;
-          
-          if (unit === 'kW') {
-            powerKW = rating;
-            current = calculateCurrent(powerKW, voltage, powerFactor, true); // All treated as motors
-          } else {
-            // Unit is A (Amps)
-            current = rating;
-            // Calculate power from current
-            if (voltage === 230) {
-              powerKW = (current * voltage * powerFactor) / 1000;
-            } else {
-              powerKW = (current * Math.sqrt(3) * voltage * powerFactor) / 1000;
-            }
-          }
-          
-          loads.push({ name, power: powerKW, breakerType, current });
-        }
-      });
-      
-      return loads;
-    }
-
-    function calculateCurrent(powerKW, voltage, powerFactor, isMotor) {
-      if (voltage === 230) {
-        // Single phase
-        return (powerKW * 1000) / (voltage * powerFactor);
-      } else {
-        // Three phase
-        return (powerKW * 1000) / (Math.sqrt(3) * voltage * powerFactor);
-      }
-    }
-
-    function selectCBSize(current, isMotor) {
-      // Motor circuits: 1.5x current for starting
-      const designCurrent = isMotor ? current * 1.5 : current;
-      
-      const standardSizes = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000];
-      
-      for (const size of standardSizes) {
-        if (size >= designCurrent) {
-          return size;
-        }
-      }
-      
-      return standardSizes[standardSizes.length - 1];
-    }
-
-    function getBreakerType(rating) {
-      if (rating > 800) return 'ACB';
-      if (rating > 100) return 'MCCB';
-      return 'MCB';
-    }
-
-    function drawCircuitBreaker(svg, x, y, rating, breakerType, label) {
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      
-      if (breakerType === 'rcd') {
-        // RCD Circuit Breaker
-        const rcdText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        rcdText.setAttribute('x', x - 15);
-        rcdText.setAttribute('y', y - 8);
-        rcdText.setAttribute('font-size', '8');
-        rcdText.setAttribute('font-weight', 'bold');
-        rcdText.textContent = 'RCD';
-        g.appendChild(rcdText);
-        
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', x);
-        circle.setAttribute('cy', y);
-        circle.setAttribute('r', 12);
-        circle.setAttribute('fill', 'white');
-        circle.setAttribute('stroke', '#000');
-        circle.setAttribute('stroke-width', '2');
-        g.appendChild(circle);
-        
-        const crossLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        crossLine.setAttribute('x1', x + 12);
-        crossLine.setAttribute('y1', y - 8);
-        crossLine.setAttribute('x2', x + 12);
-        crossLine.setAttribute('y2', y + 8);
-        crossLine.setAttribute('stroke', '#000');
-        crossLine.setAttribute('stroke-width', '2');
-        g.appendChild(crossLine);
-      } else if (breakerType === 'air') {
-        // Air Circuit Breaker
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', x);
-        circle.setAttribute('cy', y);
-        circle.setAttribute('r', 12);
-        circle.setAttribute('fill', 'white');
-        circle.setAttribute('stroke', '#000');
-        circle.setAttribute('stroke-width', '2');
-        g.appendChild(circle);
-        
-        const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        arrow.setAttribute('d', `M ${x+12} ${y} L ${x+25} ${y-6} L ${x+30} ${y} L ${x+25} ${y+6} L ${x+12} ${y}`);
-        arrow.setAttribute('fill', 'none');
-        arrow.setAttribute('stroke', '#000');
-        arrow.setAttribute('stroke-width', '2');
-        g.appendChild(arrow);
-      } else if (breakerType === 'air') {
-        // MCCB - Air Circuit Breaker
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', x);
-        circle.setAttribute('cy', y);
-        circle.setAttribute('r', 12);
-        circle.setAttribute('fill', 'white');
-        circle.setAttribute('stroke', '#000');
-        circle.setAttribute('stroke-width', '2');
-        g.appendChild(circle);
-        
-        const crossLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        crossLine.setAttribute('x1', x + 12);
-        crossLine.setAttribute('y1', y - 8);
-        crossLine.setAttribute('x2', x + 12);
-        crossLine.setAttribute('y2', y + 8);
-        crossLine.setAttribute('stroke', '#000');
-        crossLine.setAttribute('stroke-width', '2');
-        g.appendChild(crossLine);
-      } else {
-        // Standard Circuit Breaker
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', x);
-        circle.setAttribute('cy', y);
-        circle.setAttribute('r', 15);
-        circle.setAttribute('fill', 'white');
-        circle.setAttribute('stroke', '#000');
-        circle.setAttribute('stroke-width', '2');
-        g.appendChild(circle);
-        
-        const crossLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        crossLine.setAttribute('x1', x + 15);
-        crossLine.setAttribute('y1', y - 8);
-        crossLine.setAttribute('x2', x + 15);
-        crossLine.setAttribute('y2', y + 8);
-        crossLine.setAttribute('stroke', '#000');
-        crossLine.setAttribute('stroke-width', '2');
-        g.appendChild(crossLine);
-      }
-      
-      // Rating text with breaker type
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', x + 35);
-      text.setAttribute('y', y + 5);
-      text.setAttribute('font-size', '12');
-      text.setAttribute('font-weight', 'bold');
-      const breakerClass = getBreakerType(rating);
-      text.textContent = `${rating}A ${breakerClass}`;
-      g.appendChild(text);
-      
-      // Label text
-      if (label) {
-        const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        labelText.setAttribute('x', x + 35);
-        labelText.setAttribute('y', y + 18);
-        labelText.setAttribute('font-size', '10');
-        labelText.setAttribute('fill', '#666');
-        labelText.textContent = label;
-        g.appendChild(labelText);
-      }
-      
-      svg.appendChild(g);
-      return g;
-    }
-
-    function drawLoad(svg, x, y, load, current) {
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      
-      // Load box
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x', x);
-      rect.setAttribute('y', y - 20);
-      rect.setAttribute('width', 200);
-      rect.setAttribute('height', 40);
-      rect.setAttribute('fill', loadTypeColors[load.type] || loadTypeColors.other);
-      rect.setAttribute('stroke', '#000');
-      rect.setAttribute('stroke-width', '2');
-      g.appendChild(rect);
-      
-      // Load name
-      const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      nameText.setAttribute('x', x + 100);
-      nameText.setAttribute('y', y - 2);
-      nameText.setAttribute('font-size', '13');
-      nameText.setAttribute('font-weight', 'bold');
-      nameText.setAttribute('text-anchor', 'middle');
-      nameText.textContent = load.name;
-      g.appendChild(nameText);
-      
-      // Power and current
-      const detailText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      detailText.setAttribute('x', x + 100);
-      detailText.setAttribute('y', y + 12);
-      detailText.setAttribute('font-size', '11');
-      detailText.setAttribute('text-anchor', 'middle');
-      detailText.textContent = `${load.power}kW | ${current.toFixed(1)}A`;
-      g.appendChild(detailText);
-      
-      svg.appendChild(g);
-      return g;
-    }
-
-    function drawLine(svg, x1, y1, x2, y2) {
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', x1);
-      line.setAttribute('y1', y1);
-      line.setAttribute('x2', x2);
-      line.setAttribute('y2', y2);
-      line.setAttribute('stroke', '#000');
-      line.setAttribute('stroke-width', '2');
-      svg.appendChild(line);
-    }
-
-    function generateDiagram() {
-      const voltage = parseInt(document.getElementById('supplyVoltage').value);
-      const powerFactor = parseFloat(document.getElementById('powerFactor').value);
-      const mainSwitchRating = parseInt(document.getElementById('mainSwitchRating').value);
-      const mainSwitchType = document.getElementById('mainSwitchType').value;
-      const boardName = document.getElementById('boardName').value;
-      const hasSafetyServices = document.getElementById('safetyServices').checked;
-      
-      const loads = parseLoads();
-      
-      if (loads.length === 0) {
-        alert('Please add at least one circuit.');
-        return;
-      }
-      
-      // All loads go to normal section
-      const normalLoads = loads;
-      
-      const svg = document.getElementById('sldCanvas');
-      svg.innerHTML = ''; // Clear previous diagram
-      
-      // Calculate diagram dimensions - HORIZONTAL LAYOUT
-      const startX = 150;
-      const startY = 600; // Busbar will be at bottom
-      const columnWidth = 120;
-      const normalWidth = startX + (normalLoads.length * columnWidth) + 200;
-      const safetyGap = 150; // Gap between sections
-      const safetyStartX = normalWidth + safetyGap;
-      const totalWidth = hasSafetyServices ? (safetyStartX + (normalLoads.length * columnWidth) + 200) : Math.max(normalWidth, 1200);
-      const totalHeight = 800;
-      
-      svg.setAttribute('height', totalHeight);
-      svg.setAttribute('width', totalWidth);
-      
-      // Draw title
-      const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      title.setAttribute('x', totalWidth / 2);
-      title.setAttribute('y', 30);
-      title.setAttribute('font-size', '20');
-      title.setAttribute('font-weight', 'bold');
-      title.setAttribute('text-anchor', 'middle');
-      title.textContent = boardName;
-      svg.appendChild(title);
-      
-      // Draw incoming supply/main switch (enters from below busbar)
-      if (mainSwitchType === 'isolator') {
-        // ISOLATOR SWITCH - two parallel vertical lines
-        const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line1.setAttribute('x1', startX - 75);
-        line1.setAttribute('y1', startY + 15);
-        line1.setAttribute('x2', startX - 75);
-        line1.setAttribute('y2', startY + 45);
-        line1.setAttribute('stroke', '#000');
-        line1.setAttribute('stroke-width', '2');
-        svg.appendChild(line1);
-        
-        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line2.setAttribute('x1', startX - 65);
-        line2.setAttribute('y1', startY + 15);
-        line2.setAttribute('x2', startX - 65);
-        line2.setAttribute('y2', startY + 45);
-        line2.setAttribute('stroke', '#000');
-        line2.setAttribute('stroke-width', '2');
-        svg.appendChild(line2);
-        
-        // Line from isolator to busbar
-        const lineToBar = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        lineToBar.setAttribute('x1', startX - 70);
-        lineToBar.setAttribute('y1', startY + 15);
-        lineToBar.setAttribute('x2', startX - 70);
-        lineToBar.setAttribute('y2', startY);
-        lineToBar.setAttribute('stroke', '#000');
-        lineToBar.setAttribute('stroke-width', '2');
-        svg.appendChild(lineToBar);
-        
-        const isoText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        isoText.setAttribute('x', startX - 70);
-        isoText.setAttribute('y', startY + 75);
-        isoText.setAttribute('font-size', '11');
-        isoText.setAttribute('font-weight', 'bold');
-        isoText.setAttribute('text-anchor', 'middle');
-        const mainSwitchClass = getBreakerType(mainSwitchRating);
-        isoText.textContent = `${mainSwitchRating}A ${mainSwitchClass}`;
-        svg.appendChild(isoText);
-        
-        const isoLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        isoLabel.setAttribute('x', startX - 70);
-        isoLabel.setAttribute('y', startY + 60);
-        isoLabel.setAttribute('font-size', '9');
-        isoLabel.setAttribute('text-anchor', 'middle');
-        isoLabel.textContent = 'ISOLATOR';
-        svg.appendChild(isoLabel);
-      } else {
-        // MAIN SWITCH - circle and angled line (no X) entering from below
-        const cbX = startX + 20; // More central position
-        const cbY = startY + 30;
-        const gapLength = 25; // Gap between circle and where line continues
-        
-        // Circle (bottom, closest to incoming supply)
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', cbX);
-        circle.setAttribute('cy', cbY + 20);
-        circle.setAttribute('r', 5);
-        circle.setAttribute('fill', 'none');
-        circle.setAttribute('stroke', '#000');
-        circle.setAttribute('stroke-width', '2');
-        svg.appendChild(circle);
-        
-        // Small wire below circle (incoming supply)
-        const incomingWire = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        incomingWire.setAttribute('x1', cbX);
-        incomingWire.setAttribute('y1', cbY + 25);
-        incomingWire.setAttribute('x2', cbX);
-        incomingWire.setAttribute('y2', cbY + 40);
-        incomingWire.setAttribute('stroke', '#000');
-        incomingWire.setAttribute('stroke-width', '2');
-        svg.appendChild(incomingWire);
-        
-        // Angled line from circle (slightly shorter than gap)
-        const angledLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        angledLine.setAttribute('x1', cbX + 3);
-        angledLine.setAttribute('y1', cbY + 15);
-        angledLine.setAttribute('x2', cbX + 15);
-        angledLine.setAttribute('y2', cbY - 5);
-        angledLine.setAttribute('stroke', '#000');
-        angledLine.setAttribute('stroke-width', '2');
-        svg.appendChild(angledLine);
-        
-        // Line to busbar (with gap from circle)
-        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line2.setAttribute('x1', cbX);
-        line2.setAttribute('y1', cbY + 20 - 5 - gapLength); // Start after gap
-        line2.setAttribute('x2', cbX);
-        line2.setAttribute('y2', startY);
-        line2.setAttribute('stroke', '#000');
-        line2.setAttribute('stroke-width', '2');
-        svg.appendChild(line2);
-        
-        const incomerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        incomerText.setAttribute('x', cbX);
-        incomerText.setAttribute('y', cbY + 50);
-        incomerText.setAttribute('font-size', '11');
-        incomerText.setAttribute('font-weight', 'bold');
-        incomerText.setAttribute('text-anchor', 'middle');
-        const mainSwitchClass = getBreakerType(mainSwitchRating);
-        incomerText.textContent = `${mainSwitchRating}A ${mainSwitchClass}`;
-        svg.appendChild(incomerText);
-        
-        const cbLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        cbLabel.setAttribute('x', cbX);
-        cbLabel.setAttribute('y', cbY + 37);
-        cbLabel.setAttribute('font-size', '9');
-        cbLabel.setAttribute('text-anchor', 'middle');
-        cbLabel.textContent = 'MAIN SWITCH';
-        svg.appendChild(cbLabel);
-      }
-      
-      const voltageText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      voltageText.setAttribute('x', 50);
-      voltageText.setAttribute('y', startY + 80);
-      voltageText.setAttribute('font-size', '11');
-      voltageText.setAttribute('fill', '#666');
-      voltageText.textContent = voltage === 230 ? '230V 1Ph' : '400V 3Ph';
-      svg.appendChild(voltageText);
-      
-      // Draw NORMAL LOADS section
-      drawBusbarSection(svg, startX, startY, normalLoads, 'MSB', voltage, powerFactor, false);
-      
-      // Draw SAFETY SERVICES section if enabled (on same horizontal line)
-      if (hasSafetyServices) {
-        // Draw connection line between busbars
-        const normalBusbarEnd = startX + (normalLoads.length * columnWidth) + 50;
-        const safetyBusbarStart = safetyStartX - 50;
-        const connectionLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        connectionLine.setAttribute('x1', normalBusbarEnd);
-        connectionLine.setAttribute('y1', startY);
-        connectionLine.setAttribute('x2', safetyBusbarStart);
-        connectionLine.setAttribute('y2', startY);
-        connectionLine.setAttribute('stroke', '#0D47A1');
-        connectionLine.setAttribute('stroke-width', '8');
-        connectionLine.setAttribute('stroke-linecap', 'round');
-        svg.appendChild(connectionLine);
-        
-        drawBusbarSection(svg, safetyStartX, startY, normalLoads, 'SAFETY SERVICES', voltage, powerFactor, true);
-      }
-      
-      // Generate circuit schedules
-      generateCircuitSchedule(normalLoads, hasSafetyServices);
-    }
-    
-    function generateCircuitSchedule(loads, includeSafety) {
-      const container = document.getElementById('circuitScheduleContainer');
-      const normalSchedule = document.getElementById('normalSchedule');
-      const safetySchedule = document.getElementById('safetySchedule');
-      
-      // Show container
-      container.style.display = 'block';
-      
-      // Generate normal schedule
-      normalSchedule.innerHTML = createScheduleTable(loads, 'MSB');
-      
-      // Generate safety schedule if enabled
-      if (includeSafety) {
-        safetySchedule.innerHTML = createScheduleTable(loads, 'SAFETY SERVICES');
-      } else {
-        safetySchedule.innerHTML = '';
-      }
-    }
-    
-    function createScheduleTable(loads, sectionName) {
-      let totalPower = 0;
-      let totalCurrent = 0;
-      
-      let html = `<div style="margin-bottom: 20px;">`;
-      html += `<h3>${sectionName}</h3>`;
-      html += `<table style="border-collapse: collapse; width: 100%; max-width: 600px; margin: 0 auto; font-size: 12px;">`;
-      html += `<thead><tr style="background: var(--accent); color: white;">`;
-      html += `<th style="border: 1px solid var(--border-light); padding: 8px;">Circuit</th>`;
-      html += `<th style="border: 1px solid var(--border-light); padding: 8px;">Breaker (A)</th>`;
-      html += `<th style="border: 1px solid var(--border-light); padding: 8px;">Type</th>`;
-      html += `<th style="border: 1px solid var(--border-light); padding: 8px;">Load (kW)</th>`;
-      html += `<th style="border: 1px solid var(--border-light); padding: 8px;">Current (A)</th>`;
-      html += `</tr></thead><tbody>`;
-      
-      loads.forEach((load, index) => {
-        const cbSize = selectCBSize(load.current, true);
-        const breakerLabel = load.breakerType === 'air' ? 'MCCB' : 'MCB';
-        totalPower += load.power;
-        totalCurrent += load.current;
-        
-        html += `<tr style="background: ${index % 2 === 0 ? 'var(--bg-input)' : 'var(--bg-card)'};">`;
-        html += `<td style="border: 1px solid var(--border-light); padding: 8px;">${load.name}</td>`;
-        html += `<td style="border: 1px solid var(--border-light); padding: 8px; text-align: center;">${cbSize}</td>`;
-        html += `<td style="border: 1px solid var(--border-light); padding: 8px; text-align: center;">${breakerLabel}</td>`;
-        html += `<td style="border: 1px solid var(--border-light); padding: 8px; text-align: right;">${load.power.toFixed(1)}</td>`;
-        html += `<td style="border: 1px solid var(--border-light); padding: 8px; text-align: right;">${load.current.toFixed(1)}</td>`;
-        html += `</tr>`;
-      });
-      
-      // Total row
-      html += `<tr style="background: var(--bg-info); font-weight: bold;">`;
-      html += `<td style="border: 1px solid var(--border-light); padding: 8px;" colspan="3">TOTAL</td>`;
-      html += `<td style="border: 1px solid var(--border-light); padding: 8px; text-align: right;">${totalPower.toFixed(1)}</td>`;
-      html += `<td style="border: 1px solid var(--border-light); padding: 8px; text-align: right;">${totalCurrent.toFixed(1)}</td>`;
-      html += `</tr>`;
-      
-      html += `</tbody></table></div>`;
-      return html;
-    }
-    
-    function drawBusbarSection(svg, startX, busbarY, loads, sectionLabel, voltage, powerFactor, isSafety) {
-      const columnWidth = 120;
-      
-      // Draw horizontal busbar line at bottom
-      const busbarStartX = startX - 50;
-      const busbarEndX = startX + (loads.length * columnWidth) + 50;
-      
-      // Thick busbar line with rounded ends (dark blue)
-      const busbar = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      busbar.setAttribute('x1', busbarStartX);
-      busbar.setAttribute('y1', busbarY);
-      busbar.setAttribute('x2', busbarEndX);
-      busbar.setAttribute('y2', busbarY);
-      busbar.setAttribute('stroke', '#0D47A1');
-      busbar.setAttribute('stroke-width', '8');
-      busbar.setAttribute('stroke-linecap', 'round');
-      svg.appendChild(busbar);
-      
-      // Section label below busbar
-      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      label.setAttribute('x', (busbarStartX + busbarEndX) / 2);
-      label.setAttribute('y', busbarY + 35);
-      label.setAttribute('font-size', '18');
-      label.setAttribute('font-weight', 'bold');
-      label.setAttribute('fill', isSafety ? '#c2185b' : '#000');
-      label.setAttribute('text-anchor', 'middle');
-      label.textContent = sectionLabel;
-      svg.appendChild(label);
-      
-      // Draw each load circuit - VERTICAL from busbar going UP
-      let totalCurrent = 0;
-      let totalPower = 0;
-      loads.forEach((load, index) => {
-        const x = startX + (index * columnWidth);
-        
-        // Calculate CB size (all loads treated as motors)
-        const cbSize = selectCBSize(load.current, true);
-        totalCurrent += load.current;
-        totalPower += load.power;
-        
-        // Vertical line from busbar going UP to CB
-        const cbY = busbarY - 100;
-        drawLine(svg, x, busbarY, x, cbY + 10);
-        
-        // Circuit breaker
-        drawCircuitBreakerVertical(svg, x, cbY - 20, cbSize, load.breakerType, '');
-        
-        // Vertical line from CB to load (goes to bottom of DB)
-        const loadY = busbarY - 380;
-        drawLine(svg, x, cbY - 30, x, loadY - 45);
-        
-        // Load box or DB representation
-        drawLoadVertical(svg, x, loadY - 80, load, load.current);
-      });
-      
-      // Draw total load summary
-      const summaryText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      summaryText.setAttribute('x', startX - 50);
-      summaryText.setAttribute('y', busbarY + 55);
-      summaryText.setAttribute('font-size', '12');
-      summaryText.setAttribute('font-weight', 'bold');
-      summaryText.setAttribute('fill', isSafety ? '#c2185b' : '#666');
-      summaryText.textContent = `Total: ${totalPower.toFixed(1)}kW | ${totalCurrent.toFixed(1)}A`;
-      svg.appendChild(summaryText);
-    }
-    
-    function drawCircuitBreakerVertical(svg, x, y, rating, breakerType, label) {
-      // Use Bluebeam symbols exclusively
-      const symbolMap = {
-        'standard': 'Circuit Breaker',
-        'rcd': 'RCD Circuit Breaker',
-        'air': 'Circuit Breaker'
-      };
-      
-      const symbolName = symbolMap[breakerType] || 'Circuit Breaker';
-      const customSymbol = window.customBluebeamSymbols?.find(s => s.name === symbolName);
-      
-      if (!customSymbol) {
-        console.error(`Bluebeam symbol not found: ${symbolName}`);
-        // Create placeholder
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', x);
-        text.setAttribute('y', y);
-        text.setAttribute('font-size', '10');
-        text.setAttribute('fill', 'red');
-        text.textContent = 'Loading...';
-        g.appendChild(text);
-        svg.appendChild(g);
-        return g;
-      }
-      
-      // Use Bluebeam symbol - center on x position
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.setAttribute('transform', `translate(${x - 30}, ${y - 50})`);
-      g.innerHTML = customSymbol.svg;
-      
-      // Add rating text
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', x + 15);
-      text.setAttribute('y', y - 28);
-      text.setAttribute('font-size', '9');
-      text.setAttribute('font-weight', 'bold');
-      const breakerClass = getBreakerType(rating);
-      text.textContent = `${rating}A`;
-      svg.appendChild(text);
-      
-      const typeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      typeText.setAttribute('x', x + 15);
-      typeText.setAttribute('y', y - 18);
-      typeText.setAttribute('font-size', '7');
-      typeText.setAttribute('fill', '#666');
-      typeText.textContent = breakerClass;
-      svg.appendChild(typeText);
-      
-      svg.appendChild(g);
-      return g;
-    }
-
-    // Remove built-in symbol code - only Bluebeam symbols used
-    function drawCircuitBreakerVertical_OLD(svg, x, y, rating, breakerType, label) {
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      
-      if (breakerType === 'rcd') {
-        // RCD CIRCUIT BREAKER - from top: circle, arrow down, X, circle with X, X, circle
-        // Line from load
-        const line0 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line0.setAttribute('x1', x);
-        line0.setAttribute('y1', y - 80);
-        line0.setAttribute('x2', x);
-        line0.setAttribute('y2', y - 70);
-        line0.setAttribute('stroke', '#000');
-        line0.setAttribute('stroke-width', '1.5');
-        g.appendChild(line0);
-        
-        // Top circle
-        const circle1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle1.setAttribute('cx', x);
-        circle1.setAttribute('cy', y - 62);
-        circle1.setAttribute('r', 8);
-        circle1.setAttribute('fill', 'none');
-        circle1.setAttribute('stroke', '#000');
-        circle1.setAttribute('stroke-width', '1.5');
-        g.appendChild(circle1);
-        
-        // Arrow pointing down
-        const arrowLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        arrowLine1.setAttribute('x1', x);
-        arrowLine1.setAttribute('y1', y - 54);
-        arrowLine1.setAttribute('x2', x);
-        arrowLine1.setAttribute('y2', y - 44);
-        arrowLine1.setAttribute('stroke', '#000');
-        arrowLine1.setAttribute('stroke-width', '1.5');
-        g.appendChild(arrowLine1);
-        
-        const arrowHead1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        arrowHead1.setAttribute('x1', x - 4);
-        arrowHead1.setAttribute('y1', y - 48);
-        arrowHead1.setAttribute('x2', x);
-        arrowHead1.setAttribute('y2', y - 44);
-        arrowHead1.setAttribute('stroke', '#000');
-        arrowHead1.setAttribute('stroke-width', '1.5');
-        g.appendChild(arrowHead1);
-        
-        const arrowHead2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        arrowHead2.setAttribute('x1', x + 4);
-        arrowHead2.setAttribute('y1', y - 48);
-        arrowHead2.setAttribute('x2', x);
-        arrowHead2.setAttribute('y2', y - 44);
-        arrowHead2.setAttribute('stroke', '#000');
-        arrowHead2.setAttribute('stroke-width', '1.5');
-        g.appendChild(arrowHead2);
-        
-        // Line
-        const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line1.setAttribute('x1', x);
-        line1.setAttribute('y1', y - 44);
-        line1.setAttribute('x2', x);
-        line1.setAttribute('y2', y - 36);
-        line1.setAttribute('stroke', '#000');
-        line1.setAttribute('stroke-width', '1.5');
-        g.appendChild(line1);
-        
-        // X symbol
-        const x1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        x1.setAttribute('x1', x - 5);
-        x1.setAttribute('y1', y - 31);
-        x1.setAttribute('x2', x + 5);
-        x1.setAttribute('y2', y - 21);
-        x1.setAttribute('stroke', '#000');
-        x1.setAttribute('stroke-width', '1.5');
-        g.appendChild(x1);
-        
-        const x2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        x2.setAttribute('x1', x - 5);
-        x2.setAttribute('y1', y - 21);
-        x2.setAttribute('x2', x + 5);
-        x2.setAttribute('y2', y - 31);
-        x2.setAttribute('stroke', '#000');
-        x2.setAttribute('stroke-width', '1.5');
-        g.appendChild(x2);
-        
-        // Line to circle with X
-        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line2.setAttribute('x1', x);
-        line2.setAttribute('y1', y - 16);
-        line2.setAttribute('x2', x);
-        line2.setAttribute('y2', y - 8);
-        line2.setAttribute('stroke', '#000');
-        line2.setAttribute('stroke-width', '1.5');
-        g.appendChild(line2);
-        
-        // Circle with X inside (RCD symbol)
-        const circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle2.setAttribute('cx', x);
-        circle2.setAttribute('cy', y);
-        circle2.setAttribute('r', 8);
-        circle2.setAttribute('fill', 'none');
-        circle2.setAttribute('stroke', '#000');
-        circle2.setAttribute('stroke-width', '1.5');
-        g.appendChild(circle2);
-        
-        // X inside circle
-        const xIn1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        xIn1.setAttribute('x1', x - 5);
-        xIn1.setAttribute('y1', y - 5);
-        xIn1.setAttribute('x2', x + 5);
-        xIn1.setAttribute('y2', y + 5);
-        xIn1.setAttribute('stroke', '#000');
-        xIn1.setAttribute('stroke-width', '1.5');
-        g.appendChild(xIn1);
-        
-        const xIn2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        xIn2.setAttribute('x1', x - 5);
-        xIn2.setAttribute('y1', y + 5);
-        xIn2.setAttribute('x2', x + 5);
-        xIn2.setAttribute('y2', y - 5);
-        xIn2.setAttribute('stroke', '#000');
-        xIn2.setAttribute('stroke-width', '1.5');
-        g.appendChild(xIn2);
-        
-        // Line
-        const line3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line3.setAttribute('x1', x);
-        line3.setAttribute('y1', y + 8);
-        line3.setAttribute('x2', x);
-        line3.setAttribute('y2', y + 16);
-        line3.setAttribute('stroke', '#000');
-        line3.setAttribute('stroke-width', '1.5');
-        g.appendChild(line3);
-        
-        // X symbol
-        const x3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        x3.setAttribute('x1', x - 5);
-        x3.setAttribute('y1', y + 21);
-        x3.setAttribute('x2', x + 5);
-        x3.setAttribute('y2', y + 31);
-        x3.setAttribute('stroke', '#000');
-        x3.setAttribute('stroke-width', '1.5');
-        g.appendChild(x3);
-        
-        const x4 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        x4.setAttribute('x1', x - 5);
-        x4.setAttribute('y1', y + 31);
-        x4.setAttribute('x2', x + 5);
-        x4.setAttribute('y2', y + 21);
-        x4.setAttribute('stroke', '#000');
-        x4.setAttribute('stroke-width', '1.5');
-        g.appendChild(x4);
-        
-        // Line to bottom circle
-        const line4 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line4.setAttribute('x1', x);
-        line4.setAttribute('y1', y + 36);
-        line4.setAttribute('x2', x);
-        line4.setAttribute('y2', y + 44);
-        line4.setAttribute('stroke', '#000');
-        line4.setAttribute('stroke-width', '1.5');
-        g.appendChild(line4);
-        
-        // Bottom circle
-        const circle3 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle3.setAttribute('cx', x);
-        circle3.setAttribute('cy', y + 52);
-        circle3.setAttribute('r', 8);
-        circle3.setAttribute('fill', 'none');
-        circle3.setAttribute('stroke', '#000');
-        circle3.setAttribute('stroke-width', '1.5');
-        g.appendChild(circle3);
-        
-        // Line to busbar
-        const line5 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line5.setAttribute('x1', x);
-        line5.setAttribute('y1', y + 60);
-        line5.setAttribute('x2', x);
-        line5.setAttribute('y2', y + 70);
-        line5.setAttribute('stroke', '#000');
-        line5.setAttribute('stroke-width', '1.5');
-        g.appendChild(line5);
-        
-      } else {
-        // CIRCUIT BREAKER - from top: circle, X, circle
-        // Line from load
-        const line0 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line0.setAttribute('x1', x);
-        line0.setAttribute('y1', y - 50);
-        line0.setAttribute('x2', x);
-        line0.setAttribute('y2', y - 40);
-        line0.setAttribute('stroke', '#000');
-        line0.setAttribute('stroke-width', '1.5');
-        g.appendChild(line0);
-        
-        // Top circle
-        const circle1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle1.setAttribute('cx', x);
-        circle1.setAttribute('cy', y - 32);
-        circle1.setAttribute('r', 8);
-        circle1.setAttribute('fill', 'none');
-        circle1.setAttribute('stroke', '#000');
-        circle1.setAttribute('stroke-width', '1.5');
-        g.appendChild(circle1);
-        
-        // Line
-        const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line1.setAttribute('x1', x);
-        line1.setAttribute('y1', y - 24);
-        line1.setAttribute('x2', x);
-        line1.setAttribute('y2', y - 16);
-        line1.setAttribute('stroke', '#000');
-        line1.setAttribute('stroke-width', '1.5');
-        g.appendChild(line1);
-        
-        // X symbol
-        const x1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        x1.setAttribute('x1', x - 5);
-        x1.setAttribute('y1', y - 11);
-        x1.setAttribute('x2', x + 5);
-        x1.setAttribute('y2', y - 1);
-        x1.setAttribute('stroke', '#000');
-        x1.setAttribute('stroke-width', '1.5');
-        g.appendChild(x1);
-        
-        const x2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        x2.setAttribute('x1', x - 5);
-        x2.setAttribute('y1', y - 1);
-        x2.setAttribute('x2', x + 5);
-        x2.setAttribute('y2', y - 11);
-        x2.setAttribute('stroke', '#000');
-        x2.setAttribute('stroke-width', '1.5');
-        g.appendChild(x2);
-        
-        // Line to circle
-        const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line2.setAttribute('x1', x);
-        line2.setAttribute('y1', y + 4);
-        line2.setAttribute('x2', x);
-        line2.setAttribute('y2', y + 12);
-        line2.setAttribute('stroke', '#000');
-        line2.setAttribute('stroke-width', '1.5');
-        g.appendChild(line2);
-        
-        // Bottom circle
-        const circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle2.setAttribute('cx', x);
-        circle2.setAttribute('cy', y + 20);
-        circle2.setAttribute('r', 8);
-        circle2.setAttribute('fill', 'none');
-        circle2.setAttribute('stroke', '#000');
-        circle2.setAttribute('stroke-width', '1.5');
-        g.appendChild(circle2);
-        
-        // Line to busbar
-        const line3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line3.setAttribute('x1', x);
-        line3.setAttribute('y1', y + 28);
-        line3.setAttribute('x2', x);
-        line3.setAttribute('y2', y + 38);
-        line3.setAttribute('stroke', '#000');
-        line3.setAttribute('stroke-width', '1.5');
-        g.appendChild(line3);
-      }
-      
-      // Rating text beside top circle
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', x + 15);
-      text.setAttribute('y', y - 28);
-      text.setAttribute('font-size', '9');
-      text.setAttribute('font-weight', 'bold');
-      const breakerClass = getBreakerType(rating);
-      text.textContent = `${rating}A`;
-      g.appendChild(text);
-      
-      const typeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      typeText.setAttribute('x', x + 15);
-      typeText.setAttribute('y', y + 13);
-      typeText.setAttribute('font-size', '7');
-      typeText.setAttribute('fill', '#666');
-      typeText.textContent = breakerClass;
-      g.appendChild(typeText);
-      
-      svg.appendChild(g);
-      return g;
-    }
-    
-    function drawLoadVertical(svg, x, y, load, current) {
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      
-      // Draw DB symbol (triangle with border)
-      const dbSymbol = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      
-      // White background rectangle
-      const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      bgRect.setAttribute('x', x - 27);
-      bgRect.setAttribute('y', y);
-      bgRect.setAttribute('width', 54);
-      bgRect.setAttribute('height', 35);
-      bgRect.setAttribute('fill', 'white');
-      dbSymbol.appendChild(bgRect);
-      
-      // Triangle (filled black polygon)
-      const triangle = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      triangle.setAttribute('points', `${x - 27},${y + 35} ${x + 27},${y} ${x + 27},${y + 35}`);
-      triangle.setAttribute('fill', 'black');
-      dbSymbol.appendChild(triangle);
-      
-      // Border rectangle
-      const borderRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      borderRect.setAttribute('x', x - 27);
-      borderRect.setAttribute('y', y);
-      borderRect.setAttribute('width', 54);
-      borderRect.setAttribute('height', 35);
-      borderRect.setAttribute('fill', 'none');
-      borderRect.setAttribute('stroke', 'black');
-      borderRect.setAttribute('stroke-width', '3');
-      dbSymbol.appendChild(borderRect);
-      
-      g.appendChild(dbSymbol);
-      
-      // DB label (above the symbol)
-      const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      nameText.setAttribute('x', x);
-      nameText.setAttribute('y', y - 5);
-      nameText.setAttribute('font-size', '11');
-      nameText.setAttribute('font-weight', 'bold');
-      nameText.setAttribute('text-anchor', 'middle');
-      nameText.textContent = load.name;
-      g.appendChild(nameText);
-      
-      svg.appendChild(g);
-      return g;
-    }
-
-    function exportSVG() {
-      const svg = document.getElementById('sldCanvas');
-      const serializer = new XMLSerializer();
-      const svgString = serializer.serializeToString(svg);
-      const blob = new Blob([svgString], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'single-line-diagram.svg';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function exportPNG() {
-      const svg = document.getElementById('sldCanvas');
-      const width = parseInt(svg.getAttribute('width')) || svg.clientWidth;
-      const height = parseInt(svg.getAttribute('height')) || svg.clientHeight;
-      const serializer = new XMLSerializer();
-      const svgString = serializer.serializeToString(svg);
-      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(svgBlob);
-
-      const img = new Image();
-      img.onload = function() {
-        const scale = 2; // 2x resolution for crisp output
-        const canvas = document.createElement('canvas');
-        canvas.width = width * scale;
-        canvas.height = height * scale;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.scale(scale, scale);
-        ctx.drawImage(img, 0, 0, width, height);
-        URL.revokeObjectURL(url);
-        canvas.toBlob(function(blob) {
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = 'single-line-diagram.png';
-          a.click();
-          URL.revokeObjectURL(a.href);
-        }, 'image/png');
-      };
-      img.onerror = function() {
-        URL.revokeObjectURL(url);
-        alert('PNG export failed - try Export SVG instead.');
-      };
-      img.src = url;
-    }
-
-    function exportA1() {
-      const svg = document.getElementById('sldCanvas');
-      const svgWidth = parseInt(svg.getAttribute('width'));
-      const svgHeight = parseInt(svg.getAttribute('height'));
-      const boardName = document.getElementById('boardName').value || 'Switchboard';
-      
-      // A1 size LANDSCAPE: 841mm x 594mm
-      const a1WidthMM = 841;
-      const a1HeightMM = 594;
-      
-      // Create new SVG for A1 page with proper viewBox for vector editing
-      const a1Svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      a1Svg.setAttribute('width', a1WidthMM + 'mm');
-      a1Svg.setAttribute('height', a1HeightMM + 'mm');
-      a1Svg.setAttribute('viewBox', `0 0 ${a1WidthMM} ${a1HeightMM}`);
-      a1Svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      
-      // White background
-      const background = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      background.setAttribute('width', a1WidthMM);
-      background.setAttribute('height', a1HeightMM);
-      background.setAttribute('fill', 'white');
-      a1Svg.appendChild(background);
-      
-      // Add border
-      const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      border.setAttribute('x', '5');
-      border.setAttribute('y', '5');
-      border.setAttribute('width', a1WidthMM - 10);
-      border.setAttribute('height', a1HeightMM - 10);
-      border.setAttribute('fill', 'none');
-      border.setAttribute('stroke', '#000');
-      border.setAttribute('stroke-width', '0.5');
-      a1Svg.appendChild(border);
-      
-      // Clone and scale the diagram
-      const diagramClone = svg.cloneNode(true);
-      const scale = Math.min((a1WidthMM * 0.8) / svgWidth, (a1HeightMM * 0.8) / svgHeight);
-      const offsetX = (a1WidthMM * 0.4) - (svgWidth * scale / 2);
-      const offsetY = (a1HeightMM - svgHeight * scale) / 2;
-      
-      const diagramGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      diagramGroup.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${scale})`);
-      
-      // Copy all children from cloned diagram
-      while (diagramClone.firstChild) {
-        diagramGroup.appendChild(diagramClone.firstChild);
-      }
-      a1Svg.appendChild(diagramGroup);
-      
-      // Add title block (vector text for editing)
-      const titleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      titleText.setAttribute('x', a1WidthMM - 150);
-      titleText.setAttribute('y', a1HeightMM - 50);
-      titleText.setAttribute('font-size', '12');
-      titleText.setAttribute('font-weight', 'bold');
-      titleText.setAttribute('font-family', 'Arial');
-      titleText.textContent = boardName;
-      a1Svg.appendChild(titleText);
-      
-      const subtitleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      subtitleText.setAttribute('x', a1WidthMM - 150);
-      subtitleText.setAttribute('y', a1HeightMM - 35);
-      subtitleText.setAttribute('font-size', '8');
-      subtitleText.setAttribute('font-family', 'Arial');
-      subtitleText.textContent = 'Single Line Diagram';
-      a1Svg.appendChild(subtitleText);
-      
-      const dateText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      dateText.setAttribute('x', a1WidthMM - 150);
-      dateText.setAttribute('y', a1HeightMM - 22);
-      dateText.setAttribute('font-size', '8');
-      dateText.setAttribute('font-family', 'Arial');
-      dateText.textContent = new Date().toLocaleDateString();
-      a1Svg.appendChild(dateText);
-      
-      // Export as PDF using html2canvas for reasonable file size
+  /* ── exports ────────────────────────────────────────────────── */
+  function buildExportSvg() {
+    const src = document.getElementById('sldCanvas');
+    const clone = src.cloneNode(true);
+    clone.setAttribute('xmlns', SVGNS);
+    const st = clone.querySelector('style.sld-style');
+    if (st) st.textContent = EXPORT_CSS;
+    const w = clone.getAttribute('width'), h = clone.getAttribute('height');
+    clone.insertAdjacentHTML('afterbegin', `<rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff"/>`);
+    return clone;
+  }
+  function exportSVG() {
+    const xml = new XMLSerializer().serializeToString(buildExportSvg());
+    const url = URL.createObjectURL(new Blob([xml], { type: 'image/svg+xml' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = fileName() + '.svg'; a.click();
+    URL.revokeObjectURL(url);
+  }
+  function rasterize(clone, px, cb) {
+    const w = +clone.getAttribute('width'), h = +clone.getAttribute('height');
+    const xml = new XMLSerializer().serializeToString(clone);
+    const url = URL.createObjectURL(new Blob([xml], { type: 'image/svg+xml;charset=utf-8' }));
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = w * px; cv.height = h * px;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+      ctx.scale(px, px); ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url); cb(cv, w, h);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); toast('Export failed — try Export SVG.', 'error'); };
+    img.src = url;
+  }
+  function exportPNG() {
+    rasterize(buildExportSvg(), 2, cv => {
+      cv.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = fileName() + '.png'; a.click();
+        URL.revokeObjectURL(a.href);
+      }, 'image/png');
+    });
+  }
+  function exportA1() {
+    if (!window.jspdf) { toast('PDF library not loaded.', 'error'); return; }
+    rasterize(buildExportSvg(), 2.5, (cv, w, h) => {
       const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a1',
-        compress: true
-      });
-      
-      // Render to canvas at 150 DPI (good quality, reasonable file size)
-      const tempDiv = document.createElement('div');
-      tempDiv.style.width = a1WidthMM + 'mm';
-      tempDiv.style.height = a1HeightMM + 'mm';
-      tempDiv.style.position = 'absolute';
-      tempDiv.style.left = '-9999px';
-      tempDiv.appendChild(a1Svg);
-      document.body.appendChild(tempDiv);
-      
-      html2canvas(a1Svg, {
-        scale: 2, // 150 DPI equivalent
-        backgroundColor: '#ffffff',
-        logging: false
-      }).then(canvas => {
-        document.body.removeChild(tempDiv);
-        
-        const imgData = canvas.toDataURL('image/jpeg', 0.85); // JPEG with 85% quality for smaller size
-        pdf.addImage(imgData, 'JPEG', 0, 0, a1WidthMM, a1HeightMM);
-        pdf.save(`${boardName.replace(/\s+/g, '_')}_SLD_A1.pdf`);
-      });
-    }
-    
-    function exportBluebeamToolset() {
-      // Create Bluebeam Toolset XML format
-      const toolset = {
-        name: "Electrical Symbols",
-        version: "1.0",
-        tools: [
-          {
-            name: "Circuit Breaker",
-            type: "symbol",
-            svg: generateCircuitBreakerSVG()
-          },
-          {
-            name: "RCD Circuit Breaker",
-            type: "symbol",
-            svg: generateRCDCircuitBreakerSVG()
-          },
-          {
-            name: "Isolator Switch",
-            type: "symbol",
-            svg: generateIsolatorSVG()
-          }
-        ]
-      };
-      
-      // Convert to Bluebeam-compatible XML
-      const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<BluebeamToolset name="Electrical Single Line Symbols" version="1.0">
-  <Tool name="Circuit Breaker" type="Markup">
-    <SVGData><![CDATA[${generateCircuitBreakerSVG()}]]></SVGData>
-  </Tool>
-  <Tool name="RCD Circuit Breaker" type="Markup">
-    <SVGData><![CDATA[${generateRCDCircuitBreakerSVG()}]]></SVGData>
-  </Tool>
-  <Tool name="Isolator Switch" type="Markup">
-    <SVGData><![CDATA[${generateIsolatorSVG()}]]></SVGData>
-  </Tool>
-</BluebeamToolset>`;
-      
-      const blob = new Blob([xml], { type: 'application/xml' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'Electrical_Symbols_Toolset.xml';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-    
-    function generateCircuitBreakerSVG() {
-      return `<svg width="50" height="50" xmlns="http://www.w3.org/2000/svg">
-        <line x1="25" y1="5" x2="25" y2="13" stroke="black" stroke-width="1.5"/>
-        <circle cx="25" cy="19" r="6" fill="none" stroke="black" stroke-width="1.5"/>
-        <line x1="25" y1="25" x2="25" y2="29" stroke="black" stroke-width="1.5"/>
-        <line x1="20" y1="31" x2="30" y2="37" stroke="black" stroke-width="1.5"/>
-        <line x1="20" y1="37" x2="30" y2="31" stroke="black" stroke-width="1.5"/>
-        <line x1="25" y1="38" x2="25" y2="42" stroke="black" stroke-width="1.5"/>
-        <circle cx="25" cy="47" r="6" fill="none" stroke="black" stroke-width="1.5"/>
-      </svg>`;
-    }
-    
-    function generateRCDCircuitBreakerSVG() {
-      return `<svg width="50" height="80" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="25" cy="8" r="6" fill="none" stroke="black" stroke-width="1.5"/>
-        <line x1="25" y1="14" x2="25" y2="18" stroke="black" stroke-width="1.5"/>
-        <line x1="20" y1="20" x2="30" y2="26" stroke="black" stroke-width="1.5"/>
-        <line x1="20" y1="26" x2="30" y2="20" stroke="black" stroke-width="1.5"/>
-        <line x1="25" y1="27" x2="25" y2="31" stroke="black" stroke-width="1.5"/>
-        <circle cx="25" cy="37" r="6" fill="none" stroke="black" stroke-width="1.5"/>
-        <line x1="21" y1="33" x2="29" y2="41" stroke="black" stroke-width="1.5"/>
-        <line x1="21" y1="41" x2="29" y2="33" stroke="black" stroke-width="1.5"/>
-        <line x1="25" y1="43" x2="25" y2="47" stroke="black" stroke-width="1.5"/>
-        <line x1="20" y1="49" x2="30" y2="55" stroke="black" stroke-width="1.5"/>
-        <line x1="20" y1="55" x2="30" y2="49" stroke="black" stroke-width="1.5"/>
-        <line x1="25" y1="56" x2="25" y2="60" stroke="black" stroke-width="1.5"/>
-        <circle cx="25" cy="66" r="6" fill="none" stroke="black" stroke-width="1.5"/>
-      </svg>`;
-    }
-    
-    function generateIsolatorSVG() {
-      return `<svg width="40" height="30" xmlns="http://www.w3.org/2000/svg">
-        <line x1="5" y1="15" x2="15" y2="15" stroke="black" stroke-width="2"/>
-        <line x1="15" y1="10" x2="15" y2="20" stroke="black" stroke-width="2"/>
-        <line x1="25" y1="15" x2="35" y2="15" stroke="black" stroke-width="2"/>
-        <line x1="25" y1="10" x2="25" y2="20" stroke="black" stroke-width="2"/>
-      </svg>`;
-    }
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a1', compress: true });
+      const pw = 841, ph = 594, m = 18;
+      const scale = Math.min((pw - 2*m) / w, (ph - 2*m) / h);
+      const dw = w * scale, dh = h * scale, ox = (pw - dw) / 2, oy = (ph - dh) / 2;
+      pdf.addImage(cv.toDataURL('image/jpeg', 0.9), 'JPEG', ox, oy, dw, dh);
+      pdf.setDrawColor(0); pdf.rect(6, 6, pw - 12, ph - 12);
+      pdf.setFontSize(12); pdf.text(document.getElementById('boardName').value || 'Switchboard', pw - m, ph - 24, { align: 'right' });
+      pdf.setFontSize(8);
+      pdf.text('Single Line Diagram · ' + new Date().toLocaleDateString(), pw - m, ph - 14, { align: 'right' });
+      pdf.save(fileName() + '_A1.pdf');
+    });
+  }
+  function fileName() {
+    return (document.getElementById('boardName').value || 'SLD').replace(/[^\w]+/g, '_') + '_SLD';
+  }
 
-    // Generate example diagram on page load
-    window.addEventListener('load', function() {
-      // Add a few more example rows
-      addRow();
-      const rows = document.querySelectorAll('#loadTableBody tr');
-      rows[1].querySelector('.load-name').value = 'Office Lighting';
-      rows[1].querySelector('.load-rating').value = '5';
-      rows[1].querySelector('.load-type').value = 'lighting';
-      
-      addRow();
-      rows[2].querySelector('.load-name').value = 'HVAC Unit';
-      rows[2].querySelector('.load-rating').value = '22';
-      rows[2].querySelector('.load-type').value = 'motor';
-      
+  /* ── init ───────────────────────────────────────────────────── */
+  window.addEventListener('load', () => {
+    [
+      { name: 'Main Lighting',  rating: 8,   unit: 'kW', prot: 'mcb',  section: 'normal',    floor: 'GF', dest: 'load' },
+      { name: 'GPO Power',      rating: 12,  unit: 'kW', prot: 'mcb',  section: 'normal',    floor: 'L1', dest: 'load' },
+      { name: 'HVAC Unit',      rating: 22,  unit: 'kW', prot: 'mccb', section: 'normal',    floor: 'L2', dest: 'motor' },
+      { name: 'DB-L3',          rating: 100, unit: 'A',  prot: 'mccb', section: 'normal',    floor: 'L3', dest: 'db' },
+      { name: 'Fire Pump',      rating: 11,  unit: 'kW', prot: 'rcd',  section: 'essential', floor: 'GF', dest: 'motor' },
+      { name: 'Essential DB',   rating: 63,  unit: 'A',  prot: 'mccb', section: 'essential', floor: 'L1', dest: 'db' }
+    ].forEach(addRow);
+
+    document.getElementById('floorsInput').addEventListener('change', () => {
+      refreshFloorSelects(); generateDiagram();
+    });
+    const section = document.querySelector('.input-section');
+    section.addEventListener('change', e => {
+      if (e.target.id === 'floorsInput') return; // handled above
       generateDiagram();
     });
+
+    generateDiagram();
+  });
   </script>
-  <script src="omni-utils.js"></script></body>
+  <script src="omni-utils.js"></script>
+</body>
 </html>
