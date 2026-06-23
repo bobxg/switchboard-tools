@@ -30,8 +30,8 @@
       <div class="input-group">
         <label for="areaType">Area Classification:</label>
         <select id="areaType">
-          <option value="escape">Escape Routes / Corridors (1.0 lux required)</option>
-          <option value="open">Open Areas > 60m&sup2; (0.5 lux required)</option>
+          <option value="escape">Escape Routes / Corridors (0.5 lux required)</option>
+          <option value="open">Open Areas &gt; 60m&sup2; (1.0 lux required)</option>
           <option value="highrisk">High Risk Task Areas (10 lux required)</option>
           <option value="carpark">Covered Car Parks (1.0 lux required)</option>
         </select>
@@ -173,12 +173,12 @@
         <tbody>
           <tr>
             <td>Escape Routes / Corridors</td>
-            <td>1.0 lux minimum</td>
+           <td>0.5 lux minimum (at floor level)</td>
             <td>90 minutes</td>
           </tr>
           <tr>
-            <td>Open Areas > 60m&sup2;</td>
-            <td>0.5 lux minimum</td>
+           <td>Open Areas &gt; 60m&sup2; (anti-panic)</td>
+           <td>1.0 lux minimum</td>
             <td>90 minutes</td>
           </tr>
           <tr>
@@ -200,11 +200,11 @@
       </table>
 
       <div class="info-box">
-        <strong>Testing Requirements:</strong>
+        <strong>Testing Requirements (AS/NZS 2293.2:2018):</strong>
         <ul style="margin: 8px 0 0 20px;">
-          <li>Simulated power failure test: Every 6 months</li>
-          <li>Full duration discharge test: Annually</li>
           <li>Visual inspection: Monthly</li>
+          <li>Simulated power failure functional test: Monthly (not less than &frac14; rated duration)</li>
+          <li>Full duration discharge test (90 min): Every 6 months</li>
           <li>Record all tests in maintenance log</li>
         </ul>
       </div>
@@ -387,12 +387,12 @@
       let areaName;
       switch(areaType) {
         case 'escape':
-          requiredLux = 1.0;
+          requiredLux = 0.5;
           areaName = 'Escape Routes';
           break;
         case 'open':
-          requiredLux = 0.5;
-          areaName = 'Open Areas > 60m&sup2;';
+          requiredLux = 1.0;
+          areaName = 'Open Areas > 60m&sup2; (anti-panic)';
           break;
         case 'highrisk':
           requiredLux = 10.0;

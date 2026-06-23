@@ -5,43 +5,270 @@
   <title>Conduit Sizer - OMNI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .conduit-intro span {
+      color: var(--accent);
+      font-size: 0.95em;
+    }
+    .conduit-toolbar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+      align-items: end;
+    }
+    .conduit-table-wrap {
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    .conduit-table {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .conduit-table td:last-child {
+      text-align: center;
+    }
+    .conduit-table input[type="number"] {
+      width: 100%;
+      max-width: 110px;
+      padding: 8px 10px;
+      border: 1.5px solid var(--border-input);
+      border-radius: var(--radius-input);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      text-align: center;
+      font: inherit;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    .conduit-table input[type="number"]:focus {
+      border-color: var(--accent);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-input-focus);
+    }
+    .conduit-empty {
+      color: rgba(255,255,255,0.8);
+      line-height: 1.7;
+    }
+    .conduit-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .conduit-metric {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .conduit-metric-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(147,197,253,0.16);
+      color: var(--accent-light);
+      flex-shrink: 0;
+    }
+    .conduit-metric-icon .oi {
+      width: 18px;
+      height: 18px;
+    }
+    .conduit-metric-label {
+      font-size: 0.8em;
+      text-transform: uppercase;
+      letter-spacing: 0.45px;
+      opacity: 0.7;
+      margin-bottom: 4px;
+    }
+    .conduit-metric-value {
+      font-size: 1.18em;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .conduit-layout-note {
+      margin: 0 0 18px;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.6;
+    }
+    .conduit-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .conduit-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .conduit-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .conduit-card-title {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 700;
+      font-size: 1.08em;
+    }
+    .conduit-card-title .oi {
+      width: 18px;
+      height: 18px;
+      color: var(--accent-light);
+    }
+    .conduit-card-subtitle {
+      color: rgba(255,255,255,0.68);
+      font-size: 0.88em;
+      margin-top: 4px;
+    }
+    .conduit-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(147,197,253,0.16);
+      color: #dbeafe;
+      font-size: 0.84em;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .conduit-card-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .conduit-card-stat {
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .conduit-card-stat-label {
+      font-size: 0.76em;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      opacity: 0.65;
+      margin-bottom: 6px;
+    }
+    .conduit-card-stat-value {
+      font-size: 1.04em;
+      font-weight: 700;
+    }
+    .conduit-cable-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+    .conduit-cable-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 9px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .conduit-cable-size {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .conduit-cable-size .oi {
+      width: 14px;
+      height: 14px;
+      color: var(--accent-light);
+    }
+    .conduit-alt-table {
+      margin-top: 8px;
+    }
+    .conduit-alt-table .ref-table {
+      margin-bottom: 0;
+    }
+    .conduit-alt-table td {
+      color: white;
+      border-right-color: rgba(255,255,255,0.08);
+    }
+    .conduit-alt-table tr:nth-child(even),
+    .conduit-alt-table tr:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .conduit-alt-table th {
+      background: rgba(255,255,255,0.08);
+      color: white;
+    }
+    .conduit-result .warn-box,
+    .conduit-result .info-box {
+      margin-bottom: 0;
+    }
+    @media (max-width: 768px) {
+      .conduit-card-stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="top-tabs"></div>
   <div class="main-content">
     <h1>Conduit Sizer (AS/NZS 3000)</h1>
-    <p>
-      Enter the number of each cable size to calculate the smallest conduit size required.<br>
-      <span style="color:var(--accent); font-size:0.95em;">
-        (Fill factors per AS/NZS 3000 Appendix C: 1 cable = 50%, 2 cables = 33%, 3+ cables = 40%)
-      </span>
+    <p class="conduit-intro">
+      Enter cable quantities to size a conduit run, or split the set across multiple conduits when a smaller maximum size is preferred.<br>
+      <span>Fill factors per AS/NZS 3000:2018 Appendix C Table C2: 1 cable = 53%, 2 cables = 31%, 3+ cables = 40%.</span>
     </p>
-    <div style="margin-bottom: 20px; text-align: center;">
-      <label for="cableTypeSelect" style="font-weight: bold; margin-right: 10px;">Cable Type:</label>
-      <select id="cableTypeSelect" style="padding: 5px;">
-        <option value="single">Single Core (Thermoplastic)</option>
-        <option value="multicore">Multicore Circular (PVC/PVC)</option>
-      </select>
+    <div class="info-box">
+      Layouts are packed largest-to-smallest, then each run is resized to the smallest conduit that still complies with the applicable fill factor.
     </div>
     <form id="cableForm" autocomplete="off">
-        <table style="margin:0 auto 20px auto; border-collapse:collapse; width:100%; max-width:350px; background:var(--bg-card); box-shadow:var(--shadow);">
-        <thead>
-          <tr>
-            <th>Cable Area (mm&sup2;)</th>
-            <th>Number of Cables</th>
-          </tr>
-        </thead>
-        <tbody id="cableTableBody"></tbody>
-      </table>
-      <div class="conduit-result" id="conduitResult">
-        Smallest Suitable Conduit: -
+      <div class="conduit-toolbar">
+        <div class="input-group">
+          <label for="cableTypeSelect">Cable Type</label>
+          <select id="cableTypeSelect">
+            <option value="single">Single Core (Thermoplastic)</option>
+            <option value="multicore">Multicore Circular (PVC/PVC)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="maxConduitSelect">Preferred Maximum Conduit</label>
+          <select id="maxConduitSelect"></select>
+        </div>
       </div>
-      <button class="btn-export" onclick="exportConduitResult()" style="margin-top:10px;">Export CSV</button>
+
+      <div class="conduit-table-wrap">
+        <table class="ref-table conduit-table">
+          <thead>
+            <tr>
+              <th>Cable Area (mm&sup2;)</th>
+              <th>Number of Cables</th>
+            </tr>
+          </thead>
+          <tbody id="cableTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="result-box conduit-result" id="conduitResult">
+        <div class="conduit-empty">Add at least one cable to generate conduit layouts and fill detail.</div>
+      </div>
+      <button type="button" class="btn-export" onclick="exportConduitResult()">Export CSV</button>
     </form>
   </div>
-    <script src="omni-utils.js"></script>
+  <script src="omni-utils.js"></script>
   <script>
-    // Cable diameters (approximate mm)
     const CABLE_DB = {
       single: [
         { area: 1.5, diameter: 3.2 },
@@ -79,8 +306,6 @@
       ]
     };
 
-    // Conduit Dimensions (Nominal OD : Internal Diameter mm)
-    // Based on Medium Duty Rigid PVC
     const CONDUIT_DATA = [
       { od: 20, id: 16.1 },
       { od: 25, id: 21.2 },
@@ -88,128 +313,468 @@
       { od: 40, id: 35.4 },
       { od: 50, id: 44.2 },
       { od: 63, id: 56.8 },
-      { od: 80, id: 72.5 }, // Approx
-      { od: 100, id: 93.0 }, // Approx
-      { od: 125, id: 116.0 }, // Approx
-      { od: 150, id: 140.0 } // Approx
+      { od: 80, id: 72.5 },
+      { od: 100, id: 93.0 },
+      { od: 125, id: 116.0 },
+      { od: 150, id: 140.0 }
     ];
 
-    const conduitAreas = CONDUIT_DATA.map(c => ({
-      od: c.od,
-      area: Math.PI * Math.pow(c.id / 2, 2)
+    const conduitAreas = CONDUIT_DATA.map(conduit => ({
+      od: conduit.od,
+      id: conduit.id,
+      area: Math.PI * Math.pow(conduit.id / 2, 2)
     }));
 
-    function diameterToArea(d) {
-      return Math.PI * Math.pow(d/2, 2);
+    let lastCalculatedLayout = null;
+
+    function diameterToArea(diameter) {
+      return Math.PI * Math.pow(diameter / 2, 2);
     }
 
     function getFillPercentage(numCables) {
-      // AS/NZS 3000:2018 Appendix C - Conduit fill factors
-      if (numCables === 1) return 0.50;
-      if (numCables === 2) return 0.33;
+      if (numCables === 1) return 0.53;
+      if (numCables === 2) return 0.31;
       if (numCables >= 3) return 0.40;
       return 0;
     }
 
-    function findSmallestConduit(totalCableArea, numCables) {
+    function formatNumber(value, decimals) {
+      return Number(value).toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function formatArea(value) {
+      return `${formatNumber(value, value >= 100 ? 0 : 1)} mm²`;
+    }
+
+    function formatPercent(value) {
+      return `${formatNumber(value, 1)}%`;
+    }
+
+    function findSmallestConduit(totalCableArea, numCables, maxConduitOd) {
       const fill = getFillPercentage(numCables);
-      for (let i=0; i<conduitAreas.length; ++i) {
-        const allowed = conduitAreas[i].area * fill;
-        if (totalCableArea <= allowed) {
-          return conduitAreas[i].od;
+      if (!fill) return null;
+      const limit = Number.isFinite(maxConduitOd) ? maxConduitOd : Infinity;
+      for (let i = 0; i < conduitAreas.length; i += 1) {
+        const conduit = conduitAreas[i];
+        if (conduit.od > limit) continue;
+        if (totalCableArea <= (conduit.area * fill) + 0.0001) {
+          return conduit;
         }
       }
       return null;
+    }
+
+    function buildMaxConduitOptions() {
+      const select = document.getElementById('maxConduitSelect');
+      select.innerHTML = '<option value="auto">Auto (smallest overall layout)</option>';
+      conduitAreas.forEach(conduit => {
+        const option = document.createElement('option');
+        option.value = conduit.od;
+        option.textContent = `${conduit.od} mm max`;
+        select.appendChild(option);
+      });
     }
 
     function buildCableTable() {
       const type = document.getElementById('cableTypeSelect').value;
       const data = CABLE_DB[type];
       const tbody = document.getElementById('cableTableBody');
-      
-      // Store current values if any
       const currentValues = {};
-      const inputs = tbody.querySelectorAll('input');
-      inputs.forEach(input => {
+
+      tbody.querySelectorAll('input').forEach(input => {
         currentValues[input.dataset.area] = input.value;
       });
 
       tbody.innerHTML = '';
       data.forEach((cable, idx) => {
         const tr = document.createElement('tr');
-        const val = currentValues[cable.area] || 0;
+        const value = currentValues[cable.area] || 0;
         tr.innerHTML = `
           <td>${cable.area}</td>
           <td>
-            <input type="number" min="0" value="${val}" id="cableCount${idx}" data-idx="${idx}" data-area="${cable.area}" />
+            <input
+              type="number"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              value="${value}"
+              id="cableCount${idx}"
+              data-idx="${idx}"
+              data-area="${cable.area}"
+            />
           </td>
         `;
         tbody.appendChild(tr);
       });
-      setupListeners(); // Re-attach listeners
+
+      setupListeners();
     }
 
-    function updateTotalArea() {
+    function getCableInputs() {
       const type = document.getElementById('cableTypeSelect').value;
       const data = CABLE_DB[type];
-      let total = 0;
-      let numCables = 0;
-      
+      const items = [];
+      const schedule = [];
+      let totalArea = 0;
+      let totalCables = 0;
+
       data.forEach((cable, idx) => {
-        const el = document.getElementById(`cableCount${idx}`);
-        if (el) {
-          const count = parseInt(el.value) || 0;
-          const area = diameterToArea(cable.diameter);
-          total += count * area;
-          numCables += count;
+        const input = document.getElementById(`cableCount${idx}`);
+        const count = input ? Math.max(0, parseInt(input.value, 10) || 0) : 0;
+        if (!count) return;
+
+        const cableArea = diameterToArea(cable.diameter);
+        schedule.push({
+          area: cable.area,
+          count,
+          diameter: cable.diameter,
+          cableArea
+        });
+
+        for (let i = 0; i < count; i += 1) {
+          items.push({
+            label: `${cable.area} mm²`,
+            area: cableArea,
+            diameter: cable.diameter
+          });
         }
+
+        totalArea += count * cableArea;
+        totalCables += count;
       });
 
-      let resultText = "Smallest Suitable Conduit: -";
-      if (numCables > 0 && total > 0) {
-        const result = findSmallestConduit(total, numCables);
-        if (result) {
-          resultText = `Smallest Suitable Conduit: <b>${result} mm</b>`;
+      items.sort((a, b) => b.area - a.area || b.diameter - a.diameter);
+      schedule.sort((a, b) => b.area - a.area);
+
+      return { items, schedule, totalArea, totalCables, type };
+    }
+
+    function summariseBin(binItems) {
+      const counts = new Map();
+      binItems.forEach(item => {
+        counts.set(item.label, (counts.get(item.label) || 0) + 1);
+      });
+
+      return Array.from(counts.entries())
+        .map(([label, count]) => ({ label, count, areaValue: parseFloat(label) }))
+        .sort((a, b) => b.areaValue - a.areaValue);
+    }
+
+    function finaliseBin(bin, maxConduitOd, index) {
+      const smallest = findSmallestConduit(bin.totalArea, bin.items.length, maxConduitOd);
+      if (!smallest) return null;
+
+      const fillAllowance = smallest.area * getFillPercentage(bin.items.length);
+      const fillRatio = bin.totalArea / fillAllowance;
+
+      return {
+        index,
+        od: smallest.od,
+        id: smallest.id,
+        conduitArea: smallest.area,
+        cableCount: bin.items.length,
+        totalArea: bin.totalArea,
+        fillAllowance,
+        fillPercent: fillRatio * 100,
+        spareArea: fillAllowance - bin.totalArea,
+        breakdown: summariseBin(bin.items)
+      };
+    }
+
+    function packIntoBaseConduit(items, baseConduit, maxConduitOd) {
+      const bins = [];
+      const singleLimit = baseConduit.area * getFillPercentage(1);
+
+      for (let i = 0; i < items.length; i += 1) {
+        const item = items[i];
+        if (item.area > singleLimit + 0.0001) {
+          return null;
+        }
+
+        let bestBin = null;
+        let bestRemaining = Infinity;
+
+        for (let j = 0; j < bins.length; j += 1) {
+          const bin = bins[j];
+          const nextCount = bin.items.length + 1;
+          const nextFill = nextCount === 1 ? 0.53 : nextCount === 2 ? 0.31 : 0.40;
+          const allowedArea = baseConduit.area * nextFill;
+          const nextArea = bin.totalArea + item.area;
+
+          if (nextArea <= allowedArea + 0.0001) {
+            const remaining = allowedArea - nextArea;
+            if (remaining < bestRemaining) {
+              bestRemaining = remaining;
+              bestBin = bin;
+            }
+          }
+        }
+
+        if (!bestBin) {
+          bins.push({ items: [item], totalArea: item.area });
         } else {
-          resultText = "No suitable conduit size found for this fill.";
+          bestBin.items.push(item);
+          bestBin.totalArea += item.area;
         }
       }
-      document.getElementById('conduitResult').innerHTML = resultText;
+
+      const conduits = [];
+      for (let i = 0; i < bins.length; i += 1) {
+        const finalised = finaliseBin(bins[i], maxConduitOd, i + 1);
+        if (!finalised) return null;
+        conduits.push(finalised);
+      }
+
+      const conduitSizes = conduits.map(conduit => conduit.od).sort((a, b) => a - b);
+      const signature = conduits
+        .map(conduit => `${conduit.od}:${conduit.breakdown.map(item => `${item.label}x${item.count}`).join(',')}`)
+        .sort()
+        .join('|');
+
+      return {
+        conduits,
+        conduitCount: conduits.length,
+        maxConduitOd: Math.max.apply(null, conduitSizes),
+        totalConduitArea: conduits.reduce((sum, conduit) => sum + conduit.conduitArea, 0),
+        worstFillPercent: Math.max.apply(null, conduits.map(conduit => conduit.fillPercent)),
+        conduitSizes,
+        signature
+      };
+    }
+
+    function rankLayouts(a, b) {
+      if (a.conduitCount !== b.conduitCount) return a.conduitCount - b.conduitCount;
+      if (a.maxConduitOd !== b.maxConduitOd) return a.maxConduitOd - b.maxConduitOd;
+      if (Math.abs(a.totalConduitArea - b.totalConduitArea) > 0.0001) {
+        return a.totalConduitArea - b.totalConduitArea;
+      }
+      return a.worstFillPercent - b.worstFillPercent;
+    }
+
+    function calculateLayouts(items, maxConduitOd) {
+      const layouts = [];
+      const seen = new Set();
+      const candidates = conduitAreas.filter(conduit => conduit.od <= maxConduitOd);
+
+      candidates.forEach(baseConduit => {
+        const layout = packIntoBaseConduit(items, baseConduit, maxConduitOd);
+        if (!layout || seen.has(layout.signature)) return;
+        seen.add(layout.signature);
+        layouts.push(layout);
+      });
+
+      layouts.sort(rankLayouts);
+      return layouts;
+    }
+
+    function summariseLayout(layout) {
+      const counts = {};
+      layout.conduitSizes.forEach(size => {
+        counts[size] = (counts[size] || 0) + 1;
+      });
+
+      return Object.keys(counts)
+        .map(size => `${counts[size]} x ${size} mm`)
+        .join(', ');
+    }
+
+    function renderMetric(icon, label, value) {
+      return `
+        <div class="conduit-metric">
+          <div class="conduit-metric-icon">${OmniIcons.get(icon, 18)}</div>
+          <div>
+            <div class="conduit-metric-label">${label}</div>
+            <div class="conduit-metric-value">${value}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderConduitCard(conduit) {
+      return `
+        <article class="conduit-card">
+          <div class="conduit-card-header">
+            <div>
+              <div class="conduit-card-title">
+                ${OmniIcons.get('conduit', 18)}
+                <span>Conduit ${conduit.index}</span>
+              </div>
+              <div class="conduit-card-subtitle">${conduit.cableCount} cable${conduit.cableCount === 1 ? '' : 's'} in this run</div>
+            </div>
+            <span class="conduit-pill">${conduit.od} mm OD</span>
+          </div>
+          <div class="conduit-card-stats">
+            <div class="conduit-card-stat">
+              <div class="conduit-card-stat-label">Fill Used</div>
+              <div class="conduit-card-stat-value">${formatPercent(conduit.fillPercent)}</div>
+            </div>
+            <div class="conduit-card-stat">
+              <div class="conduit-card-stat-label">Fill Limit</div>
+              <div class="conduit-card-stat-value">${formatPercent(getFillPercentage(conduit.cableCount) * 100)}</div>
+            </div>
+            <div class="conduit-card-stat">
+              <div class="conduit-card-stat-label">Cable Area</div>
+              <div class="conduit-card-stat-value">${formatArea(conduit.totalArea)}</div>
+            </div>
+            <div class="conduit-card-stat">
+              <div class="conduit-card-stat-label">Spare Fill Area</div>
+              <div class="conduit-card-stat-value">${formatArea(Math.max(conduit.spareArea, 0))}</div>
+            </div>
+          </div>
+          <ul class="conduit-cable-list">
+            ${conduit.breakdown.map(item => `
+              <li>
+                <span class="conduit-cable-size">${OmniIcons.get('cable', 14)} ${item.label}</span>
+                <strong>${item.count}</strong>
+              </li>
+            `).join('')}
+          </ul>
+        </article>
+      `;
+    }
+
+    function renderAltLayoutRow(layout, index) {
+      return `
+        <tr>
+          <td>Option ${index + 1}</td>
+          <td>${layout.conduitCount}</td>
+          <td>${summariseLayout(layout)}</td>
+          <td>${formatPercent(layout.worstFillPercent)}</td>
+        </tr>
+      `;
+    }
+
+    function renderEmptyResult(message, type) {
+      const result = document.getElementById('conduitResult');
+      const className = type === 'warn' ? 'warn-box' : 'info-box';
+      result.innerHTML = `<div class="${className}">${message}</div>`;
+    }
+
+    function updateLayouts() {
+      const inputData = getCableInputs();
+      const result = document.getElementById('conduitResult');
+      lastCalculatedLayout = null;
+
+      if (!inputData.totalCables) {
+        result.innerHTML = '<div class="conduit-empty">Add at least one cable to generate conduit layouts and fill detail.</div>';
+        return;
+      }
+
+      const selectedMax = document.getElementById('maxConduitSelect').value;
+      const maxConduitOd = selectedMax === 'auto'
+        ? conduitAreas[conduitAreas.length - 1].od
+        : parseInt(selectedMax, 10);
+      const layouts = calculateLayouts(inputData.items, maxConduitOd);
+
+      if (!layouts.length) {
+        renderEmptyResult(`No compliant layout was found with a maximum conduit size of ${maxConduitOd} mm. Increase the maximum conduit size or reduce the cable set.`, 'warn');
+        return;
+      }
+
+      const recommended = layouts[0];
+      lastCalculatedLayout = {
+        input: inputData,
+        maxConduitOd,
+        selectedMax,
+        recommended,
+        layouts
+      };
+
+      result.innerHTML = `
+        <h3>Recommended Layout</h3>
+        <div class="conduit-metric-grid">
+          ${renderMetric('layers', 'Layout', summariseLayout(recommended))}
+          ${renderMetric('conduit', 'Conduits', `${recommended.conduitCount}`)}
+          ${renderMetric('cable', 'Total Cables', `${inputData.totalCables}`)}
+          ${renderMetric('gauge', 'Worst Fill', formatPercent(recommended.worstFillPercent))}
+          ${renderMetric('calc', 'Cable Area', formatArea(inputData.totalArea))}
+          ${renderMetric('box', 'Largest Conduit', `${recommended.maxConduitOd} mm`)}
+        </div>
+        <p class="conduit-layout-note">
+          Preferred maximum conduit: <strong>${selectedMax === 'auto' ? 'Auto' : `${maxConduitOd} mm`}</strong>. Each conduit below is resized individually after packing.
+        </p>
+        <div class="conduit-detail-grid">
+          ${recommended.conduits.map(renderConduitCard).join('')}
+        </div>
+        <h3>Alternative Compliant Layouts</h3>
+        <div class="conduit-alt-table">
+          <table class="ref-table">
+            <thead>
+              <tr>
+                <th>Option</th>
+                <th>Conduits</th>
+                <th>Arrangement</th>
+                <th>Worst Fill</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${layouts.slice(0, 5).map(renderAltLayoutRow).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
     }
 
     function setupListeners() {
       const type = document.getElementById('cableTypeSelect').value;
-      const data = CABLE_DB[type];
-      data.forEach((cable, idx) => {
-        const el = document.getElementById(`cableCount${idx}`);
-        if (el) {
-          el.addEventListener('input', updateTotalArea);
-        }
+      CABLE_DB[type].forEach((cable, idx) => {
+        const input = document.getElementById(`cableCount${idx}`);
+        if (!input) return;
+        input.addEventListener('input', updateLayouts);
       });
     }
 
     document.getElementById('cableTypeSelect').addEventListener('change', () => {
       buildCableTable();
-      updateTotalArea();
+      updateLayouts();
     });
 
-    buildCableTable();
-    updateTotalArea();
+    document.getElementById('maxConduitSelect').addEventListener('change', updateLayouts);
+
     function exportConduitResult() {
-      var res = document.getElementById('conduitResult').textContent.trim();
-      if (res.indexOf('-') > -1 && res.length < 30) { OmniToast.show('Add cables first', 'warn'); return; }
-      var rows = [];
-      document.querySelectorAll('#cableTableBody tr').forEach(function(tr) {
-        var cells = [];
-        tr.querySelectorAll('td').forEach(function(td) {
-          var inp = td.querySelector('input, select');
-          cells.push(inp ? inp.value : td.textContent.trim());
-        });
-        if (cells.length) rows.push(cells);
+      if (!lastCalculatedLayout) {
+        OmniToast.show('Add cables first', 'warn');
+        return;
+      }
+
+      const rows = [];
+      rows.push(['Inputs', 'Cable Type', document.getElementById('cableTypeSelect').selectedOptions[0].text]);
+      rows.push(['Inputs', 'Preferred Maximum Conduit', lastCalculatedLayout.selectedMax === 'auto' ? 'Auto' : `${lastCalculatedLayout.maxConduitOd} mm`]);
+      rows.push(['Inputs', 'Total Cables', `${lastCalculatedLayout.input.totalCables}`]);
+      rows.push(['Inputs', 'Total Cable Area', formatArea(lastCalculatedLayout.input.totalArea)]);
+
+      lastCalculatedLayout.input.schedule.forEach(item => {
+        rows.push(['Cable Schedule', `${item.area} mm²`, `${item.count}`]);
       });
-      rows.push(['Result', res]);
-      OmniExport.toCSV(['Cable Size','Number'], rows, 'conduit-sizing');
+
+      rows.push(['Recommended Layout', 'Arrangement', summariseLayout(lastCalculatedLayout.recommended)]);
+      rows.push(['Recommended Layout', 'Worst Fill', formatPercent(lastCalculatedLayout.recommended.worstFillPercent)]);
+
+      lastCalculatedLayout.recommended.conduits.forEach(conduit => {
+        rows.push([`Conduit ${conduit.index}`, 'Conduit Size', `${conduit.od} mm`]);
+        rows.push([`Conduit ${conduit.index}`, 'Cable Count', `${conduit.cableCount}`]);
+        rows.push([`Conduit ${conduit.index}`, 'Fill Used', formatPercent(conduit.fillPercent)]);
+        rows.push([`Conduit ${conduit.index}`, 'Fill Limit', formatPercent(getFillPercentage(conduit.cableCount) * 100)]);
+        rows.push([`Conduit ${conduit.index}`, 'Cable Area', formatArea(conduit.totalArea)]);
+        rows.push([`Conduit ${conduit.index}`, 'Spare Fill Area', formatArea(Math.max(conduit.spareArea, 0))]);
+        conduit.breakdown.forEach(item => {
+          rows.push([`Conduit ${conduit.index}`, item.label, `${item.count}`]);
+        });
+      });
+
+      lastCalculatedLayout.layouts.slice(0, 5).forEach((layout, index) => {
+        rows.push(['Options', `Option ${index + 1}`, `${summariseLayout(layout)} | ${formatPercent(layout.worstFillPercent)} worst fill`]);
+      });
+
+      OmniExport.toCSV(['Section', 'Item', 'Value'], rows, 'conduit-sizing');
     }
+
+    buildMaxConduitOptions();
+    buildCableTable();
+    updateLayouts();
   </script>
 </body>
 </html>
