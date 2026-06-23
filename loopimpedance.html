@@ -175,7 +175,7 @@
       <div class="calc-section">
         <h2>Reference &mdash; Maximum Zs Values (AS/NZS 3000 Table 8.1 / 8.2 Extract)</h2>
         <div class="info-box">
-          Values below are maximum earth fault loop impedance (&#937;) at the most remote point. 80% rule applied for design (to account for temperature rise during fault).
+          Values below are maximum earth fault loop impedance (&#937;) at the most remote point. 80% rule applied for design (to account for temperature rise during fault). For MCBs these values align with the AS/NZS 3000 table method; for HRC and semi-enclosed fuses this tool gives an indicative estimate only and final compliance must be checked against the actual fuse time-current data.
         </div>
         <div id="refTableContainer"></div>
       </div>
@@ -249,6 +249,7 @@
       const cableZ = (loopR * length) / 1000; // &#937;
 
       const Zs = Ze + cableZ;
+      const indicativeOnly = deviceType === 'hrc' || deviceType === 'semi';
       const maxZs = getMaxZs(deviceType, rating, circuitType);
       const designZs = maxZs * 0.8; // 80% rule for design
       const faultCurrent = Uo / Zs;
@@ -267,6 +268,9 @@
       } else {
         verdict.innerHTML = `<div class="fail-box">&#10005; FAIL &mdash; Calculated Zs (${Zs.toFixed(3)} &#937;) exceeds maximum (${maxZs.toFixed(3)} &#937;). Automatic disconnection NOT achieved. Remedies: increase conductor size, reduce cable length, add RCD, or use alternative earthing arrangement.</div>`;
       }
+      if (indicativeOnly) {
+        verdict.innerHTML += `<div class="info-box" style="margin-top:12px;"><strong>Fuse note:</strong> For HRC and semi-enclosed fuses, this result is indicative only. Confirm final Zs compliance from the actual fuse time-current curve or manufacturer data rather than relying on a single current multiplier.</div>`;
+      }
 
       // Build reference table
       buildRefTable(deviceType, circuitType);
@@ -277,10 +281,11 @@
       const ratings = [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100];
       const container = document.getElementById('refTableContainer');
       const deviceLabel = { mcb_b: 'MCB Type B', mcb_c: 'MCB Type C', mcb_d: 'MCB Type D', hrc: 'HRC Fuse', semi: 'Semi-enclosed Fuse' }[deviceType];
+      const zLabel = (deviceType === 'hrc' || deviceType === 'semi') ? 'Indicative Max Zs' : 'Max Zs';
       const timeLabel = circuitType === 'final' ? '0.4s' : '5s';
       let html = `<table class="ref-table"><thead><tr><th>Rating (A)</th>`;
       ratings.forEach(r => { html += `<th>${r}</th>`; });
-      html += `</tr></thead><tbody><tr><td><strong>${deviceLabel} &mdash; Max Zs (&#937;) at ${timeLabel}</strong></td>`;
+      html += `</tr></thead><tbody><tr><td><strong>${deviceLabel} &mdash; ${zLabel} (&#937;) at ${timeLabel}</strong></td>`;
       ratings.forEach(r => {
         const z = getMaxZs(deviceType, r, circuitType);
         html += `<td>${z.toFixed(2)}</td>`;
