@@ -149,7 +149,7 @@
         <strong>Standards Referenced:</strong>
         <ul>
           <li>AS/NZS 3000:2018 - Electrical installations (Wiring Rules)</li>
-          <li>AS/NZS 3439.1 - Low-voltage switchgear and controlgear assemblies</li>
+          <li>AS/NZS 61439.1 - Low-voltage switchgear and controlgear assemblies (supersedes AS/NZS 3439.1)</li>
         </ul>
       </div>
 
@@ -192,7 +192,7 @@ Width Selection:
       </div>
 
       <div class="standard-ref">
-        <strong>Note:</strong> Busbar sizing follows manufacturer specifications and AS/NZS 3439.1 for current density and temperature rise limits (typically 30-50K rise at rated current).
+        <strong>Note:</strong> Busbar sizing follows manufacturer specifications and AS/NZS 61439.1 for current density and temperature rise limits (typically 30&ndash;50K rise at rated current).
       </div>
     </div>
 
@@ -379,8 +379,8 @@ Where:
       <div class="formula-box">
 Fill Ratio = (Total Cable CSA) / (Conduit Internal CSA)
 
-AS/NZS 3000 Limits:
-- Single cable: 31% maximum fill
+AS/NZS 3000:2018 Appendix C Table C2 Limits:
+- Single cable: 53% maximum fill
 - 2 cables: 31% maximum fill
 - 3+ cables: 40% maximum fill
       </div>
@@ -398,15 +398,16 @@ AS/NZS 3000 Limits:
             </ul>
           </dd>
           
-          <dt>Conduit Internal Area</dt>
-          <dd>Based on nominal bore size (internal diameter):
+          <dt>Conduit Internal Area (AS/NZS 2053 medium-duty rigid PVC)</dt>
+          <dd>Based on actual internal diameter (OD minus wall thickness):
             <ul>
-              <li>20mm: 314mm&sup2; internal area</li>
-              <li>25mm: 491mm&sup2; internal area</li>
-              <li>32mm: 804mm&sup2; internal area</li>
-              <li>40mm: 1257mm&sup2; internal area</li>
-              <li>50mm: 1963mm&sup2; internal area</li>
+              <li>20mm OD (ID&nbsp;&#8776;&nbsp;16.1mm): &nbsp;~204mm&sup2; internal area</li>
+              <li>25mm OD (ID&nbsp;&#8776;&nbsp;21.2mm): &nbsp;~353mm&sup2; internal area</li>
+              <li>32mm OD (ID&nbsp;&#8776;&nbsp;28.0mm): &nbsp;~616mm&sup2; internal area</li>
+              <li>40mm OD (ID&nbsp;&#8776;&nbsp;35.4mm): &nbsp;~984mm&sup2; internal area</li>
+              <li>50mm OD (ID&nbsp;&#8776;&nbsp;44.2mm): 1534mm&sup2; internal area</li>
             </ul>
+            <small>Note: Always use manufacturer data for exact wall thickness. Nominal OD does not equal ID.</small>
           </dd>
         </dl>
       </div>
@@ -414,7 +415,7 @@ AS/NZS 3000 Limits:
       <h3>Conduit Selection Process</h3>
       <ol style="margin-left: 20px; line-height: 1.8;">
         <li>Count total number of cables to be installed</li>
-        <li>Determine fill limit (31% for 1-2 cables, 40% for 3+ cables)</li>
+        <li>Determine fill limit: 53% for 1 cable, 31% for 2 cables, 40% for 3+ cables</li>
         <li>Calculate total cable CSA (sum of all individual cable CSAs)</li>
         <li>Select smallest conduit where: Internal Area &times; Fill Limit &#8805; Total Cable CSA</li>
       </ol>
@@ -423,9 +424,9 @@ AS/NZS 3000 Limits:
         <strong>Example:</strong> 5 &times; 2.5mm&sup2; TPS cables (44.2mm&sup2; each)<br><br>
         
         Total cable CSA = 5 &times; 44.2mm&sup2; = 221mm&sup2;<br>
-        Fill limit = 40% (more than 2 cables)<br>
+        Fill limit = 40% (3+ cables)<br>
         Required conduit area = 221mm&sup2; / 0.40 = 552.5mm&sup2;<br>
-        Selected: 32mm conduit (804mm&sup2; internal area) &#10003;
+        Selected: 40mm conduit (ID 35.4mm, 984mm&sup2; internal area) &#10003;
       </div>
     </div>
 
@@ -1001,7 +1002,7 @@ Fuel tank (L) = Fuel rate × Autonomy hours
         <strong>Standards Referenced:</strong>
         <ul>
           <li>AS 62040 series — Uninterruptible power systems</li>
-          <li>AS 2676 — Battery room ventilation</li>
+          <li>AS/NZS 3000:2018 — Cl. 5.4 (battery room hydrogen hazard control)</li>
           <li>AS/NZS 3000:2018</li>
         </ul>
       </div>
@@ -1032,8 +1033,8 @@ DoD: 0.80 (VRLA/NiCd),  0.85 (Li-ion)
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 2897 — Power factor correction equipment</li>
-          <li>AS/NZS 61921 — Power capacitors</li>
+          <li>AS/NZS 61921 — Power capacitors for power factor correction</li>
+          <li>AS/NZS 61000.3.2 — Harmonic emission limits for equipment ≤16 A</li>
           <li>IEC 62423 — Type B RCDs for capacitor banks</li>
         </ul>
       </div>

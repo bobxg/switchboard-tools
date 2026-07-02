@@ -10,7 +10,7 @@
   <div class="top-tabs"></div>
   <div class="main-content">
     <h1>Power Factor Correction Calculator</h1>
-    <p>Size PFC capacitor banks and check for harmonic resonance per <strong>AS/NZS 2897</strong>, <strong>AS/NZS 61921</strong>, and distributor supply agreements.</p>
+    <p>Size PFC capacitor banks and check for harmonic resonance per <strong>AS/NZS 61921</strong> (capacitors for power factor correction) and distributor supply agreements. Harmonic emission limits per <strong>AS/NZS 61000.3.2</strong> / <strong>AS/NZS 61000.3.12</strong>.</p>
     <div class="calc-section">
       <h2>Load Profile</h2>
       <div class="info-box"><strong>Distributor requirement:</strong> Most Australian distributors (e.g., Ausgrid NS220, SA Power Networks) require power factor &#8805; 0.9 lagging at the point of supply. Penalties apply for PF below this threshold.</div>
@@ -123,7 +123,7 @@
         &#8226; Required PFC: <strong>${requiredKVAr.toFixed(0)} kVAr</strong><br>
         &#8226; Suggested configuration: ${stepped === 'auto' ? Math.round(requiredKVAr / selectedStep) + ' steps &times; ' + selectedStep + ' kVAr = ' + (Math.round(requiredKVAr / selectedStep) * selectedStep) + ' kVAr' : 'Fixed bank ' + requiredKVAr.toFixed(0) + ' kVAr'}<br>
         &#8226; Current reduction: ${(existKVA * 1000 / 400 / 1.732).toFixed(0)} A &#8594; ${(newKVA * 1000 / 400 / 1.732).toFixed(0)} A (at 400V, 3-phase)<br>
-        <em>Refer to AS/NZS 2897 for PFC installation requirements; AS/NZS 61921 for capacitor specifications.</em>
+        <em>Refer to AS/NZS 61921 for capacitor specifications and PFC installation requirements.</em>
       `;
 
       const resNote = document.getElementById('resonanceNote');

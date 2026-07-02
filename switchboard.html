@@ -306,15 +306,24 @@
       .sb-panel .sb-card { flex: 1 1 250px; }
     }
 
-    /* ===== Print: drawing only, A3 landscape ===== */
+    /* ===== Print: drawing only, paper set at runtime ===== */
     @media print {
-      @page { size: A3 landscape; margin: 10mm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       html, body { background: #fff !important; margin: 0; padding: 0; }
       .top-tabs, .page-band, .sb-panel, .omni-footer, .omni-fab, .omni-backtop, #qc-overlay { display: none !important; }
       .sb-workspace { display: block; padding: 0; max-width: none; margin: 0; }
-      .sb-canvas { border: none; box-shadow: none; padding: 0; overflow: visible; border-radius: 0; }
-      #sbSvg { width: 100% !important; height: auto !important; }
+      .sb-canvas {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        overflow: hidden;
+        border-radius: 0;
+        page-break-inside: avoid;
+        break-inside: avoid-page;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -396,7 +405,7 @@
         <h3><span data-ico="bolt"></span>Actions</h3>
         <div class="sb-actions">
           <button type="button" class="sb-btn primary" id="arrangeBtn" title="Re-pack all modules largest-first">Auto-arrange</button>
-          <button type="button" class="sb-btn" id="exportBtn" title="Print the drawing (A3 landscape)">Print Drawing</button>
+          <button type="button" class="sb-btn" id="exportBtn" title="Print the drawing to the recommended sheet size">Print Drawing</button>
           <div class="sb-btn-row">
             <button type="button" class="sb-btn" id="saveBtn" title="Save board to browser">Save</button>
             <button type="button" class="sb-btn" id="loadBtn" title="Load saved board">Load</button>
@@ -525,6 +534,17 @@
     const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
     const MARGIN = { l: 320, r: 560, t: 560, b: 760 };
+    const PRINT_MARGIN_MM = 8;
+    const PRINT_MIN_SCALE = 0.07;
+    const PRINT_SHEETS = [
+      { name: 'A4', orientation: 'portrait', width: 210, height: 297 },
+      { name: 'A4', orientation: 'landscape', width: 297, height: 210 },
+      { name: 'A3', orientation: 'portrait', width: 297, height: 420 },
+      { name: 'A3', orientation: 'landscape', width: 420, height: 297 },
+      { name: 'A2', orientation: 'portrait', width: 420, height: 594 },
+      { name: 'A2', orientation: 'landscape', width: 594, height: 420 }
+    ];
+    let lastRenderMeta = null;
 
     function svgDefs() {
       return '<defs>' +
@@ -617,17 +637,40 @@
         '<text x="' + cx + '" y="' + y + '" font-size="52">' + label + '</text></g>';
     }
 
-    function drawingScale(totalW) {
-      const viewW = totalW + MARGIN.l + MARGIN.r;
-      const viewH = TOTAL_H + MARGIN.t + MARGIN.b;
+    function choosePrintLayout(viewW, viewH) {
+      const options = PRINT_SHEETS.map(sheet => {
+        const printableW = sheet.width - (PRINT_MARGIN_MM * 2);
+        const printableH = sheet.height - (PRINT_MARGIN_MM * 2);
+        const scale = Math.min(printableW / viewW, printableH / viewH);
+        return {
+          name: sheet.name,
+          orientation: sheet.orientation,
+          pageWidth: sheet.width,
+          pageHeight: sheet.height,
+          printableW: printableW,
+          printableH: printableH,
+          scale: scale,
+          renderW: viewW * scale,
+          renderH: viewH * scale
+        };
+      });
+
+      const adequate = options.filter(option => option.scale >= PRINT_MIN_SCALE);
+      if (adequate.length) return adequate[0];
+
+      return options.reduce((best, option) => option.scale > best.scale ? option : best, options[0]);
+    }
+
+    function drawingScale(viewW, viewH, printLayout) {
+      const target = printLayout || choosePrintLayout(viewW, viewH);
       const std = [10, 15, 20, 25, 30, 40, 50, 75, 100];
       for (let i = 0; i < std.length; i++) {
-        if (viewW / std[i] <= 400 && viewH / std[i] <= 277) return '1:' + std[i];
+        if (viewW / std[i] <= target.printableW && viewH / std[i] <= target.printableH) return '1:' + std[i];
       }
       return 'NTS';
     }
 
-    function titleBlock(totalW) {
+    function titleBlock(totalW, viewW, viewH, printLayout) {
       const name = (document.getElementById('boardName').value || 'SWITCHBOARD').toUpperCase();
       const tbW = 1500, tbH = 360;
       const x1 = totalW + MARGIN.r - 40;     // right edge near sheet edge
@@ -643,7 +686,7 @@
         '<text class="tb-name" x="' + cx + '" y="' + (y0 + 66) + '" font-size="86">' + esc(name) + '</text>' +
         '<text class="tb-sub" x="' + cx + '" y="' + (y0 + 188) + '" font-size="52">SWITCHBOARD &mdash; FRONT ELEVATION</text>' +
         '<text class="tb-meta" x="' + cx + '" y="' + (y0 + 304) + '" font-size="44">' +
-          totalW + ' &#215; ' + TOTAL_H + ' &#215; ' + DEPTH + ' mm &#183; Scale ' + drawingScale(totalW) + ' (A3) &#183; ' + date +
+          totalW + ' &#215; ' + TOTAL_H + ' &#215; ' + DEPTH + ' mm &#183; Scale ' + drawingScale(viewW, viewH, printLayout) + ' (' + printLayout.name + ' ' + printLayout.orientation + ') &#183; ' + date +
         '</text></g>';
     }
 
@@ -657,6 +700,7 @@
       const viewX = -MARGIN.l, viewY = -MARGIN.t;
       const viewW = totalW + MARGIN.l + MARGIN.r;
       const viewH = TOTAL_H + MARGIN.t + MARGIN.b;
+      const printLayout = choosePrintLayout(viewW, viewH);
       parts.push('<rect class="sb-sheet" x="' + viewX + '" y="' + viewY + '" width="' + viewW + '" height="' + viewH + '"/>');
 
       // section brackets
@@ -727,11 +771,17 @@
       }
       parts.push('<rect class="sb-outline" x="0" y="0" width="' + totalW + '" height="' + TOTAL_H + '"/>');
       parts.push(dimSet(totalW));
-      parts.push(titleBlock(totalW));
+      parts.push(titleBlock(totalW, viewW, viewH, printLayout));
 
       svg.setAttribute('viewBox', viewX + ' ' + viewY + ' ' + viewW + ' ' + viewH);
       svg.innerHTML = parts.join('');
       sizeSvg(viewW, viewH);
+      lastRenderMeta = {
+        totalW: totalW,
+        viewW: viewW,
+        viewH: viewH,
+        printLayout: printLayout
+      };
       showBoardDimensions(totalW);
     }
 
@@ -746,10 +796,41 @@
 
     function showBoardDimensions(totalW) {
       const txt = 'Total Board Size: ' + totalW + 'mm (W) x ' + TOTAL_H + 'mm (H) x ' + DEPTH + 'mm (D)';
+      const printInfo = lastRenderMeta && lastRenderMeta.printLayout
+        ? '<br><span style="font-size:0.92em;color:var(--text-secondary);">Print: <strong>' + lastRenderMeta.printLayout.name + ' ' + lastRenderMeta.printLayout.orientation + '</strong> at ' + drawingScale(lastRenderMeta.viewW, lastRenderMeta.viewH, lastRenderMeta.printLayout) + '</span>'
+        : '';
       document.getElementById('boardDims').innerHTML =
-        '<strong>' + totalW + ' W</strong> &times; <strong>' + TOTAL_H + ' H</strong> &times; <strong>' + DEPTH + ' D</strong> mm';
+        '<strong>' + totalW + ' W</strong> &times; <strong>' + TOTAL_H + ' H</strong> &times; <strong>' + DEPTH + ' D</strong> mm' + printInfo;
+      document.getElementById('exportBtn').title = lastRenderMeta && lastRenderMeta.printLayout
+        ? 'Print the drawing on ' + lastRenderMeta.printLayout.name + ' ' + lastRenderMeta.printLayout.orientation
+        : 'Print the drawing to the recommended sheet size';
       localStorage.setItem('switchboardDims', txt);
     }
+
+    function ensurePrintStyle() {
+      let style = document.getElementById('sbPrintStyle');
+      if (!style) {
+        style = document.createElement('style');
+        style.id = 'sbPrintStyle';
+        document.head.appendChild(style);
+      }
+      return style;
+    }
+
+    function applyPrintLayout() {
+      if (!lastRenderMeta) return null;
+      const layout = lastRenderMeta.printLayout || choosePrintLayout(lastRenderMeta.viewW, lastRenderMeta.viewH);
+      const style = ensurePrintStyle();
+      style.textContent = '@media print {' +
+        '@page { size: ' + layout.name + ' ' + layout.orientation + '; margin: ' + PRINT_MARGIN_MM + 'mm; }' +
+        'html, body { width: auto !important; height: auto !important; }' +
+        '.sb-canvas { width: ' + layout.printableW + 'mm !important; height: ' + layout.printableH + 'mm !important; margin: 0 auto !important; }' +
+        '#sbSvg { width: ' + layout.renderW + 'mm !important; height: ' + layout.renderH + 'mm !important; max-width: none !important; max-height: none !important; margin: 0 auto !important; }' +
+      '}';
+      return layout;
+    }
+
+    window.addEventListener('beforeprint', applyPrintLayout);
 
     /* ════════════════════════════════════════════════════════
        Generation & controls
@@ -792,7 +873,10 @@
     document.getElementById('ctMeterChk').addEventListener('change', doGenerate);
     document.getElementById('boardName').addEventListener('input', function () { render(); });
     document.getElementById('arrangeBtn').addEventListener('click', autoArrange);
-    document.getElementById('exportBtn').addEventListener('click', function () { window.print(); });
+    document.getElementById('exportBtn').addEventListener('click', function () {
+      applyPrintLayout();
+      window.print();
+    });
     window.addEventListener('resize', function () { render(); });
 
     /* ════════════════════════════════════════════════════════

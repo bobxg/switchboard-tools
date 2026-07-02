@@ -39,7 +39,7 @@
         <div class="input-group">
           <label for="targetR">Target Earth Resistance (&#937;)</label>
           <input type="number" id="targetR" value="1" min="0.1" step="0.1" />
-          <span style="font-size:0.8em;color:var(--text-secondary);">AS/NZS 3000 recommends &#8804;1 &#937; for MEN; distributors may require lower</span>
+          <span style="font-size:0.8em;color:var(--text-secondary);">Earthing impedance must be low enough to achieve automatic disconnection. Low values (often around 1 &#937; or below by design) are commonly targeted, but the acceptable value depends on the fault path and protective device.</span>
         </div>
       </div>
     </div>
@@ -249,12 +249,9 @@
         if (n === 1) {
           combinedR = singleR;
         } else {
-          // Schwarz-based utilisation: &#951; &#8776; 1 - (0.5 &times; ln(n) &times; L / (n &times; s))
+          // Indicative parallel-rod utilisation factor including spacing interaction.
           const eta = Math.min(1, 1 / (1 + (n - 1) * 0.5 * (L / s > 1 ? L / s * 0.3 : 0.15)));
           combinedR = singleR / (n * eta);
-          // Simplified: parallel reduction with coupling factor
-          const kFactor = 1 - 0.05 * (n - 1) * Math.min(1, L / s);
-          combinedR = (singleR / n) / Math.max(0.3, kFactor);
         }
       } else if (type === 'strip') {
         const L = parseFloat(document.getElementById('stripLength').value);
