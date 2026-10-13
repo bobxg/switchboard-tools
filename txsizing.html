@@ -94,8 +94,7 @@
 
     // Estimated no-load and load losses
     function estLosses(kva, type) {
-      const f = type === 'onan' ? 1 : 1.3; // dry type generally higher losses
-      // Approximate AS 2374.1 loss values (W)
+            // Approximate AS 2374.1 loss values (W)
       const nll = Math.round(kva * (1.5 + kva * 0.0005) * (type === 'onan' ? 1 : 1.3));
       const ll = Math.round(kva * (5 + kva * 0.002) * (type === 'onan' ? 1 : 1.15));
       return { nll: Math.min(nll, kva*12), ll: Math.min(ll, kva*18) };
@@ -119,6 +118,7 @@
       ], 'transformer-sizing');
     }
     function calculate() {
+      if (typeof OmniValidate !== 'undefined' && !OmniValidate.requireAll()) return;
       const totalLoad = parseFloat(document.getElementById('totalLoadKVA').value);
       const df = parseFloat(document.getElementById('diversityFactor').value);
       const growth = parseFloat(document.getElementById('growthFactor').value) / 100;
@@ -152,7 +152,7 @@
       const flc = secV > 300 ? (selectedKVA * 1000) / (secV * Math.sqrt(3)) : (selectedKVA * 1000) / secV;
 
       // Prospective fault current (symmetrical)
-      const ifault = flc / (zk / 100);
+      const ifault = flc / (zk / 100); // infinite upstream source (conservative); see Fault Level tool
 
       // Losses
       const losses = estLosses(selectedKVA, txType);
@@ -180,7 +180,7 @@
       } else if (loading < 40) {
         rec += `<div class="info-box"><strong>Note:</strong> TX loading < 40%. Consider down-sizing to reduce no-load losses, or verify growth projection warrants this capacity.</div>`;
       } else {
-        rec += `<div class="pass-box"><strong>&#10003; Suitable selection.</strong> Loading is within recommended 60&ndash;80% range.</div>`;
+        rec += `<div class="pass-box"><strong>&#10003; Suitable selection.</strong> Loading ${loading.toFixed(0)}% is within the 40&ndash;85% band${loading < 60 ? ' (below the 60&ndash;80% efficiency sweet spot &mdash; ample growth capacity)' : loading > 80 ? ' (above the 60&ndash;80% sweet spot)' : ' and the 60&ndash;80% efficiency sweet spot'}.</div>`;
       }
       if (ambTemp > 40) {
         rec += `<div class="warn-box"><strong>Temperature Derating Applied:</strong> Ambient ${ambTemp}&deg;C exceeds reference 40&deg;C. Effective TX capacity derated to ${(selectedKVA * tempDerate).toFixed(0)} kVA.</div>`;

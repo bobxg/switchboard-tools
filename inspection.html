@@ -469,7 +469,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="omni-utils.js"></script>
   <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    // PDF.js loads from a CDN; guard so the rest of the checklist still works offline
+    if (typeof pdfjsLib !== 'undefined') pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     let pdfDoc = null;
     let pageNum = 1;
@@ -521,6 +522,7 @@
       const fileReader = new FileReader();
       fileReader.onload = function() {
         const typedarray = new Uint8Array(this.result);
+        if (typeof pdfjsLib === 'undefined') { alert('PDF preview needs an internet connection (PDF.js loads from a CDN).'); return; }
         pdfjsLib.getDocument(typedarray).promise.then(pdf => {
           pdfDoc = pdf;
           document.getElementById('pageCount').textContent = pdf.numPages;

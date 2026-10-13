@@ -938,14 +938,16 @@
       else if (arrangement === 'trefoil') { derateTable = DERATE_TREFOIL; derateLabel = 'Trefoil formation (Table 22 Note)'; }
       else { derateTable = DERATE_MULTI_LAYER; derateLabel = 'Multi-layer / stacked (Table 23)'; }
 
+      // Grouping factors are tabulated per circuit: a trefoil group of three single-core cables is one circuit
+      var circuits = arrangement === 'trefoil' ? Math.ceil(totalCables / 3) : totalCables;
       var keys = Object.keys(derateTable).map(Number).sort(function(a, b) { return a - b; });
       var closestKey = keys[keys.length - 1];
-      for (var i = 0; i < keys.length; i++) { if (keys[i] >= totalCables) { closestKey = keys[i]; break; } }
+      for (var i = 0; i < keys.length; i++) { if (keys[i] >= circuits) { closestKey = keys[i]; break; } }
       var derateFactor = derateTable[closestKey];
 
       deratingText.innerHTML =
         'Arrangement: <b>' + derateLabel + '</b> · ' +
-        'Circuits: <b>' + totalCables + '</b> · ' +
+        'Circuits: <b>' + circuits + '</b>' + (arrangement === 'trefoil' ? ' (' + totalCables + ' cables)' : '') + ' · ' +
         'Derating factor: <b>' + derateFactor.toFixed(2) + '</b><br>' +
         '<em>Apply this factor to cable current capacity from AS/NZS 3008.1.1 tables.</em>';
       deratingDiv.style.display = 'block';

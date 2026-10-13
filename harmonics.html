@@ -26,6 +26,10 @@
         <div class="input-group"><label for="linearKW">Linear Loads (kW total)</label><input type="number" id="linearKW" value="100" min="0" /></div>
         <div class="input-group"><label for="totalSupplyA">Supply Rating (A per phase)</label><input type="number" id="totalSupplyA" value="630" min="10" /></div>
       </div>
+      <div class="input-row four">
+        <div class="input-group"><label for="txKVA">Supply Transformer (kVA)</label><input type="number" id="txKVA" value="1000" min="10" /></div>
+        <div class="input-group"><label for="txZ">Transformer Impedance u<sub>k</sub> (%)</label><input type="number" id="txZ" value="5" min="1" max="15" step="0.25" /></div>
+      </div>
       <button class="calc-button" onclick="calculate()">Estimate Harmonics</button>
       <button class="btn-export" onclick="exportHarmonicsResult()">Export Harmonics Result as CSV</button>
     </div>
@@ -36,7 +40,9 @@
           <div class="result-item"><div class="result-label">THD-I (Current)</div><div class="result-value" id="resTHDI">&mdash;</div></div>
           <div class="result-item"><div class="result-label">THD-V (Voltage, est.)</div><div class="result-value" id="resTHDV">&mdash;</div></div>
           <div class="result-item"><div class="result-label">Non-linear Load %</div><div class="result-value" id="resNL">&mdash;</div></div>
-          <div class="result-item"><div class="result-label">Neutral Current Multiplier</div><div class="result-value" id="resNeutral">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">Neutral / Phase Current</div><div class="result-value" id="resNeutral">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">Transformer K-Factor</div><div class="result-value" id="resK">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">TDD (of supply rating)</div><div class="result-value" id="resTDD">&mdash;</div></div>
         </div>
       </div>
       <div class="calc-section" style="margin-top:24px;">
@@ -49,77 +55,97 @@
     </div>
   </div>
   <script>
-    // Typical harmonic current spectra (% of fundamental) for common load types
+    // Typical harmonic current spectra (% of each load's own fundamental)
     const spectra = {
-      led:  { 3: 80, 5: 55, 7: 30, 9: 15, 11: 8, 13: 5 },   // cheap LED drivers
-      vsd6: { 3: 2, 5: 25, 7: 12, 9: 1, 11: 7, 13: 4 },      // 6-pulse VSD
-      smps: { 3: 75, 5: 50, 7: 25, 9: 10, 11: 7, 13: 4 },     // IT SMPS
+      led:  { 3: 80, 5: 55, 7: 30, 9: 15, 11: 8, 13: 5 },   // low-cost single-phase LED drivers
+      vsd6: { 3: 0, 5: 35, 7: 12, 9: 0, 11: 7, 13: 4 },     // 6-pulse VSD, no DC choke (no triplens on a balanced 3-phase bridge)
+      smps: { 3: 75, 5: 50, 7: 25, 9: 10, 11: 7, 13: 4 },   // IT switch-mode power supplies
     };
-
-    // AS/NZS 61000.3.12 limits (% of fundamental at PCC, for Rsce &#8805; 33)
+    // AS/NZS 61000.3.12 Table 2 limits (% of fundamental, Rsce = 33) — an equipment emission limit used here as a reference
     const limits = { 3: 21.6, 5: 10.7, 7: 7.2, 9: 3.8, 11: 3.1, 13: 2.0, thd: 23 };
-
+    // Summation exponent for harmonics from multiple sources (IEC 61000-3-6): α = 1 (h < 5), 1.4 (5 ≤ h ≤ 10), 2 (h > 10)
+    function alpha(h) { return h < 5 ? 1 : h <= 10 ? 1.4 : 2; }
 
     function exportHarmonicsResult() {
       var rb = document.getElementById('resTHDI');
-      if (!rb || rb.textContent === '\u2014') { OmniToast.show('Calculate first', 'warn'); return; }
+      if (!rb || rb.textContent === '—') { OmniToast.show('Calculate first', 'warn'); return; }
       OmniExport.toCSV(['Parameter','Value'],[
         ['THD-I (%)', document.getElementById('resTHDI').textContent],
         ['THD-V (%)', document.getElementById('resTHDV').textContent],
         ['Non-linear Load (%)', document.getElementById('resNL').textContent],
-        ['Neutral Multiplier', document.getElementById('resNeutral').textContent]
+        ['Neutral / Phase Current', document.getElementById('resNeutral').textContent],
+        ['K-Factor', document.getElementById('resK').textContent],
+        ['TDD (%)', document.getElementById('resTDD').textContent]
       ], 'harmonics-analysis');
     }
+
+    function num(id) { const v = parseFloat(document.getElementById(id).value); return isFinite(v) && v > 0 ? v : 0; }
+
     function calculate() {
-      const ledTotal = parseInt(document.getElementById('ledQty').value) * parseFloat(document.getElementById('ledW').value);
-      const vsdTotal = parseInt(document.getElementById('vsdQty').value) * parseFloat(document.getElementById('vsdKW').value) * 1000;
-      const itTotal = parseInt(document.getElementById('itQty').value) * parseFloat(document.getElementById('itW').value);
-      const linearTotal = parseFloat(document.getElementById('linearKW').value) * 1000;
-      const supplyA = parseFloat(document.getElementById('totalSupplyA').value);
+      const ledTotal = num('ledQty') * num('ledW');
+      const vsdTotal = num('vsdQty') * num('vsdKW') * 1000;
+      const itTotal = num('itQty') * num('itW');
+      const linearTotal = num('linearKW') * 1000;
+      const supplyA = num('totalSupplyA');
+      const txKVA = num('txKVA') || 1000;
+      const uk = num('txZ') || 5;
 
       const totalLoad = ledTotal + vsdTotal + itTotal + linearTotal;
+      if (totalLoad <= 0) { OmniToast.show('Enter at least one load', 'warn'); return; }
       const nlLoad = ledTotal + vsdTotal + itTotal;
       const nlPct = (nlLoad / totalLoad * 100);
 
-      // Weighted harmonic current for each order
+      // Fundamental current per phase: single-phase loads spread evenly over three phases (P / 3×230),
+      // three-phase loads P / (√3 × 400). Unity displacement assumed.
+      const I1 = {
+        led: ledTotal / (3 * 230),
+        it: itTotal / (3 * 230),
+        vsd: vsdTotal / (Math.sqrt(3) * 400),
+        lin: linearTotal / (Math.sqrt(3) * 400)
+      };
+      const fundamentalI = I1.led + I1.it + I1.vsd + I1.lin;
+
       const orders = [3, 5, 7, 9, 11, 13];
       const harmonicI = {};
-      let sumSqI = 0;
-
+      let sumSqI = 0, kNum = fundamentalI * fundamentalI, kDen = fundamentalI * fundamentalI;
       orders.forEach(h => {
-        // RMS addition (geometric) of harmonic currents from each source
-        const ledI = (ledTotal / 230) * (spectra.led[h] || 0) / 100;
-        const vsdI = (vsdTotal / 400 / 1.732) * (spectra.vsd6[h] || 0) / 100;
-        const itI = (itTotal / 230) * (spectra.smps[h] || 0) / 100;
-        // For 3-phase cancellation: triplen harmonics from 3-phase balanced loads cancel
-        const totalHI = Math.sqrt(ledI*ledI + vsdI*vsdI + itI*itI);
-        harmonicI[h] = totalHI;
-        sumSqI += totalHI * totalHI;
+        const parts = [I1.led * spectra.led[h] / 100, I1.vsd * spectra.vsd6[h] / 100, I1.it * spectra.smps[h] / 100];
+        const a = alpha(h);
+        const ih = Math.pow(parts.reduce((acc, x) => acc + Math.pow(x, a), 0), 1 / a);
+        harmonicI[h] = ih;
+        sumSqI += ih * ih;
+        kNum += ih * ih * h * h;
+        kDen += ih * ih;
       });
 
-      const fundamentalI = totalLoad / (230 * 1.732); // 3-phase equivalent
-      const thdi = (Math.sqrt(sumSqI) / fundamentalI * 100);
-
-      // THD-V estimate (simple): THD-V &#8776; THD-I &times; Zsc/Zload (simplified: THD-I &times; source impedance factor)
-      const thdv = thdi * 0.15; // rough: ~15% of THD-I for typical LV installations
-
-      // Neutral current multiplier for triplen harmonics (3-phase 4-wire)
-      const tripleI = (harmonicI[3] || 0) * 3; // triplen harmonics add in neutral
-      const neutralMult = Math.max(1, tripleI / fundamentalI + 0.3);
+      const thdi = Math.sqrt(sumSqI) / fundamentalI * 100;
+      // Voltage distortion at the transformer secondary: Vh% = (Ih / Irated) × h × uk%
+      const iTx = txKVA * 1000 / (Math.sqrt(3) * 400);
+      let sumSqV = 0;
+      orders.forEach(h => { const vh = harmonicI[h] / iTx * h * uk; sumSqV += vh * vh; });
+      const thdv = Math.sqrt(sumSqV);
+      // Neutral: triplen currents from the three phases add arithmetically
+      const triplenSq = (harmonicI[3] || 0) ** 2 + (harmonicI[9] || 0) ** 2;
+      const neutralI = 3 * Math.sqrt(triplenSq);
+      const phaseRms = Math.sqrt(fundamentalI * fundamentalI + sumSqI);
+      const neutralMult = neutralI / phaseRms;
+      const kFactor = kNum / kDen;
+      const tdd = supplyA > 0 ? Math.sqrt(sumSqI) / supplyA * 100 : 0;
 
       document.getElementById('resTHDI').textContent = thdi.toFixed(1) + '%';
       document.getElementById('resTHDV').textContent = thdv.toFixed(1) + '%';
       document.getElementById('resNL').textContent = nlPct.toFixed(0) + '%';
-      document.getElementById('resNeutral').textContent = neutralMult.toFixed(2) + '&times;';
+      document.getElementById('resNeutral').innerHTML = neutralMult.toFixed(2) + '&times;';
+      document.getElementById('resK').textContent = 'K-' + kFactor.toFixed(1);
+      document.getElementById('resTDD').textContent = tdd.toFixed(1) + '%';
 
-      // Bar chart
       const chart = document.getElementById('barChart');
       chart.innerHTML = '';
-      const maxVal = Math.max(...orders.map(h => (harmonicI[h]/fundamentalI*100)), 30);
-      let specHtml = '<table class="ref-table"><thead><tr><th>Harmonic</th><th>Estimated %</th><th>AS/NZS 61000.3.12 Limit %</th><th>Status</th></tr></thead><tbody>';
-
+      const maxVal = Math.max(...orders.map(h => (harmonicI[h] / fundamentalI * 100)), 30);
+      let specHtml = '<table class="ref-table"><thead><tr><th>Harmonic</th><th>Current (A/phase)</th><th>Estimated % of I<sub>1</sub></th><th>V<sub>h</sub> at TX (%)</th><th>AS/NZS 61000.3.12 Ref. Limit %</th><th>Status</th></tr></thead><tbody>';
       orders.forEach(h => {
         const pct = harmonicI[h] / fundamentalI * 100;
+        const vh = harmonicI[h] / iTx * h * uk;
         const lim = limits[h] || 999;
         const over = pct > lim;
         const barH = Math.max(2, (pct / maxVal) * 180);
@@ -127,29 +153,29 @@
         col.className = 'bar-col';
         col.innerHTML = `<div class="bar-value">${pct.toFixed(1)}%</div><div class="bar ${over?'over':''}" style="height:${barH}px;"></div><div class="bar-label">H${h}</div>`;
         chart.appendChild(col);
-        specHtml += `<tr><td>H${h} (${h*50} Hz)</td><td>${pct.toFixed(1)}%</td><td>${lim}%</td><td style="color:${over?'#c62828':'#2e7d32'};font-weight:bold;">${over?'&#9888; EXCEEDS':'&#10003; OK'}</td></tr>`;
+        specHtml += `<tr><td>H${h} (${h*50} Hz)</td><td>${harmonicI[h].toFixed(1)}</td><td>${pct.toFixed(1)}%</td><td>${vh.toFixed(2)}%</td><td>${lim}%</td><td style="color:${over?'#c62828':'#2e7d32'};font-weight:bold;">${over?'&#9888; EXCEEDS':'&#10003; OK'}</td></tr>`;
       });
-      specHtml += `<tr><td><strong>THD-I</strong></td><td><strong>${thdi.toFixed(1)}%</strong></td><td><strong>${limits.thd}%</strong></td><td style="color:${thdi>limits.thd?'#c62828':'#2e7d32'};font-weight:bold;">${thdi>limits.thd?'&#9888; EXCEEDS':'&#10003; OK'}</td></tr>`;
+      specHtml += `<tr><td><strong>THD</strong></td><td>${Math.sqrt(sumSqI).toFixed(1)}</td><td><strong>${thdi.toFixed(1)}%</strong></td><td><strong>${thdv.toFixed(2)}%</strong></td><td><strong>${limits.thd}%</strong></td><td style="color:${thdi>limits.thd?'#c62828':'#2e7d32'};font-weight:bold;">${thdi>limits.thd?'&#9888; EXCEEDS':'&#10003; OK'}</td></tr>`;
       specHtml += '</tbody></table>';
       document.getElementById('spectrumTable').innerHTML = specHtml;
 
-      // Verdict
-      const anyOver = orders.some(h => (harmonicI[h]/fundamentalI*100) > limits[h]) || thdi > limits.thd;
+      const anyOver = orders.some(h => (harmonicI[h]/fundamentalI*100) > limits[h]) || thdi > limits.thd || thdv > 8;
       const verd = document.getElementById('verdict');
+      const kNote = `<div class="info-box"><strong>Transformer K-factor ${kFactor.toFixed(1)}</strong> (UL 1561 method, &Sigma;I<sub>h</sub>&sup2;h&sup2; / &Sigma;I<sub>h</sub>&sup2;). ${kFactor > 4 ? 'Specify a K-rated transformer (K-' + (kFactor <= 4 ? 4 : kFactor <= 9 ? 9 : kFactor <= 13 ? 13 : 20) + ') or derate a standard unit.' : 'A standard transformer is generally adequate.'} THD-V assumes the transformer reactance dominates the source impedance (u<sub>k</sub> = ${uk}%, ${txKVA} kVA) and excludes background distortion from the network.</div>`;
       if (anyOver) {
-        verd.innerHTML = `<div class="fail-box"><strong>&#9888; Harmonic limits exceeded.</strong> Mitigation measures are recommended. See below.</div>`;
+        verd.innerHTML = `<div class="fail-box"><strong>&#9888; Harmonic levels exceed the reference limits${thdv > 8 ? ' (THD-V above 8%)' : ''}.</strong> Mitigation measures are recommended. See below.</div>` + kNote;
         const mit = document.getElementById('mitigation');
         mit.style.display = 'block';
         mit.innerHTML = `<strong>Recommended Mitigation:</strong><ul>
           <li>Install <strong>active harmonic filters</strong> at MSB (most effective for mixed harmonics)</li>
-          <li>Use <strong>18-pulse or AFE (Active Front End) VSDs</strong> for large motors</li>
-          <li>Specify LED drivers with <strong>THD-I < 10%</strong> (Class C compliant per AS/NZS 61000.3.2)</li>
+          <li>Use <strong>DC chokes, 12/18-pulse or AFE (Active Front End) VSDs</strong> for large motors</li>
+          <li>Specify LED drivers with <strong>THD-I &lt; 20%</strong> and SMPS with active PFC</li>
           <li>Use <strong>detuned PFC</strong> to avoid resonance (see PFC Sizing tool)</li>
-          <li>Oversize <strong>neutral conductors</strong> &mdash; size for ${neutralMult.toFixed(2)}&times; phase current due to triplen harmonics</li>
+          <li>Size <strong>neutral conductors</strong> for ${neutralMult.toFixed(2)}&times; phase current (triplen harmonics); AS/NZS 3008.1.1 treats a neutral carrying significant harmonic current as a loaded conductor</li>
           <li>Consider <strong>K-rated transformers</strong> or derating standard transformers</li>
-          </ul><em>Refer to AS/NZS 61000.3.2 (&#8804;16A equipment), AS/NZS 61000.3.12 (>16A), and distributor harmonic policies.</em>`;
+        </ul><em>Refer to AS/NZS 61000.3.2 (&#8804;16A equipment), AS/NZS 61000.3.12 (>16A), and distributor harmonic policies.</em>`;
       } else {
-        verd.innerHTML = `<div class="pass-box"><strong>&#10003; Estimated harmonic levels within AS/NZS 61000.3.12 limits.</strong> No active mitigation required; maintain monitoring at commissioning.</div>`;
+        verd.innerHTML = `<div class="pass-box"><strong>&#10003; Estimated harmonic levels within the reference limits.</strong> No active mitigation indicated; confirm by measurement at commissioning.</div>` + kNote;
         document.getElementById('mitigation').style.display = 'none';
       }
       document.getElementById('resultSection').style.display = 'block';

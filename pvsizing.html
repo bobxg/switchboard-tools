@@ -129,6 +129,33 @@
         </div>
       </div>
 
+      <div class="calc-section" style="margin-top:24px;">
+        <h2>String Sizing (AS/NZS 5033)</h2>
+        <div class="info-box">Checks modules per string against the inverter voltage limits using the module temperature coefficients: maximum V<sub>oc</sub> at the lowest expected cell temperature, and minimum V<sub>mp</sub> at the highest cell temperature.</div>
+        <div class="input-row three">
+          <div class="input-group"><label for="modVoc">Module V<sub>oc</sub> at STC (V)</label><input type="number" id="modVoc" value="49.5" step="0.1" /></div>
+          <div class="input-group"><label for="modVmp">Module V<sub>mp</sub> at STC (V)</label><input type="number" id="modVmp" value="41.6" step="0.1" /></div>
+          <div class="input-group"><label for="modIsc">Module I<sub>sc</sub> at STC (A)</label><input type="number" id="modIsc" value="13.9" step="0.1" /></div>
+        </div>
+        <div class="input-row three">
+          <div class="input-group"><label for="betaVoc">V<sub>oc</sub> Temp. Coefficient (%/&deg;C)</label><input type="number" id="betaVoc" value="-0.25" step="0.01" /></div>
+          <div class="input-group"><label for="betaVmp">V<sub>mp</sub> / P<sub>max</sub> Temp. Coefficient (%/&deg;C)</label><input type="number" id="betaVmp" value="-0.30" step="0.01" /></div>
+          <div class="input-group"><label for="tMin">Minimum Cell Temperature (&deg;C)</label><input type="number" id="tMin" value="0" step="1" /><small>Lowest daytime ambient at site</small></div>
+        </div>
+        <div class="input-row three">
+          <div class="input-group"><label for="tMax">Maximum Cell Temperature (&deg;C)</label><input type="number" id="tMax" value="75" step="1" /><small>Max ambient + 30&ndash;35&deg;C for roof mounting</small></div>
+          <div class="input-group"><label for="invVmax">Inverter Max DC Input Voltage (V)</label><input type="number" id="invVmax" value="600" step="10" /></div>
+          <div class="input-group"><label for="invImax">Inverter Max Input Current per MPPT (A)</label><input type="number" id="invImax" value="16" step="0.5" /></div>
+        </div>
+        <div class="input-row three">
+          <div class="input-group"><label for="mpptMin">MPPT Range Min (V)</label><input type="number" id="mpptMin" value="120" step="10" /></div>
+          <div class="input-group"><label for="mpptMax">MPPT Range Max (V)</label><input type="number" id="mpptMax" value="550" step="10" /></div>
+          <div class="input-group"><label for="stringsPerMppt">Parallel Strings per MPPT</label><input type="number" id="stringsPerMppt" value="1" min="1" step="1" /></div>
+        </div>
+        <button class="calc-button" onclick="calculateStrings()">Check String Configuration</button>
+        <div id="stringResult" style="display:none;"></div>
+      </div>
+
       <div class="info-box">
         <strong>Notes:</strong>
         <ul style="margin:8px 0 0 20px; padding:0;">
@@ -261,6 +288,50 @@
         ['Total Benefit (dollar/yr)', document.getElementById('totalBenefit').textContent]
       ], 'pv-sizing');
     }
+    function calculateStrings() {
+      const g = id => parseFloat(document.getElementById(id).value);
+      const voc = g('modVoc'), vmp = g('modVmp'), isc = g('modIsc');
+      const bVoc = g('betaVoc') / 100, bVmp = g('betaVmp') / 100;
+      const tMin = g('tMin'), tMax = g('tMax');
+      const vInv = g('invVmax'), iInv = g('invImax');
+      const mMin = g('mpptMin'), mMax = g('mpptMax');
+      const nPar = Math.max(1, parseInt(document.getElementById('stringsPerMppt').value) || 1);
+      if (![voc, vmp, isc, vInv, mMin, mMax].every(v => isFinite(v) && v > 0)) { OmniToast.show('Enter all module and inverter values', 'warn'); return; }
+
+      const vocCold = voc * (1 + bVoc * (tMin - 25));   // highest open-circuit voltage
+      const vmpCold = vmp * (1 + bVmp * (tMin - 25));
+      const vmpHot = vmp * (1 + bVmp * (tMax - 25));    // lowest operating voltage
+      const nMaxV = Math.floor(vInv / vocCold);
+      const nMaxMppt = Math.floor(mMax / vmpCold);
+      const nMin = Math.ceil(mMin / vmpHot);
+      const nMax = Math.min(nMaxV, nMaxMppt);
+      const iArray = 1.25 * isc * nPar;                 // AS/NZS 5033 array maximum current (1.25 × Isc)
+      const ok = nMin <= nMax;
+
+      let rows = '';
+      for (let n = Math.max(1, nMin - 2); n <= nMaxV + 2; n++) {
+        const vo = n * vocCold, vh = n * vmpHot, vc = n * vmpCold;
+        const good = vo <= vInv && vh >= mMin && vc <= mMax;
+        rows += `<tr${good ? '' : ' style="opacity:0.55;"'}><td>${n}</td><td>${vo.toFixed(0)}</td><td>${vh.toFixed(0)}</td><td>${vc.toFixed(0)}</td><td>${good ? '&#10003;' : '&#10005;'}</td></tr>`;
+      }
+      const out = document.getElementById('stringResult');
+      out.style.display = 'block';
+      out.innerHTML = `
+        <div class="result-box"><h3>String Window</h3><div class="result-grid">
+          <div class="result-item"><div class="result-label">V<sub>oc</sub> at ${tMin}&deg;C</div><div class="result-value">${vocCold.toFixed(1)} V</div></div>
+          <div class="result-item"><div class="result-label">V<sub>mp</sub> at ${tMax}&deg;C</div><div class="result-value">${vmpHot.toFixed(1)} V</div></div>
+          <div class="result-item"><div class="result-label">Modules per String</div><div class="result-value">${ok ? nMin + ' &ndash; ' + nMax : 'None'}</div></div>
+          <div class="result-item"><div class="result-label">Array Current (1.25 I<sub>sc</sub>)</div><div class="result-value">${iArray.toFixed(1)} A</div></div>
+        </div></div>
+        <div class="${ok ? 'pass-box' : 'fail-box'}">${ok
+          ? `Use ${nMin} to ${nMax} modules per string. The upper limit is set by ${nMaxV <= nMaxMppt ? 'the inverter maximum DC voltage (' + vInv + ' V) at minimum temperature' : 'the MPPT upper limit (' + mMax + ' V)'}; the lower limit keeps V<sub>mp</sub> above ${mMin} V on hot days.`
+          : 'No string length satisfies both the maximum-voltage and MPPT-window limits &mdash; choose a different inverter or module.'}</div>
+        ${iArray > iInv ? `<div class="warn-box">Array current ${iArray.toFixed(1)} A exceeds the inverter input current of ${iInv} A per MPPT &mdash; reduce parallel strings or confirm the inverter can clip safely (the short-circuit current rating must not be exceeded).</div>` : ''}
+        ${nPar >= 3 ? `<div class="info-box">${nPar} strings in parallel: string overcurrent protection is generally required where the reverse current can exceed the module's maximum series fuse rating (AS/NZS 5033).</div>` : ''}
+        <table class="ref-table"><thead><tr><th>Modules</th><th>V<sub>oc</sub> max (V)</th><th>V<sub>mp</sub> hot (V)</th><th>V<sub>mp</sub> cold (V)</th><th>OK</th></tr></thead><tbody>${rows}</tbody></table>
+        <p style="font-size:0.85em;color:var(--text-secondary);">PV array maximum voltage for LV systems in AS/NZS 5033 is calculated from V<sub>oc</sub> corrected to the minimum expected cell temperature. Confirm all limits against the inverter datasheet.</p>`;
+    }
+
     function calculatePV() {
       const dailyUsage = parseFloat(document.getElementById('dailyUsage').value);
       const peakSunHours = parseFloat(document.getElementById('location').value);
@@ -292,8 +363,10 @@
       const locationName = getLocationName(peakSunHours.toString());
       const multipliers = MONTHLY_MULTIPLIERS[locationName];
       const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-      const monthlyGeneration = multipliers.map((mult, i) => 
-        actualDailyGen * mult * daysInMonth[i]
+      // Normalise the multipliers so the twelve months add up to the annual total
+      const weighted = multipliers.reduce((acc, m, i) => acc + m * daysInMonth[i], 0) / 365;
+      const monthlyGeneration = multipliers.map((mult, i) =>
+        actualDailyGen * (mult / weighted) * daysInMonth[i]
       );
 
       // Financial calculations

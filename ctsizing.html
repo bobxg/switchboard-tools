@@ -82,17 +82,17 @@
     <div class="calc-section">
       <h2>CT Accuracy Classes</h2>
       <table class="ref-table">
-        <thead><tr><th>Class</th><th>Accuracy at Rated</th><th>Accuracy at 10%</th><th>Application</th><th>Standard</th></tr></thead>
+        <thead><tr><th>Class</th><th>Ratio Error at 100&ndash;120% I<sub>n</sub></th><th>Ratio Error at 5% I<sub>n</sub></th><th>Application</th><th>Standard</th></tr></thead>
         <tbody>
-          <tr><td><strong>Class 0.2s</strong></td><td>&plusmn;0.2%</td><td>&plusmn;0.75%</td><td>Revenue metering (NMI) &mdash; high accuracy</td><td>AS 61869.2</td></tr>
-          <tr><td><strong>Class 0.5s</strong></td><td>&plusmn;0.5%</td><td>&plusmn;1.5%</td><td>Revenue metering (NMI) &mdash; standard</td><td>AS 61869.2</td></tr>
+          <tr><td><strong>Class 0.2S</strong></td><td>&plusmn;0.2%</td><td>&plusmn;0.35% (&plusmn;0.75% at 1%)</td><td>Revenue metering (NMI) &mdash; high accuracy</td><td>AS 61869.2</td></tr>
+          <tr><td><strong>Class 0.5S</strong></td><td>&plusmn;0.5%</td><td>&plusmn;0.75% (&plusmn;1.5% at 1%)</td><td>Revenue metering (NMI) &mdash; standard</td><td>AS 61869.2</td></tr>
           <tr><td><strong>Class 0.5</strong></td><td>&plusmn;0.5%</td><td>&plusmn;1.5%</td><td>Sub-metering / check meters</td><td>AS 61869.2</td></tr>
           <tr><td><strong>Class 1</strong></td><td>&plusmn;1.0%</td><td>&plusmn;3.0%</td><td>BMS monitoring, general metering</td><td>AS 61869.2</td></tr>
-          <tr><td><strong>Class 3</strong></td><td>&plusmn;3.0%</td><td>&mdash;</td><td>Indication only</td><td>AS 61869.2</td></tr>
+          <tr><td><strong>Class 3</strong></td><td>&plusmn;3.0% (50&ndash;120%)</td><td>&mdash;</td><td>Indication only</td><td>AS 61869.2</td></tr>
           <tr><td><strong>5P / 10P</strong></td><td>&plusmn;1% / &plusmn;3%</td><td>&mdash;</td><td>Protection CTs (5% / 10% composite error at ALF &times; In)</td><td>AS 61869.2</td></tr>
         </tbody>
       </table>
-      <div class="warn-box"><strong>NMI Revenue Metering (>100A supply):</strong> Must use <strong>Class 0.5s or better</strong> CTs that are NMI-approved (pattern approved). CT ratio must be selected so current at typical load is between 10% and 120% of CT primary rating. The distributor (e.g., Ausgrid, Citipower, Energex) will specify exact CT requirements.</div>
+      <div class="warn-box"><strong>NMI Revenue Metering (>100A supply):</strong> Must use <strong>Class 0.5s or better</strong> CTs that are NMI-approved (pattern approved). CT ratio should be selected so the current at typical load stays within the accuracy range (S classes are specified down to 1% of rated current, other classes down to 5%), and the maximum load does not exceed 120% of the CT primary rating. The distributor (e.g., Ausgrid, Citipower, Energex) will specify exact CT requirements.</div>
     </div>
   </div>
   <script>
@@ -112,6 +112,7 @@
       ], 'ct-sizing');
     }
     function calculate() {
+      if (typeof OmniValidate !== 'undefined' && !OmniValidate.requireAll()) return;
       const supplyA = parseFloat(document.getElementById('supplyA').value);
       const loadPct = parseFloat(document.getElementById('expectedLoad').value) / 100;
       const meteringType = document.getElementById('meteringType').value;

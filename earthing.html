@@ -228,6 +228,27 @@
       document.getElementById('numElectrodesGroup').style.display = (t === 'rod') ? '' : 'none';
     }
 
+    // Single vertical rod: R = ρ/(2πL)·[ln(8L/d) − 1]
+    function rodResistance(rho, L, d) {
+      return (rho / (2 * Math.PI * L)) * (Math.log(8 * L / d) - 1);
+    }
+    // n rods in a straight line at spacing s (BS 7430): Rn = R1·(1 + λα)/n, α = ρ/(2π·R1·s),
+    // λ = 2·(1/2 + 1/3 + … + 1/n), i.e. λ2 = 1.00, λ3 = 1.67, λ4 = 2.17, λ10 = 3.86
+    function rodsInLine(R1, rho, n, s) {
+      if (n <= 1) return R1;
+      let lambda = 0;
+      for (let k = 2; k <= n; k++) lambda += 2 / k;
+      const alpha = rho / (2 * Math.PI * R1 * s);
+      return R1 * (1 + lambda * alpha) / n;
+    }
+    // Smallest number of rods in line meeting the target (null if not reachable with 50 rods)
+    function rodsNeeded(R1, rho, s, target) {
+      for (let n = 1; n <= 50; n++) {
+        if (rodsInLine(R1, rho, n, s) <= target) return n;
+      }
+      return null;
+    }
+
     function calculate() {
       OmniValidate.clearErrors();
       const rho = OmniValidate.parseNum('soilRes', 100);
@@ -235,30 +256,25 @@
       if (rho <= 0) { OmniToast.show('Soil resistivity must be > 0', 'warn'); return; }
       const type = document.getElementById('electrodeType').value;
       let singleR = 0, combinedR = 0;
+      let rodCtx = null;
 
       if (type === 'rod') {
         const L = parseFloat(document.getElementById('rodLength').value);
         const d = parseFloat(document.getElementById('rodDia').value) / 1000;
-        const n = parseInt(document.getElementById('numElectrodes').value);
-        const s = parseFloat(document.getElementById('rodSpacing').value);
-
-        // R = (&#961; / 2&#960;L) &times; ln(4L/d)  &mdash; single vertical rod formula
-        singleR = (rho / (2 * Math.PI * L)) * Math.log(4 * L / d);
-
-        // Parallel rods with utilisation factor
-        if (n === 1) {
-          combinedR = singleR;
-        } else {
-          // Indicative parallel-rod utilisation factor including spacing interaction.
-          const eta = Math.min(1, 1 / (1 + (n - 1) * 0.5 * (L / s > 1 ? L / s * 0.3 : 0.15)));
-          combinedR = singleR / (n * eta);
-        }
+        const n = Math.max(1, parseInt(document.getElementById('numElectrodes').value) || 1);
+        const s = Math.max(0.1, parseFloat(document.getElementById('rodSpacing').value) || L);
+        // Single vertical rod (Dwight; AS/NZS 1768, BS 7430): R = ρ/(2πL) × [ln(8L/d) − 1]
+        singleR = rodResistance(rho, L, d);
+        combinedR = rodsInLine(singleR, rho, n, s);
+        rodCtx = { L, d, n, s };
       } else if (type === 'strip') {
         const L = parseFloat(document.getElementById('stripLength').value);
         const w = parseFloat(document.getElementById('stripWidth').value) / 1000;
-        const d = parseFloat(document.getElementById('stripDepth').value);
-        // R = (&#961; / &#960;L) &times; ln(2L&sup2; / (w&times;d))
-        singleR = (rho / (Math.PI * L)) * Math.log((2 * L * L) / (w * d));
+        const h = parseFloat(document.getElementById('stripDepth').value);
+        // Horizontal strip (Sunde/Dwight), equivalent radius a = w/4:
+        // R = ρ/(πL) × [ln(2L / √(2·a·h)) − 1]
+        const a = w / 4;
+        singleR = (rho / (Math.PI * L)) * (Math.log((2 * L) / Math.sqrt(2 * a * h)) - 1);
         combinedR = singleR;
       } else if (type === 'grid') {
         const gL = parseFloat(document.getElementById('gridL').value);
@@ -266,15 +282,16 @@
         const sp = parseFloat(document.getElementById('gridSpacing').value);
         const A = gL * gW;
         const totalConductor = (Math.floor(gW / sp) + 1) * gL + (Math.floor(gL / sp) + 1) * gW;
-        // Laurent-Niemann: R &#8776; &#961;/(4&#8730;A) + &#961;/L_total
-        singleR = rho / (4 * Math.sqrt(A)) + rho / totalConductor;
+        // Laurent-Niemann: R = ρ/(4r) + ρ/L_total, r = √(A/π) equivalent radius
+        const r = Math.sqrt(A / Math.PI);
+        singleR = rho / (4 * r) + rho / totalConductor;
         combinedR = singleR;
       } else if (type === 'plate') {
         const Ap = parseFloat(document.getElementById('plateArea').value);
         const dp = parseFloat(document.getElementById('plateDepth').value);
-        // R = &#961; / (4 &times; &#8730;(A/&#960;)) &mdash; circular plate approximation
+        // Buried plate (BS 7430): R = ρ/(8r) × [1 + r/(2.5h + r)], r = √(A/π)
         const eqR = Math.sqrt(Ap / Math.PI);
-        singleR = rho / (4 * eqR);
+        singleR = (rho / (8 * eqR)) * (1 + eqR / (2.5 * dp + eqR));
         combinedR = singleR;
       }
 
@@ -297,8 +314,11 @@
       } else {
         let advice = `<strong>&#10005; Result:</strong> Estimated earth resistance of <strong>${combinedR.toFixed(2)} &#937;</strong> exceeds target of <strong>${target.toFixed(1)} &#937;</strong>.<br><strong>Options:</strong><ul>`;
         if (type === 'rod') {
-          const neededN = Math.ceil(singleR / target * 1.3);
-          advice += `<li>Increase to approximately <strong>${neededN} rods</strong> (with spacing &#8805; rod length)</li>`;
+          const nReq = rodsNeeded(singleR, rho, rodCtx.s, target);
+          const nReq2L = rodsNeeded(singleR, rho, Math.max(rodCtx.s, 2 * rodCtx.L), target);
+          advice += nReq
+            ? `<li>Use <strong>${nReq} rods</strong> in line at ${rodCtx.s} m spacing${nReq2L && nReq2L < nReq ? `, or <strong>${nReq2L} rods</strong> at ${Math.max(rodCtx.s, 2 * rodCtx.L).toFixed(1)} m (2&times; rod length)` : ''}</li>`
+            : `<li>Target not reachable with up to 50 rods at ${rodCtx.s} m spacing &mdash; mutual interference dominates; widen spacing or combine with a grid</li>`;
           advice += `<li>Use longer rods (3.0&ndash;6.0 m) to reach lower-resistivity layers</li>`;
         }
         advice += `<li>Augment with horizontal strip/ring earth</li>`;
@@ -306,6 +326,18 @@
         advice += `<li>Combine rod + grid configuration</li></ul>`;
         rec.innerHTML = advice;
         rec.className = 'warn-box';
+      }
+
+      if (rodCtx) {
+        const nReq = rodsNeeded(singleR, rho, rodCtx.s, target);
+        let rows = '';
+        [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20].forEach(n => {
+          const r = rodsInLine(singleR, rho, n, rodCtx.s);
+          rows += `<tr${n === nReq ? ' style="background:var(--bg-info);font-weight:bold;"' : ''}><td>${n}</td><td>${r.toFixed(2)}</td><td>${(singleR / (n * r)).toFixed(2)}</td><td>${r <= target ? '&#10003;' : '&#10005;'}</td></tr>`;
+        });
+        rec.innerHTML += `<h4 style="margin-top:14px;">Rod Count Solver &mdash; ${rodCtx.L} m rods in line at ${rodCtx.s} m</h4>
+          <p>${nReq ? `Minimum rods to reach ${target} &#937;: <strong>${nReq}</strong>.` : `Target ${target} &#937; is not reachable with up to 50 rods at this spacing.`}</p>
+          <table class="ref-table"><thead><tr><th>Rods</th><th>R (&#937;)</th><th>Utilisation &eta;</th><th>Meets target</th></tr></thead><tbody>${rows}</tbody></table>`;
       }
 
       document.getElementById('resultSection').style.display = 'block';

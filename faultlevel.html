@@ -92,6 +92,15 @@
           <input type="number" id="netXR" value="10" min="1" max="50" step="1" />
           <span class="input-hint">Typical: 10&ndash;15. Use 10 if unknown.</span>
         </div>
+        <div class="input-group">
+          <label for="cFactor">Voltage Factor c<sub>max</sub> (IEC 60909)</label>
+          <select id="cFactor">
+            <option value="1.10" selected>1.10 &mdash; LV, +10% tolerance (AS 60038)</option>
+            <option value="1.05">1.05 &mdash; LV, +6% tolerance</option>
+            <option value="1.00">1.00 &mdash; no voltage factor</option>
+          </select>
+          <span class="input-hint">c<sub>min</sub> = 0.95 is used for the minimum earth-fault current.</span>
+        </div>
       </div>
 
       <div class="btn-row">
@@ -175,7 +184,8 @@
               <th>Z<sub>cum</sub> (m&Omega;)</th>
               <th>I<sub>sc</sub> 3&phi; sym (kA rms)</th>
               <th>I<sub>p</sub> 3&phi; peak (kA)</th>
-              <th>I<sub>sc</sub> 1&phi;-E (kA)</th>
+              <th>I<sub>sc</sub> 1&phi;-E max (kA)</th>
+              <th>I<sub>sc</sub> 1&phi;-E min (kA)</th>
               <th>Device Rating</th>
               <th>Status</th>
             </tr>
@@ -190,7 +200,8 @@
           <li>1&phi;-E fault: I<sub>sc</sub> = V<sub>LN</sub>&nbsp;/&nbsp;Z<sub>loop</sub>, where Z<sub>loop</sub> = source&nbsp;+ phase conductor&nbsp;+ CPC/earth conductor (one-way each). Assumes TN earthing system.</li>
           <li>Peak factor &kappa; = 1.02 + 0.98 &times; e<sup>&minus;3R/X</sup> per IEC&nbsp;60909. Computed from cumulative R/X at each node.</li>
           <li>Device Status checks I<sub>sc</sub> 3&phi; sym against the specified kA breaking rating.</li>
-          <li>Results are indicative. Motor infeed, arc-flash, and IEC&nbsp;60909 voltage-factor c adjustments require specialist software.</li>
+          <li>Maximum currents use c<sub>max</sub>, the IEC&nbsp;60909 transformer correction K<sub>T</sub> = 0.95&middot;c<sub>max</sub>/(1 + 0.6&middot;x<sub>T</sub>) and conductors at 20&deg;C. The minimum earth-fault current uses c<sub>min</sub> = 0.95 and conductors at 75&deg;C &mdash; use it to check protective-device operation (disconnection time).</li>
+          <li>Results are indicative. Motor infeed and arc-flash require specialist software.</li>
         </ul>
       </div>
     </div>
@@ -201,33 +212,36 @@
     // { 'size_mm2': [R_Cu_XLPE (mΩ/m at 75°C), X (mΩ/m)] }
     // Source: AS/NZS 3008.1.1. Al resistance = Cu × 1.64 (conductivity ratio at 75°C for cable-grade alloy).
     const CABLE = {
-      '1.5':  [14.60, 0.110],
-      '2.5':  [ 8.76, 0.107],
-      '4':    [ 5.48, 0.100],
-      '6':    [ 3.65, 0.096],
-      '10':   [ 2.19, 0.090],
-      '16':   [ 1.37, 0.086],
-      '25':   [ 0.876,0.083],
-      '35':   [ 0.626,0.081],
-      '50':   [ 0.438,0.079],
-      '70':   [ 0.313,0.076],
-      '95':   [ 0.230,0.074],
-      '120':  [ 0.183,0.073],
-      '150':  [ 0.146,0.072],
-      '185':  [ 0.122,0.071],
-      '240':  [ 0.0913,0.070],
-      '300':  [ 0.0762,0.069],
-      '400':  [ 0.0602,0.068],
-      '500':  [ 0.0482,0.067],
-      '630':  [ 0.0387,0.066]
+      // [R20 Cu (mΩ/m, IEC 60228 class 2), X (mΩ/m, typical multicore/trefoil)]
+      '1.5':  [12.1,   0.110],
+      '2.5':  [ 7.41,  0.107],
+      '4':    [ 4.61,  0.100],
+      '6':    [ 3.08,  0.096],
+      '10':   [ 1.83,  0.090],
+      '16':   [ 1.15,  0.086],
+      '25':   [ 0.727, 0.083],
+      '35':   [ 0.524, 0.081],
+      '50':   [ 0.387, 0.079],
+      '70':   [ 0.268, 0.076],
+      '95':   [ 0.193, 0.074],
+      '120':  [ 0.153, 0.073],
+      '150':  [ 0.124, 0.072],
+      '185':  [ 0.0991,0.071],
+      '240':  [ 0.0754,0.070],
+      '300':  [ 0.0601,0.069],
+      '400':  [ 0.0470,0.068],
+      '500':  [ 0.0366,0.067],
+      '630':  [ 0.0283,0.066]
     };
     const SIZES = Object.keys(CABLE);
-    const AL_FACTOR = 1.64;
+    const AL_FACTOR = 1.64; // ρAl / ρCu
 
-    // Returns [R (mΩ/m), X (mΩ/m)] adjusted for conductor material
-    function cableRX(size, material) {
+    const HOT_FACTOR = 1 + 0.00393 * (75 - 20); // R75 / R20
+    // Returns [R (mΩ/m), X (mΩ/m)] for the conductor material; hot = true gives R at 75°C, else 20°C
+    function cableRX(size, material, hot) {
       const base = CABLE[size] || [0.1, 0.1];
-      const r = (material === 'al_xlpe' || material === 'al_pvc') ? base[0] * AL_FACTOR : base[0];
+      let r = (material === 'al_xlpe' || material === 'al_pvc') ? base[0] * AL_FACTOR : base[0];
+      if (hot) r *= HOT_FACTOR;
       return [r, base[1]];
     }
 
@@ -312,6 +326,8 @@
       const vLL   = parseFloat(document.getElementById('supplyVoltage').value);
       const upMVA = parseFloat(document.getElementById('upstreamMVA').value);
       const netXR = parseFloat(document.getElementById('netXR').value);
+      const cMax  = parseFloat(document.getElementById('cFactor').value) || 1.0;
+      const cMin  = 0.95;
 
       if (!kVA || kVA <= 0 || !zPct || !vLL || !upMVA) {
         OmniToast.show('Check supply inputs — all fields are required.', 'warn');
@@ -322,11 +338,14 @@
 
       // Transformer impedance (Ω):  Z = (%Z/100) × V_LL² / S_VA
       const Z_tx = (zPct / 100) * (vLL * vLL) / (kVA * 1000);
-      const R_tx = Z_tx / Math.sqrt(1 + txXR * txXR);
+      // IEC 60909-0 transformer correction factor K_T = 0.95·c_max / (1 + 0.6·x_T)
+      const xT = (zPct / 100) * txXR / Math.sqrt(1 + txXR * txXR);
+      const K_T = cMax > 1 ? 0.95 * cMax / (1 + 0.6 * xT) : 1;
+      const R_tx = K_T * Z_tx / Math.sqrt(1 + txXR * txXR);
       const X_tx = txXR * R_tx;
 
-      // Upstream HV network impedance referred to LV (Ω):  Z = V_LL² / S_sc_VA
-      const Z_net = (vLL * vLL) / (upMVA * 1e6);
+      // Upstream HV network impedance referred to LV (Ω):  Z = c·V_LL² / S_sc_VA
+      const Z_net = cMax * (vLL * vLL) / (upMVA * 1e6);
       const R_net = Z_net / Math.sqrt(1 + netXR * netXR);
       const X_net = netXR * R_net;
 
@@ -335,8 +354,8 @@
       const X_src = X_tx + X_net;
       const Z_src = Math.sqrt(R_src * R_src + X_src * X_src);
 
-      // 3-phase symmetrical fault (A rms):  I = V_LL / (√3 × Z_src)
-      const I3ph_msb = vLL / (Math.sqrt(3) * Z_src);
+      // 3-phase symmetrical fault (A rms):  I = c·V_LL / (√3 × Z_src)
+      const I3ph_msb = cMax * vLL / (Math.sqrt(3) * Z_src);
 
       // Peak factor κ (IEC 60909 eq. 29)
       const kappa_msb = kappaFactor(R_src, X_src);
@@ -358,7 +377,7 @@
       // cumNode[label] = { R3, X3 } — 3-phase path (phase conductor only, one-way)
       //                  { R1, X1 } — earth-fault loop (phase + CPC, one-way each)
       const cumNode = {
-        MSB: { R3: R_src, X3: X_src, R1: R_src, X1: X_src }
+        MSB: { R3: R_src, X3: X_src, R1: R_src, X1: X_src, R1h: R_src, X1h: X_src }
       };
 
       const summaryBody = document.getElementById('summaryBody');
@@ -374,7 +393,8 @@
         <td>${fmt2(Z_src * 1000)}</td>
         <td>${fmt3(I3ph_msb / 1000)}</td>
         <td>${fmt3(Ipeak_msb / 1000)}</td>
-        <td>&mdash;</td>
+        <td>${fmt3(cMax * vLN / Z_src / 1000)}</td>
+        <td>${fmt3(cMin * vLN / Z_src / 1000)}</td>
         <td>&mdash;</td>
         <td>&mdash;</td>
       `;
@@ -400,14 +420,14 @@
           const earthSel = row.querySelector('.earth-size').value;
           const devKA    = parseFloat(row.querySelector('.device-ka').value) || 0;
 
-          // Phase conductor (Ω, one-way, per-phase divided by parallel runs)
-          const [r_ph, x_ph] = cableRX(phSize, material);
+          // Phase conductor (Ω, one-way, per-phase divided by parallel runs) — 20°C for maximum currents
+          const [r_ph, x_ph] = cableRX(phSize, material, false);
           const R_ph = (r_ph / 1000) * length / parallel;
           const X_ph = (x_ph / 1000) * length / parallel;
 
           // CPC/Earth conductor (Ω, one-way, single run — CPCs are not paralleled)
           const eSize      = earthSel === 'same' ? phSize : earthSel;
-          const [r_e, x_e] = cableRX(eSize, material);
+          const [r_e, x_e] = cableRX(eSize, material, false);
           const R_cpc = (r_e / 1000) * length;
           const X_cpc = (x_e / 1000) * length;
 
@@ -418,18 +438,22 @@
           const X3 = parent.X3 + X_ph;
           const Z3 = Math.sqrt(R3 * R3 + X3 * X3);
 
-          // Earth-fault loop cumulative (phase + CPC)
+          // Earth-fault loop cumulative (phase + CPC): cold for maximum, 75°C for minimum
           const R1 = parent.R1 + R_ph + R_cpc;
           const X1 = parent.X1 + X_ph + X_cpc;
           const Z1 = Math.sqrt(R1 * R1 + X1 * X1);
+          const R1h = parent.R1h + (R_ph + R_cpc) * HOT_FACTOR;
+          const X1h = parent.X1h + X_ph + X_cpc;
+          const Z1h = Math.sqrt(R1h * R1h + X1h * X1h);
 
           // Fault currents
-          const I3ph    = vLL / (Math.sqrt(3) * Z3);         // A sym rms
+          const I3ph    = cMax * vLL / (Math.sqrt(3) * Z3);  // A sym rms (maximum)
           const kappa3  = kappaFactor(R3, X3);
           const Ipeak3  = kappa3 * Math.sqrt(2) * I3ph;      // A peak
-          const I1ph    = vLN / Z1;                           // A earth fault
+          const I1ph    = cMax * vLN / Z1;                   // A earth fault, maximum
+          const I1min   = cMin * vLN / Z1h;                  // A earth fault, minimum
 
-          cumNode[label] = { R3, X3, R1, X1 };
+          cumNode[label] = { R3, X3, R1, X1, R1h, X1h };
 
           // Device status
           const I3phKA = I3ph / 1000;
@@ -449,6 +473,7 @@
             <td><strong>${fmt3(I3ph / 1000)}</strong></td>
             <td><strong>${fmt3(Ipeak3 / 1000)}</strong></td>
             <td>${fmt3(I1ph / 1000)}</td>
+            <td>${fmt3(I1min / 1000)}</td>
             <td>${devKA > 0 ? devKA + '&nbsp;kA' : '&mdash;'}</td>
             <td>${statusHtml}</td>
           `;
@@ -486,7 +511,7 @@
         return;
       }
       const hdr = ['Node', 'R_cum (mΩ)', 'X_cum (mΩ)', 'Z_cum (mΩ)',
-                   'Isc 3ph sym (kA rms)', 'Ip 3ph peak (kA)', 'Isc 1ph-E (kA)',
+                   'Isc 3ph sym (kA rms)', 'Ip 3ph peak (kA)', 'Isc 1ph-E max (kA)', 'Isc 1ph-E min (kA)',
                    'Device Rating (kA)', 'Status'];
       const rows = [['TX Secondary / MSB',
         document.getElementById('resSrcR').textContent,
@@ -494,7 +519,7 @@
         document.getElementById('resSrcZ').textContent,
         document.getElementById('resI3ph').textContent,
         document.getElementById('resIpeak').textContent,
-        '—', '—', '—']];
+        '—', '—', '—', '—']];
       document.querySelectorAll('#summaryTable tbody tr').forEach(tr => {
         if (tr.classList.contains('msb-highlight')) return;
         const cells = [...tr.querySelectorAll('td')].map(td => td.textContent.trim());

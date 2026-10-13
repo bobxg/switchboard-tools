@@ -26,6 +26,15 @@ Load Schedule, Cable Schedule, Design Certificate, T&C Checklists (AS/NZS 3000 S
 - **AS/NZS 3000 Viewer** (`as3000viewer.html`) — Wiring Rules with clause-level deep links (`as3000viewer.html#cl-2.6.3`)
 - **NSW IR Viewer** (`nswirviewer.html`) — NSW Service & Installation Rules
 
+## Calculation Notes
+
+- Cable sizing: parallel runs, power-factor/reactance voltage drop with an upstream drop budget (AS/NZS 3000 cl. 3.6.2), adiabatic short-circuit check. Tabulated ratings are indicative (IEC 60364-5-52 reference methods) — confirm against AS/NZS 3008.1.1.
+- Loop impedance uses AS/NZS 3000 Table 8.1 directly and suggests the smallest compliant earth conductor.
+- Fault level applies the IEC 60909 voltage factor and transformer correction, and reports the minimum earth-fault current.
+- Diversity uses the real AS/NZS 3000 Table C1 column formulas and the Table C4 switchboard-diversity method.
+- Busbar sizing includes electrodynamic force / support-span and loss / voltage-drop checks; generator sizing uses an X'd voltage-dip criterion; UPS sizing handles module counts and output pf; harmonics reports K-factor and transformer THD-V; PV sizing includes string-length checks; earthing includes a rod-count solver; the load schedule balances single-phase circuits across phases; the cable schedule calculates voltage drop per row (Table C8).
+- `tests/` holds headless-browser checks (`node tests/calcs.js`) — run them after changing any calculation.
+
 ## Architecture
 
 - `omni-utils.js` — shared module: centralised navigation (`OmniNav.structure` — add new pages there), SVG icon set, dark mode, breadcrumb header band with per-tool favourites, site footer, favicon injection, back-to-top, localStorage save/load, toasts, validation, CSV export, keyboard shortcuts (Ctrl+K Quick Calc, Ctrl+S save, Ctrl+Enter calculate, Ctrl+P print)

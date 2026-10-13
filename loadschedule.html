@@ -50,6 +50,7 @@
       <button class="calc-button sm" onclick="addMultipleRows(5)">+ Add 5 Rows</button>
       <button class="calc-button sm red" onclick="deleteLastRow()">- Delete Last</button>
       <button class="calc-button sm" onclick="recalcAll()">Recalculate All</button>
+      <button class="calc-button sm green" onclick="balancePhases()">Auto-Balance Phases</button>
       <button class="btn-export" onclick="exportCSV()">Export CSV</button>
       <button class="calc-button sm" onclick="window.print()">Print</button>
       <button class="calc-button sm red" onclick="clearAll()">Clear All</button>
@@ -68,7 +69,7 @@
             <th>Total VA</th>
             <th>Diversity (%)</th>
             <th>Demand (VA)</th>
-            <th>Current (A)</th>
+            <th>Current (A/phase)</th>
             <th>Category</th>
             <th>Essential</th>
           </tr>
@@ -90,12 +91,19 @@
     <div class="summary-grid" id="summaryGrid">
       <div class="summary-item"><div class="value" id="sumConnected">0</div><div class="label">Total Connected (kVA)</div></div>
       <div class="summary-item"><div class="value" id="sumDemand">0</div><div class="label">Total Demand (kVA)</div></div>
-      <div class="summary-item"><div class="value" id="sumCurrent">0</div><div class="label">Total Current (A)</div></div>
+      <div class="summary-item"><div class="value" id="sumCurrent">0</div><div class="label">Max Phase Current (A)</div></div>
       <div class="summary-item"><div class="value" id="sumDiversity">0%</div><div class="label">Overall Diversity</div></div>
     </div>
+    <div class="summary-grid" id="phaseGrid">
+      <div class="summary-item"><div class="value" id="sumL1">0</div><div class="label">L1 Current (A)</div></div>
+      <div class="summary-item"><div class="value" id="sumL2">0</div><div class="label">L2 Current (A)</div></div>
+      <div class="summary-item"><div class="value" id="sumL3">0</div><div class="label">L3 Current (A)</div></div>
+      <div class="summary-item"><div class="value" id="sumImb">0%</div><div class="label">Phase Imbalance</div></div>
+    </div>
+    <div id="balanceNote"></div>
 
     <div class="info-box" style="margin-top:24px;">
-      <strong>Diversity Factor Guide (AS/NZS 3000 Appendix C):</strong><br>
+      <strong>Typical Diversity Allowances (engineering judgement &mdash; not AS/NZS 3000 values; use Appendix C / the Maximum Demand tool for compliance):</strong><br>
       <strong>Lighting:</strong> 90-100% &mdash; continuous loads, minimal diversity<br>
       <strong>Socket Outlets (GPO):</strong> 50-80% &mdash; depends on quantity and usage<br>
       <strong>HVAC:</strong> 80-100% &mdash; high utilisation plant<br>
@@ -110,126 +118,179 @@
     </div>
   </div>
   <script>
-    let rowCount = 0;
-    const phaseOptions = ['1P', '3P'];
-    const categoryOptions = ['Lighting', 'GPO', 'Small Power', 'HVAC', 'Mechanical', 'Lifts', 'Fire Systems', 'IT / Comms', 'EV Charging', 'Spare', 'Other'];
+let rowCount = 0;
+// '1P' = single-phase, phase not yet assigned (auto-balanced); L1/L2/L3 = fixed phase
+const phaseOptions = ['3P', '1P', 'L1', 'L2', 'L3'];
+const categoryOptions = ['Lighting', 'GPO', 'Small Power', 'HVAC', 'Mechanical', 'Lifts', 'Fire Systems', 'IT / Comms', 'EV Charging', 'Spare', 'Other'];
 
-    function addRow(data) {
-      rowCount++;
-      const d = data || {};
-      const tr = document.createElement('tr');
-      const phSel = phaseOptions.map(o => `<option${o===(d.phase||'3P')?' selected':''}>${o}</option>`).join('');
-      const catSel = categoryOptions.map(o => `<option${o===(d.category||'Lighting')?' selected':''}>${o}</option>`).join('');
-      tr.innerHTML = `
-        <td style="text-align:center;font-weight:bold;color:var(--text-secondary);">${rowCount}</td>
-        <td><input type="text" value="${d.id || ''}" placeholder="C${rowCount}" onchange="recalcAll()" /></td>
-        <td><input type="text" value="${d.desc || ''}" placeholder="Description" /></td>
-        <td><select onchange="recalcAll()">${phSel}</select></td>
-        <td><input type="number" value="${d.va || ''}" placeholder="0" onchange="recalcAll()" /></td>
-        <td><input type="number" value="${d.qty || 1}" min="1" style="width:40px;" onchange="recalcAll()" /></td>
-        <td class="calc-cell">0</td>
-        <td><input type="number" value="${d.div || 100}" min="0" max="100" style="width:50px;" onchange="recalcAll()" /> </td>
-        <td class="calc-cell">0</td>
-        <td class="calc-cell">0</td>
-        <td><select>${catSel}</select></td>
-        <td style="text-align:center;"><input type="checkbox" ${d.essential ? 'checked' : ''} /></td>`;
-      document.getElementById('scheduleBody').appendChild(tr);
-      recalcAll();
+function numOr(v, dflt) { const x = parseFloat(v); return Number.isFinite(x) ? x : dflt; }
+
+function addRow(data) {
+  rowCount++;
+  const d = data || {};
+  const tr = document.createElement('tr');
+  const phSel = phaseOptions.map(o => `<option${o===(d.phase||'3P')?' selected':''}>${o}</option>`).join('');
+  const catSel = categoryOptions.map(o => `<option${o===(d.category||'Lighting')?' selected':''}>${o}</option>`).join('');
+  tr.innerHTML = `
+    <td style="text-align:center;font-weight:bold;color:var(--text-secondary);">${rowCount}</td>
+    <td><input type="text" value="${d.id || ''}" placeholder="C${rowCount}" onchange="recalcAll()" /></td>
+    <td><input type="text" value="${d.desc || ''}" placeholder="Description" /></td>
+    <td><select onchange="recalcAll()">${phSel}</select></td>
+    <td><input type="number" value="${d.va || ''}" placeholder="0" onchange="recalcAll()" /></td>
+    <td><input type="number" value="${d.qty || 1}" min="1" style="width:40px;" onchange="recalcAll()" /></td>
+    <td class="calc-cell">0</td>
+    <td><input type="number" value="${d.div !== undefined ? d.div : 100}" min="0" max="100" style="width:50px;" onchange="recalcAll()" /> </td>
+    <td class="calc-cell">0</td>
+    <td class="calc-cell">0</td>
+    <td><select>${catSel}</select></td>
+    <td style="text-align:center;"><input type="checkbox" ${d.essential ? 'checked' : ''} /></td>`;
+  document.getElementById('scheduleBody').appendChild(tr);
+  recalcAll();
+}
+
+function addMultipleRows(n) { for (let i = 0; i < n; i++) addRow(); }
+
+function deleteLastRow() {
+  const body = document.getElementById('scheduleBody');
+  if (body.lastChild) { body.removeChild(body.lastChild); rowCount--; recalcAll(); }
+}
+
+function clearAll() {
+  if (confirm('Clear all circuit entries?')) {
+    document.getElementById('scheduleBody').innerHTML = '';
+    rowCount = 0;
+    recalcAll();
+  }
+}
+
+// Row controls in DOM order: 0 ID, 1 description, 2 phase, 3 VA, 4 qty, 5 diversity, 6 category, 7 essential
+function readRow(row) {
+  const inputs = row.querySelectorAll('input, select');
+  const phase = inputs[2].value;
+  const vaPerUnit = Math.max(0, numOr(inputs[3].value, 0));
+  const qty = Math.max(0, numOr(inputs[4].value, 1));
+  const diversity = Math.min(100, Math.max(0, numOr(inputs[5].value, 100)));
+  const connectedVA = vaPerUnit * qty;
+  const demandVA = connectedVA * (diversity / 100);
+  return { inputs, phase, connectedVA, demandVA };
+}
+
+function recalcAll() {
+  const rows = document.querySelectorAll('#scheduleBody tr');
+  const singlePhaseSupply = parseFloat(document.getElementById('supplyVoltage').value) === 230;
+  let totalVA = 0, totalDemand = 0;
+  const ph = { L1: 0, L2: 0, L3: 0 };
+  let unassigned = 0;
+  rows.forEach(row => {
+    const r = readRow(row);
+    let current;
+    if (r.phase === '3P' && !singlePhaseSupply) {
+      current = r.demandVA / (400 * Math.sqrt(3));   // per phase
+      ph.L1 += current; ph.L2 += current; ph.L3 += current;
+    } else {
+      current = r.demandVA / 230;
+      if (singlePhaseSupply) ph.L1 += current;
+      else if (ph[r.phase] !== undefined) ph[r.phase] += current;
+      else unassigned += current;                       // '1P' awaiting allocation
     }
+    const calcCells = row.querySelectorAll('.calc-cell');
+    calcCells[0].textContent = Math.round(r.connectedVA).toLocaleString();
+    calcCells[1].textContent = Math.round(r.demandVA).toLocaleString();
+    calcCells[2].textContent = current.toFixed(1);
+    totalVA += r.connectedVA;
+    totalDemand += r.demandVA;
+  });
+  // Unassigned single-phase load is shown spread evenly for the totals until balanced
+  const share = singlePhaseSupply ? 0 : unassigned / 3;
+  const L = singlePhaseSupply ? [ph.L1 + unassigned, 0, 0] : [ph.L1 + share, ph.L2 + share, ph.L3 + share];
+  const maxI = Math.max(...L);
+  const live = singlePhaseSupply ? [L[0]] : L;
+  const avg = live.reduce((a, b) => a + b, 0) / live.length;
+  const imb = avg > 0 ? Math.max(...live.map(x => Math.abs(x - avg))) / avg * 100 : 0;
 
-    function addMultipleRows(n) { for (let i = 0; i < n; i++) addRow(); }
+  document.getElementById('totalVA').textContent = Math.round(totalVA).toLocaleString();
+  document.getElementById('totalDemand').textContent = Math.round(totalDemand).toLocaleString();
+  document.getElementById('totalCurrent').textContent = maxI.toFixed(1);
+  document.getElementById('sumConnected').textContent = (totalVA / 1000).toFixed(1);
+  document.getElementById('sumDemand').textContent = (totalDemand / 1000).toFixed(1);
+  document.getElementById('sumCurrent').textContent = maxI.toFixed(1);
+  document.getElementById('sumDiversity').textContent = totalVA > 0 ? Math.round((totalDemand / totalVA) * 100) + '%' : '0%';
+  document.getElementById('sumL1').textContent = L[0].toFixed(1);
+  document.getElementById('sumL2').textContent = L[1].toFixed(1);
+  document.getElementById('sumL3').textContent = L[2].toFixed(1);
+  document.getElementById('sumImb').textContent = singlePhaseSupply ? 'n/a' : imb.toFixed(1) + '%';
+  const note = document.getElementById('balanceNote');
+  if (note) {
+    let html = '';
+    if (unassigned > 0 && !singlePhaseSupply) html += `<div class="info-box">${unassigned.toFixed(1)} A of single-phase load ('1P') has no phase assigned and is shown spread evenly &mdash; click <strong>Auto-Balance Phases</strong> to allocate it.</div>`;
+    if (!singlePhaseSupply && imb > 10) html += `<div class="warn-box">Phase imbalance ${imb.toFixed(1)}% (maximum deviation from the average phase current). Re-allocate single-phase circuits &mdash; many distributors limit imbalance at the point of supply.</div>`;
+    note.innerHTML = html;
+  }
+}
 
-    function deleteLastRow() {
-      const body = document.getElementById('scheduleBody');
-      if (body.lastChild) { body.removeChild(body.lastChild); rowCount--; recalcAll(); }
-    }
+// Greedy balancing: largest '1P' loads first, each to the currently lightest phase.
+// Fixed L1/L2/L3 circuits are respected; only '1P' (unassigned) circuits are moved.
+function balancePhases() {
+  if (parseFloat(document.getElementById('supplyVoltage').value) === 230) { OmniToast.show('Single-phase supply — nothing to balance', 'warn'); return; }
+  const rows = [...document.querySelectorAll('#scheduleBody tr')];
+  const ph = { L1: 0, L2: 0, L3: 0 };
+  const free = [];
+  rows.forEach(row => {
+    const r = readRow(row);
+    if (r.phase === '3P') { const i = r.demandVA / (400 * Math.sqrt(3)); ph.L1 += i; ph.L2 += i; ph.L3 += i; }
+    else if (r.phase === '1P') free.push({ row, i: r.demandVA / 230 });
+    else ph[r.phase] += r.demandVA / 230;
+  });
+  if (!free.length) { OmniToast.show("No unassigned '1P' circuits — set circuits to 1P to let the tool allocate them", 'warn'); return; }
+  free.sort((a, b) => b.i - a.i).forEach(f => {
+    const target = Object.keys(ph).reduce((a, b) => ph[a] <= ph[b] ? a : b);
+    ph[target] += f.i;
+    f.row.querySelectorAll('select')[0].value = target;
+  });
+  recalcAll();
+  OmniToast.show(free.length + ' single-phase circuit(s) allocated', 'success');
+}
 
-    function clearAll() {
-      if (confirm('Clear all circuit entries?')) {
-        document.getElementById('scheduleBody').innerHTML = '';
-        rowCount = 0;
-        recalcAll();
-      }
-    }
+function exportCSV() {
+  const board = document.getElementById('boardName').value;
+  const headers = ['#', 'Circuit ID', 'Description', 'Phase', 'VA per Unit', 'Qty', 'Total VA', 'Diversity %', 'Demand VA', 'Current A/phase', 'Category', 'Essential'];
+  const rows = document.querySelectorAll('#scheduleBody tr');
+  const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+  let csv = 'Board: ' + q(board) + '\n' + headers.join(',') + '\n';
+  rows.forEach((row, i) => {
+    const cells = row.querySelectorAll('input, select');
+    const calcCells = row.querySelectorAll('.calc-cell');
+    csv += [
+      i + 1,
+      q(cells[0].value || ''),
+      q(cells[1].value || ''),
+      cells[2].value,
+      cells[3].value || 0,
+      cells[4].value || 1,
+      q(calcCells[0].textContent),
+      cells[5].value === '' ? 100 : cells[5].value,
+      q(calcCells[1].textContent),
+      calcCells[2].textContent,
+      cells[6].value,
+      cells[7].checked ? 'Yes' : 'No'
+    ].join(',') + '\n';
+  });
+  csv += `\nPhase currents (A),L1,${document.getElementById('sumL1').textContent},L2,${document.getElementById('sumL2').textContent},L3,${document.getElementById('sumL3').textContent},Imbalance,${document.getElementById('sumImb').textContent}\n`;
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = board.replace(/\s+/g, '_') + '_load_schedule.csv';
+  a.click();
+}
 
-    function recalcAll() {
-      const rows = document.querySelectorAll('#scheduleBody tr');
-      const voltage = parseFloat(document.getElementById('supplyVoltage').value);
-      let totalVA = 0, totalDemand = 0, totalCurrent = 0;
+document.getElementById('supplyVoltage').addEventListener('change', recalcAll);
 
-      rows.forEach(row => {
-        const inputs = row.querySelectorAll('input, select');
-        const phase = inputs[2].value; // phase select
-        const vaPerUnit = parseFloat(inputs[3].value) || 0;
-        const qty = parseFloat(inputs[4].value) || 1;
-        const diversity = parseFloat(inputs[6].value) || 100;
-
-        const connectedVA = vaPerUnit * qty;
-        const demandVA = connectedVA * (diversity / 100);
-        let current;
-        if (phase === '3P') {
-          current = demandVA / (voltage * Math.sqrt(3));
-          if (voltage === 230) current = demandVA / (400 * Math.sqrt(3)); // assume 400V for 3P
-        } else {
-          current = demandVA / 230; // single phase always 230V
-        }
-
-        const calcCells = row.querySelectorAll('.calc-cell');
-        calcCells[0].textContent = Math.round(connectedVA).toLocaleString();
-        calcCells[1].textContent = Math.round(demandVA).toLocaleString();
-        calcCells[2].textContent = current.toFixed(1);
-
-        totalVA += connectedVA;
-        totalDemand += demandVA;
-        totalCurrent += current;
-      });
-
-      document.getElementById('totalVA').textContent = Math.round(totalVA).toLocaleString();
-      document.getElementById('totalDemand').textContent = Math.round(totalDemand).toLocaleString();
-      document.getElementById('totalCurrent').textContent = totalCurrent.toFixed(1);
-
-      document.getElementById('sumConnected').textContent = (totalVA / 1000).toFixed(1);
-      document.getElementById('sumDemand').textContent = (totalDemand / 1000).toFixed(1);
-      document.getElementById('sumCurrent').textContent = totalCurrent.toFixed(1);
-      document.getElementById('sumDiversity').textContent = totalVA > 0 ? Math.round((totalDemand / totalVA) * 100) + '%' : '0%';
-    }
-
-    function exportCSV() {
-      const board = document.getElementById('boardName').value;
-      const headers = ['#', 'Circuit ID', 'Description', 'Phase', 'VA per Unit', 'Qty', 'Total VA', 'Diversity %', 'Demand VA', 'Current A', 'Category', 'Essential'];
-      const rows = document.querySelectorAll('#scheduleBody tr');
-      let csv = `Board: ${board}\n` + headers.join(',') + '\n';
-      rows.forEach((row, i) => {
-        const cells = row.querySelectorAll('input, select');
-        const calcCells = row.querySelectorAll('.calc-cell');
-        csv += [
-          i + 1,
-          '"' + (cells[0].value || '') + '"',
-          '"' + (cells[1].value || '') + '"',
-          cells[2].value,
-          cells[3].value || 0,
-          cells[4].value || 1,
-          calcCells[0].textContent,
-          cells[6].value || 100,
-          calcCells[1].textContent,
-          calcCells[2].textContent,
-          cells[7] ? cells[7].value : '',
-          cells[8] && cells[8].checked ? 'Yes' : 'No'
-        ].join(',') + '\n';
-      });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = board.replace(/\s+/g, '_') + '_load_schedule.csv';
-      a.click();
-    }
-
-    // Start with sample rows
-    addRow({ id: 'C01', desc: 'Level 1 Lighting', phase: '3P', va: 5000, qty: 1, div: 90, category: 'Lighting' });
-    addRow({ id: 'C02', desc: 'Level 1 GPOs', phase: '1P', va: 2300, qty: 10, div: 50, category: 'GPO' });
-    addRow({ id: 'C03', desc: 'AHU-01', phase: '3P', va: 15000, qty: 1, div: 100, category: 'HVAC' });
-    addRow({ id: 'C04', desc: 'Lift Motor', phase: '3P', va: 22000, qty: 1, div: 70, category: 'Lifts' });
-    addRow({ id: 'C05', desc: 'Fire Panel', phase: '1P', va: 500, qty: 1, div: 100, category: 'Fire Systems', essential: true });
+// Start with sample rows
+addRow({ id: 'C01', desc: 'Level 1 Lighting', phase: '3P', va: 5000, qty: 1, div: 90, category: 'Lighting' });
+addRow({ id: 'C02', desc: 'Level 1 GPOs', phase: '1P', va: 2300, qty: 10, div: 50, category: 'GPO' });
+addRow({ id: 'C03', desc: 'AHU-01', phase: '3P', va: 15000, qty: 1, div: 100, category: 'HVAC' });
+addRow({ id: 'C04', desc: 'Lift Motor', phase: '3P', va: 22000, qty: 1, div: 70, category: 'Lifts' });
+addRow({ id: 'C05', desc: 'Fire Panel', phase: 'L1', va: 500, qty: 1, div: 100, category: 'Fire Systems', essential: true });
   </script>
   <script src="omni-utils.js"></script></body>
 </html>

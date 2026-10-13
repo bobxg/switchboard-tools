@@ -199,106 +199,59 @@ Width Selection:
     <!-- CABLE SIZING -->
     <div class="qa-section" id="cable-sizing">
       <h2>2. Cable Sizing Calculator</h2>
-      
+
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 3008.1.1:2017 - Electrical installations - Selection of cables (Current-carrying capacity)</li>
-          <li>AS/NZS 3000:2018 - Electrical installations (Table C8 - Voltage drop)</li>
+          <li>AS/NZS 3008.1.1:2017 &mdash; Selection of cables (current-carrying capacity, voltage drop, short-circuit)</li>
+          <li>AS/NZS 3000:2018 cl. 3.6.2 &mdash; voltage drop limit (5% from the point of supply to any point)</li>
+          <li>IEC 60364-5-52 &mdash; reference installation methods used for the indicative rating table</li>
+          <li>IEC 60228 &mdash; conductor resistance at 20&deg;C</li>
         </ul>
       </div>
 
       <h3>Current Carrying Capacity</h3>
       <div class="formula-box">
-Required Cable Capacity = Design Current / (Installation Factor &times; Temperature Factor &times; Grouping Factor)
+I<sub>z</sub> = I<sub>tab</sub> &times; k<sub>temp</sub> &times; k<sub>group</sub> &times; n<sub>parallel</sub> &nbsp;&ge;&nbsp; I<sub>B</sub>
 
-Design Current = Load Current &times; 1.25  (AS/NZS 3000 requirement for continuous loads)
+k<sub>temp</sub> = &radic;[(&theta;<sub>c</sub> &minus; &theta;<sub>a</sub>) / (&theta;<sub>c</sub> &minus; &theta;<sub>ref</sub>)]
+  &theta;<sub>c</sub> = 90&deg;C (X-90) or 75&deg;C (V-90);  &theta;<sub>ref</sub> = 30&deg;C air, 20&deg;C ground
       </div>
-
-      <div class="variable-list">
-        <dl>
-          <dt>Installation Factor (AS/NZS 3008.1.1 Table 27/28)</dt>
-          <dd>Installation method derating:
-            <ul>
-              <li>Enclosed in conduit/trunking: Uses Table 27 Column 6 or 7</li>
-              <li>In air (on cable tray): Uses Table 27 Column 3 or 4</li>
-              <li>Direct buried: Uses Table 28</li>
-            </ul>
-          </dd>
-          
-          <dt>Temperature Factor (Table 27/28 notes)</dt>
-          <dd>Ambient temperature correction:
-            <ul>
-              <li>25&deg;C: 1.10</li>
-              <li>30&deg;C: 1.05</li>
-              <li>35&deg;C: 1.00 (base)</li>
-              <li>40&deg;C: 0.94</li>
-              <li>45&deg;C: 0.87</li>
-              <li>50&deg;C: 0.79</li>
-            </ul>
-          </dd>
-          
-          <dt>Grouping Factor (AS/NZS 3008.1.1 Table 22)</dt>
-          <dd>Multiple circuits in same enclosure:
-            <ul>
-              <li>1 circuit: 1.00</li>
-              <li>2 circuits: 0.80</li>
-              <li>3 circuits: 0.70</li>
-              <li>4-5 circuits: 0.65</li>
-              <li>6-8 circuits: 0.60</li>
-            </ul>
-          </dd>
-        </dl>
+      <div class="variable-def">
+        <strong>Tabulated ratings (indicative)</strong>
+        <p>Cu, three loaded conductors, XLPE/90&deg;C, IEC 60364-5-52 reference methods A1, A2, B1, B2, C, D and E. PVC ratings are taken as 84% and aluminium as 78% of the copper XLPE values. Final selection must be confirmed against AS/NZS 3008.1.1 tables for the actual cable and installation.</p>
+        <strong>Grouping factor (bunched circuits)</strong>
+        <ul>
+          <li>1: 1.00 &nbsp; 2: 0.80 &nbsp; 3: 0.70 &nbsp; 4: 0.65 &nbsp; 5: 0.60 &nbsp; 6: 0.57 &nbsp; 7: 0.54 &nbsp; 8: 0.52 &nbsp; 9: 0.50 &nbsp; 10&ndash;12: 0.45 &nbsp; 13&ndash;16: 0.41 &nbsp; 17&ndash;20: 0.38</li>
+        </ul>
       </div>
 
       <h3>Voltage Drop Calculation</h3>
       <div class="formula-box">
-Voltage Drop (V) = (mV/A/m) &times; Current &times; Length / 1000
+V<sub>d</sub> = k &times; (I<sub>B</sub> / n) &times; L &times; (R<sub>75</sub> cos&phi; + X sin&phi;)      k = 2 (1-phase), &radic;3 (3-phase)
+R<sub>75</sub> = R<sub>20</sub> &times; [1 + &alpha;(75 &minus; 20)],  &alpha; = 0.00393 (Cu), 0.00403 (Al)
 
-Voltage Drop (%) = (Voltage Drop / Supply Voltage) &times; 100
-
-AS/NZS 3000 Limits:
-- Final sub-circuits: 5% maximum
-- Mains cable: 1% maximum (from origin to main switchboard)
-- Total installation: 6% maximum
+Budget for this cable = min(user limit, 5% &minus; upstream drop already used)   (AS/NZS 3000 cl. 3.6.2)
       </div>
 
-      <div class="variable-list">
-        <dl>
-          <dt>mV/A/m (millivolts per Amp per meter)</dt>
-          <dd>From AS/NZS 3000 Table C8. Values depend on:
-            <ul>
-              <li>Cable size (mm&sup2;)</li>
-              <li>Cable material (Copper or Aluminium)</li>
-              <li>System type (Single-phase or Three-phase)</li>
-              <li>Power factor (typically 0.8-1.0)</li>
-            </ul>
-          </dd>
-          
-          <dt>Current</dt>
-          <dd>Maximum expected load current (Amps)</dd>
-          
-          <dt>Length</dt>
-          <dd>One-way cable run length (meters). Note: This is run length, not circuit length (no need to double)</dd>
-        </dl>
+      <h3>Short-Circuit Withstand (adiabatic)</h3>
+      <div class="formula-box">
+S &ge; I &radic;t / k     k = 143 (Cu X-90), 115 (Cu V-90), 94 (Al X-90), 76 (Al V-90)
       </div>
 
       <h3>Cable Selection Process</h3>
       <ol style="margin-left: 20px; line-height: 1.8;">
-        <li>Calculate derated current capacity requirement</li>
-        <li>Select smallest cable from Table 27/28 that meets capacity</li>
-        <li>Calculate voltage drop for selected cable</li>
-        <li>If voltage drop exceeds limits, select next larger cable size</li>
-        <li>Repeat until both capacity and voltage drop are compliant</li>
+        <li>For 1 run (then 2, 3, 4 runs in Auto mode), step through sizes 1.5&ndash;300 mm&sup2;</li>
+        <li>Accept the first size that meets current rating, voltage-drop budget and short-circuit withstand together</li>
+        <li>Report which criterion governed; report "no solution" rather than an undersized cable when nothing complies</li>
       </ol>
 
       <div class="example-box">
-        <strong>Example:</strong> 32A load, 50m run, 3-phase, 40&deg;C ambient, 3 circuits in conduit<br><br>
-        
-        Derated requirement = 32A / (1.0 &times; 0.94 &times; 0.70) = 48.6A<br>
-        Selected: 10mm&sup2; copper (52A capacity from Table 27)<br>
-        Voltage drop = 3.8 mV/A/m &times; 32A &times; 50m / 1000 = 6.08V<br>
-        VD% = 6.08V / 400V &times; 100 = 1.52% &#10003; Compliant
+        <strong>Example:</strong> 32 A, 50 m, 3-phase 400 V, pf 0.9, Cu X-90 multicore in conduit on a wall (B2), 40&deg;C, 3 circuits grouped<br><br>
+        k<sub>temp</sub> = &radic;(50/60) = 0.913; k<sub>group</sub> = 0.70 &rarr; derating 0.639<br>
+        6 mm&sup2;: 44 &times; 0.639 = 28.1 A &lt; 32 A &#10007;; &nbsp;10 mm&sup2;: 60 &times; 0.639 = 38.3 A &#10003;<br>
+        R<sub>75</sub> = 1.83 &times; 1.216 = 2.225 m&#937;/m; Z = 2.225&times;0.9 + 0.090&times;0.436 = 2.042 m&#937;/m<br>
+        V<sub>d</sub> = &radic;3 &times; 32 &times; 50 &times; 2.042 / 1000 = 5.66 V = 1.41% &#10003; &rarr; <strong>10 mm&sup2;</strong>
       </div>
     </div>
 
@@ -379,9 +332,9 @@ Where:
       <div class="formula-box">
 Fill Ratio = (Total Cable CSA) / (Conduit Internal CSA)
 
-AS/NZS 3000:2018 Appendix C Table C2 Limits:
-- Single cable: 53% maximum fill
-- 2 cables: 31% maximum fill
+AS/NZS 3000:2018 Appendix C Paragraph C6.2 space factors:
+- Single cable: 50% maximum fill
+- 2 cables: 33% maximum fill
 - 3+ cables: 40% maximum fill
       </div>
 
@@ -415,7 +368,7 @@ AS/NZS 3000:2018 Appendix C Table C2 Limits:
       <h3>Conduit Selection Process</h3>
       <ol style="margin-left: 20px; line-height: 1.8;">
         <li>Count total number of cables to be installed</li>
-        <li>Determine fill limit: 53% for 1 cable, 31% for 2 cables, 40% for 3+ cables</li>
+        <li>Determine fill limit: 50% for 1 cable, 33% for 2 cables (AS/NZS 3000 Paragraph C6.2), 40% for 3+ cables</li>
         <li>Calculate total cable CSA (sum of all individual cable CSAs)</li>
         <li>Select smallest conduit where: Internal Area &times; Fill Limit &#8805; Total Cable CSA</li>
       </ol>
@@ -586,13 +539,13 @@ Typical values:
 
       <h3>Spacing Calculation (Lumen Method)</h3>
       <div class="formula-box">
-Maximum Spacing (m) = &#8730;[(Lumens &times; UF &times; MF) / (Required Lux &times; Width)]
+Maximum Spacing (m) = (Lumens &times; UF &times; MF) / (Required Lux &times; Width)
 
 Where:
 - Lumens = Luminaire output (from manufacturer data)
 - UF = Utilization Factor (0.4 to 0.6, depends on reflectance)
 - MF = Maintenance Factor (0.8 for standard LED emergency lights)
-- Required Lux = From AS/NZS 2293.1 (0.5 to 10 lux)
+- Required Lux = 0.2 lx minimum (AS/NZS 2293.1); higher design targets for car parks / high-risk areas
 - Width = Corridor or area width (meters)
       </div>
 
@@ -618,10 +571,10 @@ Where:
           <dt>Required Illuminance (AS/NZS 2293.1)</dt>
           <dd>
             <ul>
-              <li>Escape routes: 1.0 lux (horizontal)</li>
-              <li>Open areas > 60m&sup2;: 0.5 lux</li>
-              <li>High risk task areas: 10 lux</li>
-              <li>Covered car parks: 1.0 lux</li>
+              <li>Escape routes and open areas: 0.2 lx minimum horizontal at floor level (AS/NZS 2293.1)</li>
+              <li>Covered car parks: 1.0 lx used as a design target</li>
+              <li>High risk task areas: 10 lx design target, point-by-point design required</li>
+              <li>Classification mode (C/D classes) uses the AS/NZS 2293.1 spacing tables directly, without scaling</li>
             </ul>
           </dd>
         </dl>
@@ -637,11 +590,10 @@ average illuminance is adequate. Based on photometric distribution patterns.
 
       <div class="example-box">
         <strong>Example:</strong> 400 lumen LED, 2.5m high, 2m wide corridor, medium reflectance<br><br>
-        
-        UF = 0.45, MF = 0.8, Required = 1.0 lux<br>
-        Spacing = &#8730;[(400 &times; 0.45 &times; 0.8) / (1.0 &times; 2)] = &#8730;[57.6] = 7.6m<br>
+        UF = 0.5, MF = 0.8, Required = 0.2 lux<br>
+        Spacing = (400 &times; 0.5 &times; 0.8) / (0.2 &times; 2) = 400 m (average-illuminance result)<br>
         Height constraint = 3 &times; 2.5m = 7.5m<br>
-        Final spacing: 7.5m (limited by height) &#10003;
+        Final spacing: 7.5m (limited by height &mdash; the lumen method averages light and cannot guarantee the minimum point illuminance; use classification tables or photometry) &#10003;
       </div>
     </div>
 
@@ -715,13 +667,15 @@ Ratio considerations:
 
       <h3>String Configuration (Voltage Calculations)</h3>
       <div class="formula-box">
-Panels per String = Inverter MPPT Voltage / Panel Vmp
+Voc(max)  = Voc &times; [1 + &beta;<sub>Voc</sub> &times; (T<sub>min</sub> &minus; 25)]      (&beta; negative, so Voc rises when cold)
+Vmp(hot)  = Vmp &times; [1 + &beta;<sub>Vmp</sub> &times; (T<sub>cell,max</sub> &minus; 25)]
+Vmp(cold) = Vmp &times; [1 + &beta;<sub>Vmp</sub> &times; (T<sub>min</sub> &minus; 25)]
 
-Verify:
-- Min Voltage: Panels &times; Vmp(min) &#8805; Inverter MPPT Min
-- Max Voltage: Panels &times; Voc(max) &#8804; Inverter Max Voltage
+Max modules = min( floor(V<sub>inv,max</sub> / Voc(max)), floor(MPPT<sub>max</sub> / Vmp(cold)) )
+Min modules = ceil(MPPT<sub>min</sub> / Vmp(hot))
+Array current = 1.25 &times; Isc &times; parallel strings  (AS/NZS 5033) &le; inverter input rating
 
-Where Voc(max) = Voc &times; Temperature Coefficient &times; Lowest Temp
+Monthly generation: the location multipliers are normalised so the 12 months sum to the annual total.
       </div>
 
       <div class="example-box">
@@ -749,6 +703,7 @@ Where Voc(max) = Voc &times; Temperature Coefficient &times; Lowest Temp
       <div class="formula-box">
 Lighting:          3A for first 20 points + 2A per additional 20 points
 Socket-outlets:    10A for first 20 outlets + 5A per additional 20
+15 A / 20 A outlets: +10 A if any 15 A; +15 A if any 20 A; +15 A (not 25 A) if both (Note 10)
 Cooking loads:     50% of connected load
 HVAC / sauna:      75% of connected load
 Inst. water heater: 33.3% of rated load
@@ -762,8 +717,9 @@ Column selection: 2–5 units → Col 3,  6–20 units → Col 4,  21+ units →
 Lighting diversity decreases with unit count, e.g.:
   Col 3: 6A  |  Col 4: 5A + 0.25×n  |  Col 5: 0.5×n
 
-Lift loads:  100% largest + 75% second + 50% remainder
-Motor loads: 100% largest + 50% remainder
+Water heaters: Col 3&ndash;4: 6 A &times; n;  Col 5: 100 A + 0.8 A &times; n
+Lifts (Table C2): 125% largest + 75% next + 50% remainder
+Motor loads (Table C2 Col 2): 100% largest + 50% remainder
       </div>
       <h3>Table C2 — Non-Domestic Premises</h3>
       <div class="formula-box">
@@ -788,22 +744,26 @@ Motors:         100% largest + 75% second + 50% remainder (commercial)
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 3000:2018 Appendix C — Tables C1, C3, C7/C8</li>
+          <li>AS/NZS 3000:2018 Appendix C &mdash; Tables C1, C2, C3 and C4 (Paragraph C2.4.4)</li>
         </ul>
       </div>
-      <h3>Multiple Dwelling Diversity (Table C1)</h3>
+      <h3>Blocks of Living Units (Table C1 Columns 3&ndash;5)</h3>
       <div class="formula-box">
-Diversity factors are interpolated for 1–200 units between fixed reference points.
-
-Example (10 units):  Col 3 = 0.58,  Col 4 = 0.40,  Col 5 = 0.46
-
-Motor diversity by quantity:
-  1 motor:   100%
-  2 motors:  100% + 75%
-  3+ motors: 100% + 75% + 50% each additional
+n = ceil(units / phases)    (Table C1 Note 2)
+Col 3 (2&ndash;5): lighting 6 A;  sockets 10 + 5n;  cooking 15 A;  water heating 6n
+Col 4 (6&ndash;20): lighting 5 + 0.25n;  sockets 15 + 3.75n;  cooking 2.8n;  water heating 6n
+Col 5 (21+): lighting 0.5n;  sockets 50 + 1.9n;  cooking 2.8n;  water heating 100 + 0.8n
+Fixed heating / A/C: 75% of connected load
+      </div>
+      <h3>Switchboard Diversity (Table C4)</h3>
+      <div class="formula-box">
+Maximum demand = &Sigma;(downstream circuit overload ratings) &times; factor
+2&ndash;3 devices: 0.9 &nbsp;|&nbsp; 4&ndash;5: 0.8 &nbsp;|&nbsp; 6&ndash;9: 0.7 &nbsp;|&nbsp; 10 or more: 0.6
+Applies to switchboards conforming with the AS/NZS 61439 series.
       </div>
       <div class="example-box">
-        <strong>Note:</strong> The diversity calculator interpolates linearly between the tabulated reference points in Table C1. Final design values must always be taken directly from the relevant AS/NZS 3000 table.
+        <strong>Example (Table C4):</strong> ten downstream devices 63+63+40+32+32+20+20+20+16+16 = 322 A; 10 devices &rarr; factor 0.6; maximum demand = 193.2 A &rarr; 200 A upstream device.<br>
+        <strong>Example (Table C1):</strong> 20 units on 3 phases &rarr; n = 7 (Col 4): lighting 5 + 0.25&times;7 = 6.75 A; sockets 15 + 3.75&times;7 = 41.25 A.
       </div>
     </div>
 
@@ -827,11 +787,12 @@ X_tx = (X/R) × R_tx
       </div>
       <h3>Upstream Network Impedance</h3>
       <div class="formula-box">
-Z_net = V_LL² / S_sc_VA    (referred to LV side)
+Z_net = c_max × V_LL² / S_sc_VA    (referred to LV side)
+Transformer correction (IEC 60909-0): K_T = 0.95 × c_max / (1 + 0.6 × x_T),  Z_tx,K = K_T × Z_tx
       </div>
       <h3>Symmetrical 3-Phase Fault Current</h3>
       <div class="formula-box">
-I_3ph (kA) = V_LL / (√3 × Z_cumulative)
+I_3ph (kA) = c_max × V_LL / (√3 × Z_cumulative)     c_max = 1.10 (LV, +10%) by default
 
 Peak factor (IEC 60909 Eq. 29):
   κ = 1.02 + 0.98 × e^(−3R/X)
@@ -839,12 +800,13 @@ Peak factor (IEC 60909 Eq. 29):
       </div>
       <h3>Single-Phase-to-Earth Fault</h3>
       <div class="formula-box">
-I_1ph = V_LN / Z_loop    (phase impedance + CPC return path)
+I_1ph,max = c_max × V_LN / Z_loop(20°C)
+I_1ph,min = c_min × V_LN / Z_loop(75°C),  c_min = 0.95   — use for protective-device operation checks
       </div>
       <div class="variable-list">
         <dl>
-          <dt>Cable resistance (mΩ/m at 75°C — AS/NZS 3008.1.1)</dt>
-          <dd>1.5mm²: 14.48 Cu / 23.69 Al &nbsp;|&nbsp; 25mm²: 0.882 Cu / 1.454 Al &nbsp;|&nbsp; 300mm²: 0.0762 Cu / 0.125 Al</dd>
+          <dt>Cable resistance (mΩ/m at 20°C — IEC 60228; Al = Cu × 1.64; × 1.216 for 75°C)</dt>
+          <dd>1.5mm²: 12.1 Cu / 19.8 Al &nbsp;|&nbsp; 25mm²: 0.727 Cu / 1.19 Al &nbsp;|&nbsp; 300mm²: 0.0601 Cu / 0.0986 Al</dd>
           <dt>Cable reactance (mΩ/m)</dt>
           <dd>0.069–0.110 mΩ/m (trefoil/flat formation)</dd>
         </dl>
@@ -857,33 +819,27 @@ I_1ph = V_LN / Z_loop    (phase impedance + CPC return path)
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 3000:2018 — <a href="as3000viewer.html#cl-2.6" target="_blank">Clause 2.6.2–2.6.3</a>, Tables 8.1/8.2</li>
-          <li>AS/NZS 3008.1.1 — Conductor resistance data</li>
+          <li>AS/NZS 3000:2018 &mdash; <a href="as3000viewer.html#cl-5.7" target="_blank">Clause 5.7</a>, 1.5.5.3, Tables 8.1/8.2, Appendix B</li>
+          <li>IEC 60228 &mdash; conductor resistance</li>
         </ul>
       </div>
       <h3>Loop Impedance</h3>
       <div class="formula-box">
-Z_s = Z_e + Z_cable
-
-Z_cable = (R_active + R_earth) × L / 1000   (Ω)
-
-Prospective fault current:  I_f = U_o / Z_s   (U_o = 230V)
+Z_s = Z_e + (R_active + R_earth) × L / 1000   (Ω)
+R_T = R_20 × [1 + 0.00393 × (T − 20)]  (Cu; Al = Cu × 1.64), T = 75, 45 or 20°C
+Prospective fault current:  I_f = U_o / Z_s   (U_o = 230 V)
+Compliance: Z_s ≤ Z_s,max (no further 80% factor — conductors are already taken hot)
       </div>
-      <h3>Maximum Permitted Z_s by Device</h3>
+      <h3>Maximum Permitted Z_s (AS/NZS 3000 Table 8.1)</h3>
       <div class="formula-box">
-MCB Type B:  Z_s_max = 230 / (5  × I_n)
-MCB Type C:  Z_s_max = 230 / (10 × I_n)
-MCB Type D:  Z_s_max = 230 / (20 × I_n)
-
-80% design rule:  Z_s_design = 0.8 × Z_s_max
+MCBs: Z_s,max = 230 / (m × I_n), mean instantaneous trip m = 4 (B), 7.5 (C), 12.5 (D)  (Paragraph B4.5)
+gG fuses (tabulated), 0.4 s:  6 A 11.5 | 10 A 6.4 | 16 A 3.1 | 20 A 2.1 | 25 A 1.6 | 32 A 1.3 | 40 A 1.0 | 50 A 0.7 | 63 A 0.6 Ω
+gG fuses (tabulated), 5 s:    6 A 15.3 | 10 A 9.2 | 16 A 5.0 | 20 A 3.6 | 25 A 2.7 | 32 A 2.2 | 40 A 1.6 | 50 A 1.3 | 63 A 0.9 Ω
+Measured test value (Table 8.2 basis): R_phe ≈ 0.8 × (Z_s,max − Z_e) at ~20°C
+Earth-conductor solver: smallest earth size with Z_s ≤ Z_s,max; L_max = (Z_s,max − Z_e) × 1000 / (R_a + R_e)
       </div>
-      <div class="variable-list">
-        <dl>
-          <dt>Default external Ze values</dt>
-          <dd>TN-C-S (MEN): 0.35 Ω &nbsp;|&nbsp; TN-S (separate earth): 0.80 Ω</dd>
-          <dt>Temperature correction</dt>
-          <dd>At 45°C ambient: R × 0.85 (from 75°C reference)</dd>
-        </dl>
+      <div class="example-box">
+        <strong>Example:</strong> C20 MCB, Z<sub>e</sub> = 0.35 &#937;, 2.5/2.5 mm&sup2; Cu, 30 m at 75&deg;C: R = 7.41 &times; 1.216 = 9.01 m&#937;/m per conductor; Z<sub>s</sub> = 0.35 + 18.02 &times; 30/1000 = 0.891 &#937; &le; 230/(7.5 &times; 20) = 1.533 &#937; &#10003;
       </div>
     </div>
 
@@ -893,29 +849,27 @@ MCB Type D:  Z_s_max = 230 / (20 × I_n)
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 3000:2018 — <a href="as3000viewer.html#cl-2.5" target="_blank">Clause 2.5.5</a></li>
-          <li>IEC 61009 — Time-current characteristics</li>
+          <li>AS/NZS 3000:2018 &mdash; <a href="as3000viewer.html#cl-2.5" target="_blank">Clause 2.5</a></li>
+          <li>IEC 60898-1 / IEC 60947-2 &mdash; circuit-breaker trip characteristics</li>
+          <li>IEC 60269 &mdash; gG fuse selectivity ratio</li>
         </ul>
       </div>
       <h3>Overload Discrimination</h3>
       <div class="formula-box">
-Rating ratio = Upstream I_n / Downstream I_n
-
-≥ 1.6 × — marginal discrimination likely
-≥ 2.0 × — full discrimination achieved
+Ratio = upstream I_r / downstream I_r     (MCCB I_r = setting × I_n)
+≥ 2.0 — likely OK   |   1.6–2.0 — marginal, check curves   |   < 1.6 — unlikely
       </div>
       <h3>Short-Circuit Discrimination</h3>
       <div class="formula-box">
-Instantaneous trip ranges:
-  MCB Type B:  3–5 × I_n
-  MCB Type C:  5–10 × I_n
-  MCB Type D:  10–20 × I_n
-  HRC Fuse:    2.0–4.5 × I_n (varies by rating)
-
-Condition: Upstream instantaneous trip threshold > Downstream instantaneous trip threshold
+Instantaneous bands: B 3–5 × I_n, C 5–10 × I_n, D 10–20 × I_n, MCCB setting × I_n ± 20%
+Selectivity limit I_s ≈ lowest upstream instantaneous threshold
+Bands overlap                        → not selective
+Bands separate and I_k ≤ I_s         → total selectivity at this fault level
+Bands separate and I_k > I_s         → partial selectivity up to I_s (use manufacturer tables)
+gG fuse / gG fuse: ratio ≥ 1.6 → selective;  fuse upstream of breaker: I²t comparison (indicative ≥ 2:1)
       </div>
       <div class="example-box">
-        <strong>Note:</strong> Full discrimination requires upstream device to withstand fault long enough for downstream device to clear. Time-current curve comparison is the definitive check — this tool provides an indicative verdict only.
+        <strong>Note:</strong> This is an indicative screening check. Manufacturer selectivity tables or time-current/I&sup2;t curves are the definitive check.
       </div>
     </div>
 
@@ -968,30 +922,30 @@ Efficiency η     = P_out / (P_out + Total Losses) × 100%
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 3010:2017 — Electrical installations — Generating sets (Clause 4.4)</li>
-          <li>AS/NZS 3000:2018 — <a href="as3000viewer.html#cl-7.3" target="_blank">Clause 7.3</a></li>
+          <li>AS/NZS 3010:2017 &mdash; Electrical installations &mdash; Generating sets</li>
+          <li>ISO 8528-1 &mdash; standby / prime / continuous rating definitions</li>
+          <li>AS/NZS 3000:2018 &mdash; <a href="as3000viewer.html#cl-7.3" target="_blank">Clause 7.3</a></li>
         </ul>
       </div>
-      <h3>Altitude &amp; Temperature Derating</h3>
+      <h3>Site Derating (typical &mdash; use manufacturer curves)</h3>
       <div class="formula-box">
-Altitude derating:    3.5% per 1000 m above 1000 m ASL
-Temperature derating: 2.0% per °C above 40°C ambient
-
-Derated capacity = Rated kVA × Alt_factor × Temp_factor
+Altitude:    −3.5% per 300 m above 1000 m
+Temperature: −2% per 5.5°C above 40°C
+Duty factor: standby 1.0, prime 0.9, continuous 0.75 of the standby rating
       </div>
-      <h3>Motor Starting — Step Loading</h3>
+      <h3>Running Load and Voltage Dip</h3>
       <div class="formula-box">
-Starting kVA multipliers:
-  DOL:        6.5 × FLC
-  Star-delta: 2.5 × FLC
-  VSD:        1.2 × FLC
-
-Voltage dip estimate (%) = (Starting kVA / Gen kVA) × 100
+Steady state: S_gen ≥ S_running × (1 + growth) / (duty factor × derating)
+Dip for a step: dip = X'd × S_start / (S_gen,available + X'd × S_start)
+Dip criterion:  S_gen ≥ X'd × S_start × (1 − D_max) / D_max / derating
+Starting kVA: DOL 6.5×, star-delta 2.5×, VSD 1.2×, UPS 1.5× running kVA (or user value)
       </div>
-      <h3>Fuel Consumption</h3>
+      <h3>Fuel</h3>
       <div class="formula-box">
-Diesel consumption: ~0.27 L/kWh at 75% load
-Fuel tank (L) = Fuel rate × Autonomy hours
+Fuel (L) = 0.27 L/kWh × running kW × autonomy hours   (also reported at full rated output, 0.8 pf)
+      </div>
+      <div class="example-box">
+        <strong>Example:</strong> largest step 382 kVA DOL start, X'd = 0.25, D<sub>max</sub> = 20%: S<sub>gen</sub> &ge; 0.25 &times; 382 &times; 0.8 / 0.2 = 382 kVA &rarr; 400 kVA set; dip = 0.25&times;382/(400 + 95.5) = 19.3% &#10003;
       </div>
     </div>
 
@@ -1001,29 +955,24 @@ Fuel tank (L) = Fuel rate × Autonomy hours
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS 62040 series — Uninterruptible power systems</li>
-          <li>AS/NZS 3000:2018 — Cl. 5.4 (battery room hydrogen hazard control)</li>
-          <li>AS/NZS 3000:2018</li>
+          <li>AS 62040 series &mdash; Uninterruptible power systems</li>
+          <li>AS 3011 / AS 2676 &mdash; secondary batteries in buildings</li>
+          <li>IEEE 485 &mdash; ageing and temperature correction concepts</li>
         </ul>
       </div>
-      <h3>Design kVA</h3>
+      <h3>UPS Rating</h3>
       <div class="formula-box">
-Design kVA = Load kW × (1 + Growth% / 100) / Power Factor
+Design kW = load kW × (1 + growth);  design kVA = design kW / load pf
+Required kVA = max(design kVA, design kW / UPS output pf)
+Modules: N = ceil(required kVA / module kVA);  installed = N (single), N + 1, or 2N
       </div>
-      <h3>Battery Capacity</h3>
+      <h3>Battery Capacity (C10 equivalent, indicative)</h3>
       <div class="formula-box">
-DC Current = (Design kW / Inverter Efficiency) × 1000 / DC Voltage
-
-Required Ah = (DC Current × Autonomy_hours) / (Ageing Factor × Temperature Factor × DoD)
-
-Temperature factor (VRLA): ±0.5% per °C from 25°C reference
-DoD: 0.80 (VRLA/NiCd),  0.85 (Li-ion)
-      </div>
-      <div class="variable-list">
-        <dl>
-          <dt>Battery energy density (Wh/kg)</dt>
-          <dd>Li-ion: 150 &nbsp;|&nbsp; VRLA: 35 &nbsp;|&nbsp; NiCd: 25</dd>
-        </dl>
+DC current = design kW / 0.94 × 1000 / V_DC
+Required Ah = DC current × hours / (rate factor × ageing × temperature × usable window)
+Rate factor (fraction of C10 available): VRLA 5 min 0.33, 10 min 0.45, 15 min 0.53, 30 min 0.65, 60 min 0.75, 120 min 0.85
+Temperature: −1% per °C below 25°C (VRLA/NiCd); no credit above 25°C (life reduces instead)
+Li-ion usable window 0.9;  recharge current = discharged Ah / recharge time × 1.1
       </div>
     </div>
 
@@ -1053,8 +1002,10 @@ Resonant harmonic order:  h_r = √(S_sc_kVA / Q_c_kVAr)
 If h_r coincides with a characteristic harmonic (5th, 7th, 11th…) → detuned reactor required
 
 Detuning:
-  h_r ≤ 5:  7%   reactor  (tunes to 189 Hz)
-  h_r ≤ 7:  5.67% reactor (tunes to 210 Hz)
+h_r near 3rd:  14%   reactor (tunes to 134 Hz)
+h_r near 5th:  7%    reactor (tunes to 189 Hz)
+h_r near 7th:  5.67% reactor (tunes to 210 Hz)
+Steps: n = ceil(Q_required / step size) so the installed bank is never below the requirement
       </div>
     </div>
 
@@ -1064,37 +1015,26 @@ Detuning:
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 61000.3.2 — Harmonic limits for equipment ≤16A</li>
-          <li>AS/NZS 61000.3.12 — Harmonic limits for equipment &gt;16A</li>
+          <li>AS/NZS 61000.3.2 / 61000.3.12 &mdash; equipment emission limits (used as a reference)</li>
+          <li>IEC 61000-3-6 &mdash; summation of harmonics from multiple sources</li>
+          <li>UL 1561 &mdash; transformer K-factor</li>
         </ul>
       </div>
-      <h3>THD-I Calculation</h3>
+      <h3>Per-phase Currents</h3>
       <div class="formula-box">
-THD-I (%) = (√Σ I_h²) / I_1 × 100
-
-Neutral current estimate (triplen-dominant loads):
-  I_neutral ≈ 3 × I_3rd   (triplen harmonics add in the neutral)
-  Neutral multiplier = max(1,  I_3 × 3 / I_1 + 0.3)
-
-THD-V estimate (simplified for LV):
-  THD-V ≈ THD-I × 0.15
+Single-phase loads spread over 3 phases: I_1 = P / (3 × 230);  three-phase loads: I_1 = P / (√3 × 400)
+I_h = (Σ I_h,i^α)^(1/α),  α = 1 (h < 5), 1.4 (5 ≤ h ≤ 10), 2 (h > 10)
+THD-I = √(Σ I_h²) / I_1 × 100;  TDD = √(Σ I_h²) / supply rating × 100
       </div>
-      <h3>Harmonic Current Spectrum (% of fundamental)</h3>
-      <div class="variable-list">
-        <dl>
-          <dt>LED drivers (low-quality switched-mode)</dt>
-          <dd>H3: 80%&nbsp; H5: 55%&nbsp; H7: 30%&nbsp; H9: 15%&nbsp; H11: 8%&nbsp; H13: 5%</dd>
-          <dt>6-pulse VSD</dt>
-          <dd>H3: 2%&nbsp; H5: 25%&nbsp; H7: 12%&nbsp; H11: 7%&nbsp; H13: 4%</dd>
-          <dt>IT switch-mode power supplies</dt>
-          <dd>H3: 75%&nbsp; H5: 50%&nbsp; H7: 25%&nbsp; H9: 10%&nbsp; H11: 7%&nbsp; H13: 4%</dd>
-        </dl>
-      </div>
-      <h3>AS/NZS 61000.3.12 Emission Limits</h3>
+      <h3>Neutral, Voltage Distortion and K-factor</h3>
       <div class="formula-box">
-For R_sce ≥ 33 (% of fundamental):
-  H3: 21.6%  |  H5: 10.7%  |  H7: 7.2%  |  H9: 3.8%  |  H11: 3.1%  |  H13: 2.0%
-  THD-I limit: 23%
+I_N = 3 × √(I_3² + I_9²);  neutral ratio = I_N / √(I_1² + Σ I_h²)
+V_h (%) = (I_h / I_TX,rated) × h × u_k(%);  THD-V = √(Σ V_h²)
+K = Σ(I_h² h²) / Σ(I_h²)  (including the fundamental)
+      </div>
+      <h3>Reference Limits (AS/NZS 61000.3.12 Table 2, R_sce = 33)</h3>
+      <div class="formula-box">
+H3 21.6% | H5 10.7% | H7 7.2% | H9 3.8% | H11 3.1% | H13 2.0% | THC 23%;  THD-V flagged above 8%
       </div>
     </div>
 
@@ -1104,35 +1044,38 @@ For R_sce ≥ 33 (% of fundamental):
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 61439.1 — Low-voltage switchgear and controlgear assemblies</li>
-          <li>IEC 60439 — Busbar current density and temperature rise</li>
-          <li>AS/NZS 3000:2018 — <a href="as3000viewer.html#cl-3.9" target="_blank">Clause 3.9</a></li>
+          <li>AS/NZS 61439.1 &mdash; LV assemblies (Table 7 peak factor, temperature-rise verification)</li>
+          <li>IEC 60865-1 &mdash; mechanical effects of short-circuit currents</li>
+          <li>IEC 60949 &mdash; adiabatic short-circuit temperature limits</li>
+          <li>DIN 43671 &mdash; copper busbar ratings (order of magnitude)</li>
         </ul>
       </div>
       <h3>Continuous Current Rating</h3>
       <div class="formula-box">
-Rating = R_reference × √(ΔT_allowed / 30°C)
-
-Multiple bars — proximity derating:
-  2 bars: × 0.85  |  3 bars: × 0.78  |  4 bars: × 0.72
-
-Temperature rise check:
-  ΔT_actual = ΔT_allowed × (I_actual / I_rated)²
+I = I_base × k_material × √(ΔT / 30 K) × k_enclosure × n × k_proximity
+I_base: single bare bar on edge, free air, 30 K rise (e.g. 50×10: 852 A, 100×10: 1490 A)
+k_material: Cu 1.0, Al 0.78;  k_enclosure: free air 1.0, ventilated 0.85, IP2X–4X 0.75, IP54+ 0.65
+k_proximity per bar: 2 bars 0.87, 3 bars 0.80, 4 bars 0.73
       </div>
       <h3>Short-Circuit Withstand</h3>
       <div class="formula-box">
-I_cw = k × A / √t   (kA)
-
-  Copper:    k = 13 A·s^0.5/mm²
-  Aluminium: k = 8.5 A·s^0.5/mm²
-
-Where A = cross-sectional area (mm²), t = fault duration (s)
+I_cw = k × A / √t,   k = K × √ln[(β + θ_f)/(β + θ_i)]
+Cu: K = 226, β = 234.5;  Al: K = 148, β = 228;  θ_i = operating temperature, θ_f = 200°C
+e.g. Cu from 70°C: k ≈ 135 A·√s/mm²
       </div>
-      <div class="variable-list">
-        <dl>
-          <dt>Standard copper busbar ratings (single bar, 40°C ambient, 70°C rise)</dt>
-          <dd>15×3 mm: 80 A &nbsp;|&nbsp; 50×5 mm: 335 A &nbsp;|&nbsp; 100×10 mm: 1000 A</dd>
-        </dl>
+      <h3>Electrodynamic Force and Support Span</h3>
+      <div class="formula-box">
+i_p = n × I_k  (n: 1.5 ≤5 kA, 1.7 ≤10 kA, 2.0 ≤20 kA, 2.1 ≤50 kA, 2.2 >50 kA)
+F = 0.866 × 0.2 × i_p²(kA) × L / a  (N);   σ = 0.73 × F × L / (8 Z),  Z = n_bars × b × t² / 6
+σ ≤ 1.5 × R_p0.2 (Cu 200 N/mm², Al 100 N/mm²) → L_max = √(1.5 R_p0.2 × 8Z / (0.73 F/L))
+      </div>
+      <h3>Losses and Voltage Drop</h3>
+      <div class="formula-box">
+R = ρ20 [1 + α(θ − 20)] / A × 1.05 (AC);  X = 2πf × 2×10⁻⁷ × ln(1.26a / 0.2235(b + t))
+P = 3 I² R L;   V_d = √3 I L (R cos φ + X sin φ)
+      </div>
+      <div class="example-box">
+        <strong>Example:</strong> 1600 A, 36 kA / 1 s, Cu, 40&deg;C ambient, 70&deg;C max, IP2X&ndash;4X enclosure (0.75): k = 226&radic;ln(434.5/304.5) = 134.8 A&middot;&radic;s/mm&sup2;. 120&times;10: 1740 &times; 0.75 = 1305 A &#10007;; 160&times;10: 2220 &times; 0.75 = 1665 A &#10003; and 134.8 &times; 1600 / 1000 = 216 kA &#8805; 36 kA &#10003; &rarr; <strong>160&times;10 mm, one bar per phase</strong>
       </div>
     </div>
 
@@ -1149,7 +1092,7 @@ Where A = cross-sectional area (mm²), t = fault duration (s)
       <h3>CT Ratio Selection</h3>
       <div class="formula-box">
 CT primary rating ≥ supply rating (A)
-Optimal load: 10–120% of CT primary (NMI requirement)
+Accuracy range: S classes 1–120%, other classes 5–120% of rated primary current
 Secondary: 5A standard
       </div>
       <h3>Burden Calculation</h3>
@@ -1170,7 +1113,7 @@ Total burden (VA) = Meter burden + Cable burden
         </dl>
       </div>
       <div class="example-box">
-        <strong>NMI Note:</strong> Pattern-approved CTs required for installations &gt;100A. Minimum Class 0.5S. Expected load must fall between 10–120% of CT primary rating throughout service life.
+        <strong>NMI Note:</strong> Pattern-approved CTs required for installations &gt;100A. Minimum Class 0.5S. Typical load should stay within the accuracy range and the maximum load must not exceed 120% of the CT primary rating.
       </div>
     </div>
 
@@ -1180,43 +1123,34 @@ Total burden (VA) = Meter burden + Cable burden
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 3000:2018 — <a href="as3000viewer.html#cl-5.6" target="_blank">Clause 5.3, 5.6</a></li>
-          <li>ENA EG-0 — Power system earthing guide</li>
+          <li>AS/NZS 3000:2018 &mdash; <a href="as3000viewer.html#cl-5.6" target="_blank">Section 5</a></li>
+          <li>AS/NZS 1768, BS 7430 &mdash; electrode resistance formulas</li>
+          <li>ENA EG-0 &mdash; Power system earthing guide</li>
         </ul>
       </div>
-      <h3>Vertical Rod Resistance</h3>
+      <h3>Vertical Rod (Dwight)</h3>
       <div class="formula-box">
-R = (ρ / 2πL) × ln(4L / d)
-
-  ρ = soil resistivity (Ω·m)
-  L = rod length (m)
-  d = rod diameter (m)
+R = (ρ / 2πL) × [ln(8L / d) − 1]      ρ (Ω·m), L rod length (m), d diameter (m)
       </div>
-      <h3>Horizontal Strip / Buried Tape</h3>
+      <h3>Rods in Line (BS 7430)</h3>
       <div class="formula-box">
-R = (ρ / πL) × ln(2L² / (w × d))
-
-  w = strip width (m),  d = burial depth (m)
+R_n = R_1 × (1 + λα) / n,   α = ρ / (2π R_1 s),   λ = 2 × (1/2 + 1/3 + … + 1/n)
+λ: 2 rods 1.00, 3 rods 1.67, 4 rods 2.17, 10 rods 3.86;  rod-count solver = smallest n with R_n ≤ target
       </div>
-      <h3>Earth Grid (Laurent-Niemann Approximation)</h3>
+      <h3>Horizontal Strip (Sunde/Dwight)</h3>
       <div class="formula-box">
-R_grid ≈ ρ / (4√A) + ρ / L_total
-
-  A = grid area (m²),  L_total = total conductor length (m)
+R = (ρ / πL) × [ln(2L / √(2 a h)) − 1],   a = w/4 (equivalent radius), h = burial depth
       </div>
-      <h3>Parallel Electrodes</h3>
+      <h3>Earth Grid (Laurent-Niemann)</h3>
       <div class="formula-box">
-R_combined = R_single / (n × η)
-
-Efficiency factor η accounts for mutual coupling between electrodes (Schwarz method)
+R = ρ / (4r) + ρ / L_total,   r = √(A/π)   (= 0.443 ρ/√A + ρ/L)
       </div>
-      <div class="variable-list">
-        <dl>
-          <dt>Soil resistivity reference (Ω·m)</dt>
-          <dd>Marshy: 2–50 (design 10) &nbsp;|&nbsp; Clay: 20–200 (design 100) &nbsp;|&nbsp; Sand: 200–2000 (design 500) &nbsp;|&nbsp; Rock/dry: 1000–10000 (design 3000)</dd>
-          <dt>AS/NZS 3000 target</dt>
-          <dd>MEN systems: ≤1 Ω (distributor requirements may be lower)</dd>
-        </dl>
+      <h3>Buried Plate (BS 7430)</h3>
+      <div class="formula-box">
+R = (ρ / 8r) × [1 + r / (2.5h + r)],   r = √(A/π)
+      </div>
+      <div class="example-box">
+        <strong>Example:</strong> &rho; = 100 &#937;&middot;m, 2.4 m &times; 15.9 mm rod: R = 100/(2&pi;&times;2.4) &times; [ln(8&times;2.4/0.0159) &minus; 1] = 6.63 &times; 6.10 = 40.4 &#937;
       </div>
     </div>
 
@@ -1226,7 +1160,7 @@ Efficiency factor η accounts for mutual coupling between electrodes (Schwarz me
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 3000:2018 — <a href="as3000viewer.html#cl-2.6" target="_blank">Clause 2.6.3–2.6.4</a></li>
+          <li>AS/NZS 3000:2018 — <a href="as3000viewer.html#cl-2.6.3" target="_blank">Clause 2.6.3.2</a></li>
           <li>AS/NZS 3190 — RCD types and characteristics</li>
           <li>IEC 62423 — Type F and Type B RCDs</li>
         </ul>
@@ -1248,9 +1182,10 @@ Type III (B):  AC + pulsating DC + smooth DC — required for EV/VSD/inverter ci
       </div>
       <h3>Mandatory Requirements</h3>
       <div class="formula-box">
-All socket outlets ≤20A (domestic &amp; commercial):  30mA, Type II (A)
-Lighting final circuits (residential):               30mA RCD
-Wet areas, outdoor circuits, garages:                30mA mandatory
+Domestic / residential: all final subcircuits         30mA  (cl. 2.6.3.2.2)
+Non-domestic: socket-outlets, lighting and hand-held
+  equipment on final subcircuits ≤ 32 A               30mA  (cl. 2.6.3.2.3.3)
+Wet areas, outdoor circuits:                           30mA mandatory
 EV chargers (Mode 3):                                Type B or 6mA DC-detecting Type II
 VSD / inverter-fed loads:                            Type B required
 Medical circuits:                                    10mA minimum

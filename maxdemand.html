@@ -103,7 +103,7 @@
             (a)(ii) Outdoor &gt;1000 W: 75% connected load &nbsp;|&nbsp;
             (b)(i) Socket-outlets &#8804;10 A: 10 A for first 20 points + 5 A per additional 20 (or part) &nbsp;|&nbsp;
             (b)(ii) 15 A SO: +10 A &nbsp;|&nbsp;
-            (b)(iii) 20 A SO: +15 A &nbsp;|&nbsp;
+            (b)(iii) 20 A SO: +15 A (both 15 A &amp; 20 A: +15 A total) &nbsp;|&nbsp;
             (c) Cooking/laundry &gt;10 A: 50% connected load &nbsp;|&nbsp;
             (d) Fixed HVAC/saunas: 75% connected load &nbsp;|&nbsp;
             (e) Instant water heater: 33.3% connected load &nbsp;|&nbsp;
@@ -149,7 +149,7 @@
                 <td class="row-label">(b)(iii) 20 A socket-outlets <span class="note-text">(not cooking/HVAC dedicated)</span></td>
                 <td><input type="number" id="c1sSock20" min="0" value="0" oninput="c1Calc()"> <span class="note-text">qty</span></td>
                 <td class="row-amps" id="c1sSock20A">0.0</td>
-                <td class="row-note">+15 A if any</td>
+                <td class="row-note">+15 A if any (replaces the 15 A increase)</td>
               </tr>
 
               <tr class="group-header"><td colspan="4">(c) Cooking / Laundry (&gt;10 A)</td></tr>
@@ -908,9 +908,12 @@
 
       // (b)(ii) 15 A: +10 A if any exist
       const s15 = parseInt(document.getElementById('c1sSock15').value) || 0;
-      // (b)(iii) 20 A: +15 A if any exist. Both apply independently.
+      // (b)(iii) 20 A: +15 A if any exist. Table C1 Note 10: if both 15 A and 20 A
+      // socket-outlets are installed, the increase is 15 A (not 25 A).
       const s20 = parseInt(document.getElementById('c1sSock20').value) || 0;
-      const sockBoost = (s15 > 0 ? 10 : 0) + (s20 > 0 ? 15 : 0);
+      const boost15 = (s15 > 0 && s20 === 0) ? 10 : 0;
+      const boost20 = s20 > 0 ? 15 : 0;
+      const sockBoost = boost15 + boost20;
       const totalSockA = sockA + sockBoost;
 
       // (c) Cooking / laundry / SO >10 A: 50% connected load
@@ -948,8 +951,8 @@
       document.getElementById('c1sLightA').textContent = lightA.toFixed(1);
       document.getElementById('c1sOutdoorA').textContent = outdoorA.toFixed(1);
       document.getElementById('c1sSocketA').textContent = sockA.toFixed(1);
-      document.getElementById('c1sSock15A').textContent = (s15 > 0 ? 10 : 0).toFixed(1);
-      document.getElementById('c1sSock20A').textContent = (s20 > 0 ? 15 : 0).toFixed(1);
+      document.getElementById('c1sSock15A').textContent = boost15.toFixed(1);
+      document.getElementById('c1sSock20A').textContent = boost20.toFixed(1);
       document.getElementById('c1sCookA').textContent = cookA.toFixed(1);
       document.getElementById('c1sHVACA').textContent = hvacA.toFixed(1);
       document.getElementById('c1sInstantA').textContent = instA.toFixed(1);
@@ -1055,11 +1058,12 @@
           case 2:
             waterF = 'Single unit &mdash; enter in single dwelling mode';
             break;
-          case 3:
+          case 3: case 4:
+            // Table C1: 6 A per living unit for 2–20 units per phase (Cols 3 and 4)
             waterA = 6 * n;
             waterF = '6&times;' + n + ' (' + waterType + ')';
             break;
-          case 4: case 5:
+          case 5:
             waterA = 100 + 0.8 * n;
             waterF = '100 + 0.8&times;' + n + ' (' + waterType + ')';
             break;

@@ -180,8 +180,9 @@
           <ul style="margin:0 0 10px 18px;line-height:2;font-size:0.89em;">
             <li><span style="color:#dc2626;">&#9632;</span> <strong>Primary zone:</strong> 600 mm (maintenance access)</li>
             <li><span style="color:#d97706;">&#9632;</span> <strong>Secondary zone:</strong> 600&ndash;1000 mm (operation)</li>
-            <li><strong>Min. front clearance:</strong> 1000 mm (AS/NZS 3000 Cl. 2.10.2)</li>
-            <li><strong>Min. side clearance:</strong> 600 mm (AS/NZS 3000 Cl. 2.10.2)</li>
+            <li><strong>Min. front clearance:</strong> 1000 mm from closed faces (AS/NZS 3000 Cl. 2.10.2.2(c)(i))</li>
+            <li><strong>Around open doors / racked-out gear:</strong> 600 mm unimpeded (Cl. 2.10.2.2(c)(ii))</li>
+            <li><strong>Access doors:</strong> at least 0.9 m &times; 2.2 m, opening in the direction of egress</li>
             <li><strong>Min. room dimensions:</strong> 2000 &times; 2000 mm</li>
           </ul>
           <div class="legend">
@@ -191,6 +192,12 @@
             <div class="legend-item"><div class="legend-swatch" style="background:#f59e0b;border:1.5px solid rgba(0,0,0,0.3);"></div>Meter</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#9333ea;border:1.5px solid rgba(0,0,0,0.3);"></div>CT</div>
           </div>
+        </div>
+
+        <div class="calc-section">
+          <label for="msbRating" style="font-weight:600;font-size:0.9em;">MSB Rating (A per phase)</label>
+          <input type="number" id="msbRating" value="400" min="0" step="50" oninput="renderCanvas()" style="width:100%;margin-top:6px;" />
+          <span style="font-size:0.8em;color:var(--text-secondary);">Two exit paths are required at &#8805; 800 A or &gt; 3 m length</span>
         </div>
 
         <!-- Results & warnings -->
@@ -313,7 +320,8 @@
       const maxDepth = Math.max(...equipment.map(e => e.d));
       const maxFrontClr = Math.max(...equipment.map(e => (e.type === 'MSB' && e.panels) ? 1400 : FRONT_CLR));
 
-      if (totalW <= 3400) {
+      // A single item can only go on one wall, however wide it is
+      if (totalW <= 3400 || equipment.length < 2) {
         // Single-wall layout
         return {
           wallW: Math.max(totalW, MIN_ROOM),
@@ -570,16 +578,22 @@
 
       const warnings = [];
 
-      // Two-exits check — any single MSB > 3 m OR total MSB wall > 3 m
+      // Two emergency exit paths — AS/NZS 3000 Cl. 2.10.2.2(c)(iii): switchboard rated ≥ 800 A per phase
+      // or more than 3 m long (unless 3 m clear space is provided in front of the board)
       const msbs = equipment.filter(e => e.type === 'MSB');
       const msbTotalW = msbs.reduce((s, e) => s + e.w, 0);
-      if (msbs.some(e => e.w > 3000) || msbTotalW > 3000) {
+      const msbRating = parseFloat((document.getElementById('msbRating') || {}).value) || 0;
+      const tooLong = msbs.some(e => e.w > 3000) || msbTotalW > 3000;
+      const highRating = msbs.length > 0 && msbRating >= 800;
+      if (tooLong || highRating) {
+        const reason = [tooLong ? 'is more than 3 m long' : '', highRating ? 'is rated ' + msbRating + ' A (&#8805; 800 A per phase)' : ''].filter(Boolean).join(' and ');
+        const clearFront = room.roomD - Math.max(...msbs.map(e => e.d));
         warnings.push(
           `<div class="warn-box danger">` +
-          `<strong>&#9888;&nbsp; Two exits required</strong><br>` +
-          `The MSB exceeds 3 m &mdash; the switchroom must have <strong>two exits</strong> ` +
-          `(AS/NZS&nbsp;3000:2018 Cl.&nbsp;2.10.6). Position exits so no worker can be trapped ` +
-          `at either end of the switchboard.` +
+          `<strong>&#9888;&nbsp; Two exit paths required</strong><br>` +
+          `The MSB ${reason} &mdash; provide <strong>two emergency exit paths, spaced well apart</strong> ` +
+          `(AS/NZS&nbsp;3000:2018 Cl.&nbsp;2.10.2.2(c)(iii)). ` +
+          (clearFront >= 3000 ? 'This layout gives at least 3 m clear in front of the board, so one exit path may be acceptable (exception, Figure 2.24).' : 'One exit path is acceptable only with at least 3 m clear space in front of the board and its open doors.') +
           `</div>`
         );
       }

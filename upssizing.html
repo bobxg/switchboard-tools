@@ -35,6 +35,13 @@
         <div class="input-group"><label for="ageingFactor">Battery Ageing Factor</label><input type="number" id="ageingFactor" value="0.8" min="0.5" max="1.0" step="0.05" /><span style="font-size:0.8em;color:var(--text-secondary);">0.8 typical for end-of-life capacity</span></div>
         <div class="input-group"><label for="rechargeHrs">Target Recharge Time (hours)</label><input type="number" id="rechargeHrs" value="8" min="1" step="1" /></div>
       </div>
+      <div class="input-row three">
+        <div class="input-group"><label for="upsPF">UPS Output Power Factor (kW/kVA)</label>
+          <select id="upsPF"><option value="0.8">0.8</option><option value="0.9" selected>0.9</option><option value="1.0">1.0</option></select></div>
+        <div class="input-group"><label for="moduleKVA">Module / Frame Size (kVA)</label>
+          <select id="moduleKVA"><option value="0" selected>Auto (one standard frame per path)</option><option value="10">10</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="40">40</option><option value="50">50</option><option value="60">60</option><option value="100">100</option><option value="200">200</option><option value="250">250</option><option value="300">300</option><option value="500">500</option></select></div>
+        <div class="input-group"><label for="dcV">Battery DC Bus Voltage (V)</label><input type="number" id="dcV" value="480" min="48" step="12" /></div>
+      </div>
       <button class="calc-button" onclick="calculate()">Calculate UPS Size</button>
       <button class="btn-export" onclick="exportUPSResult()">Export UPS Result as CSV</button>
     </div>
@@ -44,7 +51,8 @@
         <div class="result-grid">
           <div class="result-item"><div class="result-label">Design Load (kVA)</div><div class="result-value" id="resKVA">&mdash;</div></div>
           <div class="result-item"><div class="result-label">UPS Module Rating (kVA)</div><div class="result-value" id="resUPS">&mdash;</div></div>
-          <div class="result-item"><div class="result-label">Battery Capacity (Ah @ 480VDC)</div><div class="result-value" id="resAH">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">Modules Installed</div><div class="result-value" id="resModules">&mdash;</div></div>
+          <div class="result-item"><div class="result-label">Battery Capacity (Ah, C10)</div><div class="result-value" id="resAH">&mdash;</div></div>
           <div class="result-item"><div class="result-label">Number of Battery Strings</div><div class="result-value" id="resStrings">&mdash;</div></div>
           <div class="result-item"><div class="result-label">Indicative Battery Weight (kg)</div><div class="result-value" id="resWeight">&mdash;</div></div>
           <div class="result-item"><div class="result-label">Recharge Current (A)</div><div class="result-value" id="resRecharge">&mdash;</div></div>
@@ -55,20 +63,29 @@
   </div>
   <script>
     const stdUPS = [10,15,20,30,40,50,60,80,100,120,150,160,200,225,250,300,400,500,600,750,800,1000];
+    // Fraction of the 10-hour (C10) capacity available at UPS discharge rates to a typical end voltage (indicative)
+    const RATE_FACTOR = {
+      vrla: { 5: 0.33, 10: 0.45, 15: 0.53, 30: 0.65, 60: 0.75, 120: 0.85 },
+      lion: { 5: 0.85, 10: 0.90, 15: 0.92, 30: 0.95, 60: 0.97, 120: 0.98 },
+      nicd: { 5: 0.50, 10: 0.60, 15: 0.65, 30: 0.75, 60: 0.85, 120: 0.90 }
+    };
 
     function exportUPSResult() {
       var rb = document.getElementById('resKVA');
-      if (!rb || rb.textContent === '\u2014') { OmniToast.show('Calculate first', 'warn'); return; }
+      if (!rb || rb.textContent === '—') { OmniToast.show('Calculate first', 'warn'); return; }
       OmniExport.toCSV(['Parameter','Value'],[
         ['Design Load (kVA)', document.getElementById('resKVA').textContent],
         ['UPS Module (kVA)', document.getElementById('resUPS').textContent],
-        ['Battery Capacity (Ah)', document.getElementById('resAH').textContent],
+        ['Modules Installed', document.getElementById('resModules').textContent],
+        ['Battery Capacity (Ah C10)', document.getElementById('resAH').textContent],
         ['Battery Strings', document.getElementById('resStrings').textContent],
         ['Battery Weight (kg)', document.getElementById('resWeight').textContent],
         ['Recharge Current (A)', document.getElementById('resRecharge').textContent]
       ], 'ups-sizing');
     }
+
     function calculate() {
+      if (typeof OmniValidate !== 'undefined' && !OmniValidate.requireAll()) return;
       const kw = parseFloat(document.getElementById('loadKW').value);
       const pf = parseFloat(document.getElementById('loadPF').value);
       const growth = parseFloat(document.getElementById('growthPct').value) / 100;
@@ -78,70 +95,64 @@
       const temp = parseFloat(document.getElementById('ambTemp').value);
       const ageing = parseFloat(document.getElementById('ageingFactor').value);
       const rechargeHrs = parseFloat(document.getElementById('rechargeHrs').value);
+      const upsPF = parseFloat(document.getElementById('upsPF').value);
+      const moduleSel = parseFloat(document.getElementById('moduleKVA').value) || 0;
+      const dcV = Math.max(12, parseFloat(document.getElementById('dcV').value) || 480);
 
       const designKW = kw * (1 + growth);
       const designKVA = designKW / pf;
+      // A UPS is limited by both its kVA and its kW rating (kW = kVA × output pf)
+      const requiredKVA = Math.max(designKVA, designKW / upsPF);
 
-      // UPS module sizing
-      let upsKVA;
-      if (config === 1) {
-        upsKVA = designKVA;
-      } else if (config === 2) {
-        // N+1: each module = designKVA, need N+1 modules; practical: single module &#8805; designKVA
-        upsKVA = designKVA;
+      let selectedUPS, modulesN, modulesInstalled, configLabel;
+      if (moduleSel > 0) {
+        selectedUPS = moduleSel;
+        modulesN = Math.ceil(requiredKVA / moduleSel);
       } else {
-        upsKVA = designKVA; // 2N: two independent UPS each &#8805; design
+        selectedUPS = stdUPS.find(s => s >= requiredKVA) || Math.ceil(requiredKVA / 50) * 50;
+        modulesN = 1;
       }
-      let selectedUPS = upsKVA;
-      for (const s of stdUPS) { if (s >= upsKVA) { selectedUPS = s; break; } }
-      if (selectedUPS < upsKVA) selectedUPS = Math.ceil(upsKVA / 50) * 50;
+      if (config === 1) { modulesInstalled = modulesN; configLabel = 'Single (N)'; }
+      else if (config === 2) { modulesInstalled = modulesN + 1; configLabel = 'N+1 Parallel Redundant'; }
+      else { modulesInstalled = 2 * modulesN; configLabel = '2N Fully Redundant'; }
 
-      // Battery sizing
-      const dcV = 480; // typical DC bus voltage
+      // Battery: energy drawn through the inverter at full design load
       const inverterEff = 0.94;
-      const dcPower = designKW / inverterEff; // kW from battery
-      const dcCurrent = (dcPower * 1000) / dcV; // A
-
-      // Temperature derating
+      const dcPower = designKW / inverterEff;          // kW from battery
+      const dcCurrent = (dcPower * 1000) / dcV;        // A
+      // Temperature: capacity falls ~1%/°C below 25°C; above 25°C capacity is not credited (life falls instead)
       let tempFactor = 1.0;
-      if (battType === 'vrla') {
-        tempFactor = temp > 25 ? 1 - (temp - 25) * 0.005 : 1 + (25 - temp) * 0.005; // approx
-        tempFactor = Math.max(0.7, Math.min(1.1, tempFactor));
-      }
-
-      // Required Ah = (DC current &times; time in hours) / (ageing &times; temp factor &times; depth of discharge)
-      const dod = battType === 'lion' ? 0.85 : 0.80; // depth of discharge
+      if (battType !== 'lion' && temp < 25) tempFactor = Math.max(0.6, 1 - (25 - temp) * 0.01);
+      const rate = RATE_FACTOR[battType][mins] || 0.6;
+      const usable = battType === 'lion' ? 0.9 : 1.0;  // Li-ion BMS usable window
       const hours = mins / 60;
-      const requiredAh = (dcCurrent * hours) / (ageing * tempFactor * dod);
-
-      // Strings: each string provides requiredAh at nominal; parallel strings for redundancy
-      const stringAh = battType === 'lion' ? 100 : 100; // typical monobloc
+      // Required nominal (C10) capacity = Ah drawn / (rate factor × ageing × temperature × usable window)
+      const requiredAh = (dcCurrent * hours) / (rate * ageing * tempFactor * usable);
+      const stringAh = 100; // typical monobloc string capacity
       const numStrings = Math.max(1, Math.ceil(requiredAh / stringAh));
-
-      // Weight estimate
       const whPerKg = battType === 'lion' ? 150 : battType === 'vrla' ? 35 : 25;
       const totalWh = requiredAh * dcV;
       const weight = totalWh / whPerKg;
-
-      // Recharge current
-      const rechargeCurrent = requiredAh / rechargeHrs * 1.1; // 10% overhead
+      const rechargeCurrent = (dcCurrent * hours) / rechargeHrs * 1.1; // replace discharged Ah plus 10%
 
       document.getElementById('resKVA').textContent = designKVA.toFixed(0);
       document.getElementById('resUPS').textContent = selectedUPS;
+      document.getElementById('resModules').textContent = modulesInstalled + (moduleSel > 0 ? ' × ' + selectedUPS + ' kVA' : '');
       document.getElementById('resAH').textContent = requiredAh.toFixed(0);
       document.getElementById('resStrings').textContent = numStrings;
       document.getElementById('resWeight').textContent = weight.toFixed(0);
       document.getElementById('resRecharge').textContent = rechargeCurrent.toFixed(1);
 
-      const configLabel = {1:'Single (N)', 2:'N+1 Parallel Redundant', 3:'2N Fully Redundant'}[config];
+      const installedKVA = modulesInstalled * selectedUPS;
       document.getElementById('notes').innerHTML = `
         <strong>Design Summary:</strong><br>
-        &#8226; Critical load: ${kw} kW + ${(growth*100).toFixed(0)}% growth = ${designKW.toFixed(1)} kW / ${designKVA.toFixed(0)} kVA<br>
-        &#8226; Configuration: ${configLabel} ${config >= 2 ? '&mdash; total installed: ' + (config === 2 ? '2 &times; ' + selectedUPS + ' kVA modules' : '2 &times; ' + selectedUPS + ' kVA independent UPS') : ''}<br>
-        &#8226; Battery: ${battType.toUpperCase()} &mdash; ${requiredAh.toFixed(0)} Ah at ${dcV} VDC, ${numStrings} string(s), ${mins} min autonomy<br>
+        &#8226; Critical load: ${kw} kW + ${(growth*100).toFixed(0)}% growth = ${designKW.toFixed(1)} kW / ${designKVA.toFixed(0)} kVA${designKW / upsPF > designKVA ? ` &mdash; <strong>kW-limited</strong>: at output pf ${upsPF} the UPS must be rated &#8805; ${(designKW / upsPF).toFixed(0)} kVA` : ''}<br>
+        &#8226; Configuration: ${configLabel} &mdash; ${modulesInstalled} &times; ${selectedUPS} kVA installed (${installedKVA} kVA total, ${modulesN} needed for the load)${config >= 2 ? '; loading per module with all units healthy ' + (requiredKVA / installedKVA * 100).toFixed(0) + '%' : ''}<br>
+        &#8226; Battery: ${battType.toUpperCase()} &mdash; ${requiredAh.toFixed(0)} Ah (C10) at ${dcV} VDC, ${numStrings} &times; ${stringAh} Ah string(s), ${mins} min autonomy (rate factor ${rate}, ageing ${ageing}, temperature ${tempFactor.toFixed(2)})<br>
         &#8226; Estimated battery weight: ${weight.toFixed(0)} kg &mdash; verify floor loading capacity<br>
-        &#8226; Recharge time: ${rechargeHrs} hours at ${rechargeCurrent.toFixed(1)} A<br>
-        <em>Refer to the AS 62040 series for detailed UPS requirements. Battery room ventilation sizing per manufacturer requirements and AS/NZS 3000 Cl. 5.4 (hydrogen hazard control).</em>
+        &#8226; Recharge in ${rechargeHrs} h needs about ${rechargeCurrent.toFixed(1)} A of charger capacity in addition to the inverter load<br>
+        ${battType !== 'lion' && temp > 25 ? '&#8226; <strong>Battery room above 25&deg;C:</strong> VRLA/NiCd service life roughly halves for every 8&ndash;10&deg;C above 25&deg;C.<br>' : ''}
+        <em>Battery capacity is indicative &mdash; confirm with the manufacturer's constant-power discharge tables. Refer to the AS 62040 series for UPS requirements; battery room ventilation per AS 3011 (secondary batteries in buildings) and AS 2676.</em>
       `;
       document.getElementById('resultSection').style.display = 'block';
     }

@@ -30,10 +30,10 @@
       <div class="input-group">
         <label for="areaType">Area Classification:</label>
         <select id="areaType">
-          <option value="escape">Escape Routes / Corridors (0.5 lux required)</option>
-          <option value="open">Open Areas &gt; 60m&sup2; (1.0 lux required)</option>
-          <option value="highrisk">High Risk Task Areas (10 lux required)</option>
-          <option value="carpark">Covered Car Parks (1.0 lux required)</option>
+          <option value="escape">Escape Routes / Corridors (0.2 lux minimum)</option>
+          <option value="open">Open Areas &gt; 60m&sup2; (0.2 lux minimum)</option>
+          <option value="highrisk">High Risk Task Areas (10 lux design target)</option>
+          <option value="carpark">Covered Car Parks (1.0 lux design target)</option>
         </select>
       </div>
 
@@ -173,22 +173,22 @@
         <tbody>
           <tr>
             <td>Escape Routes / Corridors</td>
-           <td>0.5 lux minimum (at floor level)</td>
+           <td>0.2 lux minimum (horizontal, at floor level)</td>
             <td>90 minutes</td>
           </tr>
           <tr>
            <td>Open Areas &gt; 60m&sup2; (anti-panic)</td>
-           <td>1.0 lux minimum</td>
+           <td>0.2 lux minimum (horizontal, at floor level)</td>
             <td>90 minutes</td>
           </tr>
           <tr>
             <td>High Risk Task Areas</td>
-            <td>10 lux minimum</td>
+            <td>10 lux (design target 10 lux minimummdash; point-by-point design)</td>
             <td>90 minutes</td>
           </tr>
           <tr>
             <td>Covered Car Parks</td>
-            <td>1.0 lux minimum</td>
+            <td>1.0 lux (typical design target)</td>
             <td>90 minutes</td>
           </tr>
           <tr>
@@ -373,6 +373,7 @@
     }
 
     function calculateSpacing() {
+      if (typeof OmniValidate !== 'undefined' && !OmniValidate.requireAll()) return;
       // Get inputs
       const mode = document.getElementById('calcMode').value;
       const areaType = document.getElementById('areaType').value;
@@ -387,11 +388,11 @@
       let areaName;
       switch(areaType) {
         case 'escape':
-          requiredLux = 0.5;
+          requiredLux = 0.2;
           areaName = 'Escape Routes';
           break;
         case 'open':
-          requiredLux = 1.0;
+          requiredLux = 0.2;
           areaName = 'Open Areas > 60m&sup2; (anti-panic)';
           break;
         case 'highrisk':
@@ -407,38 +408,24 @@
       if (mode === 'class') {
         const classification = document.getElementById('classification').value;
         
-        // Get base spacing for 1 lux
-        let baseSpacing = getSpacingFromTable(classification, mountHeight);
-        
-        // Adjust for other lux levels (Approximate inverse square law relationship for spacing? 
-        // Actually, spacing tables are specific. For 0.5 lux, spacing is wider. For 10 lux, much closer.
-        // This is a limitation of the simplified tool. We will apply a factor.)
-        
-        let luxFactor = 1.0;
-        if (requiredLux === 0.5) luxFactor = 1.25; // Approx wider spacing
-        if (requiredLux === 10.0) luxFactor = 0.35; // Much closer spacing
-        
-        maxSpacing = baseSpacing * luxFactor;
-        
-        calcMethodText = `Based on AS/NZS 2293 Classification ${classification} at ${mountHeight}m height. ` +
-                         `Base spacing for 1 lux: ${baseSpacing.toFixed(1)}m. ` +
-                         `Adjusted for ${requiredLux} lux (${areaName}).`;
-
+        // AS/NZS 2293.1 classification tables give the maximum spacing that achieves the
+        // standard's minimum illuminance — use them directly, without scaling
+        const baseSpacing = getSpacingFromTable(classification, mountHeight);
+        maxSpacing = baseSpacing;
+        calcMethodText = `Based on AS/NZS 2293.1 classification ${classification} at ${mountHeight} m mounting height: ` +
+                        `tabulated maximum spacing ${baseSpacing.toFixed(1)} m (${areaName}). ` +
+                        `Classification spacing applies only to luminaires tested and classified by the manufacturer.`;
       } else {
         // Lumen Method (Existing)
         const lumens = parseFloat(document.getElementById('lumens').value);
         const reflectance = parseFloat(document.getElementById('reflectance').value);
         
-        // Apply reflectance factor (lower reflectance reduces effective lumens)
-        const effectiveLumens = lumens * (0.5 + reflectance * 0.5);
-
-        // Calculate spacing using lumen method with corridor geometry
-        const utilizationFactor = 0.4 + (reflectance * 0.2); // 0.4-0.6 depending on reflectance
-        const maintenanceFactor = 0.8; // Account for dirt and aging
-        
-        // Simplified spacing calculation
-        maxSpacing = Math.sqrt((effectiveLumens * utilizationFactor * maintenanceFactor) / (requiredLux * corridorWidth));
-        
+        // Average-illuminance (lumen) method along a path of width w:
+        // E = Φ·UF·MF / (S·w)  →  S = Φ·UF·MF / (E·w)
+        const utilizationFactor = 0.4 + (reflectance * 0.2); // 0.4–0.6 depending on reflectance
+        const maintenanceFactor = 0.8; // dirt and ageing
+        const width = Math.max(0.5, corridorWidth || 1);
+        maxSpacing = (lumens * utilizationFactor * maintenanceFactor) / (requiredLux * width);
         calcMethodText = `Calculated using Lumen Method (Approximate) for ${areaName} (${requiredLux} lux required) with ${lumens}lm luminaire.`;
       }
       

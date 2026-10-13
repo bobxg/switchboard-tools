@@ -16,7 +16,7 @@
     <div class="calc-section">
       <h2>Site Conditions &amp; Derating</h2>
       <div class="info-box">
-        <strong>AS/NZS 3010:2017 cl. 4.4:</strong> Generator output shall be derated for altitude above 1000m and ambient temperature above 40&deg;C. Standard ratings are at sea level, 40&deg;C ambient.
+        <strong>Site derating:</strong> Generator output is derated for altitude and high ambient temperature. This tool applies typical values (3.5% per 300 m above 1000 m, 2% per 5.5&deg;C above 40&deg;C) &mdash; use the manufacturer&rsquo;s derating curves for final selection (AS/NZS 3010, ISO 8528-1).
       </div>
       <div class="input-row three">
         <div class="input-group">
@@ -51,6 +51,18 @@
         <div class="input-group">
           <label for="fuelRuntime">Required Fuel Autonomy (hours)</label>
           <input type="number" id="fuelRuntime" value="8" min="1" step="1" />
+        </div>
+      </div>
+      <div class="input-row three">
+        <div class="input-group">
+          <label for="xdTrans">Alternator Transient Reactance X'd (pu)</label>
+          <input type="number" id="xdTrans" value="0.25" min="0.05" max="0.5" step="0.01" />
+          <span style="font-size:0.8em;color:var(--text-secondary);">Typical 0.2&ndash;0.3 pu; use the alternator datasheet</span>
+        </div>
+        <div class="input-group">
+          <label for="maxDip">Maximum Permissible Voltage Dip (%)</label>
+          <input type="number" id="maxDip" value="20" min="5" max="40" step="1" />
+          <span style="font-size:0.8em;color:var(--text-secondary);">AS/ISO 8528 performance class G2 is about 20&ndash;24%</span>
         </div>
       </div>
     </div>
@@ -107,6 +119,10 @@
           <div class="result-item">
             <div class="result-label">Indicative Fuel Tank (L)</div>
             <div class="result-value" id="resFuel">&mdash;</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">Governing Criterion</div>
+            <div class="result-value" id="resGovern" style="font-size:1.1em;">&mdash;</div>
           </div>
         </div>
       </div>
@@ -182,26 +198,30 @@
       ], 'generator-sizing');
     }
     function calculate() {
-      const altitude = parseFloat(document.getElementById('altitude').value);
-      const temp = parseFloat(document.getElementById('ambientTemp').value);
-      const growth = parseFloat(document.getElementById('growthFactor').value) / 100;
-      const fuelHrs = parseFloat(document.getElementById('fuelRuntime').value);
+      const altitude = parseFloat(document.getElementById('altitude').value) || 0;
+      const temp = parseFloat(document.getElementById('ambientTemp').value) || 40;
+      const growth = (parseFloat(document.getElementById('growthFactor').value) || 0) / 100;
+      const fuelHrs = parseFloat(document.getElementById('fuelRuntime').value) || 0;
       const appType = document.getElementById('application').value;
+      const xd = Math.max(0.05, parseFloat(document.getElementById('xdTrans').value) || 0.25);
+      const maxDip = Math.min(40, Math.max(5, parseFloat(document.getElementById('maxDip').value) || 20)) / 100;
 
-      // Derating factors
+      // Typical site derating (confirm with the manufacturer's curves): 3.5% per 300 m above 1000 m,
+      // 2% per 5.5°C above 40°C
       let altDerate = 1.0;
-      if (altitude > 1000) altDerate = 1 - (altitude - 1000) * 0.035 / 1000; // ~3.5% per 1000m above 1000m
+      if (altitude > 1000) altDerate = 1 - (altitude - 1000) / 300 * 0.035;
       let tempDerate = 1.0;
-      if (temp > 40) tempDerate = 1 - (temp - 40) * 0.02; // ~2% per &deg;C above 40&deg;C
-      const totalDerate = altDerate * tempDerate;
+      if (temp > 40) tempDerate = 1 - (temp - 40) / 5.5 * 0.02;
+      const totalDerate = Math.max(0.3, altDerate * tempDerate);
+      // Usable fraction of the standby (nameplate) rating for the duty (ISO 8528-1 rating definitions)
+      const appFactor = { standby: 1.0, prime: 0.9, continuous: 0.75 }[appType] || 1.0;
 
       const rows = document.getElementById('loadBody').querySelectorAll('tr');
       const summaryBody = document.getElementById('summaryBody');
       summaryBody.innerHTML = '';
 
-      let cumKW = 0, cumKVA = 0, peakStepKVA = 0;
+      let cumKW = 0, cumKVA = 0, peakStepKVA = 0, maxStartKVA = 0;
       let allSteps = [];
-
       rows.forEach((row, i) => {
         const cells = row.querySelectorAll('td');
         const desc = cells[1].querySelector('input').value;
@@ -211,35 +231,31 @@
         const manStart = parseFloat(cells[5].querySelector('input').value) || 0;
         const runKVA = kw / pf;
         const startKVA = getStartingKVA(type, kw, pf, manStart);
-
         cumKW += kw;
         cumKVA += runKVA;
-        const stepKVA = cumKVA - runKVA + startKVA; // existing running + this step starting
+        const stepKVA = cumKVA - runKVA + startKVA; // existing running load + this step's starting kVA
         if (stepKVA > peakStepKVA) peakStepKVA = stepKVA;
-
-        // Voltage dip estimate: Vdip &#8776; (startKVA / genKVA) &times; 100%
-        // We'll calculate after we know gen size
+        if (startKVA > maxStartKVA) maxStartKVA = startKVA;
         allSteps.push({ desc, kw, runKVA, startKVA, cumKW, cumKVA, stepKVA });
       });
 
-      // Apply growth
       const designKW = cumKW * (1 + growth);
       const designKVA = cumKVA * (1 + growth);
+      // (1) Steady-state: design running kVA within the derated duty rating
+      const kvaForRunning = designKVA / (appFactor * totalDerate);
+      // (2) Transient: voltage dip for the largest step, dip = X'd·Ss / (Sg + X'd·Ss) ≤ Dmax
+      //     → Sg ≥ X'd·Ss·(1 − Dmax)/Dmax  (Sg = available kVA after site derating)
+      const kvaForDip = (xd * maxStartKVA * (1 - maxDip) / maxDip) / totalDerate;
+      const deratedMinKVA = Math.max(kvaForRunning, kvaForDip);
+      const governing = kvaForDip > kvaForRunning ? 'Voltage dip' : 'Running load';
 
-      // Required gen kVA: max of (running with growth) and (peak step)
-      const minKVA = Math.max(designKVA, peakStepKVA * (1 + growth));
-      const deratedMinKVA = minKVA / totalDerate;
+      let recKVA = stdSizes.find(s => s >= deratedMinKVA);
+      if (!recKVA) recKVA = Math.ceil(deratedMinKVA / 50) * 50;
+      const availKVA = recKVA * totalDerate;
 
-      // Select standard size
-      let recKVA = deratedMinKVA;
-      for (const s of stdSizes) {
-        if (s >= deratedMinKVA) { recKVA = s; break; }
-      }
-      if (recKVA < deratedMinKVA) recKVA = Math.ceil(deratedMinKVA / 50) * 50;
-
-      // Fuel estimate: diesel ~0.27 L/kWh at 75% load
-      const fuelRate = 0.27 * (designKW * 0.75);
-      const fuelTank = fuelRate * fuelHrs;
+      // Fuel: diesel ≈ 0.27 L/kWh at the expected running load
+      const fuelTank = 0.27 * designKW * fuelHrs;
+      const fuelFull = 0.27 * recKVA * 0.8 * fuelHrs;
 
       document.getElementById('resTotalKW').textContent = cumKW.toFixed(0);
       document.getElementById('resTotalKVA').textContent = cumKVA.toFixed(0);
@@ -247,22 +263,24 @@
       document.getElementById('resMinKVA').textContent = deratedMinKVA.toFixed(0);
       document.getElementById('resRecKVA').textContent = recKVA.toFixed(0);
       document.getElementById('resFuel').textContent = fuelTank.toFixed(0);
+      document.getElementById('resGovern').textContent = governing;
 
-      // Step summary table
-      let maxDip = 0;
+      let maxDipCalc = 0;
       allSteps.forEach((s, i) => {
-        const vDip = (s.startKVA / recKVA) * 100;
-        if (vDip > maxDip) maxDip = vDip;
+        const vDip = (xd * s.startKVA) / (availKVA + xd * s.startKVA) * 100;
+        if (vDip > maxDipCalc) maxDipCalc = vDip;
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${i+1}</td><td>${s.kw.toFixed(0)}</td><td>${s.startKVA.toFixed(0)}</td><td>${s.cumKW.toFixed(0)}</td><td>${s.cumKVA.toFixed(0)}</td><td>${s.stepKVA.toFixed(0)}</td><td style="color:${vDip>30?'#c62828':vDip>20?'#ff9800':'#2e7d32'};font-weight:bold;">${vDip.toFixed(1)}%</td>`;
+        tr.innerHTML = `<td>${i+1}</td><td>${s.kw.toFixed(0)}</td><td>${s.startKVA.toFixed(0)}</td><td>${s.cumKW.toFixed(0)}</td><td>${s.cumKVA.toFixed(0)}</td><td>${s.stepKVA.toFixed(0)}</td><td style="color:${vDip > maxDip * 100 ? '#c62828' : vDip > maxDip * 80 ? '#ff9800' : '#2e7d32'};font-weight:bold;">${vDip.toFixed(1)}%</td>`;
         summaryBody.appendChild(tr);
       });
 
       document.getElementById('dipNote').innerHTML = `
-        <strong>Voltage Dip Assessment:</strong> Maximum step voltage dip estimated at <strong>${maxDip.toFixed(1)}%</strong> of generator rated kVA.
-        ${maxDip > 30 ? '&#9888; Exceeds 30% &mdash; consider increasing generator size or staggering load steps.' : maxDip > 20 ? '&#9888; Marginal (20&ndash;30%) &mdash; verify with manufacturer data.' : '&#10003; Within acceptable limits (<20%).'}<br>
-        <strong>AS/NZS 3010 cl. 3.8:</strong> Frequency dip should not exceed &plusmn;5% and voltage dip should recover within acceptable limits.
-        ${totalDerate < 1 ? '<br><strong>Derating applied:</strong> ' + ((1-totalDerate)*100).toFixed(1) + '% (altitude + temperature).' : ''}
+        <strong>Voltage Dip Assessment:</strong> Largest step dip &asymp; <strong>${maxDipCalc.toFixed(1)}%</strong> on a ${recKVA} kVA set (X'd = ${xd} pu, ${availKVA.toFixed(0)} kVA available after derating) against a ${(maxDip * 100).toFixed(0)}% limit.
+        ${maxDipCalc > maxDip * 100 + 0.05 ? '&#9888; Exceeds the limit &mdash; stagger the steps, use soft starters/VSDs or increase the generator size.' : '&#10003; Within the limit.'}<br>
+        Running load ${designKVA.toFixed(0)} kVA (incl. growth) = ${(designKVA / availKVA * 100).toFixed(0)}% of the available ${appType} rating (${(appFactor * 100).toFixed(0)}% of standby).<br>
+        Fuel: ${fuelTank.toFixed(0)} L for ${fuelHrs} h at the running load; ${fuelFull.toFixed(0)} L at full rated output (0.8 pf). Add the unusable sump volume.
+        ${totalDerate < 1 ? '<br><strong>Site derating applied:</strong> ' + ((1-totalDerate)*100).toFixed(1) + '% (altitude + temperature).' : ''}
+        <br><em>Dip estimate uses dip = X'd&middot;S<sub>start</sub> / (S<sub>gen</sub> + X'd&middot;S<sub>start</sub>); confirm against the manufacturer's motor-starting curves and AS/NZS 3010.</em>
       `;
 
       document.getElementById('resultSection').style.display = 'block';

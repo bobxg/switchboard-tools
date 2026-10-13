@@ -148,18 +148,16 @@
     document.querySelectorAll('#upType,#upRating,#dnType,#dnRating').forEach(el => el.addEventListener('change', updateVisual));
 
     function getInstantTrip(type, rating, setting) {
-      const In = parseFloat(rating);
-      const mult = parseFloat(setting);
-      if (type === 'mcb_b') return { low: 3 * In, high: 5 * In };
-      if (type === 'mcb_c') return { low: 5 * In, high: 10 * In };
-      if (type === 'mcb_d') return { low: 10 * In, high: 20 * In };
-      if (type === 'mccb') return { low: mult * In, high: mult * In * 1.2 };
-      if (type === 'hrc' || type === 'nh_fuse') return { low: 3 * In, high: 6 * In };
-      return { low: mult * In, high: mult * In };
-    }
-
-
-    function exportDiscResult() {
+  const In = parseFloat(rating);
+  const mult = parseFloat(setting);
+  if (type === 'mcb_b') return { low: 3 * In, high: 5 * In };
+  if (type === 'mcb_c') return { low: 5 * In, high: 10 * In };
+  if (type === 'mcb_d') return { low: 10 * In, high: 20 * In };
+  if (type === 'mccb') return { low: 0.8 * mult * In, high: 1.2 * mult * In }; // ±20% tolerance (IEC 60947-2)
+  if (type === 'hrc' || type === 'nh_fuse') return { low: 3 * In, high: 6 * In };  // no true instantaneous — melting region only
+  return { low: mult * In, high: mult * In };
+}
+function exportDiscResult() {
       var rc = document.getElementById('resultContent');
       if (!rc || rc.innerHTML.trim() === '') { OmniToast.show('Calculate first', 'warn'); return; }
       OmniExport.toCSV(['Parameter','Value'],[
@@ -167,6 +165,7 @@
       ], 'discrimination-check');
     }
     function checkDiscrimination() {
+      if (typeof OmniValidate !== 'undefined' && !OmniValidate.requireAll()) return;
       const upType = document.getElementById('upType').value;
       const upRating = parseFloat(document.getElementById('upRating').value);
       const upSetting = parseFloat(document.getElementById('upSetting').value);
@@ -183,39 +182,51 @@
       let overloadOK = false, scOK = false;
       let notes = [];
 
-      // 1. Overload discrimination: rating ratio
-      const ratingRatio = upRating / dnRating;
-      if (ratingRatio >= 2.0) {
-        overloadOK = true;
-        notes.push(`&#10003; Rating ratio ${ratingRatio.toFixed(1)}:1 (&#8805;2:1) &mdash; overload discrimination likely OK.`);
-      } else if (ratingRatio >= 1.6) {
-        overloadOK = true;
-        notes.push(`&#9888; Rating ratio ${ratingRatio.toFixed(1)}:1 (&#8805;1.6:1 but <2:1) &mdash; overload discrimination marginal. Verify with curves.`);
-      } else {
-        overloadOK = false;
-        notes.push(`&#10005; Rating ratio ${ratingRatio.toFixed(1)}:1 (<1.6:1) &mdash; overload discrimination unlikely.`);
-      }
+      // 1. Overload discrimination: ratio of the set long-time currents (Ir)
+const isFuse = t => t === 'hrc' || t === 'nh_fuse';
+const upIr = upType === 'mccb' ? upRating * (upSetting > 0 ? upSetting : 1) : upRating;
+const dnIr = dnRating;
+const ratingRatio = upIr / dnIr;
+if (ratingRatio >= 2.0) {
+  overloadOK = true;
+  notes.push(`&#10003; Ir ratio ${ratingRatio.toFixed(1)}:1 (upstream Ir = ${upIr.toFixed(0)} A, &#8805;2:1) &mdash; overload discrimination likely OK.`);
+} else if (ratingRatio >= 1.6) {
+  overloadOK = true;
+  notes.push(`&#9888; Ir ratio ${ratingRatio.toFixed(1)}:1 (upstream Ir = ${upIr.toFixed(0)} A, &#8805;1.6:1 but <2:1) &mdash; overload discrimination marginal. Verify with curves.`);
+} else {
+  overloadOK = false;
+  notes.push(`&#10005; Ir ratio ${ratingRatio.toFixed(1)}:1 (upstream Ir = ${upIr.toFixed(0)} A, <1.6:1) &mdash; overload discrimination unlikely.`);
+}
 
-      // 2. Short-circuit discrimination
-      const faultA = faultLevel * 1000;
-      if (upTrip.low > dnTrip.high) {
-        scOK = true;
-        notes.push(`&#10003; Upstream instantaneous trip (${upTrip.low.toFixed(0)} A) > downstream instantaneous trip (${dnTrip.high.toFixed(0)} A) &mdash; short-circuit discrimination likely up to this level.`);
-      } else {
-        scOK = false;
-        notes.push(`&#10005; Upstream instantaneous trip (${upTrip.low.toFixed(0)} A) overlaps with downstream instantaneous trip (${dnTrip.high.toFixed(0)} A) &mdash; short-circuit discrimination NOT achieved at this fault level.`);
-      }
+// 2. Short-circuit discrimination — selectivity limit is set by the upstream device's lowest instantaneous threshold
+const faultA = faultLevel * 1000;
+const selLimit = upTrip.low;
+if (!isFuse(upType)) {
+  if (upTrip.low <= dnTrip.high) {
+    scOK = false;
+    notes.push(`&#10005; Upstream instantaneous band (from ${upTrip.low.toFixed(0)} A) overlaps the downstream band (up to ${dnTrip.high.toFixed(0)} A) &mdash; short-circuit discrimination NOT achieved.`);
+  } else if (faultA <= selLimit) {
+    scOK = true;
+    notes.push(`&#10003; Total selectivity: the ${faultLevel} kA prospective fault is below the upstream instantaneous threshold (${(selLimit / 1000).toFixed(2)} kA), so only the downstream device trips.`);
+  } else {
+    scOK = false;
+    notes.push(`&#9888; Partial selectivity up to about ${(selLimit / 1000).toFixed(2)} kA (upstream instantaneous threshold). Above that, both devices may trip at ${faultLevel} kA &mdash; check the manufacturer's selectivity tables, or use a short-time delay / energy-based selectivity on the upstream device.`);
+  }
+}
 
-      // Fuse combination check
+// Fuse combination check
       if ((upType === 'hrc' || upType === 'nh_fuse') && (dnType === 'hrc' || dnType === 'nh_fuse')) {
         if (ratingRatio >= 1.6) {
           scOK = true;
           notes.push(`&#10003; Fuse-fuse combination with &#8805;1.6:1 ratio &mdash; inherently good discrimination.`);
         }
       }
-      if ((upType === 'hrc' || upType === 'nh_fuse') && dnType.startsWith('mcb')) {
-        notes.push(`&#8505; Fuse upstream / MCB downstream: Generally provides good discrimination due to fuse I&sup2;t characteristics.`);
-        scOK = true;
+      if ((upType === 'hrc' || upType === 'nh_fuse') && (dnType.startsWith('mcb') || dnType === 'mccb')) {
+        notes.push(`&#8505; Fuse upstream / circuit-breaker downstream: selectivity holds while the breaker's let-through I&sup2;t stays below the fuse pre-arcing I&sup2;t &mdash; generally good with a large rating ratio, but confirm with the manufacturer's selectivity table at ${faultLevel} kA.`);
+        scOK = ratingRatio >= 2;
+      }
+      if ((upType === 'hrc' || upType === 'nh_fuse') && (dnType === 'hrc' || dnType === 'nh_fuse') && ratingRatio < 1.6) {
+        notes.push(`&#10005; Fuse-fuse ratio below 1.6:1 &mdash; gG fuses are not assured to discriminate (IEC 60269-2).`);
       }
 
       // MCCB with short-time delay

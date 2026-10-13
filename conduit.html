@@ -229,7 +229,7 @@
     <h1>Conduit Sizer (AS/NZS 3000)</h1>
     <p class="conduit-intro">
       Enter cable quantities to size a conduit run, or split the set across multiple conduits when a smaller maximum size is preferred.<br>
-      <span>Fill factors per AS/NZS 3000:2018 Appendix C Table C2: 1 cable = 53%, 2 cables = 31%, 3+ cables = 40%.</span>
+      <span>Space factors per AS/NZS 3000:2018 Appendix C Paragraph C6.2: 1 cable = 50%, 2 cables = 33%, 3+ cables = 40%.</span>
     </p>
     <div class="info-box">
       Layouts are packed largest-to-smallest, then each run is resized to the smallest conduit that still complies with the applicable fill factor.
@@ -331,9 +331,10 @@
       return Math.PI * Math.pow(diameter / 2, 2);
     }
 
+    // Space factors per AS/NZS 3000:2018 Paragraph C6.2: 1 cable 0.5, 2 cables 0.33, 3 or more 0.4
     function getFillPercentage(numCables) {
-      if (numCables === 1) return 0.53;
-      if (numCables === 2) return 0.31;
+      if (numCables === 1) return 0.5;
+      if (numCables === 2) return 0.33;
       if (numCables >= 3) return 0.40;
       return 0;
     }
@@ -500,7 +501,7 @@
         for (let j = 0; j < bins.length; j += 1) {
           const bin = bins[j];
           const nextCount = bin.items.length + 1;
-          const nextFill = nextCount === 1 ? 0.53 : nextCount === 2 ? 0.31 : 0.40;
+          const nextFill = getFillPercentage(nextCount);
           const allowedArea = baseConduit.area * nextFill;
           const nextArea = bin.totalArea + item.area;
 

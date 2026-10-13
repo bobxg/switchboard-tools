@@ -28,37 +28,30 @@
 </head>
 <body>
   <div class="top-tabs"></div>
-
   <div class="main-content">
     <h1>Diversity Factor Calculator</h1>
-    <p>Interactive diversity factor lookup and calculator per <strong>AS/NZS 3000:2018 Appendix C</strong> (Tables C1&ndash;C9). Select a building type to view applicable factors and calculate diversified demand.</p>
-
+    <p>Diversity rules and calculators per <strong>AS/NZS 3000:2018 Appendix C</strong> (Tables C1&ndash;C4). For a full maximum demand calculation use the <a href="maxdemand.html" style="color:var(--accent);">Maximum Demand</a> tool.</p>
     <div class="sub-tabs">
-      <button class="sub-tab active" onclick="showTab('lookup')">Factor Lookup</button>
-      <button class="sub-tab" onclick="showTab('calc')">Quick Calculator</button>
-      <button class="sub-tab" onclick="showTab('ref')">Full Reference Tables</button>
+      <button class="sub-tab active" onclick="showTab('lookup', this)">Rule Lookup</button>
+      <button class="sub-tab" onclick="showTab('calc', this)">Multiple Dwellings (C1)</button>
+      <button class="sub-tab" onclick="showTab('c4', this)">Switchboard Diversity (C4)</button>
+      <button class="sub-tab" onclick="showTab('ref', this)">Reference Tables</button>
     </div>
 
     <div id="panel-lookup" class="tab-panel active">
       <div class="calc-section">
-        <h2>Diversity Factor Lookup by Building Type</h2>
+        <h2>Diversity Rules by Installation Type</h2>
         <div class="input-row">
           <div class="input-group">
             <label for="buildingType">Building / Installation Type</label>
             <select id="buildingType" onchange="showFactors()">
               <option value="domestic_single">Domestic &mdash; Single Dwelling (Table C1 Col 2)</option>
-              <option value="domestic_multi">Domestic &mdash; Block of Units (Table C1 Cols 3&ndash;5)</option>
-              <option value="commercial">Commercial &mdash; Offices, Retail (Table C2)</option>
-              <option value="industrial">Industrial / Warehouse (Table C2)</option>
-              <option value="hospital">Hospital / Aged Care</option>
-              <option value="school">School / Education</option>
-              <option value="hotel">Hotel / Accommodation</option>
-              <option value="va_method">VA per m&sup2; Method (Table C3)</option>
+              <option value="domestic_multi">Domestic &mdash; Blocks of Living Units (Table C1 Cols 3&ndash;5)</option>
+              <option value="res_inst">Residential Institutions, Hotels, Motels, Hospitals (Table C2 Col 2)</option>
+              <option value="commercial">Factories, Shops, Offices, Schools (Table C2 Col 3)</option>
+              <option value="va_method">Energy Demand Method &mdash; VA/m&sup2; (Table C3)</option>
+              <option value="c4">Switchboard Diversity (Table C4)</option>
             </select>
-          </div>
-          <div class="input-group">
-            <label for="voltage">Supply Voltage (V)</label>
-            <input type="number" id="voltage" value="230" />
           </div>
         </div>
         <div id="factorDisplay"></div>
@@ -67,245 +60,264 @@
 
     <div id="panel-calc" class="tab-panel">
       <div class="calc-section">
-        <h2>Diversified Demand Quick Calculator</h2>
-        <div class="info-box">
-          Enter the connected loads and number of units/instances. The tool applies AS/NZS 3000 Appendix C diversity factors automatically.
+        <h2>Blocks of Living Units &mdash; Table C1 Columns 3&ndash;5</h2>
+        <div class="info-box">Demand on the heaviest-loaded phase. Units are divided by the number of supply phases (Table C1 Note 2) and the column is chosen from units per phase: 2&ndash;5 &rarr; Col 3, 6&ndash;20 &rarr; Col 4, 21+ &rarr; Col 5.</div>
+        <div class="input-row three">
+          <div class="input-group"><label for="numUnits">Number of Living Units</label><input type="number" id="numUnits" value="20" min="2" /></div>
+          <div class="input-group"><label for="phases">Supply Phases</label><select id="phases"><option value="3" selected>3</option><option value="2">2</option><option value="1">1</option></select></div>
+          <div class="input-group"><label for="cookUnits">Units with Electric Cooking</label><input type="number" id="cookUnits" value="20" min="0" /></div>
         </div>
+        <div class="input-row three">
+          <div class="input-group"><label for="waterType">Electric Water Heating in Units</label><select id="waterType"><option value="none">None (central / gas)</option><option value="storage" selected>Storage</option><option value="instant">Instantaneous</option></select></div>
+          <div class="input-group"><label for="hvacW">Fixed A/C or Heating per Unit (W)</label><input type="number" id="hvacW" value="0" min="0" step="100" /></div>
+          <div class="input-group"><label for="commonA">Communal Load (A, per Table C1 (h)&ndash;(l))</label><input type="number" id="commonA" value="20" min="0" step="1" /></div>
+        </div>
+        <button class="calc-button" onclick="calcMultiDwelling()">Calculate Demand per Phase</button>
+        <button class="btn-export" onclick="exportDiversityResult('multiResult')">Export CSV</button>
+        <div id="multiResult" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div id="panel-c4" class="tab-panel">
+      <div class="calc-section">
+        <h2>Upstream Circuit Loading after Diversity &mdash; Table C4</h2>
+        <div class="info-box"><strong>AS/NZS 3000 Paragraph C2.4.4:</strong> for switchboards conforming with the AS/NZS 61439 series, the maximum demand may be determined by multiplying the arithmetic sum of the circuit overload ratings by the Table C4 diversity factor. Enter the ratings of the circuit-protective devices downstream (per phase).</div>
         <div class="input-row">
-          <div class="input-group">
-            <label for="calcType">Calculation Type</label>
-            <select id="calcType" onchange="updateCalcForm()">
-              <option value="multi_dwelling">Multiple Dwelling Units (Table C1 Cols 3&ndash;5)</option>
-              <option value="mixed_load">Mixed Load with Manual Diversity</option>
-            </select>
+          <div class="input-group" style="flex:2;">
+            <label for="c4Ratings">Downstream Device Ratings (A) &mdash; comma or space separated, e.g. 32, 32, 20 or 6x20</label>
+            <input type="text" id="c4Ratings" value="63, 63, 40, 32, 32, 20, 20, 20, 16, 16" style="width:100%;" />
           </div>
           <div class="input-group">
-            <label for="numUnits">Number of Dwelling Units</label>
-            <input type="number" id="numUnits" value="20" min="1" />
+            <label for="c4Upstream">Proposed Upstream Device (A) &mdash; optional</label>
+            <input type="number" id="c4Upstream" value="0" min="0" />
           </div>
         </div>
-        <div id="multiDwellingCalc">
-          <div class="input-row three">
-            <div class="input-group">
-              <label for="loadPerUnit">Load per Unit (A per phase)</label>
-              <input type="number" id="loadPerUnit" value="40" min="1" step="1" />
-              <span style="font-size:0.8em;color:var(--text-secondary);">Single dwelling max demand from Table C1 Col 2</span>
-            </div>
-            <div class="input-group">
-              <label for="commonArea">Common Area Load (A)</label>
-              <input type="number" id="commonArea" value="20" min="0" step="1" />
-            </div>
-            <div class="input-group">
-              <label for="centralHW">Central Hot Water / HVAC (A)</label>
-              <input type="number" id="centralHW" value="0" min="0" step="1" />
-            </div>
-          </div>
-          <button class="calc-button" onclick="calcMultiDwelling()">Calculate Diversified Demand</button>
-          <button class="btn-export" onclick="exportDiversityResult()">Export CSV</button>
-          <div id="multiResult" style="display:none;"></div>
-        </div>
+        <button class="calc-button" onclick="calcC4()">Apply Table C4</button>
+        <button class="btn-export" onclick="exportDiversityResult('c4Result')">Export CSV</button>
+        <div id="c4Result" style="display:none;"></div>
       </div>
     </div>
 
     <div id="panel-ref" class="tab-panel">
       <div class="calc-section">
-        <h2>AS/NZS 3000 Appendix C &mdash; Diversity Factor Reference</h2>
-
-        <h3>Table C1 &mdash; Multiple Dwelling Diversity (Columns 3&ndash;5)</h3>
-        <div class="diversity-ref">
-          <strong>AS/NZS 3000:2018 Table C1 Columns 3&ndash;5:</strong> Demand per unit decreases as the number of units increases due to statistical diversity.
-        </div>
+        <h2>AS/NZS 3000:2018 Appendix C &mdash; Reference</h2>
+        <h3>Table C1 &mdash; Blocks of Living Units (per phase, n = units per phase)</h3>
         <table class="ref-table">
-          <thead><tr><th>No. of Units</th><th>Column 3 Factor</th><th>Column 4 Factor</th><th>Column 5 Factor</th></tr></thead>
-          <tbody id="c1RefBody"></tbody>
-        </table>
-
-        <h3>Table C3 &mdash; VA per m&sup2; by Occupancy Type</h3>
-        <table class="ref-table">
-          <thead><tr><th>Occupancy Type</th><th>VA/m&sup2; (Lighting)</th><th>VA/m&sup2; (Power)</th><th>Diversity</th><th>Standard Ref</th></tr></thead>
+          <thead><tr><th>Load group</th><th>Col 3: 2&ndash;5 units</th><th>Col 4: 6&ndash;20 units</th><th>Col 5: 21+ units</th></tr></thead>
           <tbody>
-            <tr><td>Office &mdash; General</td><td>25&ndash;30</td><td>15&ndash;25</td><td>0.7&ndash;0.8</td><td>Table C3</td></tr>
-            <tr><td>Office &mdash; High Density IT</td><td>25&ndash;30</td><td>40&ndash;60</td><td>0.6&ndash;0.7</td><td>Table C3</td></tr>
-            <tr><td>Retail &mdash; Shopping Centre</td><td>25&ndash;35</td><td>10&ndash;20</td><td>0.8&ndash;0.9</td><td>Table C3</td></tr>
-            <tr><td>Warehouse</td><td>10&ndash;15</td><td>5&ndash;10</td><td>0.6&ndash;0.7</td><td>Table C3</td></tr>
-            <tr><td>Hospital &mdash; General</td><td>20&ndash;30</td><td>30&ndash;50</td><td>0.5&ndash;0.7</td><td>Table C3</td></tr>
-            <tr><td>School</td><td>20&ndash;25</td><td>10&ndash;15</td><td>0.6&ndash;0.8</td><td>Table C3</td></tr>
-            <tr><td>Hotel / Motel</td><td>15&ndash;25</td><td>10&ndash;20</td><td>0.5&ndash;0.6</td><td>Table C3</td></tr>
-            <tr><td>Car Park</td><td>5&ndash;10</td><td>3&ndash;5</td><td>0.8&ndash;1.0</td><td>Table C3</td></tr>
-            <tr><td>Apartment Common Areas</td><td>10&ndash;15</td><td>5&ndash;10</td><td>0.7&ndash;0.9</td><td>Table C3</td></tr>
+            <tr><td>(a)(i) Lighting</td><td>6 A</td><td>5 A + 0.25 A &times; n</td><td>0.5 A &times; n</td></tr>
+            <tr><td>(b)(i) Socket-outlets &le;10 A</td><td>10 A + 5 A &times; n</td><td>15 A + 3.75 A &times; n</td><td>50 A + 1.9 A &times; n</td></tr>
+            <tr><td>(c) Ranges / cooking</td><td>15 A</td><td colspan="2">2.8 A &times; n</td></tr>
+            <tr><td>(d) Fixed heating / A/C</td><td colspan="3">75% connected load</td></tr>
+            <tr><td>(e)(f) Water heaters</td><td colspan="2">6 A &times; n</td><td>100 A + 0.8 A &times; n</td></tr>
+            <tr><td>(h) Communal lighting</td><td colspan="3">Full connected load</td></tr>
+            <tr><td>(i) Communal socket-outlets</td><td colspan="3">2 A per point, maximum 15 A</td></tr>
+            <tr><td>(j)(iv) EV charging (communal)</td><td>100%</td><td>90%</td><td>75%</td></tr>
           </tbody>
         </table>
-
-        <h3>Table C7/C8 &mdash; Motor Diversity</h3>
+        <h3>Table C3 &mdash; Energy Demand Method</h3>
         <table class="ref-table">
-          <thead><tr><th>No. of Motors</th><th>Diversity Factor</th></tr></thead>
+          <thead><tr><th>Occupancy</th><th>Range (VA/m&sup2;)</th><th>Average (VA/m&sup2;)</th></tr></thead>
           <tbody>
-            <tr><td>1</td><td>1.00</td></tr>
-            <tr><td>2</td><td>0.90</td></tr>
-            <tr><td>3</td><td>0.85</td></tr>
-            <tr><td>4</td><td>0.80</td></tr>
-            <tr><td>5</td><td>0.78</td></tr>
-            <tr><td>6&ndash;10</td><td>0.70</td></tr>
-            <tr><td>11&ndash;20</td><td>0.65</td></tr>
-            <tr><td>21&ndash;50</td><td>0.60</td></tr>
-            <tr><td>&gt;50</td><td>0.55</td></tr>
+            <tr><td>Offices &mdash; light and power</td><td>40&ndash;60</td><td>50</td></tr>
+            <tr><td>Offices &mdash; A/C cooling</td><td>30&ndash;40</td><td>35</td></tr>
+            <tr><td>Offices &mdash; A/C reverse cycle</td><td>20&ndash;30</td><td>25</td></tr>
+            <tr><td>Offices &mdash; A/C zonal reheat</td><td>40&ndash;60</td><td>50</td></tr>
+            <tr><td>Offices &mdash; A/C variable volume</td><td>20</td><td>20</td></tr>
+            <tr><td>Carparks &mdash; open air / EV charging</td><td>0&ndash;10 / 5&ndash;15</td><td>5 / 10</td></tr>
+            <tr><td>Carparks &mdash; basement / EV charging</td><td>10&ndash;20 / 10&ndash;30</td><td>15 / 20</td></tr>
+            <tr><td>Retail shops &mdash; light and power / A/C</td><td>40&ndash;100 / 20&ndash;40</td><td>70 / 30</td></tr>
+            <tr><td>Warehouses &mdash; light and power / ventilation</td><td>5&ndash;15 / 5</td><td>10 / 5</td></tr>
+            <tr><td>Light industrial &mdash; light and power / ventilation / A/C</td><td>10&ndash;20 / 10&ndash;20 / 30&ndash;50</td><td>15 / 15 / 40</td></tr>
+            <tr><td>Taverns, licensed clubs &mdash; total</td><td>60&ndash;100</td><td>80</td></tr>
+            <tr><td>Theatres &mdash; total</td><td>80&ndash;120</td><td>100</td></tr>
+          </tbody>
+        </table>
+        <h3>Table C4 &mdash; Upstream Circuit Loading after Diversity</h3>
+        <table class="ref-table">
+          <thead><tr><th>Number of circuit-protection devices downstream</th><th>Diversity factor</th></tr></thead>
+          <tbody>
+            <tr><td>2 and 3</td><td>0.9</td></tr>
+            <tr><td>4 and 5</td><td>0.8</td></tr>
+            <tr><td>6 to 9</td><td>0.7</td></tr>
+            <tr><td>10 or more</td><td>0.6</td></tr>
+          </tbody>
+        </table>
+        <h3>Table C2 &mdash; Motors, Lifts and Appliances</h3>
+        <table class="ref-table">
+          <thead><tr><th>Load group</th><th>Col 2: residential institutions, hotels, hospitals</th><th>Col 3: factories, shops, offices, schools</th></tr></thead>
+          <tbody>
+            <tr><td>(a) Lighting</td><td>75% connected load</td><td>Full connected load</td></tr>
+            <tr><td>(b)(iii) Socket-outlets &gt;10 A</td><td>Highest + 50% of remainder</td><td>Highest + 75% of remainder</td></tr>
+            <tr><td>(c)(i) Cooking, heating, cooling appliances</td><td>Highest + 50% of remainder</td><td>Highest + 75% of remainder</td></tr>
+            <tr><td>(d) Motors</td><td>Highest + 50% of remainder</td><td>Highest + 75% of second highest + 50% of remainder</td></tr>
+            <tr><td>(e) Lifts</td><td colspan="2">Largest 125%, next 75%, remainder 50% of full load</td></tr>
+            <tr><td>(i) X-ray equipment</td><td colspan="2">50% of the largest unit, others ignored</td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
-
   <script>
-    // Tab switching
-    function showTab(name) {
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
-      document.getElementById('panel-' + name).classList.add('active');
-      event.target.classList.add('active');
-    }
+// Tab switching
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
 
-    // Multi-dwelling diversity factors (approximate from AS/NZS 3000 Table C1)
-    // Column 3: lighting+SO, Column 4: cooking, Column 5: hot water
-    const dwellingFactors = {
-      1: [1.00, 1.00, 1.00], 2: [0.88, 0.78, 0.80], 3: [0.80, 0.65, 0.70],
-      4: [0.74, 0.57, 0.63], 5: [0.70, 0.52, 0.58], 6: [0.66, 0.48, 0.55],
-      8: [0.62, 0.43, 0.50], 10: [0.58, 0.40, 0.46], 12: [0.55, 0.38, 0.44],
-      15: [0.52, 0.36, 0.41], 20: [0.48, 0.33, 0.38], 25: [0.45, 0.31, 0.36],
-      30: [0.43, 0.30, 0.34], 40: [0.40, 0.28, 0.32], 50: [0.38, 0.27, 0.30],
-      60: [0.37, 0.26, 0.29], 80: [0.35, 0.25, 0.28], 100: [0.34, 0.24, 0.27],
-      150: [0.32, 0.23, 0.26], 200: [0.31, 0.22, 0.25]
-    };
+// AS/NZS 3000 Table C4 diversity factor for n downstream circuit-protection devices
+function c4Factor(n) {
+  if (n <= 1) return 1.0;
+  if (n <= 3) return 0.9;
+  if (n <= 5) return 0.8;
+  if (n <= 9) return 0.7;
+  return 0.6;
+}
 
-    function getDwellingFactor(n) {
-      const keys = Object.keys(dwellingFactors).map(Number).sort((a,b) => a - b);
-      if (n <= keys[0]) return dwellingFactors[keys[0]];
-      if (n >= keys[keys.length - 1]) return dwellingFactors[keys[keys.length - 1]];
-      let lower = keys[0], upper = keys[keys.length - 1];
-      for (let i = 0; i < keys.length - 1; i++) {
-        if (n >= keys[i] && n <= keys[i + 1]) { lower = keys[i]; upper = keys[i + 1]; break; }
-      }
-      const fl = dwellingFactors[lower];
-      const fu = dwellingFactors[upper];
-      const ratio = (n - lower) / (upper - lower);
-      return [0, 1, 2].map(i => fl[i] + (fu[i] - fl[i]) * ratio);
-    }
+// Table C1 Columns 3–5 per-phase demand for a block of living units
+function c1Column(n) { return n <= 5 ? 3 : n <= 20 ? 4 : 5; }
+function c1Lighting(n) { const c = c1Column(n); return c === 3 ? 6 : c === 4 ? 5 + 0.25 * n : 0.5 * n; }
+function c1Sockets(n) { const c = c1Column(n); return c === 3 ? 10 + 5 * n : c === 4 ? 15 + 3.75 * n : 50 + 1.9 * n; }
+function c1Cooking(nc) { if (nc <= 0) return 0; return nc <= 5 ? 15 : 2.8 * nc; }
+function c1Water(n) { return c1Column(n) === 5 ? 100 + 0.8 * n : 6 * n; }
 
-    function showFactors() {
-      const type = document.getElementById('buildingType').value;
-      const container = document.getElementById('factorDisplay');
-      let html = '';
+function showFactors() {
+  const type = document.getElementById('buildingType').value;
+  const container = document.getElementById('factorDisplay');
+  let html = '';
+  if (type === 'domestic_single') {
+    html = `<div class="diversity-ref"><strong>Table C1 Column 2 &mdash; Single domestic installation (per phase):</strong> demand is assessed per load group; the group rules below already contain the diversity.</div>
+    <table class="ref-table"><thead><tr><th>Load group</th><th>Demand rule</th></tr></thead><tbody>
+    <tr><td>(a)(i) Lighting</td><td>3 A for 1&ndash;20 points + 2 A per additional 20 points or part</td></tr>
+    <tr><td>(a)(ii) Outdoor lighting &gt; 1000 W</td><td>75% connected load</td></tr>
+    <tr><td>(b)(i) Socket-outlets &le;10 A</td><td>10 A for 1&ndash;20 points + 5 A per additional 20 points or part</td></tr>
+    <tr><td>(b)(ii)/(iii) 15 A / 20 A socket-outlets</td><td>+10 A if any 15 A; +15 A if any 20 A; +15 A if both (Note 10)</td></tr>
+    <tr><td>(c) Ranges, cooking, laundry</td><td>50% connected load</td></tr>
+    <tr><td>(d) Fixed heating / A/C, saunas</td><td>75% connected load (larger of heating or cooling, Note 11)</td></tr>
+    <tr><td>(e) Instantaneous water heaters</td><td>33.3% connected load</td></tr>
+    <tr><td>(f) Storage water heaters</td><td>Full-load current</td></tr>
+    <tr><td>(g) Spa and pool heaters</td><td>75% largest spa + 75% largest pool + 25% remainder</td></tr>
+    <tr><td>(j)(iv) EV charging</td><td>Full connected load</td></tr>
+    </tbody></table>`;
+  } else if (type === 'domestic_multi') {
+    html = `<div class="diversity-ref"><strong>Table C1 Columns 3&ndash;5:</strong> per-phase demand formulas for blocks of living units, n = living units on the heaviest-loaded phase.</div>`;
+    html += `<table class="ref-table"><thead><tr><th>Units / phase</th><th>Col</th><th>Lighting (A)</th><th>Sockets (A)</th><th>Cooking, all units (A)</th><th>Water heating (A)</th><th>Light + sockets per unit (A)</th></tr></thead><tbody>`;
+    [2, 3, 5, 6, 10, 15, 20, 21, 30, 50].forEach(n => {
+      const ls = c1Lighting(n) + c1Sockets(n);
+      html += `<tr><td>${n}</td><td>${c1Column(n)}</td><td>${c1Lighting(n).toFixed(1)}</td><td>${c1Sockets(n).toFixed(1)}</td><td>${c1Cooking(n).toFixed(1)}</td><td>${c1Water(n).toFixed(1)}</td><td>${(ls / n).toFixed(2)}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  } else if (type === 'res_inst' || type === 'commercial') {
+    const col2 = type === 'res_inst';
+    html = `<div class="diversity-ref"><strong>Table C2 Column ${col2 ? 2 : 3}:</strong> ${col2 ? 'residential institutions, hotels, boarding houses, hospitals, accommodation houses, motels' : 'factories, shops, stores, offices, business premises, schools and churches'}.</div>
+    <table class="ref-table"><thead><tr><th>Load group</th><th>Demand rule</th></tr></thead><tbody>
+    <tr><td>(a) Lighting</td><td>${col2 ? '75%' : 'Full'} connected load</td></tr>
+    <tr><td>(b)(i) Socket-outlets &le;10 A</td><td>1000 W first + ${col2 ? 400 : 750} W per additional outlet</td></tr>
+    <tr><td>(b)(ii) &le;10 A in permanently heated/cooled areas</td><td>1000 W first + 100 W per additional outlet</td></tr>
+    <tr><td>(b)(iii) Socket-outlets &gt;10 A</td><td>Highest + ${col2 ? 50 : 75}% of remainder</td></tr>
+    <tr><td>(c)(i) Cooking, heating, cooling</td><td>Highest + ${col2 ? 50 : 75}% of remainder</td></tr>
+    <tr><td>(c)(ii) EV charging</td><td>Highest + 75% of remainder</td></tr>
+    <tr><td>(d) Motors</td><td>${col2 ? 'Highest + 50% of remainder' : 'Highest + 75% of second highest + 50% of remainder'}</td></tr>
+    <tr><td>(e) Lifts</td><td>Largest 125%, next 75%, remainder 50%</td></tr>
+    <tr><td>(g) Thermal storage heaters</td><td>Full-load current</td></tr>
+    </tbody></table>`;
+  } else if (type === 'va_method') {
+    html = `<div class="diversity-ref"><strong>Table C3:</strong> maximum demand from floor area &times; energy demand (VA/m&sup2;). The tabulated values already allow for diversity &mdash; do not apply a further factor. EV charging is additional to all other demands. See the Reference Tables tab for the full table.</div>`;
+  } else {
+    html = `<div class="diversity-ref"><strong>Table C4 (Paragraph C2.4.4):</strong> maximum demand = arithmetic sum of downstream circuit overload ratings &times; factor (2&ndash;3 devices 0.9; 4&ndash;5 devices 0.8; 6&ndash;9 devices 0.7; 10 or more 0.6). Applies to switchboards conforming with the AS/NZS 61439 series. Use the Switchboard Diversity tab to calculate.</div>`;
+  }
+  container.innerHTML = html;
+}
 
-      if (type === 'domestic_single') {
-        html = `<div class="diversity-ref"><strong>Table C1 Column 2 &mdash; Single Dwelling:</strong> No diversity applied to individual dwelling. Full connected load is assessed per the table rules (lighting points, socket-outlets, cooking, etc.).</div>
-        <table class="ref-table"><thead><tr><th>Load Type</th><th>Rule</th><th>Typical Diversity</th></tr></thead><tbody>
-        <tr><td>Lighting (a)(i)</td><td>3 A first 20 points + 2 A per additional 20</td><td>~50%</td></tr>
-        <tr><td>Socket-outlets &#8804;10 A (b)(i)</td><td>10 A first 20 + 5 A per additional 20</td><td>~30&ndash;40%</td></tr>
-        <tr><td>15 A socket-outlet (b)(ii)</td><td>+10 A each</td><td>100%</td></tr>
-        <tr><td>Cooking >10 A (c)</td><td>50% connected load</td><td>50%</td></tr>
-        <tr><td>A/C, water heater (d)(e)</td><td>100% largest + 50% rest within group (75%)</td><td>75%</td></tr>
-        <tr><td>Permanently connected (f)</td><td>100% largest + 75% remainder</td><td>75%</td></tr>
-        </tbody></table>`;
-      } else if (type === 'domestic_multi') {
-        html = `<div class="diversity-ref"><strong>Table C1 Columns 3&ndash;5:</strong> For blocks of living units, diversity is applied to the total demand across all units. Factors decrease as the number of units increases.</div>`;
-        html += `<table class="ref-table"><thead><tr><th>No. of Units</th><th>Col 3 (Light+SO)</th><th>Col 4 (Cooking)</th><th>Col 5 (HW/AC)</th></tr></thead><tbody>`;
-        [1,2,3,5,10,15,20,30,50,100].forEach(n => {
-          const f = getDwellingFactor(n);
-          html += `<tr><td>${n}</td><td>${f[0].toFixed(2)}</td><td>${f[1].toFixed(2)}</td><td>${f[2].toFixed(2)}</td></tr>`;
-        });
-        html += `</tbody></table>`;
-      } else if (type === 'va_method') {
-        html = `<div class="diversity-ref"><strong>Table C3 &mdash; VA/m&sup2; Method:</strong> Used for commercial/industrial buildings where load is estimated from floor area. Apply appropriate diversity factor to the total connected load.</div>
-        <table class="ref-table"><thead><tr><th>Building Type</th><th>Lighting VA/m&sup2;</th><th>Power VA/m&sup2;</th><th>Diversity</th></tr></thead><tbody>
-        <tr><td>Office</td><td>25&ndash;30</td><td>15&ndash;25</td><td>0.7&ndash;0.8</td></tr>
-        <tr><td>Retail</td><td>25&ndash;35</td><td>10&ndash;20</td><td>0.8&ndash;0.9</td></tr>
-        <tr><td>Warehouse</td><td>10&ndash;15</td><td>5&ndash;10</td><td>0.6&ndash;0.7</td></tr>
-        <tr><td>Hospital</td><td>20&ndash;30</td><td>30&ndash;50</td><td>0.5&ndash;0.7</td></tr>
-        <tr><td>School</td><td>20&ndash;25</td><td>10&ndash;15</td><td>0.6&ndash;0.8</td></tr>
-        </tbody></table>`;
-      } else {
-        const typeData = {
-          commercial: { name: 'Commercial (Office/Retail)', df: '0.7&ndash;0.8', notes: 'Apply to total connected load. Exclude HVAC (use mechanical engineer data). Table C2/C3.' },
-          industrial: { name: 'Industrial / Warehouse', df: '0.5&ndash;0.7', notes: 'Motor diversity per Table C7/C8. Exclude process loads assessed separately.' },
-          hospital: { name: 'Hospital / Aged Care', df: '0.5&ndash;0.7', notes: 'Higher base load. Essential services at 100%. Non-essential areas diversified.' },
-          school: { name: 'School / Education', df: '0.6&ndash;0.8', notes: 'Seasonal variation. Apply to lighting and GPO loads.' },
-          hotel: { name: 'Hotel / Accommodation', df: '0.5&ndash;0.6', notes: 'Per-room demand typically 3&ndash;5 kVA. Apply dwelling-style diversity for room count.' }
-        };
-        const d = typeData[type];
-        html = `<div class="diversity-ref"><strong>${d.name}:</strong> Typical diversity factor range: <strong>${d.df}</strong>. ${d.notes}</div>`;
-      }
-      container.innerHTML = html;
-    }
+function calcMultiDwelling() {
+  const units = Math.max(2, parseInt(document.getElementById('numUnits').value) || 2);
+  const phases = parseInt(document.getElementById('phases').value) || 3;
+  const cookUnits = Math.max(0, parseInt(document.getElementById('cookUnits').value) || 0);
+  const water = document.getElementById('waterType').value;
+  const hvacW = Math.max(0, parseFloat(document.getElementById('hvacW').value) || 0);
+  const commonA = Math.max(0, parseFloat(document.getElementById('commonA').value) || 0);
 
-    function calcMultiDwelling() {
-      const n = parseInt(document.getElementById('numUnits').value);
-      const loadPerUnit = parseFloat(document.getElementById('loadPerUnit').value);
-      const commonArea = parseFloat(document.getElementById('commonArea').value);
-      const centralHW = parseFloat(document.getElementById('centralHW').value);
-      const f = getDwellingFactor(n);
-      const avgFactor = (f[0] + f[1] + f[2]) / 3;
-      const diversifiedUnit = loadPerUnit * avgFactor;
-      const totalDiversified = diversifiedUnit * n + commonArea + centralHW;
-      const totalUndiversified = loadPerUnit * n + commonArea + centralHW;
+  const n = Math.ceil(units / phases);
+  const nc = Math.ceil(cookUnits / phases);
+  const col = c1Column(n);
+  const light = c1Lighting(n);
+  const sock = c1Sockets(n);
+  const cook = c1Cooking(nc);
+  const wh = water === 'none' ? 0 : c1Water(n);
+  const hvac = hvacW * n * 0.75 / 230;
+  const total = light + sock + cook + wh + hvac + commonA;
+  const div = document.getElementById('multiResult');
+  div.style.display = 'block';
+  div.innerHTML = `
+    <div class="result-box">
+      <h3>Maximum Demand &mdash; ${units} Units on ${phases} Phase${phases > 1 ? 's' : ''}</h3>
+      <div class="result-grid">
+        <div class="result-item"><div class="result-label">Units per Phase</div><div class="result-value">${n} (Col ${col})</div></div>
+        <div class="result-item"><div class="result-label">Lighting + Sockets (A)</div><div class="result-value">${(light + sock).toFixed(1)}</div></div>
+        <div class="result-item"><div class="result-label">Cooking + Water (A)</div><div class="result-value">${(cook + wh).toFixed(1)}</div></div>
+        <div class="result-item"><div class="result-label">Demand per Phase (A)</div><div class="result-value">${total.toFixed(1)}</div></div>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top:16px;">
+      <strong>Breakdown (heaviest phase):</strong> lighting ${light.toFixed(1)} A + sockets ${sock.toFixed(1)} A + cooking (${nc} unit${nc === 1 ? '' : 's'}/phase) ${cook.toFixed(1)} A + water heating ${wh.toFixed(1)} A + A/C ${hvac.toFixed(1)} A (75%) + communal ${commonA.toFixed(1)} A = <strong>${total.toFixed(1)} A</strong>.
+      <br>Average ${(total / n).toFixed(2)} A per unit. ${nc === 1 ? 'With one cooking unit per phase, Table C1 Column 2 (50% connected load) applies to cooking &mdash; use the Maximum Demand tool.' : ''}
+    </div>`;
+}
 
-      const div = document.getElementById('multiResult');
-      div.style.display = 'block';
-      div.innerHTML = `
-        <div class="result-box">
-          <h3>Diversified Maximum Demand &mdash; ${n} Dwelling Units</h3>
-          <div class="result-grid">
-            <div class="result-item">
-              <div class="result-label">Undiversified Total (A)</div>
-              <div class="result-value">${totalUndiversified.toFixed(0)}</div>
-            </div>
-            <div class="result-item">
-              <div class="result-label">Average Diversity Factor</div>
-              <div class="result-value">${avgFactor.toFixed(3)}</div>
-            </div>
-            <div class="result-item">
-              <div class="result-label">Diversified Total (A)</div>
-              <div class="result-value">${totalDiversified.toFixed(0)}</div>
-            </div>
-            <div class="result-item">
-              <div class="result-label">Demand Reduction</div>
-              <div class="result-value">${((1 - totalDiversified / totalUndiversified) * 100).toFixed(0)}%</div>
-            </div>
-          </div>
-        </div>
-        <div class="info-box" style="margin-top:16px;">
-          <strong>Breakdown:</strong> ${n} units &times; ${loadPerUnit} A &times; ${avgFactor.toFixed(3)} = ${(diversifiedUnit * n).toFixed(0)} A (units) + ${commonArea} A (common) + ${centralHW} A (central services) = <strong>${totalDiversified.toFixed(0)} A per phase</strong>.
-          <br>Factors used: Col 3 = ${f[0].toFixed(3)}, Col 4 = ${f[1].toFixed(3)}, Col 5 = ${f[2].toFixed(3)} per AS/NZS 3000 Table C1.
-        </div>
-      `;
-    }
+function parseRatings(text) {
+  const out = [];
+  String(text).split(/[\s,;]+/).forEach(tok => {
+    if (!tok) return;
+    const m = tok.match(/^(\d+)\s*[x×*]\s*(\d+(?:\.\d+)?)$/i);
+    if (m) { for (let i = 0; i < parseInt(m[1]); i++) out.push(parseFloat(m[2])); return; }
+    const v = parseFloat(tok);
+    if (isFinite(v) && v > 0) out.push(v);
+  });
+  return out;
+}
 
-    function updateCalcForm() { /* Future: toggle between multi-dwelling and mixed */ }
+function calcC4() {
+  const ratings = parseRatings(document.getElementById('c4Ratings').value);
+  if (!ratings.length) { OmniToast.show('Enter at least one device rating', 'warn'); return; }
+  const upstream = Math.max(0, parseFloat(document.getElementById('c4Upstream').value) || 0);
+  const sum = ratings.reduce((a, b) => a + b, 0);
+  const f = c4Factor(ratings.length);
+  const md = sum * f;
+  const stdSizes = [16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000];
+  const sug = stdSizes.find(x => x >= md) || '> 4000';
+  const div = document.getElementById('c4Result');
+  div.style.display = 'block';
+  div.innerHTML = `
+    <div class="result-box">
+      <h3>Table C4 Result</h3>
+      <div class="result-grid">
+        <div class="result-item"><div class="result-label">Downstream Devices</div><div class="result-value">${ratings.length}</div></div>
+        <div class="result-item"><div class="result-label">Sum of Ratings (A)</div><div class="result-value">${sum.toFixed(0)}</div></div>
+        <div class="result-item"><div class="result-label">Diversity Factor</div><div class="result-value">${f.toFixed(1)}</div></div>
+        <div class="result-item"><div class="result-label">Maximum Demand (A)</div><div class="result-value">${md.toFixed(1)}</div></div>
+        <div class="result-item"><div class="result-label">Next Standard Device (A)</div><div class="result-value">${sug}</div></div>
+      </div>
+    </div>
+    ${upstream > 0 ? `<div class="${upstream >= md ? 'pass-box' : 'fail-box'}">Proposed upstream device ${upstream} A ${upstream >= md ? '&#8805;' : '&lt;'} maximum demand ${md.toFixed(1)} A.</div>` : ''}
+    <div class="info-box">${ratings.length === 1 ? 'A single downstream device takes no diversity. ' : ''}Table C4 applies to AS/NZS 61439 switchboards only; the upstream cable must still be rated for the protective device that protects it.</div>`;
+}
 
-    // Build C1 reference table on load
-    (function() {
-      const body = document.getElementById('c1RefBody');
-      [1,2,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200].forEach(n => {
-        const f = getDwellingFactor(n);
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${n}</td><td>${f[0].toFixed(3)}</td><td>${f[1].toFixed(3)}</td><td>${f[2].toFixed(3)}</td>`;
-        body.appendChild(tr);
-      });
-    })();
+showFactors();
 
-    // Show initial factors
-    showFactors();
-    function exportDiversityResult() {
-      var rs = document.getElementById('multiResult');
-      if (!rs || rs.style.display === 'none') { OmniToast.show('Calculate first', 'warn'); return; }
-      var items = rs.querySelectorAll('.result-item');
-      var rows = [];
-      items.forEach(function(it) {
-        var label = it.querySelector('.result-label');
-        var value = it.querySelector('.result-value');
-        if (label && value) rows.push([label.textContent.trim(), value.textContent.trim()]);
-      });
-      if (!rows.length) rows.push(['Result', rs.textContent.substring(0, 500)]);
-      OmniExport.toCSV(['Parameter','Value'], rows, 'diversity');
-    }
+function exportDiversityResult(id) {
+  var rs = document.getElementById(id);
+  if (!rs || rs.style.display === 'none') { OmniToast.show('Calculate first', 'warn'); return; }
+  var rows = [];
+  rs.querySelectorAll('.result-item').forEach(function(it) {
+    var label = it.querySelector('.result-label');
+    var value = it.querySelector('.result-value');
+    if (label && value) rows.push([label.textContent.trim(), value.textContent.trim()]);
+  });
+  if (!rows.length) rows.push(['Result', rs.textContent.substring(0, 500)]);
+  OmniExport.toCSV(['Parameter','Value'], rows, 'diversity');
+}
   </script>
   <script src="omni-utils.js"></script>
 </body>

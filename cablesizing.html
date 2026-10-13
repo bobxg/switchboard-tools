@@ -12,19 +12,23 @@
   <div class="calculator-container">
     <div class="calc-section">
       <h2>Cable Sizing Calculator (AS/NZS 3008)</h2>
-      
-      <div class="input-row">
+
+      <div class="input-row three">
         <div class="input-group">
-          <label for="loadCurrent">Load Current (A)</label>
+          <label for="loadCurrent">Design Current I<sub>B</sub> (A)</label>
           <input type="number" id="loadCurrent" value="32" min="0" step="0.1" />
         </div>
         <div class="input-group">
-          <label for="cableLength">Cable Length (m)</label>
+          <label for="cableLength">Route Length (m)</label>
           <input type="number" id="cableLength" value="50" min="0" step="1" />
+        </div>
+        <div class="input-group">
+          <label for="powerFactor">Load Power Factor (cos &phi;)</label>
+          <input type="number" id="powerFactor" value="0.9" min="0.1" max="1" step="0.01" />
         </div>
       </div>
 
-      <div class="input-row">
+      <div class="input-row three">
         <div class="input-group">
           <label for="voltage">System Voltage</label>
           <select id="voltage">
@@ -34,43 +38,78 @@
             <option value="415">415 V &mdash; Three Phase</option>
           </select>
         </div>
-      </div>
-
-      <div class="input-row">
         <div class="input-group">
-          <label for="installMethod">Installation Method</label>
-          <select id="installMethod">
-            <option value="1">Method 1 - Enclosed in conduit in thermally insulated wall</option>
-            <option value="3">Method 3 - Cables in conduit on surface/in trunking</option>
-            <option value="12" selected>Method 12 - Multicore cable, direct burial</option>
-            <option value="21">Method 21 - Cables in conduit underground</option>
-            <option value="31">Method 31 - Multicore cable on cable tray, unperforated</option>
-            <option value="32">Method 32 - Multicore cable on cable ladder/cleats</option>
+          <label for="cableType">Conductor</label>
+          <select id="cableType">
+            <option value="cu">Copper</option>
+            <option value="al">Aluminium</option>
           </select>
         </div>
         <div class="input-group">
-          <label for="ambientTemp">Ambient Temperature (&deg;C)</label>
-          <input type="number" id="ambientTemp" value="30" min="0" max="60" />
+          <label for="insulation">Insulation</label>
+          <select id="insulation">
+            <option value="x90" selected>X-90 / XLPE (90&deg;C)</option>
+            <option value="v90">V-90 PVC (75&deg;C normal use)</option>
+          </select>
         </div>
       </div>
 
-      <div class="input-row">
+      <div class="input-row three">
         <div class="input-group">
-          <label for="grouping">Number of Circuits Grouped</label>
+          <label for="installMethod">Installation Method</label>
+          <select id="installMethod">
+            <option value="A1">Insulated cores in conduit in a thermally insulated wall</option>
+            <option value="A2">Multicore in conduit in a thermally insulated wall</option>
+            <option value="B1">Insulated cores in conduit / trunking on a wall</option>
+            <option value="B2">Multicore in conduit / trunking on a wall</option>
+            <option value="C" selected>Multicore clipped direct to a wall</option>
+            <option value="D">Multicore in underground conduit / duct</option>
+            <option value="E">Multicore on perforated tray / ladder, in free air</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="ambientTemp">Ambient Air / Ground Temp (&deg;C)</label>
+          <input type="number" id="ambientTemp" value="40" min="0" max="70" />
+          <span style="font-size:0.8em;color:var(--text-secondary);">Ground temperature for the underground method</span>
+        </div>
+        <div class="input-group">
+          <label for="grouping">Circuits Grouped (incl. this one)</label>
           <input type="number" id="grouping" value="1" min="1" max="20" />
         </div>
+      </div>
+
+      <div class="input-row three">
         <div class="input-group">
-          <label for="voltDropPercent">Max Voltage Drop (%)</label>
-          <input type="number" id="voltDropPercent" value="5" min="1" max="10" step="0.5" />
+          <label for="voltDropPercent">Max Voltage Drop for this Cable (%)</label>
+          <input type="number" id="voltDropPercent" value="5" min="0.5" max="10" step="0.5" />
+        </div>
+        <div class="input-group">
+          <label for="upstreamVd">Upstream Voltage Drop Already Used (%)</label>
+          <input type="number" id="upstreamVd" value="0" min="0" max="10" step="0.1" />
+          <span style="font-size:0.8em;color:var(--text-secondary);">AS/NZS 3000 cl. 3.6.2: 5% total, point of supply to any point</span>
+        </div>
+        <div class="input-group">
+          <label for="parallelRuns">Parallel Runs per Phase</label>
+          <select id="parallelRuns">
+            <option value="auto" selected>Auto (1&ndash;4)</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
         </div>
       </div>
 
-      <div class="input-group">
-        <label for="cableType">Cable Type</label>
-        <select id="cableType">
-          <option value="cu">Copper Conductor</option>
-          <option value="al">Aluminium Conductor</option>
-        </select>
+      <div class="input-row three">
+        <div class="input-group">
+          <label for="faultKA">Prospective Fault Current (kA) &mdash; optional</label>
+          <input type="number" id="faultKA" value="0" min="0" step="0.1" />
+          <span style="font-size:0.8em;color:var(--text-secondary);">0 = skip short-circuit withstand check</span>
+        </div>
+        <div class="input-group">
+          <label for="clearTime">Protective Device Clearing Time (s)</label>
+          <input type="number" id="clearTime" value="0.1" min="0.01" max="5" step="0.01" />
+        </div>
       </div>
 
       <button class="calc-button" onclick="calculateCable()">Calculate Cable Size</button>
@@ -82,65 +121,89 @@
           <div class="result-value" id="cableSize"></div>
           <div id="resultDetails"></div>
         </div>
+        <div id="resultNotes"></div>
       </div>
     </div>
 
     <div class="info-box">
-      <h4>AS/NZS 3008.1.1 Cable Sizing</h4>
+      <h4>Method</h4>
       <ul style="margin-left: 20px; line-height: 1.8;">
-        <li>Calculates based on current carrying capacity and voltage drop</li>
-        <li>Applies derating factors for temperature and grouping</li>
-        <li>Default voltage drop: 5% for general circuits, 3% for lighting</li>
-        <li>Assumes XLPE insulation (90&deg;C operating temp)</li>
+        <li>Current rating I<sub>z</sub> = I<sub>tab</sub> &times; k<sub>temp</sub> &times; k<sub>group</sub> &times; parallel runs; requires I<sub>z</sub> &ge; I<sub>B</sub>.</li>
+        <li>Temperature factor k = &radic;((&theta;<sub>c</sub> &minus; &theta;<sub>a</sub>) / (&theta;<sub>c</sub> &minus; &theta;<sub>ref</sub>)), &theta;<sub>ref</sub> = 30&deg;C air / 20&deg;C ground.</li>
+        <li>Voltage drop uses impedance at operating temperature: V<sub>d</sub> = k &times; I &times; L &times; (R cos&phi; + X sin&phi;), k = 2 (1-ph) or &radic;3 (3-ph). Conductor R from IEC 60228 at 20&deg;C, corrected to 75&deg;C.</li>
+        <li>Short-circuit check (adiabatic): S &ge; I&radic;t / k with k = 143 (Cu X-90), 115 (Cu V-90), 94 (Al X-90), 76 (Al V-90).</li>
+        <li><strong>Tabulated ratings are indicative</strong> &mdash; they follow the IEC 60364-5-52 reference methods (three loaded conductors). Confirm the final selection against the current-rating tables of AS/NZS 3008.1.1 for the actual cable type and installation condition.</li>
       </ul>
     </div>
   </div>
-
     <script src="omni-utils.js"></script>
   <script>
-    // Simplified cable data (mm&sup2; : ampacity)
-    // Based on AS/NZS 3008.1.1
-    const CABLE_AMPACITY = {
-      cu: {
-        1: { 1: 19, 3: 23, 12: 24, 21: 20, 31: 21, 32: 22 },
-        1.5: { 1: 24, 3: 28, 12: 30, 21: 25, 31: 27, 32: 28 },
-        2.5: { 1: 32, 3: 37, 12: 41, 21: 34, 31: 36, 32: 38 },
-        4: { 1: 42, 3: 49, 12: 54, 21: 45, 31: 48, 32: 51 },
-        6: { 1: 54, 3: 63, 12: 70, 21: 58, 31: 62, 32: 65 },
-        10: { 1: 73, 3: 86, 12: 95, 21: 79, 31: 84, 32: 88 },
-        16: { 1: 98, 3: 115, 12: 128, 21: 107, 31: 113, 32: 119 },
-        25: { 1: 129, 3: 151, 12: 168, 21: 140, 31: 148, 32: 156 },
-        35: { 1: 158, 3: 185, 12: 206, 21: 172, 31: 182, 32: 191 },
-        50: { 1: 198, 3: 232, 12: 258, 21: 215, 31: 228, 32: 239 },
-        70: { 1: 245, 3: 287, 12: 320, 21: 267, 31: 283, 32: 297 },
-        95: { 1: 292, 3: 341, 12: 381, 21: 318, 31: 337, 32: 354 },
-        120: { 1: 334, 3: 391, 12: 437, 21: 365, 31: 386, 32: 406 },
-        150: { 1: 382, 3: 447, 12: 500, 21: 417, 31: 442, 32: 464 },
-        185: { 1: 435, 3: 509, 12: 570, 21: 476, 31: 504, 32: 529 },
-        240: { 1: 514, 3: 601, 12: 673, 21: 562, 31: 596, 32: 625 }
-      },
-      al: {
-        16: { 1: 76, 3: 89, 12: 99, 21: 83, 31: 88, 32: 92 },
-        25: { 1: 100, 3: 117, 12: 131, 21: 109, 31: 115, 32: 121 },
-        35: { 1: 122, 3: 144, 12: 160, 21: 133, 31: 141, 32: 148 },
-        50: { 1: 154, 3: 180, 12: 200, 21: 167, 31: 177, 32: 186 },
-        70: { 1: 190, 3: 223, 12: 248, 21: 207, 31: 219, 32: 230 },
-        95: { 1: 227, 3: 265, 12: 296, 21: 247, 31: 261, 32: 275 },
-        120: { 1: 259, 3: 303, 12: 339, 21: 283, 31: 300, 32: 315 },
-        150: { 1: 297, 3: 347, 12: 388, 21: 323, 31: 343, 32: 360 },
-        185: { 1: 337, 3: 395, 12: 442, 21: 369, 31: 391, 32: 410 },
-        240: { 1: 399, 3: 466, 12: 522, 21: 436, 31: 462, 32: 485 }
-      }
+    // Indicative current ratings (A), Cu conductors, three loaded conductors, 30°C air / 20°C ground.
+    // Columns follow the IEC 60364-5-52 reference installation methods (XLPE/90°C, Tables B.52.5 and B.52.12).
+    const SIZES = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300];
+    const RATING_CU_X90 = {
+      A1: [17, 23, 31, 40, 54, 73, 95, 117, 141, 179, 216, 249, 285, 324, 380, 435],
+      A2: [16.5, 22, 30, 38, 51, 68, 89, 109, 130, 164, 197, 227, 259, 295, 346, 396],
+      B1: [20, 28, 37, 48, 66, 88, 117, 144, 175, 222, 269, 312, 342, 384, 450, 514],
+      B2: [19.5, 26, 35, 44, 60, 80, 105, 128, 154, 194, 233, 268, 300, 340, 398, 455],
+      C:  [22, 30, 40, 52, 71, 96, 119, 147, 179, 229, 278, 322, 371, 424, 500, 576],
+      D:  [21, 28, 36, 44, 58, 75, 96, 115, 135, 167, 197, 223, 251, 281, 324, 365],
+      E:  [23, 32, 42, 54, 75, 100, 127, 158, 192, 246, 298, 346, 399, 456, 538, 621]
+    };
+    const PVC_FACTOR = 0.84;  // PVC (70–75°C) ratings ≈ 84% of XLPE (90°C) ratings at the same reference conditions
+    const AL_FACTOR = 0.78;   // Al ratings ≈ 78% of Cu ratings (16 mm² and above)
+    const METHOD_LABEL = {
+      A1: 'Cores in conduit, thermally insulated wall', A2: 'Multicore in conduit, thermally insulated wall',
+      B1: 'Cores in conduit/trunking on wall', B2: 'Multicore in conduit/trunking on wall',
+      C: 'Multicore clipped direct', D: 'Underground conduit/duct', E: 'Tray/ladder in free air'
     };
 
-    // Cable resistance (m&#937;/m at 75&deg;C)
-    const CABLE_RESISTANCE = {
-      cu: { 1: 21.9, 1.5: 14.6, 2.5: 8.76, 4: 5.48, 6: 3.65, 10: 2.19, 16: 1.37, 25: 0.876, 
-            35: 0.626, 50: 0.438, 70: 0.313, 95: 0.230, 120: 0.183, 150: 0.146, 185: 0.122, 240: 0.0913 },
-      al: { 16: 2.27, 25: 1.45, 35: 1.04, 50: 0.727, 70: 0.519, 95: 0.381, 120: 0.303, 150: 0.242, 185: 0.202, 240: 0.151 }
+    // DC resistance at 20°C (Ω/km), IEC 60228 class 2 stranded conductors
+    const R20 = {
+      cu: { 1.5: 12.1, 2.5: 7.41, 4: 4.61, 6: 3.08, 10: 1.83, 16: 1.15, 25: 0.727, 35: 0.524, 50: 0.387,
+            70: 0.268, 95: 0.193, 120: 0.153, 150: 0.124, 185: 0.0991, 240: 0.0754, 300: 0.0601 },
+      al: { 16: 1.91, 25: 1.20, 35: 0.868, 50: 0.641, 70: 0.443, 95: 0.320, 120: 0.253, 150: 0.206,
+            185: 0.164, 240: 0.125, 300: 0.100 }
     };
+    const ALPHA = { cu: 0.00393, al: 0.00403 };
+    // Typical reactance of multicore cables (mΩ/m) — AS/NZS 3008.1.1 order of magnitude
+    function reactance(size) {
+      if (size <= 4) return 0.105;
+      if (size <= 16) return 0.090;
+      if (size <= 50) return 0.082;
+      if (size <= 120) return 0.076;
+      return 0.072;
+    }
+    // Resistance at 75°C (mΩ/m), ac effects neglected below 300 mm²
+    function rHot(mat, size) { return R20[mat][size] * (1 + ALPHA[mat] * 55); }
 
-    const STANDARD_SIZES = [1, 1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630];
+    function ratingFor(mat, ins, method, size) {
+      const i = SIZES.indexOf(size);
+      if (i < 0) return null;
+      if (mat === 'al' && size < 16) return null;
+      let r = RATING_CU_X90[method][i];
+      if (ins === 'v90') r *= PVC_FACTOR;
+      if (mat === 'al') r *= AL_FACTOR;
+      return r;
+    }
+
+    function tempFactor(ins, method, ambient) {
+      const tc = ins === 'x90' ? 90 : 75;
+      const tref = method === 'D' ? 20 : 30;
+      if (ambient >= tc) return 0;
+      return Math.sqrt((tc - ambient) / (tc - tref));
+    }
+
+    // Grouping factors for bunched circuits (IEC 60364-5-52 Table B.52.17, item 1)
+    function groupFactor(n) {
+      const t = { 1: 1.00, 2: 0.80, 3: 0.70, 4: 0.65, 5: 0.60, 6: 0.57, 7: 0.54, 8: 0.52, 9: 0.50 };
+      if (n <= 9) return t[n];
+      if (n <= 12) return 0.45;
+      if (n <= 16) return 0.41;
+      return 0.38;
+    }
+
+    const K_ADIABATIC = { cu: { x90: 143, v90: 115 }, al: { x90: 94, v90: 76 } };
 
     let lastCableResult = null;
 
@@ -150,16 +213,19 @@
       OmniExport.toCSV(
         ['Parameter', 'Value'],
         [
-          ['Cable Size', r.size + ' mm²'],
-          ['Load Current', r.current + ' A'],
-          ['Cable Length', r.length + ' m'],
+          ['Cable Size', r.label],
+          ['Design Current', r.current + ' A'],
+          ['Route Length', r.length + ' m'],
           ['System Voltage', r.voltage + ' V'],
           ['Phases', r.phases],
-          ['Cable Type', r.cableType === 'cu' ? 'Copper' : 'Aluminium'],
-          ['Derated Ampacity', r.ampacity + ' A'],
-          ['Voltage Drop', r.vdVolts + ' V (' + r.vdPercent + '%)'],
-          ['Temp Derating', r.tempFactor],
-          ['Grouping Derating', r.groupFactor],
+          ['Conductor / Insulation', r.mat + ' / ' + r.ins],
+          ['Installation Method', r.method],
+          ['Current Rating Iz', r.ampacity + ' A'],
+          ['Voltage Drop (this cable)', r.vdVolts + ' V (' + r.vdPercent + '%)'],
+          ['Total Voltage Drop', r.totalVd + '%'],
+          ['Temperature Factor', r.tempFactor],
+          ['Grouping Factor', r.groupFactor],
+          ['Short-circuit Check', r.scText],
           ['Sized By', r.sizedBy]
         ],
         'cable-sizing-result'
@@ -170,127 +236,101 @@
       OmniValidate.clearErrors();
       const current = OmniValidate.parseNum('loadCurrent');
       const length = OmniValidate.parseNum('cableLength');
-      if (current <= 0) { OmniToast.show('Load current must be > 0', 'warn'); return; }
-      if (length <= 0) { OmniToast.show('Cable length must be > 0', 'warn'); return; }
+      if (current <= 0) { OmniToast.show('Design current must be > 0', 'warn'); return; }
+      if (length <= 0) { OmniToast.show('Route length must be > 0', 'warn'); return; }
       const voltage = parseFloat(document.getElementById('voltage').value);
       const phases = voltage <= 240 ? 1 : 3;
-      const method = parseInt(document.getElementById('installMethod').value);
-      const ambientTemp = OmniValidate.parseNum('ambientTemp', 30);
-      const grouping = parseInt(document.getElementById('grouping').value) || 1;
+      const method = document.getElementById('installMethod').value;
+      const ambient = OmniValidate.parseNum('ambientTemp', 40);
+      const grouping = Math.max(1, parseInt(document.getElementById('grouping').value) || 1);
       const maxVdPercent = OmniValidate.parseNum('voltDropPercent', 5);
-      const cableType = document.getElementById('cableType').value;
+      const upstreamVd = Math.max(0, OmniValidate.parseNum('upstreamVd', 0));
+      const pf = Math.min(1, Math.max(0.1, OmniValidate.parseNum('powerFactor', 0.9)));
+      const mat = document.getElementById('cableType').value;
+      const ins = document.getElementById('insulation').value;
+      const runsSel = document.getElementById('parallelRuns').value;
+      const faultKA = Math.max(0, OmniValidate.parseNum('faultKA', 0));
+      const clearT = Math.max(0.01, OmniValidate.parseNum('clearTime', 0.1));
 
-      // Temperature derating (AS/NZS 3008.1.1 Table 27)
-      // For 75&deg;C rated cables (V90, XLPE)
-      const tempDeratingFactors = {
-        25: 1.08, 30: 1.00, 35: 0.91, 40: 0.82, 45: 0.71, 50: 0.58, 55: 0.41
-      };
-      let tempFactor = 1.0;
-      if (ambientTemp <= 25) {
-        tempFactor = 1.08;
-      } else if (ambientTemp >= 55) {
-        tempFactor = 0.41;
-      } else {
-        // Linear interpolation between temperature points
-        const temps = [25, 30, 35, 40, 45, 50, 55];
-        for (let i = 0; i < temps.length - 1; i++) {
-          if (ambientTemp >= temps[i] && ambientTemp <= temps[i + 1]) {
-            const t1 = temps[i];
-            const t2 = temps[i + 1];
-            const f1 = tempDeratingFactors[t1];
-            const f2 = tempDeratingFactors[t2];
-            tempFactor = f1 + (f2 - f1) * (ambientTemp - t1) / (t2 - t1);
+      const kt = tempFactor(ins, method, ambient);
+      if (kt <= 0) { OmniToast.show('Ambient temperature exceeds the conductor operating limit', 'warn'); return; }
+      const kg = groupFactor(grouping);
+      const derate = kt * kg;
+      const sinphi = Math.sqrt(1 - pf * pf);
+      const vdBudget = Math.min(maxVdPercent, Math.max(0, 5 - upstreamVd));
+      const kVd = phases === 3 ? Math.sqrt(3) : 2;
+      const sMinSC = faultKA > 0 ? (faultKA * 1000 * Math.sqrt(clearT)) / K_ADIABATIC[mat][ins] : 0;
+
+      const runsList = runsSel === 'auto' ? [1, 2, 3, 4] : [parseInt(runsSel)];
+      let pick = null;
+      for (const n of runsList) {
+        const perRunI = current / n;
+        for (const size of SIZES) {
+          const tab = ratingFor(mat, ins, method, size);
+          if (tab === null || !R20[mat][size]) continue;
+          const iz = tab * derate * n;
+          const z = rHot(mat, size) * pf + reactance(size) * sinphi; // mΩ/m
+          const vd = kVd * perRunI * length * z / 1000;
+          const vdPct = vd / voltage * 100;
+          const okI = iz >= current;
+          const okVd = vdPct <= vdBudget + 1e-9;
+          const okSC = size >= sMinSC; // each run sees the full fault where the fault is at the cable end
+          if (okI && okVd && okSC) {
+            pick = { n, size, tab, iz, vd, vdPct, okI, okVd, okSC };
             break;
           }
         }
+        if (pick) break;
       }
 
-      // Grouping derating (AS/NZS 3008.1.1 Table 28)
-      const groupFactors = [1.00, 1.00, 0.80, 0.70, 0.65, 0.60, 0.57, 0.54, 0.52, 0.50, 
-                           0.48, 0.46, 0.45, 0.44, 0.43, 0.42, 0.41, 0.41, 0.40, 0.40];
-      const groupFactor = groupFactors[Math.min(grouping - 1, 19)];
-
-      const totalDeratingFactor = tempFactor * groupFactor;
-      const requiredAmpacity = current / totalDeratingFactor;
-
-      // Find cable size based on ampacity
-      let sizeByAmpacity = null;
-      const ampData = CABLE_AMPACITY[cableType];
-      
-      if (!ampData) {
-        alert('Data not available for selected cable type.');
+      const notes = [];
+      if (!pick) {
+        document.getElementById('cableSize').textContent = 'No solution';
+        document.getElementById('resultDetails').innerHTML =
+          `<p style="margin:8px 0;">No size up to 300 mm&sup2; ${runsSel === 'auto' ? 'with up to 4 parallel runs' : 'with ' + runsSel + ' run(s)'} meets current rating, voltage drop (${vdBudget.toFixed(2)}% available) and short-circuit withstand together.</p>`;
+        document.getElementById('resultNotes').innerHTML = `<div class="fail-box">Shorten the route, raise the voltage-drop allowance, use more parallel runs, or move the board closer to the load.</div>`;
+        document.getElementById('resultBox').style.display = 'block';
+        lastCableResult = null;
         return;
       }
 
-      for (let size of STANDARD_SIZES) {
-        if (ampData[size] && ampData[size][method]) {
-          if (ampData[size][method] >= requiredAmpacity) {
-            sizeByAmpacity = size;
-            break;
-          }
-        }
-      }
+      // Which criterion governed: the smallest size meeting each one on its own (same number of runs)
+      const valid = SIZES.filter(s => ratingFor(mat, ins, method, s) !== null && R20[mat][s]);
+      const sizeByI = valid.find(s => ratingFor(mat, ins, method, s) * derate * pick.n >= current);
+      const sizeBySC = valid.find(s => s >= sMinSC);
+      let sizedBy = 'Current rating';
+      if (pick.size > sizeByI) sizedBy = pick.size === sizeBySC ? 'Short-circuit withstand' : 'Voltage drop';
 
-      // Calculate voltage drop
-      const maxVdVolts = (voltage * maxVdPercent) / 100;
-      let sizeByVoltDrop = null;
+      const label = (pick.n > 1 ? pick.n + ' &times; ' : '') + pick.size + ' mm&sup2;';
+      const labelPlain = (pick.n > 1 ? pick.n + ' x ' : '') + pick.size + ' mm²';
+      const totalVd = upstreamVd + pick.vdPct;
+      const scText = sMinSC > 0 ? `S ≥ ${sMinSC.toFixed(1)} mm² required — OK` : 'Not checked';
 
-      for (let size of STANDARD_SIZES) {
-        if (CABLE_RESISTANCE[cableType] && CABLE_RESISTANCE[cableType][size]) {
-          const resistance = CABLE_RESISTANCE[cableType][size] / 1000; // Convert to &#937;/m
-          let voltDrop;
-          if (phases === 3) {
-            voltDrop = Math.sqrt(3) * current * resistance * length;
-          } else {
-            voltDrop = 2 * current * resistance * length; // 2x for single phase (out and back)
-          }
-          
-          if (voltDrop <= maxVdVolts) {
-            sizeByVoltDrop = size;
-            break;
-          }
-        }
-      }
-
-      // Select larger of the two
-      const finalSize = Math.max(sizeByAmpacity || 0, sizeByVoltDrop || 0);
-
-      if (finalSize === 0) {
-        alert('Cable size exceeds standard range. Consider parallel cables or larger size.');
-        return;
-      }
-
-      // Calculate actual voltage drop
-      const finalResistance = CABLE_RESISTANCE[cableType][finalSize] / 1000;
-      let actualVd;
-      if (phases === 3) {
-        actualVd = Math.sqrt(3) * current * finalResistance * length;
-      } else {
-        actualVd = 2 * current * finalResistance * length;
-      }
-      const actualVdPercent = (actualVd / voltage) * 100;
-
-      const actualAmpacity = ampData[finalSize][method] * totalDeratingFactor;
-
-      const sizedBy = sizeByAmpacity > sizeByVoltDrop ? 'Current Capacity' : 'Voltage Drop';
       lastCableResult = {
-        size: finalSize, current, length, voltage, phases, cableType,
-        ampacity: actualAmpacity.toFixed(1),
-        vdVolts: actualVd.toFixed(2), vdPercent: actualVdPercent.toFixed(2),
-        tempFactor: tempFactor.toFixed(2), groupFactor: groupFactor.toFixed(2), sizedBy
+        label: labelPlain, current, length, voltage, phases,
+        mat: mat === 'cu' ? 'Copper' : 'Aluminium', ins: ins === 'x90' ? 'X-90' : 'V-90',
+        method: METHOD_LABEL[method],
+        ampacity: pick.iz.toFixed(1), vdVolts: pick.vd.toFixed(2), vdPercent: pick.vdPct.toFixed(2),
+        totalVd: totalVd.toFixed(2), tempFactor: kt.toFixed(3), groupFactor: kg.toFixed(2), scText, sizedBy
       };
 
-      document.getElementById('cableSize').textContent = finalSize + ' mm²';
+      document.getElementById('cableSize').innerHTML = label + ' ' + (mat === 'cu' ? 'Cu' : 'Al');
       document.getElementById('resultDetails').innerHTML = `
-        <p style="margin:8px 0;"><strong>Derated Ampacity:</strong> ${actualAmpacity.toFixed(1)} A (${(actualAmpacity/current * 100).toFixed(0)}% margin)</p>
-        <p style="margin:8px 0;"><strong>Voltage Drop:</strong> ${actualVd.toFixed(2)} V (${actualVdPercent.toFixed(2)}%)</p>
-        <p style="margin:8px 0;"><strong>Temperature Factor:</strong> ${tempFactor.toFixed(2)}</p>
-        <p style="margin:8px 0;"><strong>Grouping Factor:</strong> ${groupFactor.toFixed(2)}</p>
+        <p style="margin:8px 0;"><strong>Current Rating I<sub>z</sub>:</strong> ${pick.iz.toFixed(1)} A for I<sub>B</sub> = ${current} A (${(pick.iz / current * 100 - 100).toFixed(0)}% margin)</p>
+        <p style="margin:8px 0;"><strong>Voltage Drop:</strong> ${pick.vd.toFixed(2)} V (${pick.vdPct.toFixed(2)}%) &mdash; total from origin ${totalVd.toFixed(2)}%</p>
+        <p style="margin:8px 0;"><strong>Temperature Factor:</strong> ${kt.toFixed(3)} &nbsp; <strong>Grouping Factor:</strong> ${kg.toFixed(2)}</p>
+        <p style="margin:8px 0;"><strong>Short-circuit:</strong> ${sMinSC > 0 ? 'minimum ' + sMinSC.toFixed(1) + ' mm&sup2; for ' + faultKA + ' kA, ' + clearT + ' s' : 'not checked'}</p>
         <p style="margin:8px 0; font-size:0.9em;"><em>Sized by: ${sizedBy}</em></p>
       `;
-      
+
+      if (pick.n > 1) notes.push(`<div class="info-box"><strong>Parallel cables:</strong> ${pick.n} identical runs per phase, same length and route, each rated for ${(current / pick.n).toFixed(1)} A. Each run carries its own earth conductor; protection must suit the combined rating (AS/NZS 3000 cl. 3.4.3).</div>`);
+      if (totalVd > 5) notes.push(`<div class="fail-box">Total voltage drop ${totalVd.toFixed(2)}% exceeds the 5% limit of AS/NZS 3000 cl. 3.6.2.</div>`);
+      if (upstreamVd > 0) notes.push(`<div class="info-box">Voltage-drop budget for this cable: ${vdBudget.toFixed(2)}% (the lesser of your limit and 5% &minus; ${upstreamVd}% upstream).</div>`);
+      if (method === 'A1' || method === 'A2') notes.push(`<div class="warn-box">Cables in thermal insulation: if the cable is completely surrounded by insulation for more than 0.5 m, further derating applies (AS/NZS 3008.1.1 cl. 3.5.3).</div>`);
+      document.getElementById('resultNotes').innerHTML = notes.join('');
+
       document.getElementById('resultBox').style.display = 'block';
-      OmniToast.show('Cable sized: ' + finalSize + ' mm²', 'success');
+      OmniToast.show('Cable sized: ' + labelPlain, 'success');
     }
   </script>
 </body>

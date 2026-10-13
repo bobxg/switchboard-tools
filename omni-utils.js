@@ -500,6 +500,21 @@ const OmniValidate = {
   },
   clearErrors() {
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+  },
+  // True when every visible number input (optionally within a container) holds a number;
+  // otherwise highlights the empty fields, focuses the first and shows one toast.
+  requireAll(scope) {
+    const root = (typeof scope === 'string' ? document.querySelector(scope) : scope) || document;
+    const bad = [...root.querySelectorAll('input[type=number]')]
+      .filter(el => el.offsetParent !== null && !el.disabled && !el.readOnly && !el.hasAttribute('data-optional'))
+      .filter(el => !Number.isFinite(parseFloat(el.value)));
+    root.querySelectorAll('input[type=number]').forEach(el => el.classList.remove('input-error'));
+    if (!bad.length) return true;
+    bad.forEach(el => el.classList.add('input-error'));
+    bad[0].focus();
+    const lbl = bad[0].id && document.querySelector('label[for="' + bad[0].id + '"]');
+    OmniToast.show((lbl ? lbl.textContent.trim() : 'A required field') + (bad.length > 1 ? ' and ' + (bad.length - 1) + ' other field(s) need' : ' needs') + ' a value', 'warn');
+    return false;
   }
 };
 

@@ -74,6 +74,8 @@
       const txZ = parseFloat(document.getElementById('txZ').value);
       const harmonic = document.getElementById('harmPresent').value;
       const stepped = document.getElementById('stepMode').value;
+      const vLL = parseFloat(document.getElementById('voltage').value) || 400;
+      if (!(pf2 > pf1)) { OmniToast.show('Target power factor must be higher than the existing power factor', 'warn'); return; }
 
       const phi1 = Math.acos(pf1);
       const phi2 = Math.acos(pf2);
@@ -91,7 +93,7 @@
       // Resonant harmonic check: hr = &#8730;(SscMVA / QcMVAr)
       // Ssc = txKVA / (txZ/100), in kVA
       const sscKVA = txKVA / (txZ / 100);
-      const hr = Math.sqrt(sscKVA / requiredKVAr);
+      const hr = Math.sqrt(sscKVA / requiredKVAr); // full bank in service — the lowest resonant order
 
       // Identify nearest harmonic
       const harmonicOrders = [3, 5, 7, 11, 13];
@@ -101,13 +103,14 @@
       }
 
       const needDetuned = nearestH !== null || harmonic === 'high';
-      const detunePct = nearestH && nearestH <= 5 ? '7% (189 Hz)' : nearestH && nearestH <= 7 ? '5.67% (210 Hz)' : '7% (189 Hz)';
+      // Tuning factor p = (f1/fr)²: 14% → 134 Hz (below H3), 7% → 189 Hz, 5.67% → 210 Hz (both below H5)
+      const detunePct = nearestH === 3 ? '14% (134 Hz)' : nearestH === 7 ? '5.67% (210 Hz)' : '7% (189 Hz)';
 
       // Suggested step sizes
       const stepSize = requiredKVAr / (stepped === 'auto' ? 6 : 1);
       const stdSteps = [5, 10, 12.5, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125, 150, 200];
-      let selectedStep = stepSize;
-      for (const s of stdSteps) { if (s >= stepSize * 0.8) { selectedStep = s; break; } }
+      let selectedStep = stdSteps.find(s => s >= stepSize * 0.8) || stdSteps[stdSteps.length - 1];
+      const numSteps = Math.ceil(requiredKVAr / selectedStep - 1e-9);
 
       document.getElementById('resKVAr').textContent = requiredKVAr.toFixed(0);
       document.getElementById('resExistKVAr').textContent = existKVAr.toFixed(0);
@@ -121,8 +124,8 @@
         &#8226; Existing: ${kw} kW at PF ${pf1} = ${existKVA.toFixed(0)} kVA / ${existKVAr.toFixed(0)} kVAr reactive<br>
         &#8226; Target: PF ${pf2} = ${newKVA.toFixed(0)} kVA / ${targetKVAr.toFixed(0)} kVAr reactive<br>
         &#8226; Required PFC: <strong>${requiredKVAr.toFixed(0)} kVAr</strong><br>
-        &#8226; Suggested configuration: ${stepped === 'auto' ? Math.round(requiredKVAr / selectedStep) + ' steps &times; ' + selectedStep + ' kVAr = ' + (Math.round(requiredKVAr / selectedStep) * selectedStep) + ' kVAr' : 'Fixed bank ' + requiredKVAr.toFixed(0) + ' kVAr'}<br>
-        &#8226; Current reduction: ${(existKVA * 1000 / 400 / 1.732).toFixed(0)} A &#8594; ${(newKVA * 1000 / 400 / 1.732).toFixed(0)} A (at 400V, 3-phase)<br>
+        &#8226; Suggested configuration: ${stepped === 'auto' ? numSteps + ' steps &times; ' + selectedStep + ' kVAr = ' + (numSteps * selectedStep) + ' kVAr' : 'Fixed bank ' + requiredKVAr.toFixed(0) + ' kVAr'}<br>
+        &#8226; Current reduction: ${(existKVA * 1000 / vLL / Math.sqrt(3)).toFixed(0)} A &#8594; ${(newKVA * 1000 / vLL / Math.sqrt(3)).toFixed(0)} A (at ${vLL} V, 3-phase)<br>
         <em>Refer to AS/NZS 61921 for capacitor specifications and PFC installation requirements.</em>
       `;
 

@@ -129,7 +129,7 @@
       if (riskScore >= 12) {
         riskLevel = 'VERY HIGH';
         type1 = true; type2 = true; type3 = true;
-        recommendations.push('Install Type 1 SPD at MSB with Iimp &#8805; 25 kA per pole.');
+        recommendations.push('Install Type 1 SPD at MSB with Iimp &#8805; 25 kA per pole (10/350 &micro;s) &mdash; above the 12.5 kA minimum given the very high risk.');
         recommendations.push('Install Type 2 SPDs at ALL sub-distribution boards.');
         recommendations.push('Install Type 3 SPDs at sensitive equipment locations.');
       } else if (riskScore >= 8) {
@@ -171,7 +171,7 @@
 
       // Zoned diagram with active zones
       html += `<div class="calc-section" style="margin-top:16px;"><h2>Required Protection Zones</h2><div class="zone-diagram">
-        <div class="zone-card ${type1?'active':''}"><h4>Type 1 ${type1?'&#10003; REQUIRED':'&mdash; Not required'}</h4><p>${type1?'Install at MSB. Iimp &#8805; 12.5 kA (10/350&micro;s). Up &#8804; 4 kV.':'Low risk &mdash; Type 1 not needed for this installation.'}</p></div>
+        <div class="zone-card ${type1?'active':''}"><h4>Type 1 ${type1?'&#10003; REQUIRED':'&mdash; Not required'}</h4><p>${type1?'Install at MSB. Iimp &#8805; 12.5 kA per pole (10/350&micro;s), 25 kA for very high risk or LPS class I&ndash;II. Up &#8804; 2.5 kV for 230/400 V equipment.':'Low risk &mdash; Type 1 not needed for this installation.'}</p></div>
         <div class="zone-card ${type2?'active':''}"><h4>Type 2 ${type2?'&#10003; REQUIRED':'&mdash; Not required'}</h4><p>${type2?'Install at sub-DBs. In &#8805; 20 kA (8/20&micro;s). Up &#8804; 2.5 kV.':'Not required based on risk assessment.'}</p></div>
         <div class="zone-card ${type3?'active':''}"><h4>Type 3 ${type3?'&#10003; REQUIRED':'&mdash; Optional'}</h4><p>${type3?'Install at sensitive equipment. Imax &#8805; 10 kA. Up &#8804; 1.5 kV.':'Optional &mdash; no critical sensitive loads identified.'}</p></div>
       </div></div>`;
