@@ -188,7 +188,7 @@
       if (ifault / 1000 > 50) {
         rec += `<div class="warn-box"><strong>High Fault Level:</strong> Prospective fault current ${(ifault/1000).toFixed(1)} kA exceeds 50 kA. Ensure switchgear rated accordingly per AS/NZS 61439.</div>`;
       }
-      rec += `<div class="info-box"><strong>Standards:</strong> AS 2374.1 (general), AS 2374.2 (temperature rise), AS 60076.11 (dry type), AS/NZS 3000 <a href="as3000viewer.html#cl-1.5.4" class="clause" target="_blank">cl 1.5.4</a> (installation). Ensure cable sizing to TX per AS/NZS 3008.1.1 for ${flc.toFixed(0)} A secondary FLC.</div>`;
+      rec += `<div class="info-box"><strong>Standards:</strong> AS 2374.1 (general), AS 2374.2 (temperature rise), AS 60076.11 (dry type), AS/NZS 3000 <a href="as3000viewer.html#cl-4.14" class="clause" target="_blank">cl 4.14</a> (transformers). Ensure cable sizing to TX per AS/NZS 3008.1.1 for ${flc.toFixed(0)} A secondary FLC.</div>`;
       document.getElementById('recommendations').innerHTML = rec;
 
       // Reference table

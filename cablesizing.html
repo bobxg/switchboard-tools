@@ -268,6 +268,7 @@
         for (const size of SIZES) {
           const tab = ratingFor(mat, ins, method, size);
           if (tab === null || !R20[mat][size]) continue;
+          if (n > 1 && size < 4) continue; // cl. 3.4.3: parallel cables not less than 4 mm²
           const iz = tab * derate * n;
           const z = rHot(mat, size) * pf + reactance(size) * sinphi; // mΩ/m
           const vd = kVd * perRunI * length * z / 1000;
@@ -323,10 +324,10 @@
         <p style="margin:8px 0; font-size:0.9em;"><em>Sized by: ${sizedBy}</em></p>
       `;
 
-      if (pick.n > 1) notes.push(`<div class="info-box"><strong>Parallel cables:</strong> ${pick.n} identical runs per phase, same length and route, each rated for ${(current / pick.n).toFixed(1)} A. Each run carries its own earth conductor; protection must suit the combined rating (AS/NZS 3000 cl. 3.4.3).</div>`);
+      if (pick.n > 1) notes.push(`<div class="info-box"><strong>Parallel cables:</strong> ${pick.n} identical runs per phase, same length and route, each rated for ${(current / pick.n).toFixed(1)} A. Parallel cables must be at least 4 mm&sup2;, of the same material, size, type and length so the current shares equally, and grouped so cooling is not impaired (AS/NZS 3000 cl. 3.4.3).</div>`);
       if (totalVd > 5) notes.push(`<div class="fail-box">Total voltage drop ${totalVd.toFixed(2)}% exceeds the 5% limit of AS/NZS 3000 cl. 3.6.2.</div>`);
       if (upstreamVd > 0) notes.push(`<div class="info-box">Voltage-drop budget for this cable: ${vdBudget.toFixed(2)}% (the lesser of your limit and 5% &minus; ${upstreamVd}% upstream).</div>`);
-      if (method === 'A1' || method === 'A2') notes.push(`<div class="warn-box">Cables in thermal insulation: if the cable is completely surrounded by insulation for more than 0.5 m, further derating applies (AS/NZS 3008.1.1 cl. 3.5.3).</div>`);
+      if (method === 'A1' || method === 'A2') notes.push(`<div class="warn-box">Cables in thermal insulation: if the cable is completely surrounded by insulation for more than 0.5 m, rate the cable by the length through the insulation &mdash; &gt;400 mm uses the &lsquo;completely surrounded&rsquo; rating (AS/NZS 3000 cl. 3.3.2.13).</div>`);
       document.getElementById('resultNotes').innerHTML = notes.join('');
 
       document.getElementById('resultBox').style.display = 'block';

@@ -10,7 +10,7 @@
   <div class="top-tabs"></div>
   <div class="main-content">
     <h1>RCD Type Selector</h1>
-    <p>Select the correct RCD type per <strong>AS/NZS 3000:2018</strong> clause <a href="as3000viewer.html#cl-2.6.3" class="clause" target="_blank">2.6.3</a> (Australian requirements in 2.6.3.2). Covers Type I (AC), Type II (A), Type III (B/B+), sensitivity, and application rules.</p>
+    <p>Select the correct RCD type per <strong>AS/NZS 3000:2018</strong> clause <a href="as3000viewer.html#cl-2.6.3" class="clause" target="_blank">2.6.3</a> (Australian requirements in 2.6.3.2). Covers Type AC, A, I, F, B and S, sensitivity, and application rules.</p>
     <div class="calc-section">
       <h2>Application Details</h2>
       <div class="input-row three">
@@ -70,14 +70,18 @@
           <tr><td>Construction sites</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td>AS/NZS 3012</td><td>All circuits</td></tr>
           <tr><td>EV charging (Mode 3)</td><td><strong>YES &mdash; Mandatory</strong></td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause" target="_blank">2.6.3.2</a> + AS/NZS 3001</td><td>Type A or B per charger requirements</td></tr>
           <tr><td>VSD/Inverter circuits</td><td>If required by above</td><td>30</td><td><a href="as3000viewer.html#cl-2.6.3.2" class="clause" target="_blank">2.6.3.2</a></td><td>Type B/B+ required (DC fault current detection)</td></tr>
-          <tr><td>Medical &mdash; Body-protected</td><td><strong>YES &mdash; Mandatory</strong></td><td>10</td><td>AS/NZS 3003</td><td>Type II (A) minimum, all patient care areas</td></tr>
+          <tr><td>Medical &mdash; Body-protected</td><td><strong>YES &mdash; Mandatory</strong></td><td>10</td><td>AS/NZS 3003</td><td>Type I (10 mA, &#8804;40 ms), patient areas</td></tr>
           <tr><td>Fire/Essential services</td><td>Generally exempt</td><td>&mdash;</td><td><a href="as3000viewer.html#cl-2.6.3.2.3.3" class="clause" target="_blank">2.6.3.2.3.3</a> Exc.</td><td>Where loss of supply causes greater danger</td></tr>
         </tbody>
       </table>
-      <div class="info-box"><strong>RCD Types per AS/NZS 61008.1 / AS/NZS 61009.1:</strong><br>
-        <strong>Type I (AC):</strong> Detects AC residual current only. Being phased out from new installations.<br>
-        <strong>Type II (A):</strong> Detects AC and pulsating DC residual current. Standard for most applications.<br>
-        <strong>Type III (B/B+):</strong> Detects AC, pulsating DC, and smooth DC. Required for VSD/inverter loads.<br>
+      <div class="info-box"><strong>RCD Types (AS/NZS 3000:2018 cl. 2.6.2.2.1 Notes; AS/NZS 3190, 61008.1, 61009.1, IEC 62423):</strong><br>
+        <strong>Type AC:</strong> Tripping ensured for residual sinusoidal AC. The general type used in Australia (not used in New Zealand).<br>
+        <strong>Type A:</strong> As Type AC, plus residual pulsating DC.<br>
+        <strong>Type I:</strong> As Type A, rated residual current &#8804; 10 mA with interrupting time &#8804; 40 ms &mdash; for patient areas (AS/NZS 3003).<br>
+        <strong>Type F:</strong> As Type A, plus composite / high-frequency residual currents (frequency converters, electronic ballasts).<br>
+        <strong>Type B:</strong> As Type A, plus AC up to 1 kHz and smooth DC residual currents (e.g. from rectifying circuits).<br>
+        <strong>Type S:</strong> Time-delayed, for selectivity with downstream RCDs.<br>
+        The waveform of possible earth-fault currents should be considered when selecting the type &mdash; consult the RCD manufacturer.<br>
         <strong>I&#916;n ratings:</strong> 10 mA (medical), 30 mA (personal protection), 100/300 mA (fire protection), 500 mA (equipment protection).</div>
     </div>
   </div>
@@ -89,7 +93,7 @@
 
       let required = true;
       let sensitivity = 30;
-      let rcdType = 'Type II (A)';
+      let rcdType = 'Type AC or Type A';
       let clause = '2.6.3.2';
       let notes = [];
       let priority = 'required'; // required, recommended, optional
@@ -128,23 +132,23 @@
         case 'aircon':
           if (location === 'residential') { required = true; clause = '2.6.3.2.2'; notes.push('Residential A/C: RCD required (all domestic final subcircuits).'); }
           else { priority = 'recommended'; notes.push('Commercial A/C with VSD: consider Type B.'); }
-          if (true) { rcdType = 'Type II (A) minimum'; notes.push('If inverter-type A/C (VSD compressor), Type III (B) is STRONGLY recommended to detect DC fault currents.'); }
+          if (true) { rcdType = 'Type A minimum'; notes.push('If inverter-type A/C (VSD compressor), consider Type F or Type B per the manufacturer, as DC or high-frequency residual currents can occur.'); }
           break;
         case 'ev_charger':
           required = true; sensitivity = 30;
-          rcdType = 'Type III (B) or Type II (A) with DC 6 mA detection';
+          rcdType = 'Type B, or Type A with 6 mA DC detection (IEC 62955)';
           clause = '2.6.3.2 + AS/NZS 3001';
-          notes.push('EV chargers (Mode 3) MUST have RCD with DC fault current detection. Type B RCD or Type A with integrated 6 mA DC detection per IEC 62955.');
+          notes.push('EV chargers (Mode 3): provide DC fault-current detection &mdash; a Type B RCD, or Type A with 6 mA DC detection (IEC 62955) where the charger does not include it. Follow the charger manufacturer and AS/NZS 3000 cl. 2.6.2.2 guidance on RCD type.');
           break;
         case 'vsd_motor':
-          rcdType = 'Type III (B/B+)';
-          notes.push('VSD loads produce smooth DC fault currents that Type A/AC RCDs cannot detect. Type B or B+ is REQUIRED where RCD protection is applied.');
+          rcdType = 'Type B (or Type F per drive manufacturer)';
+          notes.push('VSDs can produce smooth DC or high-frequency residual currents that Type AC/A RCDs may not detect &mdash; use Type B (or Type F where the drive manufacturer permits) where RCD protection is applied. Final subcircuits for specific equipment such as VSDs with high normal leakage may be exempt (cl. 2.6.3.2.3.3 Exception 3).');
           if (rating <= 20 || location === 'construction' || location === 'outdoor') { required = true; }
           else { priority = 'recommended'; }
           break;
         case 'medical':
           required = true; sensitivity = 10;
-          rcdType = 'Type II (A) minimum (AS/NZS 3003)';
+          rcdType = 'Type I (10 mA, ≤40 ms) per AS/NZS 3003';
           clause = 'AS/NZS 3003 cl. 5.2';
           notes.push('Medical patient care areas: 10 mA body-protected RCD required. Group 2 medical: consider isolated power supply (IPS) with insulation monitoring device (IMD).');
           break;
@@ -157,7 +161,7 @@
           notes.push('Where RCD is unavoidable, use 300 mA time-delayed type to minimise nuisance trips.');
           break;
         case 'solar_inverter':
-          rcdType = 'Type III (B) or Type II (A) per inverter manufacturer';
+          rcdType = 'Type B or Type A, per inverter manufacturer';
           clause = 'AS/NZS 5033 + 4777.1';
           required = true; sensitivity = 30;
           notes.push('Solar inverters may produce DC fault currents. Check inverter datasheet &mdash; many have internal RCM (residual current monitoring) allowing Type A external RCD.');
@@ -196,12 +200,12 @@
 
       // Additional guidance
       html += `<div class="calc-section" style="margin-top:16px;"><h2>Selection Guidance</h2>`;
-      html += `<div class="rcd-card"><h4>Type II (A) &mdash; Standard</h4>
+      html += `<div class="rcd-card"><h4>Type AC / Type A &mdash; General</h4>
         <span class="tag tag-required">Most common</span>
-        <p>Detects AC and pulsating DC residual currents. Suitable for resistive loads, standard motors, lighting, GPOs. This is the default selection for most circuits in AS/NZS 3000.</p></div>`;
-      html += `<div class="rcd-card"><h4>Type III (B/B+) &mdash; VSD / DC Fault</h4>
-        <span class="tag tag-recommended">Required for VSD/EV/inverter</span>
-        <p>Detects smooth DC residual currents in addition to AC and pulsating DC. Required where variable speed drives, EV chargers, or PV inverters could produce DC fault current. Also called Type B per IEC 62423.</p></div>`;
+        <p>Type AC (sinusoidal AC) is the general type used in Australia; Type A also detects pulsating DC and suits loads with simple electronic supplies. Suitable for resistive loads, standard motors, lighting and GPOs.</p></div>`;
+      html += `<div class="rcd-card"><h4>Type F / Type B &mdash; Drives, EV, Inverters</h4>
+        <span class="tag tag-recommended">Where DC or high-frequency residual current can occur</span>
+        <p>Type F covers composite and high-frequency residual currents (frequency converters); Type B (IEC 62423) also detects smooth DC. Select where variable speed drives, EV chargers or inverters could produce such fault currents, per manufacturer guidance.</p></div>`;
       html += `<div class="rcd-card"><h4>30 mA &mdash; Personal Protection</h4>
         <span class="tag tag-required">Standard</span>
         <p>Primary sensitivity for additional protection against direct contact. Required for socket-outlet and lighting circuits &#8804; 32 A, all domestic final subcircuits, wet areas, outdoor, construction sites.</p></div>`;

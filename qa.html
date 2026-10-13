@@ -257,62 +257,34 @@ S &ge; I &radic;t / k     k = 143 (Cu X-90), 115 (Cu V-90), 94 (Al X-90), 76 (Al
 
     <!-- VOLTAGE DROP -->
     <div class="qa-section" id="voltage-drop">
-      <h2>3. Voltage Drop Calculator (calc.html)</h2>
-      
+      <h2>3. Voltage Drop (Quick Calc and Cable Schedule)</h2>
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 3000:2018 - Table C8 (Voltage drop for cables)</li>
-          <li>AS/NZS 3000:2018 - Table 4.1 (Maximum voltage drop limits)</li>
+          <li>AS/NZS 3000:2018 &mdash; <a href="as3000viewer.html#cl-3.6.2" target="_blank">Clause 3.6.2</a> (5% from the point of supply to any point)</li>
+          <li>AS/NZS 3000:2018 &mdash; Appendix C, Table C8 (simplified method, Am per %V<sub>d</sub>)</li>
         </ul>
       </div>
-
-      <h3>Single-Phase Voltage Drop</h3>
+      <h3>Table C8 Method (Cable Schedule)</h3>
       <div class="formula-box">
-VD (V) = 2 &times; I &times; L &times; R / 1000
+V<sub>d</sub> (%) = I &times; L / (Am per %V<sub>d</sub>)      I = current (A), L = route length (m)
 
-Where:
-- VD = Voltage drop (volts)
-- I = Load current (amps)
-- L = One-way length (meters)
-- R = Conductor resistance per meter (mV/A/m from Table C8)
-- Factor of 2 accounts for both active and neutral conductors
+Copper, Am per %V<sub>d</sub> (single-phase 230 V / three-phase 400 V):
+1.5 mm&sup2;: 70 / 140   2.5: 128 / 256   4: 205 / 412   6: 306 / 615   10: 515 / 1034
+16: 818 / 1643   25: 1289 / 2588   35: 1773 / 3560   50: 2377 / 4772   70: 3342 / 6712   95: 4445 / 8927
       </div>
-
-      <h3>Three-Phase Voltage Drop</h3>
+      <h3>Impedance Method (Quick Calc, larger sizes)</h3>
       <div class="formula-box">
-VD (V) = &#8730;3 &times; I &times; L &times; R / 1000
-
-Where:
-- &#8730;3 &#8776; 1.732 (accounts for three-phase geometry)
-- Other variables same as single-phase
+V<sub>d</sub> = k &times; I &times; L &times; Z / 1000      k = 2 (1-phase), &radic;3 (3-phase), Z in m&#937;/m at operating temperature
       </div>
-
-      <div class="variable-list">
-        <dl>
-          <dt>Resistance Values (R) - AS/NZS 3000 Table C8</dt>
-          <dd>Values in mV/A/m for copper cables at 75&deg;C, PF=0.8:
-            <ul>
-              <li>1.5mm&sup2;: 25 mV/A/m (1-phase), 22 mV/A/m (3-phase)</li>
-              <li>2.5mm&sup2;: 15 mV/A/m (1-phase), 13 mV/A/m (3-phase)</li>
-              <li>4mm&sup2;: 9.5 mV/A/m (1-phase), 8.2 mV/A/m (3-phase)</li>
-              <li>6mm&sup2;: 6.4 mV/A/m (1-phase), 5.5 mV/A/m (3-phase)</li>
-              <li>10mm&sup2;: 3.8 mV/A/m (1-phase), 3.3 mV/A/m (3-phase)</li>
-              <li>16mm&sup2;: 2.4 mV/A/m (1-phase), 2.1 mV/A/m (3-phase)</li>
-              <li>25mm&sup2;: 1.5 mV/A/m (1-phase), 1.3 mV/A/m (3-phase)</li>
-            </ul>
-          </dd>
-          
-          <dt>Compliance Limits (AS/NZS 3000 Table 4.1)</dt>
-          <dd>
-            <ul>
-              <li>Mains: 1% maximum</li>
-              <li>Sub-mains: May utilize remaining voltage drop budget</li>
-              <li>Final sub-circuits: 5% maximum</li>
-              <li>Total (cumulative): 6% maximum from origin</li>
-            </ul>
-          </dd>
-        </dl>
+      <h3>Limits (Clause 3.6.2)</h3>
+      <div class="formula-box">
+Total: 5% of nominal voltage between the point of supply and any point in the installation
+Distributed loads on final subcircuits (socket-outlets, lighting): current may be taken as half the protective device rating
+Consumer mains / submains / final subcircuit split is a design choice within the 5% total
+      </div>
+      <div class="example-box">
+        <strong>Example (Table C8):</strong> 50 A over 75 m with 2.5% allowed &rarr; 50 &times; 75 / 2.5 = 1500 Am per %V<sub>d</sub> &rarr; single-phase 35 mm&sup2; (1773), three-phase 16 mm&sup2; (1643).
       </div>
     </div>
 
@@ -323,7 +295,7 @@ Where:
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS/NZS 3000:2018 - <a href="as3000viewer.html#cl-3.9.4.2" target="_blank">Clause 3.9.4.2</a> (Cable fill for conduits and ducts)</li>
+          <li>AS/NZS 3000:2018 - Appendix C, Paragraph C6 and Tables C10&ndash;C12 (number of cables in conduit)</li>
           <li>AS/NZS 2053 - Conduits and fittings for electrical installations</li>
         </ul>
       </div>
@@ -1167,9 +1139,12 @@ R = (ρ / 8r) × [1 + r / (2.5h + r)],   r = √(A/π)
       </div>
       <h3>RCD Type Decision Logic</h3>
       <div class="formula-box">
-Type I (AC):   AC residual current only — being phased out of general use
-Type II (A):   AC + pulsating DC — standard for most applications
-Type III (B):  AC + pulsating DC + smooth DC — required for EV/VSD/inverter circuits
+Type AC:  residual sinusoidal AC — the general type used in Australia
+Type A:   as AC + pulsating DC
+Type I:   as A, ≤ 10 mA with ≤ 40 ms interrupting time — patient areas (AS/NZS 3003)
+Type F:   as A + composite / high-frequency residual currents
+Type B:   as A + smooth DC (IEC 62423) — consider for EV / VSD / inverter circuits
+Type S:   time-delayed, for selectivity     (AS/NZS 3000 cl. 2.6.2.2.1 Notes)
       </div>
       <h3>Sensitivity Selection (I_Δn)</h3>
       <div class="variable-list">
@@ -1186,8 +1161,8 @@ Domestic / residential: all final subcircuits         30mA  (cl. 2.6.3.2.2)
 Non-domestic: socket-outlets, lighting and hand-held
   equipment on final subcircuits ≤ 32 A               30mA  (cl. 2.6.3.2.3.3)
 Wet areas, outdoor circuits:                           30mA mandatory
-EV chargers (Mode 3):                                Type B or 6mA DC-detecting Type II
-VSD / inverter-fed loads:                            Type B required
+EV chargers (Mode 3):                                Type B, or Type A with 6 mA DC detection
+VSD / inverter-fed loads:                            Type B or F per manufacturer
 Medical circuits:                                    10mA minimum
       </div>
     </div>
@@ -1278,7 +1253,7 @@ Typical SHR for LED troffers: 1.2–1.5
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS 1668.1:2015 — The use of ventilation and airconditioning in buildings (Clause 5.7)</li>
+          <li>AS 1668.1:2015 — The use of ventilation and airconditioning in buildings</li>
           <li>NCC Specification E2.2b — Smoke exhaust and pressurisation</li>
           <li>AS/NZS 3013:2005 — Electrical installations — Classification of the fire and mechanical performance of wiring system elements</li>
           <li>AS 1530.4 — Fire resistance tests</li>
@@ -1312,8 +1287,8 @@ VSD:        1.5 × running current
       <div class="standard-ref">
         <strong>Standards Referenced:</strong>
         <ul>
-          <li>AS 3013:2005 — Cable tray design (Clause 2.3)</li>
-          <li>AS/NZS 3000:2018 — <a href="as3000viewer.html#cl-3.9" target="_blank">Clause 3.9.3–3.9.7</a></li>
+          <li>AS/NZS 3013 &mdash; fire-rated wiring systems (where tray supports fire-rated cables)</li>
+          <li>AS/NZS 3000:2018 — <a href="as3000viewer.html#cl-3.9" target="_blank">Clause 3.9</a> (3.9.3 support, 3.9.6 bending radius, 3.9.8 segregation)</li>
           <li>AS/NZS 3008.1.1 — Tables 22–23 (grouping derating)</li>
         </ul>
       </div>
@@ -1325,7 +1300,7 @@ Fill % = cable_fill / (tray_width − 40 mm) × 100
       <h3>Vertical Riser Fill</h3>
       <div class="formula-box">
 Fill % = Σ(cable CSA) / usable_tray_area × 100
-Maximum fill: 40% for vertical runs (AS/NZS 3000 cl. 3.9.3)
+Maximum fill: 40% for vertical runs (design practice &mdash; not an AS/NZS 3000 limit)
       </div>
       <h3>Cable Arrangement Derating (AS/NZS 3008.1.1)</h3>
       <div class="formula-box">
@@ -1337,7 +1312,7 @@ Multi-layer / stacked (Table 23):
       </div>
       <div class="variable-list">
         <dl>
-          <dt>Standard tray widths (AS 3013:2005)</dt>
+          <dt>Standard tray widths (manufacturer ranges)</dt>
           <dd>75, 100, 150, 225, 300, 450, 600, 750, 900 mm</dd>
           <dt>Tray load (approximate)</dt>
           <dd>Galv steel 100mm: 1.5 kg/m &nbsp;|&nbsp; Galv steel 600mm: 6.5 kg/m &nbsp;|&nbsp; Aluminium 100mm: 0.6 kg/m</dd>

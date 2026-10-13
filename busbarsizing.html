@@ -83,7 +83,7 @@
           <li><strong>Short-circuit:</strong> Busbar must withstand Icw (rated short-time withstand current) for rated duration. Adiabatic withstand I = k&middot;S/&radic;t with k = 226&radic;ln((234.5+&theta;<sub>f</sub>)/(234.5+&theta;<sub>i</sub>)) for Cu (148 and 228 for Al), &theta;<sub>i</sub> = operating temperature, &theta;<sub>f</sub> = 200&deg;C &mdash; about 120&ndash;135 A/mm&sup2; for Cu over 1 s</li>
           <li><strong>Electrodynamic forces:</strong> Peak force on the middle phase F = 0.866 &times; 0.2 &times; i<sub>p</sub>&sup2; &times; L / a (N, i<sub>p</sub> in kA, i<sub>p</sub> = n&times;I<sub>k</sub> with n from AS/NZS 61439.1 Table 7). Bending stress &sigma; = 0.73&middot;F&middot;L/(8Z) must not exceed 1.5&times;R<sub>p0.2</sub> (IEC 60865-1).</li>
           <li><strong>Voltage drop:</strong> Busbar voltage drop = I &times; (R&times;cos &#966; + X&times;sin &#966;) &times; L. Typically negligible for short bus lengths</li>
-          <li><strong>Earth bar:</strong> Size the PE bar to AS/NZS 61439.1 cl. 8.4.3 (S/2 as a typical minimum for large phase bars) and for the earth-fault withstand</li>
+          <li><strong>Earth bar:</strong> Size the PE bar to the AS/NZS 61439.1 protective-conductor requirements (S/2 is a typical minimum for large phase bars) and for the earth-fault withstand</li>
           <li><strong>Neutral bar:</strong> Full-size neutral for harmonic-rich loads (3rd harmonic). Can be 50% of phase for linear balanced loads</li>
         </ul>
       </div>
@@ -244,7 +244,7 @@
         notes += `<div class="fail-box"><strong>&#9888; Supports too far apart.</strong> Bending stress ${sigma.toFixed(0)} N/mm&sup2; exceeds ${sigmaAllow} N/mm&sup2; at ${span} mm span. Reduce the support span to &le; ${Math.floor(spanMax)} mm or increase phase spacing. Insulators must also be rated for ${Math.round(force)} N.</div>`;
       }
       notes += `<div class="info-box"><strong>Losses &amp; voltage drop:</strong> R = ${(rPerM * 1e6).toFixed(1)} &micro;&#937;/m, X &asymp; ${(xPerM * 1e6).toFixed(0)} &micro;&#937;/m per phase at ${thetaOp.toFixed(0)}&deg;C. ${busLen} m of bar dissipates ${Math.round(loss)} W at ${designA} A &mdash; include in the enclosure heat balance.</div>`;
-      notes += `<div class="info-box"><strong>Neutral bus:</strong> ${Math.round(area)} mm&sup2; (full size recommended for harmonic loads). <strong>PE bus:</strong> per AS/NZS 61439.1 cl. 8.4.3, typically &#8805; ${Math.round(area * 0.5)} mm&sup2; for large phase bars, and verified for earth-fault withstand.</div>`;
+      notes += `<div class="info-box"><strong>Neutral bus:</strong> ${Math.round(area)} mm&sup2; (full size recommended for harmonic loads). <strong>PE bus:</strong> per AS/NZS 61439.1, typically &#8805; ${Math.round(area * 0.5)} mm&sup2; for large phase bars, and verified for earth-fault withstand.</div>`;
       document.getElementById('notes').innerHTML = notes;
       document.getElementById('resultSection').style.display = 'block';
 

@@ -22,12 +22,12 @@
 
   <div class="main-content">
     <h1>Discrimination (Selectivity) Check</h1>
-    <p>Check basic discrimination between upstream and downstream protective devices per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.5.5" target="_blank">cl. 2.5.5</a></strong>. Flags potential non-coordination without full manufacturer software.</p>
+    <p>Check basic discrimination between upstream and downstream protective devices per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.5.7" target="_blank">cl. 2.5.7</a></strong>. Flags potential non-coordination without full manufacturer software.</p>
 
     <div class="calc-section">
       <h2>Protection Pair</h2>
       <div class="info-box">
-        <strong>AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.5.2" target="_blank">cl. 2.5.5.2</a>:</strong> Where discrimination is required, the characteristics of the protective devices shall be coordinated so that only the device closest to the fault operates. Full discrimination requires comparison of time-current curves.
+        <strong>AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.7" target="_blank">cl. 2.5.7</a>:</strong> The installation shall be divided into circuits and protective devices selected with appropriate discrimination (selectivity) so that loss of supply from a fault is minimized; coordination considers both discrimination and backup (cascading) (cl. 2.5.7.2). Manufacturer data should be used where available.
       </div>
 
       <div class="pair-card">
@@ -236,7 +236,7 @@ if (!isFuse(upType)) {
 
       // Backup protection note
       if (!scOK && faultA > dnTrip.high) {
-        notes.push(`&#8505; If full discrimination is not achievable, backup protection (cascading) per AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.5.3" target="_blank">cl. 2.5.5.3</a> may be acceptable &mdash; both devices operate for high-level faults.`);
+        notes.push(`&#8505; If full discrimination is not achievable, backup protection (cascading) per AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.7.2" target="_blank">cl. 2.5.7.2</a> and cl. 2.5.4.2(a) Exception may be acceptable &mdash; both devices operate for high-level faults.`);
       }
 
       // Breaking capacity check
