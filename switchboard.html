@@ -442,7 +442,7 @@
         <label class="sb-toggle" for="ctMeterChk">
           <input type="checkbox" id="ctMeterChk" />
           <span class="sb-switch"></span>
-          <span><span class="sb-tlabel">CT Metering</span><span class="sb-tsub">600 &times; 800 mm CT meter panel</span></span>
+          <span><span class="sb-tlabel">CT Metering</span><span class="sb-tsub">CT chamber + meter panel, NSW rules</span></span>
         </label>
         <div class="sb-fire-grid hidden" id="fireGrid">
           <div class="sb-fire-head">Fire section modules</div>
@@ -551,7 +551,35 @@
       return INCOMER_SPEC[INCOMER_SPEC.length - 1];
     }
     function boardDepth() { return incomerSpec().depth; }
-    const CT_FILL_H = 500, CT_BOX_H = 800;
+
+    /* CT metering column (NSW S&IR Metering Annexure, July 2018).
+       Top to bottom in the 1800 tier: filler, sealed CT chamber, hinged meter panel, filler.
+       Rule-set: CTs in their own segregated enclosure (cl. 2.12.2), CT connections more
+       than 500 and less than 2500 above floor (cl. 2.12.8), meter panel at least 550 x 550
+       (cl. 2.13.1) with its bottom at least 600 and top at most 2000 above floor (cl. 2.13).
+       Derived, not published: chamber height (450 max removable link + 100 each end) and
+       column width (three CTs in line + 50 between + 100 each side). */
+    const CT_TOP_FILL_H = 100, CT_CHAMBER_H = 650, CT_PANEL_H = 550, CT_BOT_FILL_H = 500;
+    const CT_PANEL_W = 600;
+    const CT_SPEC = [
+      { max: 800,  ct: 'T 800/5',  w: 800,  limit: 1600 },
+      { max: 1250, ct: 'W 1500/5', w: 800,  limit: 3000 },
+      { max: 3200, ct: 'U 2000/5', w: 1050, limit: 4000 }
+    ];
+    function ctSpec() {
+      for (let i = 0; i < CT_SPEC.length; i++) if (incomerA <= CT_SPEC[i].max) return CT_SPEC[i];
+      return CT_SPEC[CT_SPEC.length - 1];
+    }
+    /* Meter-to-conductor spacing, Metering Annexure Table 2-2 (linear interpolation, mm) */
+    const METER_SPACING = [[150, 0], [200, 100], [400, 500], [600, 700], [1000, 900], [1500, 1200], [2000, 1400], [3000, 1700], [4000, 2000]];
+    function meterSpacing(a) {
+      const t = METER_SPACING;
+      if (a <= t[0][0]) return 0;
+      for (let i = 1; i < t.length; i++) {
+        if (a <= t[i][0]) return Math.round(t[i - 1][1] + (t[i][1] - t[i - 1][1]) * (a - t[i - 1][0]) / (t[i][0] - t[i - 1][0]));
+      }
+      return t[t.length - 1][1];
+    }
 
     // currentColumns: [{ kind:'module'|'cable'|'incoming'|'ct'|'incomer200', fire:bool, items:[{type,h,feeder}] }]
     let currentColumns = [];
@@ -561,6 +589,7 @@
       if (col.kind === 'cable') return CABLE_W;
       if (col.kind === 'incomer200') return incomerSpec().cableW;   // mains cable zone (kind name kept for old saves)
       if (col.kind === 'incoming') return incomerSpec().w;
+      if (col.kind === 'ct') return ctSpec().w;
       return MOD_W;
     }
     function ratedHeight(col) {
@@ -623,9 +652,16 @@
         run.reverse();   // cable zones sit left of their cubicle
         run.forEach(c => columns.push(c));
       }
-      columns.push({ kind: 'incoming', fire: false, items: [] });
-      if (ctActive) columns.push({ kind: 'ct', fire: false, items: [] });
-      columns.push({ kind: 'incomer200', fire: false, items: [] });
+      // With CT metering the mains cable zone moves to the line side of the incomer, so
+      // unmetered mains never cross the sealed CT column: mains | incomer | CTs | feeders
+      if (ctActive) {
+        columns.push({ kind: 'incomer200', fire: false, items: [] });
+        columns.push({ kind: 'incoming', fire: false, items: [] });
+        columns.push({ kind: 'ct', fire: false, items: [] });
+      } else {
+        columns.push({ kind: 'incoming', fire: false, items: [] });
+        columns.push({ kind: 'incomer200', fire: false, items: [] });
+      }
       packModules(mainMods).forEach(c => {
         columns.push(c);
         columns.push({ kind: 'cable', fire: false, items: [] });
@@ -843,16 +879,26 @@
             '<text class="big" x="' + (x + w / 2) + '" y="' + (cy + 80) + '" font-size="84">' + incomerA + ' A ' + incomerSpec().device + '</text>' +
             '<text class="mdims" x="' + (x + w / 2) + '" y="' + (cy + 190) + '" font-size="52">' + w + ' &#215; 1800</text></g>');
         } else if (col.kind === 'ct') {
-          parts.push(busbarBlock(x, w, 'BUSBAR 600&#215;400'));
+          parts.push(busbarBlock(x, w, 'BUSBAR ' + w + '&#215;400'));
+          const cx = x + w / 2;
           let y = BUSBAR_H;
-          parts.push('<rect class="sb-ctfill" x="' + x + '" y="' + y + '" width="' + w + '" height="' + CT_FILL_H + '"/>');
-          y += CT_FILL_H;
-          const cy = y + CT_BOX_H / 2;
-          parts.push('<g class="sb-ctbox"><rect class="box" x="' + x + '" y="' + y + '" width="' + w + '" height="' + CT_BOX_H + '"/>' +
-            '<text class="big" x="' + (x + w / 2) + '" y="' + (cy - 55) + '" font-size="92">CT METER</text>' +
-            '<text class="mdims" x="' + (x + w / 2) + '" y="' + (cy + 60) + '" font-size="52">600 &#215; 800</text></g>');
-          y += CT_BOX_H;
-          parts.push('<rect class="sb-ctfill" x="' + x + '" y="' + y + '" width="' + w + '" height="' + CT_FILL_H + '"/>');
+          parts.push('<rect class="sb-ctfill" x="' + x + '" y="' + y + '" width="' + w + '" height="' + USABLE_H + '"/>');
+          y += CT_TOP_FILL_H;
+          // sealed CT chamber, full column width
+          let cy = y + CT_CHAMBER_H / 2;
+          parts.push('<g class="sb-ctbox"><rect class="box" x="' + x + '" y="' + y + '" width="' + w + '" height="' + CT_CHAMBER_H + '"/>' +
+            '<text class="big" x="' + cx + '" y="' + (cy - 110) + '" font-size="84">CT CHAMBER</text>' +
+            '<text class="big" x="' + cx + '" y="' + (cy - 5) + '" font-size="66">3 &#215; ' + ctSpec().ct + '</text>' +
+            '<text class="mdims" x="' + cx + '" y="' + (cy + 85) + '" font-size="50">' + w + ' &#215; ' + CT_CHAMBER_H + '</text>' +
+            '<text class="mdims" x="' + cx + '" y="' + (cy + 160) + '" font-size="40">METERING CTs ENCLOSED &#183; SEALED</text></g>');
+          y += CT_CHAMBER_H;
+          // hinged meter panel, centred
+          cy = y + CT_PANEL_H / 2;
+          parts.push('<g class="sb-ctbox"><rect class="box" x="' + (cx - CT_PANEL_W / 2) + '" y="' + y + '" width="' + CT_PANEL_W + '" height="' + CT_PANEL_H + '"/>' +
+            '<text class="big" x="' + cx + '" y="' + (cy - 120) + '" font-size="84">CT METER</text>' +
+            '<text class="big" x="' + cx + '" y="' + (cy - 25) + '" font-size="84">PANEL</text>' +
+            '<text class="mdims" x="' + cx + '" y="' + (cy + 65) + '" font-size="50">' + CT_PANEL_W + ' &#215; ' + CT_PANEL_H + '</text>' +
+            '<text class="mdims" x="' + cx + '" y="' + (cy + 140) + '" font-size="40">ELECTRICITY METERS</text></g>');
         } else {
           // module cubicle
           parts.push('<rect class="sb-cubicle-bg" data-colbg="' + colIdx + '" x="' + x + '" y="' + BUSBAR_H + '" width="' + w + '" height="' + USABLE_H + '"/>');
@@ -949,6 +995,24 @@
       }
       if (lowest !== null && lowest < 300) {
         add('warn', 'Lowest device centre about ' + Math.round(lowest) + ' mm above floor', 'Below 300 mm its terminals may fall under the 200 mm minimum for handles and terminals (AS/NZS 61439.1 cl. 8.5.5). Consider moving it up a tier.');
+      }
+      // ── CT metering (NSW S&IR Metering Annexure, July 2018) ──
+      const hasCt = currentColumns.some(c => c.kind === 'ct');
+      if (!hasCt) {
+        add('', 'CT metering is off', 'NSW: CT metering is required above 80 A per phase maximum demand (Metering Annexure cl. 2.1). Leave off only if this board is not the metering point.');
+      } else {
+        const ct = ctSpec();
+        const chTop = TOTAL_H - BUSBAR_H - CT_TOP_FILL_H, chBot = chTop - CT_CHAMBER_H, pBot = chBot - CT_PANEL_H;
+        const htOk = chBot > 500 && chTop < 2500 && pBot >= 600 && chBot <= 2000 && CT_PANEL_H >= 550 && CT_PANEL_W >= 550;
+        add(htOk ? 'ok' : 'fail', 'CT chamber ' + chBot + '&ndash;' + chTop + ' mm, meter panel ' + pBot + '&ndash;' + chBot + ' mm above floor',
+          'Metering Annexure cl. 2.12.8 (CTs 500&ndash;2500), cl. 2.13 (meters 600&ndash;2000), cl. 2.13.1 (panel at least 550 &times; 550).');
+        add('warn', 'CT type ' + ct.ct + ' assumed &mdash; metering provider specifies',
+          'Annexure cl. 2.12. Incomer setting must not exceed the CT range (' + ct.limit + ' A). Chamber ' + ct.w + ' &times; ' + CT_CHAMBER_H + ' is derived from CT and link sizes, not a published minimum.');
+        const sp = meterSpacing(incomerA);
+        add('warn', 'Meters need ' + sp + ' mm from conductors at ' + incomerA + ' A',
+          'Annexure cl. 2.10 Table 2-2, or ' + Math.round(sp * 0.25) + ' mm behind 5 mm mild steel (Table 2-3). Confirm shielding or mount the meter panel remotely.');
+        add('', 'CT chamber is sealed and segregated', 'Only metering CTs and their fuses inside; CTs on the load side of the service protection device (Annexure cl. 2.12.2, 2.12.3, 2.12.7). Submit drawings to the metering provider before manufacture (cl. 2.12.13).');
+        if (incomerA > 2000) add('warn', 'Above 2000 A: consult the distributor on CT metering', 'Ausgrid ES3 Part B cl. 7.1.1 (legacy guidance).');
       }
       add('', 'Depth ' + spec.depth + ' mm assumes front access', 'Typical for a ' + incomerA + ' A ' + spec.device + ' incomer. Allow 1.0 m clear in front (cl. 2.10.2.2).');
       document.getElementById('sbChecks').innerHTML = out.join('');
