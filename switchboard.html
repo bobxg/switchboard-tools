@@ -312,6 +312,7 @@
     .sb-ctbox text.mdims { fill: var(--text-secondary); }
     .sb-ctfill { fill: var(--bg-input); stroke: var(--border-light); stroke-width: 0.8px; }
 
+    .sb-partition { stroke: var(--text-fail); stroke-width: 4px; vector-effect: non-scaling-stroke; }
     .sb-plinth { fill: var(--bg-input); stroke: var(--border-input); stroke-width: 1px; }
     .sb-plinth-label { fill: var(--text-secondary); opacity: 0.75; letter-spacing: 3px; }
 
@@ -437,7 +438,7 @@
         <label class="sb-toggle" for="fireServicesChk">
           <input type="checkbox" id="fireServicesChk" />
           <span class="sb-switch"></span>
-          <span><span class="sb-tlabel">Fire Services</span><span class="sb-tsub">Dedicated fire section, left of incomer</span></span>
+          <span><span class="sb-tlabel">Fire / Safety Services</span><span class="sb-tsub">Segregated section with its own main switches (AS/NZS 3000 cl. 7.2)</span></span>
         </label>
         <label class="sb-toggle" for="ctMeterChk">
           <input type="checkbox" id="ctMeterChk" />
@@ -445,7 +446,7 @@
           <span><span class="sb-tlabel">CT Metering</span><span class="sb-tsub">CT chamber + meter panel, NSW rules</span></span>
         </label>
         <div class="sb-fire-grid hidden" id="fireGrid">
-          <div class="sb-fire-head">Fire section modules</div>
+          <div class="sb-fire-head">Safety services main switches</div>
           <div class="sb-count-grid">
             <div class="sb-field">
               <label for="fireModules800">800 A</label>
@@ -698,7 +699,7 @@
     }
 
     /* Texts inside a rated module / spare */
-    function moduleText(x, y, w, h, m) {
+    function moduleText(x, y, w, h, m, fire) {
       const cx = x + w / 2, cy = y + h / 2;
       if (m.type === 'spare') {
         if (h < 80) return '';
@@ -709,7 +710,7 @@
                '<text x="' + cx + '" y="' + (cy + 44) + '" font-size="42">600 &#215; ' + Math.round(h) + '</text>';
       }
       const dims = '600 &#215; ' + m.h;
-      const feeder = m.feeder ? esc(m.feeder) : '';
+      const feeder = m.feeder ? esc(fire ? m.feeder.toUpperCase() : m.feeder) : '';
       if (h >= 380) {
         let t = '<text class="rating" x="' + cx + '" y="' + (cy - (feeder ? 95 : 55)) + '" font-size="110">' + m.type + '</text>' +
                 '<text class="mdims" x="' + cx + '" y="' + (cy + (feeder ? 5 : 50)) + '" font-size="50">' + dims + '</text>';
@@ -854,8 +855,8 @@
 
       // section brackets
       const fireW = currentColumns.filter(c => c.fire).reduce((s, c) => s + colWidth(c), 0);
-      if (fireW > 0) parts.push(sectionLabel(0, fireW, 'FIRE SERVICES', true));
-      if (fireW > 0 && totalW > fireW) parts.push(sectionLabel(fireW, totalW, 'MAIN SWITCHBOARD', false));
+      if (fireW > 0) parts.push(sectionLabel(0, fireW, 'SAFETY SERVICES', true));
+      if (fireW > 0 && totalW > fireW) parts.push(sectionLabel(fireW, totalW, 'GENERAL INSTALLATION', false));
 
       // columns
       let x = 0;
@@ -910,7 +911,7 @@
             const cls = m.type === 'spare' ? 'sb-spare' : ('sb-mod' + (rated ? ' draggable' : '') + (col.fire ? ' fire' : ''));
             parts.push('<g class="' + cls + '" data-col="' + colIdx + '" data-idx="' + idx + '">' +
               '<rect class="box" x="' + x + '" y="' + y + '" width="' + w + '" height="' + m.h + '"/>' +
-              moduleText(x, y, w, m.h, m) + '</g>');
+              moduleText(x, y, w, m.h, m, col.fire) + '</g>');
             y += m.h;
             if (idx < col.items.length - 1) sepLines.push(y);
           });
@@ -923,6 +924,11 @@
           parts.push('<line class="sb-colsep" x1="' + x + '" y1="0" x2="' + x + '" y2="' + COL_H + '"/>');
         }
       });
+
+      // metal partition between safety services and general switchgear (AS/NZS 3000 cl. 7.2.3.2)
+      if (fireW > 0 && totalW > fireW) {
+        parts.push('<line class="sb-partition" x1="' + fireW + '" y1="' + BUSBAR_H + '" x2="' + fireW + '" y2="' + COL_H + '"><title>Metal partition (AS/NZS 3000 cl. 7.2.3.2)</title></line>');
+      }
 
       // plinth + outline + dims + title block
       parts.push('<rect class="sb-plinth" x="0" y="' + COL_H + '" width="' + totalW + '" height="' + PLINTH_H + '"/>');
@@ -951,13 +957,14 @@
       const out = [];
       const add = (cls, head, sub) => out.push('<li class="' + cls + '">' + head + (sub ? '<small>' + sub + '</small>' : '') + '</li>');
       const spec = incomerSpec();
-      let sum = 0, maxFeeder = 0, usable = 0, spare = 0, lowest = null;
+      let sum = 0, maxFeeder = 0, usable = 0, spare = 0, lowest = null, fireUnits = 0, fireUnnamed = 0;
       currentColumns.forEach(col => {
         if (col.kind !== 'module') return;
         usable += USABLE_H;
         col.items.forEach(m => {
           const a = parseInt(m.type, 10);
           if (RATINGS[m.type]) { sum += a; if (a > maxFeeder) maxFeeder = a; } else spare += m.h;
+          if (RATINGS[m.type] && col.fire) { fireUnits++; if (!m.feeder) fireUnnamed++; }
         });
         // handle centre (above floor) of the lowest rated unit in this tier
         let below = 0;
@@ -987,7 +994,8 @@
           pct < 20 ? 'Below the usual 20&ndash;30% allowance for future feeders.' : 'Meets the usual 20&ndash;30% allowance for future feeders.');
       }
       if (incomerA >= 800) {
-        add('warn', 'Arc-fault protection applies (&ge; 800 A)', 'AS/NZS 3000 cl. 2.5.5: internal separation Form 3b/4a/4b (cl. 2.5.5.2), protection settings to cl. 2.5.5.3, or both.');
+        add('warn', 'Arc-fault protection applies (&ge; 800 A)', 'AS/NZS 3000 cl. 2.5.5: internal separation Form 3b/4a/4b (cl. 2.5.5.2), protection settings to cl. 2.5.5.3, or both.' +
+          (fireUnits ? ' Under cl. 2.5.5.2 the safety services section is also separated from the general section.' : ''));
       }
       if (incomerA >= 800 || totalW > 3000) {
         add('warn', 'Two emergency exit paths needed', 'AS/NZS 3000 cl. 2.10.2.2: ' + (incomerA >= 800 ? 'board rated &ge; 800 A' : 'board longer than 3 m') +
@@ -996,6 +1004,18 @@
       if (lowest !== null && lowest < 300) {
         add('warn', 'Lowest device centre about ' + Math.round(lowest) + ' mm above floor', 'Below 300 mm its terminals may fall under the 200 mm minimum for handles and terminals (AS/NZS 61439.1 cl. 8.5.5). Consider moving it up a tier.');
       }
+      // ── Safety services (AS/NZS 3000 cl. 7.2) ──
+      if (fireUnits) {
+        add('warn', 'Safety services: confirm main switch arrangement',
+          'AS/NZS 3000 cl. 7.2.4.2: their main switches shall be on the supply side of all general main switches, not controlled by any of them, and control only safety services. The ' + incomerA + ' A incomer may stay upstream only as a supply isolating device for authorized persons, e.g. locked on (cl. 7.2.4.2 Exception). A separate general installation main switch is then required (cl. 2.3.3.2) and is not drawn.');
+        add(fireUnnamed ? 'warn' : 'ok', fireUnnamed ? fireUnnamed + ' of ' + fireUnits + ' safety services main switch' + (fireUnits > 1 ? 'es' : '') + ' not named' : 'Safety services main switches named',
+          'cl. 7.2.4.4: mark each MAIN SWITCH with the equipment it controls and IN THE EVENT OF FIRE, DO NOT SWITCH OFF. One main switch per type of service (cl. 7.2.4.1). Double-click a unit to name it.');
+        add('warn', 'Metal partition between safety services and general switchgear',
+          'cl. 7.2.3.2 (red line on the drawing). Wiring inside the board: 50 mm or effective barriers from all other wiring, including other safety services (cl. 7.2.3.3).');
+        add('warn', 'Discrimination with safety services not checked',
+          'cl. 7.2.3.5 and 2.5.7.2.2: a fault on the general installation shall not cause loss of supply to safety services.');
+      }
+
       // ── CT metering (NSW S&IR Metering Annexure, July 2018) ──
       const hasCt = currentColumns.some(c => c.kind === 'ct');
       if (!hasCt) {
@@ -1223,7 +1243,8 @@
       if (target && target.droppable && target.colIdx !== drag.col) {
         const bg = svg.querySelector('[data-colbg="' + target.colIdx + '"]');
         if (bg) {
-          const fits = ratedHeight(currentColumns[target.colIdx]) + drag.mod.h <= USABLE_H + 1e-6;
+          const sameSection = !!currentColumns[target.colIdx].fire === !!currentColumns[drag.col].fire;
+          const fits = sameSection && ratedHeight(currentColumns[target.colIdx]) + drag.mod.h <= USABLE_H + 1e-6;
           bg.classList.add(fits ? 'drop-ok' : 'drop-no');
         }
       }
@@ -1246,6 +1267,10 @@
 
       const srcCol = currentColumns[d.col];
       const tgtCol = currentColumns[target.colIdx];
+      if (!!srcCol.fire !== !!tgtCol.fire) {
+        OmniToast.show('Safety services and general units cannot share a cubicle (AS/NZS 3000 cl. 7.2.3.2). Use the section counts to move a unit.', 'warn');
+        return;
+      }
       if (ratedHeight(tgtCol) + d.mod.h > USABLE_H + 1e-6) {
         OmniToast.show('Not enough space in that cubicle (' + (USABLE_H - ratedHeight(tgtCol)) + ' mm free)', 'warn');
         return;
@@ -1292,7 +1317,7 @@
       input.className = 'sb-edit';
       input.maxLength = 28;
       input.value = mod.feeder || '';
-      input.placeholder = 'Feeder label';
+      input.placeholder = currentColumns[col].fire ? 'Safety service, e.g. FIRE PUMP' : 'Feeder label';
       input.style.left = (box.left - host.left + canvas.scrollLeft + 6) + 'px';
       input.style.top = (box.top - host.top + canvas.scrollTop + box.height / 2 - 13) + 'px';
       input.style.width = Math.max(box.width - 12, 90) + 'px';
