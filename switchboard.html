@@ -77,6 +77,52 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .sb-select {
+      width: 100%;
+      padding: 7px 9px;
+      border: 1.5px solid var(--border-input);
+      border-radius: 8px;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-size: 0.95em;
+      font-weight: 600;
+      font-family: inherit;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .sb-select:focus { border-color: var(--accent); box-shadow: var(--shadow-input-focus); }
+    .sb-incomer-note { font-size: 0.72em; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+
+    .sb-checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    .sb-checks li {
+      font-size: 0.76em;
+      line-height: 1.45;
+      padding: 6px 9px;
+      border-radius: 0 7px 7px 0;
+      border-left: 3px solid var(--border-input);
+      background: var(--bg-input);
+      color: var(--text-primary);
+    }
+    .sb-checks li.ok { border-left-color: var(--text-pass); background: var(--bg-pass); color: var(--text-pass); }
+    .sb-checks li.warn { border-left-color: var(--text-warn); background: var(--bg-warn); color: var(--text-warn); }
+    .sb-checks li.fail { border-left-color: var(--text-fail); background: var(--bg-fail); color: var(--text-fail); }
+    .sb-checks li small { display: block; opacity: 0.85; font-size: 0.94em; }
+
+    .sb-sizes summary {
+      cursor: pointer;
+      font-size: 0.74em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+    }
+    .sb-sizes[open] summary { margin-bottom: 10px; }
+    .sb-sizes .sb-hint { margin-top: 9px; }
+    .sb-linkbtn {
+      background: none; border: none; padding: 0; margin-top: 8px;
+      color: var(--accent); font: inherit; font-size: 0.76em; font-weight: 600; cursor: pointer;
+    }
+
     .sb-count-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -341,27 +387,47 @@
       </div>
 
       <div class="sb-card">
+        <h3><span data-ico="bolt"></span>Incomer</h3>
+        <div class="sb-field">
+          <label for="incomerRating">Main switch rating</label>
+          <select id="incomerRating" class="sb-select">
+            <option value="250">250 A</option>
+            <option value="400">400 A</option>
+            <option value="630">630 A</option>
+            <option value="800" selected>800 A</option>
+            <option value="1000">1000 A</option>
+            <option value="1250">1250 A</option>
+            <option value="1600">1600 A</option>
+            <option value="2000">2000 A</option>
+            <option value="2500">2500 A</option>
+            <option value="3200">3200 A</option>
+          </select>
+          <div class="sb-incomer-note" id="incomerNote"></div>
+        </div>
+      </div>
+
+      <div class="sb-card">
         <h3><span data-ico="sliders"></span>Main Modules</h3>
         <div class="sb-count-grid">
           <div class="sb-field">
             <label for="modules800">800 A</label>
             <input type="number" id="modules800" min="0" max="20" value="0" />
-            <div class="sb-sub">600 &times; 1000 mm</div>
+            <div class="sb-sub" id="sub800">600 &times; 1000 mm</div>
           </div>
           <div class="sb-field">
             <label for="modules630">630 A</label>
             <input type="number" id="modules630" min="0" max="20" value="0" />
-            <div class="sb-sub">600 &times; 600 mm</div>
+            <div class="sb-sub" id="sub630">600 &times; 600 mm</div>
           </div>
           <div class="sb-field">
             <label for="modules400">400 A</label>
             <input type="number" id="modules400" min="0" max="30" value="2" />
-            <div class="sb-sub">600 &times; 400 mm</div>
+            <div class="sb-sub" id="sub400">600 &times; 400 mm</div>
           </div>
           <div class="sb-field">
             <label for="modules250">250 A</label>
             <input type="number" id="modules250" min="0" max="40" value="3" />
-            <div class="sb-sub">600 &times; 200 mm</div>
+            <div class="sb-sub" id="sub250">600 &times; 200 mm</div>
           </div>
         </div>
       </div>
@@ -402,6 +468,26 @@
       </div>
 
       <div class="sb-card">
+        <h3><span data-ico="shield"></span>Checks</h3>
+        <ul class="sb-checks" id="sbChecks"></ul>
+      </div>
+
+      <div class="sb-card">
+        <details class="sb-sizes">
+          <summary>Cubicle sizes (mm)</summary>
+          <div class="sb-count-grid">
+            <div class="sb-field"><label for="h800">800 A height</label><input type="number" id="h800" min="150" max="1800" step="50" value="1000" /></div>
+            <div class="sb-field"><label for="h630">630 A height</label><input type="number" id="h630" min="150" max="1800" step="50" value="600" /></div>
+            <div class="sb-field"><label for="h400">400 A height</label><input type="number" id="h400" min="150" max="1800" step="50" value="400" /></div>
+            <div class="sb-field"><label for="h250">250 A height</label><input type="number" id="h250" min="150" max="1800" step="50" value="200" /></div>
+            <div class="sb-field"><label for="cableW">Cable zone W</label><input type="number" id="cableW" min="150" max="800" step="50" value="400" /></div>
+          </div>
+          <button type="button" class="sb-linkbtn" id="resetSizesBtn">Reset to defaults</button>
+          <p class="sb-hint">Typical Form 3b values. Tier heights vary between switchboard systems &mdash; set them to your builder&rsquo;s module sizes. All cubicles are 600 wide.</p>
+        </details>
+      </div>
+
+      <div class="sb-card">
         <h3><span data-ico="bolt"></span>Actions</h3>
         <div class="sb-actions">
           <button type="button" class="sb-btn primary" id="arrangeBtn" title="Re-pack all modules largest-first">Auto-arrange</button>
@@ -439,15 +525,32 @@
       '250A': { h: 200 }
     };
     const RATING_ORDER = ['800A', '630A', '400A', '250A'];
+    const DEFAULT_H = { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 };
+    const DEFAULT_CABLE_W = 400;
     const MOD_W = 600;          // module / cubicle width
-    const CABLE_W = 400;        // cable zone width
-    const INC200_W = 200;       // 200 mm incomer column
+    let CABLE_W = DEFAULT_CABLE_W;   // outgoing cable zone width (user-adjustable)
     const BUSBAR_H = 400;       // busbar chamber height
     const USABLE_H = 1800;      // usable cubicle height below busbar
     const COL_H = BUSBAR_H + USABLE_H;   // 2200
     const PLINTH_H = 100;
     const TOTAL_H = COL_H + PLINTH_H;    // 2300
-    const DEPTH = 600;
+
+    /* Incomer-driven geometry (typical values, confirm with the switchboard builder).
+       MCCB incomers up to 630 A fit a 600 wide, 600 deep section. ACB incomers
+       (800 A and above) need a wider and deeper section, and the mains cable zone
+       must take the bending radius of the consumer mains. */
+    const INCOMER_SPEC = [
+      { max: 250,  device: 'MCCB', w: 600,  cableW: 300, depth: 600 },
+      { max: 630,  device: 'MCCB', w: 600,  cableW: 400, depth: 600 },
+      { max: 1600, device: 'ACB',  w: 800,  cableW: 400, depth: 800 },
+      { max: 3200, device: 'ACB',  w: 1000, cableW: 600, depth: 1000 }
+    ];
+    let incomerA = 800;
+    function incomerSpec() {
+      for (let i = 0; i < INCOMER_SPEC.length; i++) if (incomerA <= INCOMER_SPEC[i].max) return INCOMER_SPEC[i];
+      return INCOMER_SPEC[INCOMER_SPEC.length - 1];
+    }
+    function boardDepth() { return incomerSpec().depth; }
     const CT_FILL_H = 500, CT_BOX_H = 800;
 
     // currentColumns: [{ kind:'module'|'cable'|'incoming'|'ct'|'incomer200', fire:bool, items:[{type,h,feeder}] }]
@@ -456,7 +559,8 @@
 
     function colWidth(col) {
       if (col.kind === 'cable') return CABLE_W;
-      if (col.kind === 'incomer200') return INC200_W;
+      if (col.kind === 'incomer200') return incomerSpec().cableW;   // mains cable zone (kind name kept for old saves)
+      if (col.kind === 'incoming') return incomerSpec().w;
       return MOD_W;
     }
     function ratedHeight(col) {
@@ -469,8 +573,9 @@
     /* Fill a module column's remaining space with 250A spares (exact fit) */
     function fillSpares(col) {
       col.items = col.items.filter(m => m.type !== 'spare');
+      const sp = RATINGS['250A'].h;
       let h = col.items.reduce((s, m) => s + m.h, 0);
-      while (h + 200 <= USABLE_H + 1e-6) { col.items.push({ type: 'spare', h: 200, feeder: '' }); h += 200; }
+      while (h + sp <= USABLE_H + 1e-6) { col.items.push({ type: 'spare', h: sp, feeder: '' }); h += sp; }
       const gap = USABLE_H - h;
       if (gap > 1e-6) col.items.push({ type: 'spare', h: gap, feeder: '' });
     }
@@ -479,13 +584,15 @@
     function packModules(mods) {
       const sorted = mods.slice().sort((a, b) =>
         RATING_ORDER.indexOf(a.type) - RATING_ORDER.indexOf(b.type));
-      const cols = [];
-      let cur = [], h = 0;
+      // first-fit decreasing: a smaller module drops into the first cubicle with
+      // room, so gaps left under large modules are used before a new tier is added
+      const cols = [], used = [];
       sorted.forEach(m => {
-        if (h + m.h > USABLE_H + 1e-6) { if (cur.length) cols.push(cur); cur = []; h = 0; }
-        cur.push(m); h += m.h;
+        let i = 0;
+        while (i < cols.length && used[i] + m.h > USABLE_H + 1e-6) i++;
+        if (i === cols.length) { cols.push([]); used.push(0); }
+        cols[i].push(m); used[i] += m.h;
       });
-      if (cur.length) cols.push(cur);
       return cols.map(items => {
         const col = { kind: 'module', fire: false, items: items };
         fillSpares(col);
@@ -558,10 +665,10 @@
     function moduleText(x, y, w, h, m) {
       const cx = x + w / 2, cy = y + h / 2;
       if (m.type === 'spare') {
-        if (h < 140) {
+        if (h < 150) {
           return '<text x="' + cx + '" y="' + cy + '" font-size="46">SPARE</text>';
         }
-        return '<text x="' + cx + '" y="' + (cy - 30) + '" font-size="62">250A SPARE</text>' +
+        return '<text x="' + cx + '" y="' + (cy - 30) + '" font-size="62">' + (h + 1e-6 >= RATINGS['250A'].h ? '250A SPARE' : 'SPARE') + '</text>' +
                '<text x="' + cx + '" y="' + (cy + 44) + '" font-size="42">600 &#215; ' + Math.round(h) + '</text>';
       }
       const dims = '600 &#215; ' + m.h;
@@ -583,6 +690,7 @@
 
     function busbarBlock(x, w, label) {
       const cx = x + w / 2, cy = BUSBAR_H / 2;
+      if (w < 560) label = 'BUSBAR';          // narrow zones: the size text does not fit
       let plateW = Math.min(w - 40, 470);
       let g = '<g class="sb-busbar">' +
         '<rect class="box" x="' + x + '" y="0" width="' + w + '" height="' + BUSBAR_H + '"/>';
@@ -596,14 +704,14 @@
       return g + '</g>';
     }
 
-    function cableZone(x, w, h, y0, label) {
+    function cableZone(x, w, h, y0, label, title) {
       const cx = x + w / 2, cy = y0 + h / 2;
       const plateH = Math.min(h - 80, 760);
       return '<g class="sb-cable">' +
         '<rect class="box" x="' + x + '" y="' + y0 + '" width="' + w + '" height="' + h + '"/>' +
         '<rect class="sb-plate" x="' + (cx - 60) + '" y="' + (cy - plateH / 2) + '" width="120" height="' + plateH + '" rx="20"/>' +
         '<g transform="rotate(-90 ' + cx + ' ' + cy + ')">' +
-        '<text class="sb-zlabel" x="' + cx + '" y="' + (cy - 14) + '" font-size="58">CABLE ZONE</text>' +
+        '<text class="sb-zlabel" x="' + cx + '" y="' + (cy - 14) + '" font-size="58">' + (title || 'CABLE ZONE') + '</text>' +
         '<text class="sb-zdims" x="' + cx + '" y="' + (cy + 52) + '" font-size="42">' + label + '</text>' +
         '</g></g>';
     }
@@ -686,7 +794,7 @@
         '<text class="tb-name" x="' + cx + '" y="' + (y0 + 66) + '" font-size="86">' + esc(name) + '</text>' +
         '<text class="tb-sub" x="' + cx + '" y="' + (y0 + 188) + '" font-size="52">SWITCHBOARD &mdash; FRONT ELEVATION</text>' +
         '<text class="tb-meta" x="' + cx + '" y="' + (y0 + 304) + '" font-size="44">' +
-          totalW + ' &#215; ' + TOTAL_H + ' &#215; ' + DEPTH + ' mm &#183; Scale ' + drawingScale(viewW, viewH, printLayout) + ' (' + printLayout.name + ' ' + printLayout.orientation + ') &#183; ' + date +
+          totalW + ' &#215; ' + TOTAL_H + ' &#215; ' + boardDepth() + ' mm &#183; Scale ' + drawingScale(viewW, viewH, printLayout) + ' (' + printLayout.name + ' ' + printLayout.orientation + ') &#183; ' + date +
         '</text></g>';
     }
 
@@ -716,18 +824,19 @@
         colGeom.push({ x0: x, x1: x + w, colIdx: colIdx, droppable: droppable });
 
         if (col.kind === 'incomer200') {
-          parts.push(busbarBlock(x, w, 'BUSBAR'));
-          parts.push(cableZone(x, w, USABLE_H, BUSBAR_H, INC200_W + ' &#215; 1800'));
+          parts.push(busbarBlock(x, w, w >= 380 ? 'BUSBAR ' + w + '&#215;400' : 'BUSBAR'));
+          parts.push(cableZone(x, w, USABLE_H, BUSBAR_H, w + ' &#215; 1800', 'MAINS CABLE ZONE'));
         } else if (col.kind === 'cable') {
           parts.push(busbarBlock(x, w, 'BUSBAR ' + w + '&#215;400'));
           parts.push(cableZone(x, w, USABLE_H, BUSBAR_H, CABLE_W + ' &#215; 1800'));
         } else if (col.kind === 'incoming') {
-          parts.push(busbarBlock(x, w, 'BUSBAR 600&#215;400'));
+          parts.push(busbarBlock(x, w, 'BUSBAR ' + w + '&#215;400'));
           const cy = BUSBAR_H + USABLE_H / 2;
           parts.push('<g class="sb-incoming"><rect class="box" x="' + x + '" y="' + BUSBAR_H + '" width="' + w + '" height="' + USABLE_H + '"/>' +
-            '<text class="big" x="' + (x + w / 2) + '" y="' + (cy - 110) + '" font-size="96">INCOMING</text>' +
-            '<text class="big" x="' + (x + w / 2) + '" y="' + (cy + 10) + '" font-size="96">SECTION</text>' +
-            '<text class="mdims" x="' + (x + w / 2) + '" y="' + (cy + 130) + '" font-size="52">600 &#215; 1800</text></g>');
+            '<text class="big" x="' + (x + w / 2) + '" y="' + (cy - 170) + '" font-size="96">INCOMING</text>' +
+            '<text class="big" x="' + (x + w / 2) + '" y="' + (cy - 50) + '" font-size="96">SECTION</text>' +
+            '<text class="big" x="' + (x + w / 2) + '" y="' + (cy + 80) + '" font-size="84">' + incomerA + ' A ' + incomerSpec().device + '</text>' +
+            '<text class="mdims" x="' + (x + w / 2) + '" y="' + (cy + 190) + '" font-size="52">' + w + ' &#215; 1800</text></g>');
         } else if (col.kind === 'ct') {
           parts.push(busbarBlock(x, w, 'BUSBAR 600&#215;400'));
           let y = BUSBAR_H;
@@ -783,6 +892,59 @@
         printLayout: printLayout
       };
       showBoardDimensions(totalW);
+      updateChecks(totalW);
+    }
+
+    /* ── Design checks shown in the side panel ── */
+    function updateChecks(totalW) {
+      const out = [];
+      const add = (cls, head, sub) => out.push('<li class="' + cls + '">' + head + (sub ? '<small>' + sub + '</small>' : '') + '</li>');
+      const spec = incomerSpec();
+      let sum = 0, maxFeeder = 0, usable = 0, spare = 0, lowest = null;
+      currentColumns.forEach(col => {
+        if (col.kind !== 'module') return;
+        usable += USABLE_H;
+        let h = 0;
+        col.items.forEach(m => {
+          const a = parseInt(m.type, 10);
+          if (RATINGS[m.type]) { sum += a; if (a > maxFeeder) maxFeeder = a; } else spare += m.h;
+          h += m.h;
+        });
+        const last = col.items[col.items.length - 1];
+        if (last && RATINGS[last.type]) {
+          // handle centre of a rated unit sitting at the bottom of the tier, above floor
+          const centre = PLINTH_H + (USABLE_H - h) + last.h / 2;
+          if (lowest === null || centre < lowest) lowest = centre;
+        }
+      });
+
+      if (maxFeeder > incomerA) {
+        add('fail', maxFeeder + ' A feeder exceeds the ' + incomerA + ' A incomer', 'Increase the main switch rating or reduce the feeder.');
+      }
+      if (sum > 0) {
+        const ratio = sum / incomerA;
+        add(ratio > 2.5 ? 'warn' : 'ok', 'Feeders total ' + sum + ' A &mdash; ' + ratio.toFixed(1) + ' &times; incomer',
+          ratio > 2.5 ? 'High ratio: confirm the maximum demand (AS/NZS 3000 cl. 2.2.2) suits the incomer.'
+                      : 'Sum of feeder frame sizes, not demand. Maximum demand governs (cl. 2.2.2).');
+      }
+      if (usable > 0) {
+        const pct = Math.round(100 * spare / usable);
+        add(pct < 20 ? 'warn' : 'ok', 'Spare cubicle space ' + pct + '%',
+          pct < 20 ? 'Below the usual 20&ndash;30% allowance for future feeders.' : 'Meets the usual 20&ndash;30% allowance for future feeders.');
+      }
+      if (incomerA >= 800) {
+        add('warn', 'Arc-fault protection applies (&ge; 800 A)', 'AS/NZS 3000 cl. 2.5.5: internal separation Form 3b or better.');
+      }
+      if (incomerA >= 800 || totalW > 3000) {
+        add('warn', 'Two emergency exit paths needed', 'AS/NZS 3000 cl. 2.10.2.2: ' + (incomerA >= 800 ? 'board rated &ge; 800 A' : 'board longer than 3 m') +
+          ', unless 3 m is clear in front of the board.');
+      }
+      if (lowest !== null && lowest < 300) {
+        add('warn', 'Lowest device about ' + Math.round(lowest) + ' mm above floor', 'AS/NZS 61439.1 cl. 8.5.5: handles and terminals at least 200 mm above the base. Consider moving it up a tier.');
+      }
+      add('', 'Depth ' + spec.depth + ' mm assumes front access', 'Typical for a ' + incomerA + ' A ' + spec.device + ' incomer. Allow 1.0 m clear in front (cl. 2.10.2.2).');
+      document.getElementById('sbChecks').innerHTML = out.join('');
+      document.getElementById('incomerNote').innerHTML = spec.device + ' section ' + spec.w + ' W &middot; mains cable zone ' + spec.cableW + ' W &middot; depth ' + spec.depth;
     }
 
     function sizeSvg(viewW, viewH) {
@@ -795,6 +957,7 @@
     }
 
     function showBoardDimensions(totalW) {
+      const DEPTH = boardDepth();
       const txt = 'Total Board Size: ' + totalW + 'mm (W) x ' + TOTAL_H + 'mm (H) x ' + DEPTH + 'mm (D)';
       const printInfo = lastRenderMeta && lastRenderMeta.printLayout
         ? '<br><span style="font-size:0.92em;color:var(--text-secondary);">Print: <strong>' + lastRenderMeta.printLayout.name + ' ' + lastRenderMeta.printLayout.orientation + '</strong> at ' + drawingScale(lastRenderMeta.viewW, lastRenderMeta.viewH, lastRenderMeta.printLayout) + '</span>'
@@ -837,6 +1000,41 @@
        ════════════════════════════════════════════════════════ */
     function val(id) { return parseInt(document.getElementById(id).value, 10) || 0; }
 
+    function readIncomer() { incomerA = parseInt(document.getElementById('incomerRating').value, 10) || 800; }
+
+    /* Read the adjustable cubicle sizes: 50 mm steps, clamped to what a tier can hold */
+    function readSizes() {
+      const snap = (id, lo, hi, dflt) => {
+        const el = document.getElementById(id);
+        let v = parseInt(el.value, 10);
+        if (!isFinite(v)) v = dflt;
+        v = Math.min(hi, Math.max(lo, Math.round(v / 50) * 50));
+        el.value = v;
+        return v;
+      };
+      RATING_ORDER.forEach(t => {
+        const n = t.replace('A', '');
+        RATINGS[t].h = snap('h' + n, 150, USABLE_H, DEFAULT_H[t]);
+        document.getElementById('sub' + n).innerHTML = MOD_W + ' &times; ' + RATINGS[t].h + ' mm';
+      });
+      CABLE_W = snap('cableW', 150, 800, DEFAULT_CABLE_W);
+    }
+
+    /* Re-pack the modules already on the board (keeps feeder labels) */
+    function repack() {
+      const fireActive = document.getElementById('fireServicesChk').checked;
+      const ctActive = document.getElementById('ctMeterChk').checked;
+      const fireMods = [], mainMods = [];
+      currentColumns.forEach(col => {
+        if (col.kind !== 'module') return;
+        col.items.forEach(m => {
+          if (RATINGS[m.type]) { m.h = RATINGS[m.type].h; (col.fire ? fireMods : mainMods).push(m); }
+        });
+      });
+      currentColumns = buildColumns(fireMods, mainMods, fireActive, ctActive);
+      render();
+    }
+
     function doGenerate() {
       const fireActive = document.getElementById('fireServicesChk').checked;
       const ctActive = document.getElementById('ctMeterChk').checked;
@@ -848,19 +1046,19 @@
 
     /* Auto-arrange: re-pack current modules (keeps feeders) largest-first */
     function autoArrange() {
-      const fireActive = document.getElementById('fireServicesChk').checked;
-      const ctActive = document.getElementById('ctMeterChk').checked;
-      const fireMods = [], mainMods = [];
-      currentColumns.forEach(col => {
-        if (col.kind !== 'module') return;
-        col.items.forEach(m => {
-          if (RATINGS[m.type]) (col.fire ? fireMods : mainMods).push(m);
-        });
-      });
-      currentColumns = buildColumns(fireMods, mainMods, fireActive, ctActive);
-      render();
+      repack();
       OmniToast.show('Modules re-packed largest first');
     }
+
+    document.getElementById('incomerRating').addEventListener('change', function () { readIncomer(); render(); });
+    ['h800', 'h630', 'h400', 'h250', 'cableW'].forEach(id => {
+      document.getElementById(id).addEventListener('change', function () { readSizes(); repack(); });
+    });
+    document.getElementById('resetSizesBtn').addEventListener('click', function () {
+      RATING_ORDER.forEach(t => { document.getElementById('h' + t.replace('A', '')).value = DEFAULT_H[t]; });
+      document.getElementById('cableW').value = DEFAULT_CABLE_W;
+      readSizes(); repack();
+    });
 
     ['modules800', 'modules630', 'modules400', 'modules250',
      'fireModules800', 'fireModules630', 'fireModules400', 'fireModules250'].forEach(id => {
@@ -1025,7 +1223,7 @@
     });
 
     /* ════════════════════════════════════════════════════════
-       Save / Load (localStorage 'switchboardConfig', v2)
+       Save / Load (localStorage 'switchboardConfig', v2 + optional incomer/sizes)
        ════════════════════════════════════════════════════════ */
     function saveBoardConfig() {
       const cfg = {
@@ -1035,6 +1233,8 @@
         fireActive: document.getElementById('fireServicesChk').checked,
         fireCounts: { m800: val('fireModules800'), m630: val('fireModules630'), m400: val('fireModules400'), m250: val('fireModules250') },
         ct: document.getElementById('ctMeterChk').checked,
+        incomer: incomerA,
+        sizes: { h800: RATINGS['800A'].h, h630: RATINGS['630A'].h, h400: RATINGS['400A'].h, h250: RATINGS['250A'].h, cableW: CABLE_W },
         columns: currentColumns.map(c => ({
           kind: c.kind, fire: c.fire,
           items: c.items.map(m => ({ type: m.type, h: m.h, feeder: m.feeder || '' }))
@@ -1062,6 +1262,10 @@
         document.getElementById('fireModules400').value = cfg.fireCounts.m400;
         document.getElementById('fireModules250').value = cfg.fireCounts.m250;
         document.getElementById('ctMeterChk').checked = !!cfg.ct;
+        if (cfg.incomer) document.getElementById('incomerRating').value = String(cfg.incomer);
+        const sz = cfg.sizes || { h800: 1000, h630: 600, h400: 400, h250: 200, cableW: 400 };
+        ['h800', 'h630', 'h400', 'h250', 'cableW'].forEach(id => { if (sz[id]) document.getElementById(id).value = sz[id]; });
+        readIncomer(); readSizes();
         currentColumns = cfg.columns.map(c => ({
           kind: c.kind, fire: !!c.fire,
           items: (c.items || []).map(m => ({ type: m.type, h: m.h, feeder: m.feeder || '' }))
@@ -1101,6 +1305,8 @@
       document.querySelectorAll('[data-ico]').forEach(function (el) {
         if (typeof OmniIcons !== 'undefined') el.innerHTML = OmniIcons.get(el.getAttribute('data-ico'), 14);
       });
+      readIncomer();
+      readSizes();
       doGenerate();
     });
   </script>

@@ -153,46 +153,55 @@
         </ul>
       </div>
 
-      <h3>Main Switch Rating Calculation</h3>
-      <div class="formula-box">
-Main Switch Rating = Total Connected Load &times; Diversity Factor &times; Safety Factor
+      <p>The sizer is a front-elevation layout tool. It does not calculate the main switch rating or busbar cross-section; choose the incomer from the Maximum Demand tool and size busbars with the Busbar Sizing tool.</p>
 
-Where:
-- Total Connected Load = Sum of all circuit breaker ratings
-- Diversity Factor = User-defined (typically 0.6-0.8 for residential, 0.8-1.0 for commercial)
-- Safety Factor = 1.25 (25% margin as per AS/NZS 3000)
+      <h3>Board Envelope</h3>
+      <div class="formula-box">
+Board Width  = Incoming section + Mains cable zone + (CT metering 600)
+             + &Sigma; [ Feeder cubicle 600 + Cable zone 400 ]   (main and fire sections)
+Board Height = Busbar chamber 400 + Usable tier height 1800 + Plinth 100 = 2300 mm
+Board Depth  = set by the incomer (table below), front access
       </div>
 
+      <h3>Feeder Cubicle Sizes (defaults, adjustable in the tool)</h3>
+      <div class="formula-box">
+Rating   Cubicle W &times; H     Basis
+250 A    600 &times; 200       MCCB mounted horizontally
+400 A    600 &times; 400       400/630 A frame, single or twin cables per phase
+630 A    600 &times; 600       400/630 A frame, room for 2 &times; 240 mm&sup2; per phase
+800 A    600 &times; 1000      800 A frame MCCB with terminal and cable space
+      </div>
+      <p>Modules are packed largest first into 1800 mm tiers (first-fit decreasing); leftover space is shown as 250 A spares. Each feeder tier has its own 400 mm cable zone.</p>
+
+      <h3>Incoming Section</h3>
+      <div class="formula-box">
+Main switch      Device   Section W   Mains cable zone W   Board depth
+up to 250 A      MCCB     600         300                  600
+400 - 630 A      MCCB     600         400                  600
+800 - 1600 A     ACB      800         400                  800
+2000 - 3200 A    ACB      1000        600                  1000
+      </div>
+
+      <h3>Checks Reported</h3>
       <div class="variable-list">
         <dl>
-          <dt>Total Connected Load</dt>
-          <dd>Sum of all individual circuit ratings (in Amps)</dd>
-          
-          <dt>Diversity Factor</dt>
-          <dd>Acknowledgment that not all circuits will be at full load simultaneously. Lower values indicate greater diversity.</dd>
-          
-          <dt>Safety Factor</dt>
-          <dd>25% overhead to prevent nuisance tripping and allow for future expansion</dd>
+          <dt>Feeder larger than incomer</dt>
+          <dd>Flags any outgoing unit rated above the main switch.</dd>
+          <dt>Feeder total vs incomer</dt>
+          <dd>Sum of feeder frame ratings divided by the incomer rating. Indicative only; maximum demand per AS/NZS 3000 cl. 2.2.2 governs.</dd>
+          <dt>Spare space</dt>
+          <dd>Spare tier height as a share of total tier height; 20&ndash;30% is the usual allowance for future feeders.</dd>
+          <dt>Arc-fault protection</dt>
+          <dd>AS/NZS 3000 cl. 2.5.5 applies to switchboards rated 800 A or more per phase (internal separation Form 3b or better).</dd>
+          <dt>Emergency exits</dt>
+          <dd>AS/NZS 3000 cl. 2.10.2.2: two exit paths where the board is rated 800 A or more per phase, or is longer than 3 m, unless 3 m is clear in front.</dd>
+          <dt>Lowest device height</dt>
+          <dd>AS/NZS 61439.1 cl. 8.5.5: operating handles and terminals at least 0.2 m above the base of a floor-standing assembly.</dd>
         </dl>
       </div>
 
-      <h3>Available Main Switch Sizes</h3>
-      <p>Standard ratings rounded up to next available size: 63A, 80A, 100A, 125A, 160A, 200A, 250A, 315A, 400A, 500A, 630A, 800A</p>
-
-      <h3>Busbar Sizing</h3>
-      <div class="formula-box">
-Busbar Current Capacity = Main Switch Rating
-
-Width Selection:
-- &#8804;125A: 200mm width (standard)
-- >125A-250A: 300mm width
-- >250A-400A: 400mm width  
-- >400A-630A: 600mm width
-- >630A: 800mm width
-      </div>
-
       <div class="standard-ref">
-        <strong>Note:</strong> Busbar sizing follows manufacturer specifications and AS/NZS 61439.1 for current density and temperature rise limits (typically 30&ndash;50K rise at rated current).
+        <strong>Note:</strong> Cubicle sizes are typical planning values for Form 3b boards, cross-checked against a modular system catalogue (250 A MCCB 150&ndash;200 mm, 400/630 A MCCB 200&ndash;650 mm depending on mounting, 800 A device 850&ndash;900 mm, cable compartment 400 mm). They are not set by a standard: confirm final dimensions with the switchboard builder.
       </div>
     </div>
 
