@@ -483,7 +483,7 @@
             <div class="sb-field"><label for="cableW">Cable zone W</label><input type="number" id="cableW" min="150" max="800" step="50" value="400" /></div>
           </div>
           <button type="button" class="sb-linkbtn" id="resetSizesBtn">Reset to defaults</button>
-          <p class="sb-hint">Typical Form 3b values. Tier heights vary between switchboard systems &mdash; set them to your builder&rsquo;s module sizes. All cubicles are 600 wide.</p>
+          <p class="sb-hint">Typical Form 3b values. Tier heights vary between switchboard systems &mdash; set them to your builder&rsquo;s module sizes. Feeder cubicles are 600 wide; the incoming section follows the main switch rating.</p>
         </details>
       </div>
 
@@ -583,7 +583,7 @@
     /* Pack a flat list of rated modules into columns, largest first */
     function packModules(mods) {
       const sorted = mods.slice().sort((a, b) =>
-        RATING_ORDER.indexOf(a.type) - RATING_ORDER.indexOf(b.type));
+        (b.h - a.h) || (RATING_ORDER.indexOf(a.type) - RATING_ORDER.indexOf(b.type)));
       // first-fit decreasing: a smaller module drops into the first cubicle with
       // room, so gaps left under large modules are used before a new tier is added
       const cols = [], used = [];
@@ -665,7 +665,8 @@
     function moduleText(x, y, w, h, m) {
       const cx = x + w / 2, cy = y + h / 2;
       if (m.type === 'spare') {
-        if (h < 150) {
+        if (h < 80) return '';
+        if (h < 200) {
           return '<text x="' + cx + '" y="' + cy + '" font-size="46">SPARE</text>';
         }
         return '<text x="' + cx + '" y="' + (cy - 30) + '" font-size="62">' + (h + 1e-6 >= RATINGS['250A'].h ? '250A SPARE' : 'SPARE') + '</text>' +
@@ -679,7 +680,11 @@
         if (feeder) t += '<text class="feeder" x="' + cx + '" y="' + (cy + 92) + '" font-size="58">' + feeder + '</text>';
         return t;
       }
-      // 250A — 200 mm tall: rating on top, dims or feeder below
+      // very shallow tier: one line only
+      if (h < 200) {
+        return '<text class="rating" x="' + cx + '" y="' + cy + '" font-size="64">' + m.type + (feeder ? ' &#183; ' + feeder : '') + '</text>';
+      }
+      // 200 mm tall: rating on top, dims or feeder below
       if (feeder) {
         return '<text class="rating" x="' + cx + '" y="' + (cy - 32) + '" font-size="70">' + m.type + '</text>' +
                '<text class="feeder" x="' + cx + '" y="' + (cy + 44) + '" font-size="52">' + feeder + '</text>';
@@ -904,17 +909,20 @@
       currentColumns.forEach(col => {
         if (col.kind !== 'module') return;
         usable += USABLE_H;
-        let h = 0;
         col.items.forEach(m => {
           const a = parseInt(m.type, 10);
           if (RATINGS[m.type]) { sum += a; if (a > maxFeeder) maxFeeder = a; } else spare += m.h;
-          h += m.h;
         });
-        const last = col.items[col.items.length - 1];
-        if (last && RATINGS[last.type]) {
-          // handle centre of a rated unit sitting at the bottom of the tier, above floor
-          const centre = PLINTH_H + (USABLE_H - h) + last.h / 2;
-          if (lowest === null || centre < lowest) lowest = centre;
+        // handle centre (above floor) of the lowest rated unit in this tier
+        let below = 0;
+        for (let i = col.items.length - 1; i >= 0; i--) {
+          const m = col.items[i];
+          if (RATINGS[m.type]) {
+            const centre = PLINTH_H + below + m.h / 2;
+            if (lowest === null || centre < lowest) lowest = centre;
+            break;
+          }
+          below += m.h;
         }
       });
 
@@ -933,14 +941,14 @@
           pct < 20 ? 'Below the usual 20&ndash;30% allowance for future feeders.' : 'Meets the usual 20&ndash;30% allowance for future feeders.');
       }
       if (incomerA >= 800) {
-        add('warn', 'Arc-fault protection applies (&ge; 800 A)', 'AS/NZS 3000 cl. 2.5.5: internal separation Form 3b or better.');
+        add('warn', 'Arc-fault protection applies (&ge; 800 A)', 'AS/NZS 3000 cl. 2.5.5: internal separation Form 3b/4a/4b (cl. 2.5.5.2), protection settings to cl. 2.5.5.3, or both.');
       }
       if (incomerA >= 800 || totalW > 3000) {
         add('warn', 'Two emergency exit paths needed', 'AS/NZS 3000 cl. 2.10.2.2: ' + (incomerA >= 800 ? 'board rated &ge; 800 A' : 'board longer than 3 m') +
           ', unless 3 m is clear in front of the board.');
       }
       if (lowest !== null && lowest < 300) {
-        add('warn', 'Lowest device about ' + Math.round(lowest) + ' mm above floor', 'AS/NZS 61439.1 cl. 8.5.5: handles and terminals at least 200 mm above the base. Consider moving it up a tier.');
+        add('warn', 'Lowest device centre about ' + Math.round(lowest) + ' mm above floor', 'Below 300 mm its terminals may fall under the 200 mm minimum for handles and terminals (AS/NZS 61439.1 cl. 8.5.5). Consider moving it up a tier.');
       }
       add('', 'Depth ' + spec.depth + ' mm assumes front access', 'Typical for a ' + incomerA + ' A ' + spec.device + ' incomer. Allow 1.0 m clear in front (cl. 2.10.2.2).');
       document.getElementById('sbChecks').innerHTML = out.join('');
@@ -1000,6 +1008,12 @@
        ════════════════════════════════════════════════════════ */
     function val(id) { return parseInt(document.getElementById(id).value, 10) || 0; }
 
+    /* Saves made before the incomer existed (or with an unknown rating) load at the 800 A default */
+    function setIncomerSelect(a) {
+      const sel = document.getElementById('incomerRating');
+      sel.value = String(a || 800);
+      if (sel.selectedIndex < 0) sel.value = '800';
+    }
     function readIncomer() { incomerA = parseInt(document.getElementById('incomerRating').value, 10) || 800; }
 
     /* Read the adjustable cubicle sizes: 50 mm steps, clamped to what a tier can hold */
@@ -1051,13 +1065,26 @@
     }
 
     document.getElementById('incomerRating').addEventListener('change', function () { readIncomer(); render(); });
+    /* Apply new tier heights in place so a manual arrangement survives;
+       re-pack only if a cubicle no longer holds its modules */
+    function applySizes() {
+      readSizes();
+      let overflow = false;
+      currentColumns.forEach(col => {
+        if (col.kind !== 'module') return;
+        col.items.forEach(m => { if (RATINGS[m.type]) m.h = RATINGS[m.type].h; });
+        if (ratedHeight(col) > USABLE_H + 1e-6) overflow = true; else fillSpares(col);
+      });
+      if (overflow) { repack(); OmniToast.show('Modules re-packed to fit the new tier heights'); }
+      else render();
+    }
     ['h800', 'h630', 'h400', 'h250', 'cableW'].forEach(id => {
-      document.getElementById(id).addEventListener('change', function () { readSizes(); repack(); });
+      document.getElementById(id).addEventListener('change', applySizes);
     });
     document.getElementById('resetSizesBtn').addEventListener('click', function () {
       RATING_ORDER.forEach(t => { document.getElementById('h' + t.replace('A', '')).value = DEFAULT_H[t]; });
       document.getElementById('cableW').value = DEFAULT_CABLE_W;
-      readSizes(); repack();
+      applySizes();
     });
 
     ['modules800', 'modules630', 'modules400', 'modules250',
@@ -1186,7 +1213,9 @@
        Feeder label editing (double-click)
        ════════════════════════════════════════════════════════ */
     svg.addEventListener('dblclick', function (e) {
-      const g = e.target.closest ? e.target.closest('.sb-mod.draggable') : null;
+      // pointer capture during drag retargets the event to the <svg>, so hit-test the point
+      const hit = document.elementFromPoint(e.clientX, e.clientY) || e.target;
+      const g = hit.closest ? hit.closest('.sb-mod.draggable') : null;
       if (!g) return;
       const col = parseInt(g.getAttribute('data-col'), 10);
       const idx = parseInt(g.getAttribute('data-idx'), 10);
@@ -1262,7 +1291,7 @@
         document.getElementById('fireModules400').value = cfg.fireCounts.m400;
         document.getElementById('fireModules250').value = cfg.fireCounts.m250;
         document.getElementById('ctMeterChk').checked = !!cfg.ct;
-        if (cfg.incomer) document.getElementById('incomerRating').value = String(cfg.incomer);
+        setIncomerSelect(cfg.incomer);
         const sz = cfg.sizes || { h800: 1000, h630: 600, h400: 400, h250: 200, cableW: 400 };
         ['h800', 'h630', 'h400', 'h250', 'cableW'].forEach(id => { if (sz[id]) document.getElementById(id).value = sz[id]; });
         readIncomer(); readSizes();
@@ -1288,6 +1317,7 @@
         if (cfg.fireModules400 !== null && cfg.fireModules400 !== undefined) document.getElementById('fireModules400').value = cfg.fireModules400;
         if (cfg.fireModules250 !== null && cfg.fireModules250 !== undefined) document.getElementById('fireModules250').value = cfg.fireModules250;
         document.getElementById('ctMeterChk').checked = !!cfg.ctMeterChk;
+        setIncomerSelect(null); readIncomer();
         doGenerate();
         OmniToast.show('Board loaded (legacy save)', 'success');
         return;

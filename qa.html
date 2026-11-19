@@ -158,7 +158,8 @@
       <h3>Board Envelope</h3>
       <div class="formula-box">
 Board Width  = Incoming section + Mains cable zone + (CT metering 600)
-             + &Sigma; [ Feeder cubicle 600 + Cable zone 400 ]   (main and fire sections)
+             + &Sigma; [ Feeder cubicle 600 + Cable zone 400 ]   (main and fire sections;
+               cable zone 400 is the default, adjustable 150-800)
 Board Height = Busbar chamber 400 + Usable tier height 1800 + Plinth 100 = 2300 mm
 Board Depth  = set by the incomer (table below), front access
       </div>
@@ -171,7 +172,7 @@ Rating   Cubicle W &times; H     Basis
 630 A    600 &times; 600       400/630 A frame, room for 2 &times; 240 mm&sup2; per phase
 800 A    600 &times; 1000      800 A frame MCCB with terminal and cable space
       </div>
-      <p>Modules are packed largest first into 1800 mm tiers (first-fit decreasing); leftover space is shown as 250 A spares. Each feeder tier has its own 400 mm cable zone.</p>
+      <p>Modules are packed tallest first into 1800 mm tiers (first-fit decreasing); leftover space is shown as 250 A spares. Each feeder tier has its own cable zone.</p>
 
       <h3>Incoming Section</h3>
       <div class="formula-box">
@@ -192,11 +193,11 @@ up to 250 A      MCCB     600         300                  600
           <dt>Spare space</dt>
           <dd>Spare tier height as a share of total tier height; 20&ndash;30% is the usual allowance for future feeders.</dd>
           <dt>Arc-fault protection</dt>
-          <dd>AS/NZS 3000 cl. 2.5.5 applies to switchboards rated 800 A or more per phase (internal separation Form 3b or better).</dd>
+          <dd>AS/NZS 3000 cl. 2.5.5 applies to switchboards rated 800 A or more per phase: internal separation Form 3b, 4a or 4b (cl. 2.5.5.2), protection settings to cl. 2.5.5.3, or both.</dd>
           <dt>Emergency exits</dt>
           <dd>AS/NZS 3000 cl. 2.10.2.2: two exit paths where the board is rated 800 A or more per phase, or is longer than 3 m, unless 3 m is clear in front.</dd>
           <dt>Lowest device height</dt>
-          <dd>AS/NZS 61439.1 cl. 8.5.5: operating handles and terminals at least 0.2 m above the base of a floor-standing assembly.</dd>
+          <dd>AS/NZS 61439.1 cl. 8.5.5: operating handles and terminals at least 0.2 m above the base of a floor-standing assembly. The tool warns when the handle centre of the lowest rated unit is below 300 mm, a planning margin so its terminals stay above 0.2 m.</dd>
         </dl>
       </div>
 
