@@ -153,46 +153,77 @@
         </ul>
       </div>
 
-      <h3>Main Switch Rating Calculation</h3>
-      <div class="formula-box">
-Main Switch Rating = Total Connected Load &times; Diversity Factor &times; Safety Factor
+      <p>The sizer is a front-elevation layout tool. It does not calculate the main switch rating or busbar cross-section; choose the incomer from the Maximum Demand tool and size busbars with the Busbar Sizing tool.</p>
 
-Where:
-- Total Connected Load = Sum of all circuit breaker ratings
-- Diversity Factor = User-defined (typically 0.6-0.8 for residential, 0.8-1.0 for commercial)
-- Safety Factor = 1.25 (25% margin as per AS/NZS 3000)
+      <h3>Board Envelope</h3>
+      <div class="formula-box">
+Board Width  = Incoming section + Mains cable zone + (CT metering 600)
+             + &Sigma; [ Feeder cubicle 600 + Cable zone 400 ]   (main and fire sections;
+               cable zone 400 is the default, adjustable 150-800)
+Board Height = Busbar chamber 400 + Usable tier height 1800 + Plinth 100 = 2300 mm
+Board Depth  = set by the incomer (table below), front access
       </div>
 
+      <h3>Feeder Cubicle Sizes (defaults, adjustable in the tool)</h3>
+      <div class="formula-box">
+Rating   Cubicle W &times; H     Basis
+250 A    600 &times; 200       MCCB mounted horizontally
+400 A    600 &times; 400       400/630 A frame, single or twin cables per phase
+630 A    600 &times; 600       400/630 A frame, room for 2 &times; 240 mm&sup2; per phase
+800 A    600 &times; 1000      800 A frame MCCB with terminal and cable space
+      </div>
+      <p>Modules are packed tallest first into 1800 mm tiers (first-fit decreasing); leftover space is shown as 250 A spares. Each feeder tier has its own cable zone.</p>
+
+      <h3>Incoming Section</h3>
+      <div class="formula-box">
+Main switch      Device   Section W   Mains cable zone W   Board depth
+up to 250 A      MCCB     600         300                  600
+400 - 630 A      MCCB     600         400                  600
+800 - 1600 A     ACB      800         400                  800
+2000 - 3200 A    ACB      1000        600                  1000
+      </div>
+
+      <h3>CT Metering Column (NSW)</h3>
+      <div class="formula-box">
+Order with CT metering:  Mains cable zone | Incoming section | CT column | Feeders
+CT column, top to bottom in the 1800 mm tier:
+  Filler 100 | CT chamber 650 | CT meter panel 600 &times; 550 | Filler 500
+Above floor: CT chamber 1150-1800, meter panel 600-1150
+
+Main switch      CT type assumed   CT column W
+up to 800 A      T 800/5           800
+1000 - 1250 A    W 1500/5          800
+1600 - 3200 A    U 2000/5          1050
+      </div>
       <div class="variable-list">
         <dl>
-          <dt>Total Connected Load</dt>
-          <dd>Sum of all individual circuit ratings (in Amps)</dd>
-          
-          <dt>Diversity Factor</dt>
-          <dd>Acknowledgment that not all circuits will be at full load simultaneously. Lower values indicate greater diversity.</dd>
-          
-          <dt>Safety Factor</dt>
-          <dd>25% overhead to prevent nuisance tripping and allow for future expansion</dd>
+          <dt>Set by the rules</dt>
+          <dd>NSW Service and Installation Rules, Metering Annexure (July 2018): CT metering above 80 A per phase (cl. 2.1); CTs in an enclosure segregated from meters and switchboard equipment, on the load side of the service protection device (cl. 2.12.2); nothing else in the CT enclosure (cl. 2.12.3); CT connections more than 500 mm and less than 2500 mm above floor (cl. 2.12.8); meter panel at least 550 &times; 550 mm (cl. 2.13.1); meters between 0.6 m and 2.0 m above floor (cl. 2.13); meter spacing from conductors per Table 2-2, reduced by shielding per Table 2-3 (cl. 2.10).</dd>
+          <dt>Derived, not published</dt>
+          <dd>No rule gives a CT chamber size. Height 650 = 450 mm maximum removable link (cl. 2.12.12) + 100 mm each end. Width = three CTs in line + 50 mm between + 100 mm each side (clearances from PLUS ES PMPP 13). The CT type per rating is an assumption; the metering provider specifies it (cl. 2.12). Confirm all of these with the metering provider and switchboard builder.</dd>
         </dl>
       </div>
 
-      <h3>Available Main Switch Sizes</h3>
-      <p>Standard ratings rounded up to next available size: 63A, 80A, 100A, 125A, 160A, 200A, 250A, 315A, 400A, 500A, 630A, 800A</p>
-
-      <h3>Busbar Sizing</h3>
-      <div class="formula-box">
-Busbar Current Capacity = Main Switch Rating
-
-Width Selection:
-- &#8804;125A: 200mm width (standard)
-- >125A-250A: 300mm width
-- >250A-400A: 400mm width  
-- >400A-630A: 600mm width
-- >630A: 800mm width
+      <h3>Checks Reported</h3>
+      <div class="variable-list">
+        <dl>
+          <dt>Feeder larger than incomer</dt>
+          <dd>Flags any outgoing unit rated above the main switch.</dd>
+          <dt>Feeder total vs incomer</dt>
+          <dd>Sum of feeder frame ratings divided by the incomer rating. Indicative only; maximum demand per AS/NZS 3000 cl. 2.2.2 governs.</dd>
+          <dt>Spare space</dt>
+          <dd>Spare tier height as a share of total tier height; 20&ndash;30% is the usual allowance for future feeders.</dd>
+          <dt>Arc-fault protection</dt>
+          <dd>AS/NZS 3000 cl. 2.5.5 applies to switchboards rated 800 A or more per phase: internal separation Form 3b, 4a or 4b (cl. 2.5.5.2), protection settings to cl. 2.5.5.3, or both.</dd>
+          <dt>Emergency exits</dt>
+          <dd>AS/NZS 3000 cl. 2.10.2.2: two exit paths where the board is rated 800 A or more per phase, or is longer than 3 m, unless 3 m is clear in front.</dd>
+          <dt>Lowest device height</dt>
+          <dd>AS/NZS 61439.1 cl. 8.5.5: operating handles and terminals at least 0.2 m above the base of a floor-standing assembly. The tool warns when the handle centre of the lowest rated unit is below 300 mm, a planning margin so its terminals stay above 0.2 m.</dd>
+        </dl>
       </div>
 
       <div class="standard-ref">
-        <strong>Note:</strong> Busbar sizing follows manufacturer specifications and AS/NZS 61439.1 for current density and temperature rise limits (typically 30&ndash;50K rise at rated current).
+        <strong>Note:</strong> Cubicle sizes are typical planning values for Form 3b boards, cross-checked against a modular system catalogue (250 A MCCB 150&ndash;200 mm, 400/630 A MCCB 200&ndash;650 mm depending on mounting, 800 A device 850&ndash;900 mm, cable compartment 400 mm). They are not set by a standard: confirm final dimensions with the switchboard builder.
       </div>
     </div>
 
