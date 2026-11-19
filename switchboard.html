@@ -484,7 +484,7 @@
             <div class="sb-field"><label for="cableW">Cable zone W</label><input type="number" id="cableW" min="150" max="800" step="50" value="400" /></div>
           </div>
           <button type="button" class="sb-linkbtn" id="resetSizesBtn">Reset to defaults</button>
-          <p class="sb-hint">Typical Form 3b values. Tier heights vary between switchboard systems &mdash; set them to your builder&rsquo;s module sizes. Feeder cubicles are 600 wide; the incoming section follows the main switch rating.</p>
+          <p class="sb-hint">Typical Form 3b values for 3-pole fixed MCCBs. The 250 A and 400 A heights assume the breaker is mounted on its side (horizontal); use 300 for a 4-pole or withdrawable 250 A unit. Tier heights vary between switchboard systems &mdash; set them to your builder&rsquo;s module sizes. Feeder cubicles are 600 wide; the incoming section follows the main switch rating.</p>
         </details>
       </div>
 
@@ -541,10 +541,10 @@
        (800 A and above) need a wider and deeper section, and the mains cable zone
        must take the bending radius of the consumer mains. */
     const INCOMER_SPEC = [
-      { max: 250,  device: 'MCCB', w: 600,  cableW: 300, depth: 600 },
       { max: 630,  device: 'MCCB', w: 600,  cableW: 400, depth: 600 },
       { max: 1600, device: 'ACB',  w: 800,  cableW: 400, depth: 800 },
-      { max: 3200, device: 'ACB',  w: 1000, cableW: 600, depth: 1000 }
+      // ACBs to 3200 A are housed in 600-800 wide, 600-900 deep sections by Siemens, ABB and Rittal
+      { max: 3200, device: 'ACB',  w: 800,  cableW: 600, depth: 800 }
     ];
     let incomerA = 800;
     function incomerSpec() {

@@ -167,20 +167,19 @@ Board Depth  = set by the incomer (table below), front access
       <h3>Feeder Cubicle Sizes (defaults, adjustable in the tool)</h3>
       <div class="formula-box">
 Rating   Cubicle W &times; H     Basis
-250 A    600 &times; 200       MCCB mounted horizontally
-400 A    600 &times; 400       400/630 A frame, single or twin cables per phase
-630 A    600 &times; 600       400/630 A frame, room for 2 &times; 240 mm&sup2; per phase
-800 A    600 &times; 1000      800 A frame MCCB with terminal and cable space
+250 A    600 &times; 200       3-pole MCCB mounted horizontally (minimum; 300 for 4-pole or withdrawable)
+400 A    600 &times; 400       MCCB mounted horizontally (catalogues: 200-300)
+630 A    600 &times; 600       either orientation (catalogues: 200-400 horizontal, 350-650 vertical)
+800 A    600 &times; 1000      MCCB mounted vertically (catalogues: 300-900)
       </div>
       <p>Modules are packed tallest first into 1800 mm tiers (first-fit decreasing); leftover space is shown as 250 A spares. Each feeder tier has its own cable zone.</p>
 
       <h3>Incoming Section</h3>
       <div class="formula-box">
 Main switch      Device   Section W   Mains cable zone W   Board depth
-up to 250 A      MCCB     600         300                  600
-400 - 630 A      MCCB     600         400                  600
+up to 630 A      MCCB     600         400                  600
 800 - 1600 A     ACB      800         400                  800
-2000 - 3200 A    ACB      1000        600                  1000
+2000 - 3200 A    ACB      800         600                  800
       </div>
 
       <h3>CT Metering Column (NSW)</h3>
@@ -233,7 +232,7 @@ up to 800 A      T 800/5           800
       </div>
 
       <div class="standard-ref">
-        <strong>Note:</strong> Cubicle sizes are typical planning values for Form 3b boards, cross-checked against a modular system catalogue (250 A MCCB 150&ndash;200 mm, 400/630 A MCCB 200&ndash;650 mm depending on mounting, 800 A device 850&ndash;900 mm, cable compartment 400 mm). They are not set by a standard: confirm final dimensions with the switchboard builder.
+        <strong>Note:</strong> No standard fixes these sizes. The defaults were cross-checked against Siemens SIVACON S4, ABB System pro E power, Rittal Ri4Power and Schneider Prisma P catalogues, breaker dimensions and clearances (Schneider, Terasaki, Eaton, Siemens) and cable bending radii (Prysmian). All are at or above the published figures for the mounting stated. Not verified against any source: the 400 mm busbar chamber and the CT chamber dimensions. At 1600 A a 400 mm mains cable zone has no margin if derating forces twelve cables. Confirm final dimensions with the switchboard builder.
       </div>
     </div>
 
