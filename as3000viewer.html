@@ -444,7 +444,8 @@
     function parseInboundHash() {
       var m = window.location.hash.match(/^#cl-(.+)$/);
       if (!m) return;
-      var cl   = m[1];
+      var cl   = decodeURIComponent(m[1]);
+      pendingClause = cl;
       var page = lookupClause(cl);
       if (page) {
         pendingPageId = 'pf' + page;
@@ -462,6 +463,29 @@
       }
     }
 
+    /* Find the page holding a clause heading by its text. A heading is a
+       text line that starts with the clause number then a capital letter.
+       Pages before Section 1 (pf24) are the contents list and are skipped.
+       Note: pdf2htmlEX page ids are hexadecimal. */
+    var pendingClause = null;
+    function findClausePage(cl) {
+      try {
+        var doc = frame.contentWindow.document;
+        var pages = doc.querySelectorAll('#page-container > .pf');
+        var esc = cl.replace(/\./g, '\\.');
+        var rx = new RegExp('^' + esc + '(?![.\\d])\\s*[A-Z]');
+        var started = false;
+        for (var i = 0; i < pages.length; i++) {
+          if (!started) { if (pages[i].id === 'pf24') started = true; else continue; }
+          var lines = pages[i].querySelectorAll('.t');
+          for (var j = 0; j < lines.length; j++) {
+            if (rx.test(lines[j].textContent.trim())) return pages[i].id;
+          }
+        }
+      } catch (e) { /* fall back to page map */ }
+      return null;
+    }
+
     /* ── Start ── */
     frame.addEventListener('load', function () {
       iframeReady = true;
@@ -469,6 +493,14 @@
 
       /* Resolve inbound hash on first load */
       parseInboundHash();
+      if (pendingClause) {
+        var found = findClausePage(pendingClause);
+        if (found) {
+          pendingPageId = found;
+          setStatus('Clause ' + pendingClause, 'ok');
+        }
+        pendingClause = null;
+      }
 
       /* Execute any queued navigation */
       if (pendingPageId) {

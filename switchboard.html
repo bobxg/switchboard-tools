@@ -978,8 +978,8 @@
       if (sum > 0) {
         const ratio = sum / incomerA;
         add(ratio > 2.5 ? 'warn' : 'ok', 'Feeders total ' + sum + ' A &mdash; ' + ratio.toFixed(1) + ' &times; incomer',
-          ratio > 2.5 ? 'High ratio: confirm the maximum demand (AS/NZS 3000 cl. 2.2.2) suits the incomer.'
-                      : 'Sum of feeder frame sizes, not demand. Maximum demand governs (cl. 2.2.2).');
+          ratio > 2.5 ? 'High ratio: confirm the maximum demand (AS/NZS 3000 <a href="as3000viewer.html#cl-2.2.2" target="_blank">cl. 2.2.2</a>) suits the incomer.'
+                      : 'Sum of feeder frame sizes, not demand. Maximum demand governs (<a href="as3000viewer.html#cl-2.2.2" target="_blank">cl. 2.2.2</a>).');
       }
       if (usable > 0) {
         const pct = Math.round(100 * spare / usable);
@@ -987,10 +987,10 @@
           pct < 20 ? 'Below the usual 20&ndash;30% allowance for future feeders.' : 'Meets the usual 20&ndash;30% allowance for future feeders.');
       }
       if (incomerA >= 800) {
-        add('warn', 'Arc-fault protection applies (&ge; 800 A)', 'AS/NZS 3000 cl. 2.5.5: internal separation Form 3b/4a/4b (cl. 2.5.5.2), protection settings to cl. 2.5.5.3, or both.');
+        add('warn', 'Arc-fault protection applies (&ge; 800 A)', 'AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.5" target="_blank">cl. 2.5.5</a>: internal separation Form 3b/4a/4b (<a href="as3000viewer.html#cl-2.5.5.2" target="_blank">cl. 2.5.5.2</a>), protection settings to <a href="as3000viewer.html#cl-2.5.5.3" target="_blank">cl. 2.5.5.3</a>, or both.');
       }
       if (incomerA >= 800 || totalW > 3000) {
-        add('warn', 'Two emergency exit paths needed', 'AS/NZS 3000 cl. 2.10.2.2: ' + (incomerA >= 800 ? 'board rated &ge; 800 A' : 'board longer than 3 m') +
+        add('warn', 'Two emergency exit paths needed', 'AS/NZS 3000 <a href="as3000viewer.html#cl-2.10.2.2" target="_blank">cl. 2.10.2.2</a>: ' + (incomerA >= 800 ? 'board rated &ge; 800 A' : 'board longer than 3 m') +
           ', unless 3 m is clear in front of the board.');
       }
       if (lowest !== null && lowest < 300) {
@@ -1014,7 +1014,7 @@
         add('', 'CT chamber is sealed and segregated', 'Only metering CTs and their fuses inside; CTs on the load side of the service protection device (Annexure cl. 2.12.2, 2.12.3, 2.12.7). Submit drawings to the metering provider before manufacture (cl. 2.12.13).');
         if (incomerA > 2000) add('warn', 'Above 2000 A: consult the distributor on CT metering', 'Ausgrid ES3 Part B cl. 7.1.1 (legacy guidance).');
       }
-      add('', 'Depth ' + spec.depth + ' mm assumes front access', 'Typical for a ' + incomerA + ' A ' + spec.device + ' incomer. Allow 1.0 m clear in front (cl. 2.10.2.2).');
+      add('', 'Depth ' + spec.depth + ' mm assumes front access', 'Typical for a ' + incomerA + ' A ' + spec.device + ' incomer. Allow 1.0 m clear in front (<a href="as3000viewer.html#cl-2.10.2.2" target="_blank">cl. 2.10.2.2</a>).');
       document.getElementById('sbChecks').innerHTML = out.join('');
       document.getElementById('incomerNote').innerHTML = spec.device + ' section ' + spec.w + ' W &middot; mains cable zone ' + spec.cableW + ' W &middot; depth ' + spec.depth;
     }
