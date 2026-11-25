@@ -75,7 +75,7 @@
 
     /* Doors */
     .door-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
-    .door-svg .door-g { pointer-events: all; cursor: grab; }
+    .door-svg .door-g { pointer-events: all; cursor: grab; touch-action: none; }
     .door-svg .door-g.dragging { cursor: grabbing; }
     .door-svg .door-hit { fill: transparent; }
     .door-svg .door-g:hover .door-leaf, .door-svg .door-g.dragging .door-leaf { stroke: #2563eb; }
@@ -558,19 +558,26 @@
           ev.preventDefault();
           g.setPointerCapture(ev.pointerId);
           g.classList.add('dragging');
-          const move = e2 => {
+          const ptrPos = e => {
             const r = document.querySelector('#srCanvas .door-svg').getBoundingClientRect(); // svg is rebuilt each move
-            const cw = px(lastRoom.roomD), ch = px(lastRoom.wallW);
-            d.pos = pointToPos(e2.clientX - r.left, e2.clientY - r.top, cw, ch);
+            return pointToPos(e.clientX - r.left, e.clientY - r.top, px(lastRoom.roomD), px(lastRoom.wallW));
+          };
+          // Keep the grab point under the cursor so the door doesn't snap its centre to the pointer
+          let off = d.pos - ptrPos(ev);
+          if (off > 0.5) off -= 1; if (off < -0.5) off += 1;
+          const move = e2 => {
+            d.pos = ((ptrPos(e2) + off) % 1 + 1) % 1;
             renderCanvas();   // boards shift away from the door as it moves
           };
           const up = () => {
             window.removeEventListener('pointermove', move);
             window.removeEventListener('pointerup', up);
+            window.removeEventListener('pointercancel', up);
             updateInfo(lastRoom);
           };
           window.addEventListener('pointermove', move);
           window.addEventListener('pointerup', up);
+          window.addEventListener('pointercancel', up);
         });
       });
       canvas.appendChild(svg);
