@@ -429,7 +429,7 @@
         if (side === 'bottom') tf = `translate(${W - c + dw / 2},${H}) rotate(180)`;
         if (side === 'left')   tf = `translate(0,${H - c + dw / 2}) rotate(270)`;
         const g = mk('g', { class: 'door-g', transform: tf }, svg);
-        mk('rect', { class: 'door-hit', x: -4, y: -8, width: dw + 8, height: dw / (d.type === 'double' ? 2 : 1) + 8 }, g);
+        mk('rect', { class: 'door-hit', x: -4, y: -(dw / (d.type === 'double' ? 2 : 1)) - 4, width: dw + 8, height: dw / (d.type === 'double' ? 2 : 1) + 8 }, g);
         // Gap in wall
         mk('line', { x1: 0, y1: 0, x2: dw, y2: 0, stroke: bg, 'stroke-width': 5 }, g);
         mk('line', { x1: 0, y1: -4, x2: 0, y2: 4, stroke: fg, 'stroke-width': 2 }, g);
@@ -438,13 +438,13 @@
           ? [{ hx: 0, r: dw / 2, dir: 1 }, { hx: dw, r: dw / 2, dir: -1 }]
           : [{ hx: 0, r: dw, dir: 1 }];
         leaves.forEach(l => {
-          mk('line', { class: 'door-leaf', x1: l.hx, y1: 0, x2: l.hx, y2: l.r, stroke: fg, 'stroke-width': 2.5 }, g);
+          mk('line', { class: 'door-leaf', x1: l.hx, y1: 0, x2: l.hx, y2: -l.r, stroke: fg, 'stroke-width': 2.5 }, g);
           const ex = l.hx + l.dir * l.r;
-          mk('path', { d: `M ${l.hx} ${l.r} A ${l.r} ${l.r} 0 0 ${l.dir === 1 ? 0 : 1} ${ex} 0`, fill: 'none', stroke: fg, 'stroke-width': 1, 'stroke-dasharray': '4 3' }, g);
+          mk('path', { d: `M ${l.hx} ${-l.r} A ${l.r} ${l.r} 0 0 ${l.dir === 1 ? 1 : 0} ${ex} 0`, fill: 'none', stroke: fg, 'stroke-width': 1, 'stroke-dasharray': '4 3' }, g);
         });
-        const lbl = mk('text', { x: dw / 2, y: -8, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: fg }, g);
+        const lbl = mk('text', { x: dw / 2, y: 16, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: fg }, g);
         lbl.textContent = 'D' + (idx + 1);
-        if (side === 'bottom' || side === 'left') lbl.setAttribute('transform', `rotate(180 ${dw / 2} -12)`);
+        if (side === 'bottom' || side === 'left') lbl.setAttribute('transform', `rotate(180 ${dw / 2} 12)`);
 
         g.addEventListener('pointerdown', ev => {
           ev.preventDefault();
@@ -564,10 +564,13 @@
       const roomH_px = px(room.wallW);   // canvas height of the room outline
 
       // Reserve space to the right for labels
-      const totalW_px = roomW_px + LBL_GAP + 200;
+      // Doors open outwards: reserve room for swings outside the walls
+      const pad = doors.length ? Math.ceil(px(900)) + 12 : 0;
+      const totalW_px = roomW_px + LBL_GAP + pad + 200;
+      canvas.style.margin = `${pad}px 0 0 ${pad}px`;
 
       canvas.style.width  = totalW_px + 'px';
-      canvas.style.height = (roomH_px + 40) + 'px'; // +40 for scale bar below
+      canvas.style.height = (roomH_px + pad + 40) + 'px'; // +40 for scale bar below
       canvas.innerHTML    = '';
 
       // ── Room outline ──
@@ -697,7 +700,7 @@
 
       // ── Labels with arrows ──
       // Arrow goes from the RIGHT side of the room to a label column
-      const lblX = roomW_px + LBL_GAP;
+      const lblX = roomW_px + LBL_GAP + pad;
 
       // Sort labels by Y so they don't overlap
       labelEntries.sort((a, b) => a.anchorY - b.anchorY);
@@ -713,7 +716,7 @@
         const lineStartX = Math.min(lbl.anchorX + px(lbl.anchorX < roomW_px / 2 ? room.roomD - (lbl.anchorX / SCALE * 1000) : 0), roomW_px);
         el('div', canvas, {
           class: 'lbl-line',
-          style: `left:${lbl.anchorX}px;top:${lineY}px;width:${roomW_px - lbl.anchorX + LBL_GAP - 2}px;height:1px;background:${lbl.color};opacity:0.7;`
+          style: `left:${lbl.anchorX}px;top:${lineY}px;width:${roomW_px - lbl.anchorX + LBL_GAP + pad - 2}px;height:1px;background:${lbl.color};opacity:0.7;`
         });
 
         // Arrow head pointing left (towards board)
@@ -733,7 +736,7 @@
       renderDoors(roomW_px, roomH_px);
 
       // ── Scale bar ──
-      const scaleBar = el('div', canvas, { class: 'scale-bar', style: `left:0;top:${roomH_px + 10}px;` });
+      const scaleBar = el('div', canvas, { class: 'scale-bar', style: `left:0;top:${roomH_px + pad + 10}px;` });
       el('div', scaleBar, { style: `width:${SCALE}px;height:2px;background:var(--text-secondary);` });
       scaleBar.appendChild(document.createTextNode('\u00A01 m'));
 
