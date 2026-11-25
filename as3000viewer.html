@@ -409,13 +409,17 @@
       rowEl.classList.add('active');
       rowEl.scrollIntoView({ block: 'nearest' });
 
-      var page = EXACT_PAGES[cl];
-      if (!page) {
+      /* Prefer the clause heading found in the document; fall back to the map
+         (document page numbers) while the document is loading. */
+      var id = (iframeReady && findClausePage(cl)) ||
+               (EXACT_PAGES[cl] ? pageId(EXACT_PAGES[cl]) : null);
+      if (!id) {
         showToast('Page unknown for clause ' + cl);
         return;
       }
-      goToPage(page);
-      setStatus('Clause ' + cl + ' \u2014 page ' + page, 'ok');
+      pageInput.value = pageNo(id);
+      if (iframeReady) navigateToPage(id); else pendingPageId = id;
+      setStatus('Clause ' + cl + ' \u2014 page ' + pageNo(id), 'ok');
     }
 
     /* ── Toolbar page input ── */
@@ -463,7 +467,9 @@
     function parseInboundHash() {
       var m = window.location.hash.match(/^#cl-(.+)$/);
       if (!m) return;
-      var cl   = m[1];
+      var cl = m[1];
+      try { cl = decodeURIComponent(cl); } catch (e) { /* keep raw */ }
+      pendingClause = cl;
       var page = lookupClause(cl);
       if (page) {
         pendingPageId = pageId(page);
@@ -477,8 +483,46 @@
           }
         });
       } else {
-        showToast('Clause ' + cl + ' not found in page map');
+        /* toast deferred until the text search has also run */
       }
+    }
+
+    /* Find the page holding a clause heading by its text. A heading is a
+       text line that starts with the clause number then a capital letter.
+       Pages before Section 1 (pf24) are the contents list and are skipped.
+       Note: pdf2htmlEX page ids are hexadecimal. */
+    var pendingClause = null;
+    function findClausePage(cl) {
+      try {
+        var doc = frame.contentWindow.document;
+        var pages = doc.querySelectorAll('#page-container > .pf');
+        var esc = cl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        var rx = new RegExp('^' + esc + '(?![.\\d])\\s*[A-Z]');
+        var started = false;
+        for (var i = 0; i < pages.length; i++) {
+          if (!started) { if (pages[i].id === 'pf24') started = true; else continue; }
+          var lines = pages[i].querySelectorAll('.t');
+          for (var j = 0; j < lines.length; j++) {
+            if (rx.test(lines[j].textContent.trim())) return pages[i].id;
+          }
+        }
+      } catch (e) { /* fall back to page map */ }
+      return null;
+    }
+
+    /* pf id -> printed document page number (inverse of pageId) */
+    function pageNo(id) { return parseInt(id.slice(2), 16) - PAGE_OFFSET; }
+
+    /* Once the document is loaded, point each sidebar badge at the page
+       where its clause heading actually is. */
+    function refreshBadges() {
+      document.querySelectorAll('.cl-badge').forEach(function (b) {
+        var id = findClausePage(b.dataset.cl);
+        if (id) {
+          b.textContent = 'p' + pageNo(id);
+          b.title = 'Click to navigate to page ' + pageNo(id);
+        }
+      });
     }
 
     /* ── Start ── */
@@ -487,7 +531,18 @@
       setStatus('Document ready \u2014 click a clause to navigate', 'ok');
 
       /* Resolve inbound hash on first load */
+      refreshBadges();
       parseInboundHash();
+      if (pendingClause) {
+        var found = findClausePage(pendingClause);
+        if (found) {
+          pendingPageId = found;
+          setStatus('Clause ' + pendingClause, 'ok');
+        } else if (!pendingPageId) {
+          showToast('Clause ' + pendingClause + ' not found');
+        }
+        pendingClause = null;
+      }
 
       /* Execute any queued navigation */
       if (pendingPageId) {

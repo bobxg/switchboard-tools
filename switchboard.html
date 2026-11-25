@@ -449,7 +449,7 @@
         <label class="sb-toggle" for="fireServicesChk">
           <input type="checkbox" id="fireServicesChk" />
           <span class="sb-switch"></span>
-          <span><span class="sb-tlabel">Fire / Safety Services</span><span class="sb-tsub">Segregated section with its own main switches (AS/NZS 3000 cl. 7.2)</span></span>
+          <span><span class="sb-tlabel">Fire / Safety Services</span><span class="sb-tsub">Segregated section with its own main switches (AS/NZS 3000 <a href="as3000viewer.html#cl-7.2" target="_blank">cl. 7.2</a>)</span></span>
         </label>
         <label class="sb-toggle" for="ctMeterChk">
           <input type="checkbox" id="ctMeterChk" />
@@ -1015,8 +1015,8 @@
       if (sum > 0) {
         const ratio = sum / incomerA;
         add(ratio > 2.5 ? 'warn' : 'ok', 'Feeders total ' + sum + ' A &mdash; ' + ratio.toFixed(1) + ' &times; incomer',
-          ratio > 2.5 ? 'High ratio: confirm the maximum demand (AS/NZS 3000 cl. 2.2.2) suits the incomer.'
-                      : 'Sum of feeder frame sizes, not demand. Maximum demand governs (cl. 2.2.2).');
+          ratio > 2.5 ? 'High ratio: confirm the maximum demand (AS/NZS 3000 <a href="as3000viewer.html#cl-2.2.2" target="_blank">cl. 2.2.2</a>) suits the incomer.'
+                      : 'Sum of feeder frame sizes, not demand. Maximum demand governs (<a href="as3000viewer.html#cl-2.2.2" target="_blank">cl. 2.2.2</a>).');
       }
       if (usable > 0) {
         const pct = Math.round(100 * spare / usable);
@@ -1027,10 +1027,10 @@
       if (incomerA >= 800) {
         if (formKey === '2b') {
           add('fail', formName + ' does not meet the internal separation route (&ge; 800 A)',
-            'AS/NZS 3000 cl. 2.5.5.2 requires functional units separated from one another (Form 3b, 4a, 4b or their i/h variants). Otherwise limit arc effects to cl. 2.5.5.3.');
+            'AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.5.2" target="_blank">cl. 2.5.5.2</a> requires functional units separated from one another (Form 3b, 4a, 4b or their i/h variants). Otherwise limit arc effects to <a href="as3000viewer.html#cl-2.5.5.3" target="_blank">cl. 2.5.5.3</a>.');
         } else {
-          add('ok', formName + ' meets the internal separation route of cl. 2.5.5.2 (&ge; 800 A)',
-            'AS/NZS 3000 cl. 2.5.5 and Appendix K6.2. Mark the form and IP rating on the board (App. K8.1).' +
+          add('ok', formName + ' meets the internal separation route of <a href="as3000viewer.html#cl-2.5.5.2" target="_blank">cl. 2.5.5.2</a> (&ge; 800 A)',
+            'AS/NZS 3000 <a href="as3000viewer.html#cl-2.5.5" target="_blank">cl. 2.5.5</a> and <a href="as3000viewer.html#cl-K6.2" target="_blank">Appendix K6.2</a>. Mark the form and IP rating on the board (<a href="as3000viewer.html#cl-K8.1" target="_blank">App. K8.1</a>).' +
             (fireUnits ? ' The safety services section is also separated from the general section.' : ''));
         }
       }
@@ -1039,7 +1039,7 @@
           'Some client standards (e.g. University of Sydney, Snowy Hydro, Urban Utilities) do not accept the i/h variants. Limited to the insulated chassis rating.');
       }
       if (incomerA >= 800 || totalW > 3000) {
-        add('warn', 'Two emergency exit paths needed', 'AS/NZS 3000 cl. 2.10.2.2: ' + (incomerA >= 800 ? 'board rated &ge; 800 A' : 'board longer than 3 m') +
+        add('warn', 'Two emergency exit paths needed', 'AS/NZS 3000 <a href="as3000viewer.html#cl-2.10.2.2" target="_blank">cl. 2.10.2.2</a>: ' + (incomerA >= 800 ? 'board rated &ge; 800 A' : 'board longer than 3 m') +
           ', unless 3 m is clear in front of the board.');
       }
       if (lowest !== null && lowest < 300) {
@@ -1048,13 +1048,13 @@
       // ── Safety services (AS/NZS 3000 cl. 7.2) ──
       if (fireUnits) {
         add('warn', 'Safety services: confirm main switch arrangement',
-          'AS/NZS 3000 cl. 7.2.4.2: their main switches shall be on the supply side of all general main switches, not controlled by any of them, and control only safety services. The ' + incomerA + ' A incomer may stay upstream only as a supply isolating device for authorized persons, e.g. locked on (cl. 7.2.4.2 Exception). A separate general installation main switch is then required (cl. 2.3.3.2) and is not drawn.');
+          'AS/NZS 3000 <a href="as3000viewer.html#cl-7.2.4.2" target="_blank">cl. 7.2.4.2</a>: their main switches shall be on the supply side of all general main switches, not controlled by any of them, and control only safety services. The ' + incomerA + ' A incomer may stay upstream only as a supply isolating device for authorized persons, e.g. locked on (<a href="as3000viewer.html#cl-7.2.4.2" target="_blank">cl. 7.2.4.2</a> Exception). A separate general installation main switch is then required (<a href="as3000viewer.html#cl-2.3.3.2" target="_blank">cl. 2.3.3.2</a>) and is not drawn.');
         add(fireUnnamed ? 'warn' : 'ok', fireUnnamed ? fireUnnamed + ' of ' + fireUnits + ' safety services main switch' + (fireUnits > 1 ? 'es' : '') + ' not named' : 'Safety services main switches named',
-          'cl. 7.2.4.4: mark each MAIN SWITCH with the equipment it controls and IN THE EVENT OF FIRE, DO NOT SWITCH OFF. One main switch per type of service (cl. 7.2.4.1). Double-click a unit to name it.');
+          '<a href="as3000viewer.html#cl-7.2.4.4" target="_blank">cl. 7.2.4.4</a>: mark each MAIN SWITCH with the equipment it controls and IN THE EVENT OF FIRE, DO NOT SWITCH OFF. One main switch per type of service (<a href="as3000viewer.html#cl-7.2.4.1" target="_blank">cl. 7.2.4.1</a>). Double-click a unit to name it.');
         add('warn', 'Metal partition between safety services and general switchgear',
-          'cl. 7.2.3.2 (red line on the drawing). Wiring inside the board: 50 mm or effective barriers from all other wiring, including other safety services (cl. 7.2.3.3).');
+          '<a href="as3000viewer.html#cl-7.2.3.2" target="_blank">cl. 7.2.3.2</a> (red line on the drawing). Wiring inside the board: 50 mm or effective barriers from all other wiring, including other safety services (<a href="as3000viewer.html#cl-7.2.3.3" target="_blank">cl. 7.2.3.3</a>).');
         add('warn', 'Discrimination with safety services not checked',
-          'cl. 7.2.3.5 and 2.5.7.2.2: a fault on the general installation shall not cause loss of supply to safety services.');
+          '<a href="as3000viewer.html#cl-7.2.3.5" target="_blank">cl. 7.2.3.5</a> and <a href="as3000viewer.html#cl-2.5.7.2.2" target="_blank">2.5.7.2.2</a>: a fault on the general installation shall not cause loss of supply to safety services.');
       }
 
       // ── CT metering (NSW S&IR Metering Annexure, July 2018) ──
@@ -1075,7 +1075,7 @@
         add('', 'CT chamber is sealed and segregated', 'Only metering CTs and their fuses inside; CTs on the load side of the service protection device (Annexure cl. 2.12.2, 2.12.3, 2.12.7). Submit drawings to the metering provider before manufacture (cl. 2.12.13).');
         if (incomerA > 2000) add('warn', 'Above 2000 A: consult the distributor on CT metering', 'Ausgrid ES3 Part B cl. 7.1.1 (legacy guidance).');
       }
-      add('', 'Depth ' + spec.depth + ' mm assumes front access', 'Typical for a ' + incomerA + ' A ' + spec.device + ' incomer. Allow 1.0 m clear in front (cl. 2.10.2.2).');
+      add('', 'Depth ' + spec.depth + ' mm assumes front access', 'Typical for a ' + incomerA + ' A ' + spec.device + ' incomer. Allow 1.0 m clear in front (<a href="as3000viewer.html#cl-2.10.2.2" target="_blank">cl. 2.10.2.2</a>).');
       document.getElementById('sbChecks').innerHTML = out.join('');
       document.getElementById('incomerNote').innerHTML = spec.device + ' section ' + spec.w + ' W &middot; mains cable zone ' + spec.cableW + ' W &middot; depth ' + spec.depth;
     }
