@@ -444,7 +444,8 @@
     function parseInboundHash() {
       var m = window.location.hash.match(/^#cl-(.+)$/);
       if (!m) return;
-      var cl   = decodeURIComponent(m[1]);
+      var cl = m[1];
+      try { cl = decodeURIComponent(cl); } catch (e) { /* keep raw */ }
       pendingClause = cl;
       var page = lookupClause(cl);
       if (page) {
@@ -459,7 +460,7 @@
           }
         });
       } else {
-        showToast('Clause ' + cl + ' not found in page map');
+        /* toast deferred until the text search has also run */
       }
     }
 
@@ -472,7 +473,7 @@
       try {
         var doc = frame.contentWindow.document;
         var pages = doc.querySelectorAll('#page-container > .pf');
-        var esc = cl.replace(/\./g, '\\.');
+        var esc = cl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         var rx = new RegExp('^' + esc + '(?![.\\d])\\s*[A-Z]');
         var started = false;
         for (var i = 0; i < pages.length; i++) {
@@ -498,6 +499,8 @@
         if (found) {
           pendingPageId = found;
           setStatus('Clause ' + pendingClause, 'ok');
+        } else if (!pendingPageId) {
+          showToast('Clause ' + pendingClause + ' not found');
         }
         pendingClause = null;
       }
