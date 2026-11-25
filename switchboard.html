@@ -540,14 +540,15 @@
     /* Form of internal separation (AS/NZS 61439.2) sets the default feeder compartment
        heights and cable zone width. Size order: 2b < 3bih < 3b < 4a / 4b. */
     const FORM_PRESETS = {
-      // No cell per breaker, several devices per kit (Hager: 2 x 250 A in a 300 high kit);
-      // 400 A horizontal kit 200 (Siemens S4, ABB); 630/800 A Hager single-device kits
-      '2b':   { h: { '800A': 400,  '630A': 300, '400A': 200, '250A': 150 }, cableW: 400,
-                note: 'Units not separated from each other: the most compact form. Heights are catalogue kit heights without a cell per breaker.' },
+      // Several devices per kit, allowed only in 2b (Hager quadro evo 3.7.2.1): 2 x P250 in
+      // 300 x 600 -> 150; 2 x P630 (250-630 A) in 400 x 600 -> 200; H1000 single kit 400 x 600
+      '2b':   { h: { '800A': 400,  '630A': 200, '400A': 200, '250A': 150 }, cableW: 400,
+                note: 'Units not separated from each other: the most compact form. Heights are Hager two-devices-per-kit sizes (2b only).' },
       '3b':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: '' },
-      // Between 2b and 3b (owner's practice): insulated chassis plus shrouds and terminal covers
+      // One device per kit/row: Hager single-device kits 250 A 200, 400 A 300; NHP XBP/XCP
+      // insulated chassis pitch + 50 busbar extension each end gives 155 and ~305. 630/800 A judgement.
       '3bih': { h: { '800A': 600,  '630A': 400, '400A': 300, '250A': 200 }, cableW: 400,
-                note: 'Insulated busbars and the breakers&rsquo; IP2X housings provide the separation. Sized between Form 2b and 3b from practice, not from a catalogue.' },
+                note: 'Insulated busbars and the breakers&rsquo; IP2X housings provide the separation. 250/400 A from catalogue kits and NHP chassis; 630/800 A are judgement (no insulated chassis found for these frames).' },
       // 3b + 100: cable terminates inside each compartment (step from Eaton Form 4 box solution, +50 to +100)
       '4a':   { h: { '800A': 1100, '630A': 700, '400A': 500, '250A': 300 }, cableW: 400,
                 note: 'Cable terminates inside each compartment. The +100 mm over Form 3b is an assumption; some systems (Siemens SIVACON S4) use the same height.' },

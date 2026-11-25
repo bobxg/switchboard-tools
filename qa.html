@@ -177,8 +177,8 @@ Rating   Cubicle W &times; H     Basis
       <h3>Form of Separation</h3>
       <div class="formula-box">
 Form    250 A   400 A   630 A   800 A   Cable zone W   Basis
-2b      150     200     300     400     400            no cell per breaker; Hager (2 x 250 A per 300 kit), Siemens/ABB 400 A kit, Hager 630/800 A kits
-3bih    200     300     400     600     400            between 2b and 3b, from practice (insulated chassis plus shrouds); not catalogue-sourced
+2b      150     200     200     400     400            Hager two-devices-per-kit (2b only): 2 x 250 A in 300, 2 x 630 A in 400; 800 A single kit 400
+3bih    200     300     400     600     400            250/400 A: Hager single-device kits 200/300, NHP chassis pitch; 630/800 A judgement
 3b      200     400     600     1000    400            tool defaults, cross-checked earlier
 4a      300     500     700     1100    400            3b + 100 (assumption; step from Eaton Form 4 box solution)
 4b      200     400     600     1000    600            same cell as 3b (ABB, Hager); + 200 for terminal boxes (Prisma W200)
@@ -187,6 +187,10 @@ Form    250 A   400 A   630 A   800 A   Cable zone W   Basis
         <dl>
           <dt>Definitions</dt>
           <dd>Forms 2b, 3b, 4a and 4b as AS/NZS 3000:2018 Appendix K Table K2 (from AS/NZS 61439.2). 3bih is Form 3b achieved by insulated busbars (i) and the devices' own housings (h).</dd>
+          <dt>Form 2b against 3bih</dt>
+          <dd>Where 3bih is built one device per kit or row, it is larger than 2b, which can put two devices in one kit (Hager quadro evo handbook, section 3.7.2.1: "In case of more than 1 device per kit, the maximum reachable form of segregation is 2b"). Cleantech Controls: "Form 2 panels are generally smaller than Form 3 or 4 switchboards." Against: BEAMA's guide says integral-housing separation "will lead to the most compact assembly", and an insulated chassis board is the same size whatever form it is declared as. No source compares 3bih with 2b in millimetres.</dd>
+          <dt>Sources</dt>
+          <dd>Hager quadro evo handbook pp.122-146 (https://assets1.sc.hager.com/romania/PDF/Manual_utilizare_quadro_evo_EN.pdf); NHP Circuit Protection 2025 Pocket Book pp.253-256 (https://www.nhp.com.au/public/assets/pim/Original/10046/NHP-Circuit-Protection-2025-Product-Pocket-Book.pdf); Dara Guide to Form of Separation (https://electricalswitchboards.com.au/wp-content/uploads/2019/02/Guid-to-form-of-separations.pdf); BEAMA guide to forms of separation p.14 (https://www.beama.org.uk/static/uploaded/b5e14439-8479-4774-a196955a2fbeca7e.pdf); Cleantech Controls (https://www.cleantechcontrols.com.au/forms-of-segregation/).</dd>
           <dt>What is not verified</dt>
           <dd>No catalogue read gives a different compartment height for Form 4a than Form 3b, or a cable zone width by form: the 4a heights and the 4b cable zone are assumptions. No insulated chassis was verified for 630 or 800 A frames. Tier width, incomer width, busbar chamber and depth do not change with form in any source read.</dd>
           <dt>Check</dt>
