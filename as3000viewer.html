@@ -301,8 +301,9 @@
         var badge = document.createElement('span');
         badge.className = 'cl-badge exact';
         badge.dataset.cl = c.cl;
-        badge.title = 'Click to navigate to page ' + (EXACT_PAGES[c.cl] || '?');
-        badge.textContent = EXACT_PAGES[c.cl] ? 'p' + EXACT_PAGES[c.cl] : '?';
+        var mapped = EXACT_PAGES[c.cl] ? parseInt(String(EXACT_PAGES[c.cl]), 16) : 0;
+        badge.title = 'Click to navigate to page ' + (mapped || '?');
+        badge.textContent = mapped ? 'p' + mapped : '?';
 
         clBtn.addEventListener('click', function () { tocNav(c.cl, row); });
         badge.addEventListener('click', function () { tocNav(c.cl, row); });
@@ -327,7 +328,7 @@
       page = parseInt(page, 10);
       if (!page || page < 1) return;
       pageInput.value = page;
-      var targetId = 'pf' + page;
+      var targetId = 'pf' + page.toString(16); /* pdf2htmlEX page ids are hex */
       if (iframeReady) {
         navigateToPage(targetId);
       } else {
@@ -390,13 +391,17 @@
       rowEl.classList.add('active');
       rowEl.scrollIntoView({ block: 'nearest' });
 
-      var page = EXACT_PAGES[cl];
-      if (!page) {
+      /* Prefer the clause heading found in the document; fall back to the map
+         (whose values are hex page ids) while the document is loading. */
+      var id = (iframeReady && findClausePage(cl)) ||
+               (EXACT_PAGES[cl] ? 'pf' + EXACT_PAGES[cl] : null);
+      if (!id) {
         showToast('Page unknown for clause ' + cl);
         return;
       }
-      goToPage(page);
-      setStatus('Clause ' + cl + ' \u2014 page ' + page, 'ok');
+      pageInput.value = pageNo(id);
+      if (iframeReady) navigateToPage(id); else pendingPageId = id;
+      setStatus('Clause ' + cl + ' \u2014 page ' + pageNo(id), 'ok');
     }
 
     /* ── Toolbar page input ── */
@@ -487,12 +492,27 @@
       return null;
     }
 
+    function pageNo(id) { return parseInt(id.slice(2), 16); }
+
+    /* Once the document is loaded, point each sidebar badge at the page
+       where its clause heading actually is. */
+    function refreshBadges() {
+      document.querySelectorAll('.cl-badge').forEach(function (b) {
+        var id = findClausePage(b.dataset.cl);
+        if (id) {
+          b.textContent = 'p' + pageNo(id);
+          b.title = 'Click to navigate to page ' + pageNo(id);
+        }
+      });
+    }
+
     /* ── Start ── */
     frame.addEventListener('load', function () {
       iframeReady = true;
       setStatus('Document ready \u2014 click a clause to navigate', 'ok');
 
       /* Resolve inbound hash on first load */
+      refreshBadges();
       parseInboundHash();
       if (pendingClause) {
         var found = findClausePage(pendingClause);
