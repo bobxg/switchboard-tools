@@ -177,8 +177,8 @@ Rating   Cubicle W &times; H     Basis
       <h3>Form of Separation</h3>
       <div class="formula-box">
 Form    250 A   400 A   630 A   800 A   Cable zone W   Basis
-3bih    150     200     300     400     400            NHP insulated chassis pitch (250/400 A); Siemens S4 kit heights (630/800 A)
-2b      200     300     300     400     400            Hager quadro evo single-device kit heights
+2b      150     200     300     400     400            no cell per breaker; Hager (2 x 250 A per 300 kit), Siemens/ABB 400 A kit, Hager 630/800 A kits
+3bih    200     300     400     600     400            between 2b and 3b, from practice (insulated chassis plus shrouds); not catalogue-sourced
 3b      200     400     600     1000    400            tool defaults, cross-checked earlier
 4a      300     500     700     1100    400            3b + 100 (assumption; step from Eaton Form 4 box solution)
 4b      200     400     600     1000    600            same cell as 3b (ABB, Hager); + 200 for terminal boxes (Prisma W200)
@@ -193,6 +193,9 @@ Form    250 A   400 A   630 A   800 A   Cable zone W   Basis
           <dd>At 800 A or more, AS/NZS 3000 cl. 2.5.5.2 lists Forms 3b, 4a, 4b and their i/h variants. Form 2b is flagged as not meeting that route.</dd>
         </dl>
       </div>
+
+      <h3>General Installation Main Switch</h3>
+      <p>With a safety services section, the board is drawn as AS/NZS 3000 Figure 7.2(A): the incomer is the supply isolating device (locked on, authorized persons only; cl. 7.2.4.2 Exception), the safety services main switches are on its load side, and the general installation has its own main switch column, the same width and rating as the incomer, ahead of the general feeders (cl. 2.3.3.2).</p>
 
       <h3>Incoming Section</h3>
       <div class="formula-box">
