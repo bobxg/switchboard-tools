@@ -41,8 +41,11 @@
   <div class="top-tabs"></div>
   <div class="main-content">
     <h1>Meter Panel Sizer</h1>
-    <p>Size a multi-occupancy metering cubicle for residential or commercial developments. Dimensions are based on
-       <strong>Ausgrid NUS 080</strong> / <strong>Endeavour Energy / Essential Energy</strong> metering cubicle standards (NSW) and <strong>AS/NZS&nbsp;61439</strong>.</p>
+    <p>Size a multi-occupancy whole-current (direct-connected, &le; 80 A per phase) meter panel for NSW developments.
+       Rules are taken from the <a href="https://www.energy.nsw.gov.au/sites/default/files/2026-05/Service-and-Installation-Rules-NSW-April-2026.pdf" target="_blank" rel="noopener">Service and Installation Rules of NSW, April 2026</a>
+       and the <a href="https://www.energy.nsw.gov.au/sites/default/files/2022-08/2018_07_NSW_AnnexureToServiceAndInstallationRulesOfNSW.pdf" target="_blank" rel="noopener">Metering Annexure, July 2018</a>, which the Rules adopt as the Metering Installation
+       Requirements (S&amp;IR cl. 1.9.26). Neither sets meter position size, meters per column or cubicle dimensions: those values are
+       <strong>typical only</strong> and must be confirmed with the Metering Coordinator / Metering Provider and the enclosure manufacturer.</p>
 
     <div class="mp-wrap">
 
@@ -52,12 +55,18 @@
           <h2>Configuration</h2>
 
           <div class="input-group" style="margin-bottom:16px;">
-            <label for="dnsp">DNSP / Network Provider</label>
-            <select id="dnsp" class="sel-full" onchange="draw()">
-              <option value="ausgrid" selected>Ausgrid (Sydney, Newcastle, Central Coast)</option>
-              <option value="endeavour">Endeavour Energy (Greater Western Sydney, Wollongong)</option>
-              <option value="essential">Essential Energy (Regional NSW)</option>
-            </select>
+            <label for="mdA">Maximum demand per tenancy (A per phase)</label>
+            <input type="number" class="sel-full" id="mdA" value="63" min="1" max="2000" oninput="draw()" />
+            <span style="font-size:0.8em;color:var(--text-secondary);display:block;margin-top:4px;">Whole-current metering only up to 80 A per phase (Metering Annexure cl. 2.1).</span>
+          </div>
+
+          <div class="input-group" style="margin-bottom:16px;">
+            <label for="mainsA">Incoming service / consumer mains rating (A)</label>
+            <input type="number" class="sel-full" id="mainsA" value="400" min="0" max="4000" oninput="draw()" />
+            <div class="chk-row" style="margin-top:6px;">
+              <input type="checkbox" id="spacedCond" onchange="draw()" />
+              <span>Spaced single-core conductors or busbars near meters</span>
+            </div>
           </div>
 
           <div class="input-group" style="margin-bottom:16px;">
@@ -86,7 +95,7 @@
               <input type="number" class="mini-num" id="numCommon" value="2" min="1" max="20" oninput="draw()" />
               <span>common area position(s)</span>
             </div>
-            <span style="font-size:0.8em;color:var(--text-secondary);display:block;margin-top:4px;">Common area meters use same position size as tenancy meters.</span>
+            <span style="font-size:0.8em;color:var(--text-secondary);display:block;margin-top:4px;">Common area meters are drawn at the same (typical) position size.</span>
           </div>
 
           <div class="input-group" style="margin-bottom:16px;">
@@ -128,10 +137,10 @@
             <div class="legend-item"><div class="legend-swatch" style="background:rgba(59,130,246,0.18);border-color:#3b82f6;"></div>Tenancy meter position (MP.svg)</div>
             <div class="legend-item"><div class="legend-swatch" style="background:rgba(34,197,94,0.18);border-color:#22c55e;"></div>Common area position (MP.svg)</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#e0e7ef;border-color:#6b7280;"></div>Incoming supply / isolator</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:repeating-linear-gradient(45deg,#d1d5db,#d1d5db 2px,#f9fafb 2px,#f9fafb 8px);border-color:#9ca3af;"></div>Cable duct (100 mm)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:repeating-linear-gradient(45deg,#d1d5db,#d1d5db 2px,#f9fafb 2px,#f9fafb 8px);border-color:#9ca3af;"></div>Cable duct (100 mm, typical)</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#fef9c3;border-color:#ca8a04;"></div>Cable gland / entry zone</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:rgba(34,197,94,0.12);border-color:#22c55e;border-style:dashed;"></div>Accessible working zone (300–1800 mm AGL)</div>
-            <div class="legend-item"><div class="legend-swatch" style="background:rgba(239,68,68,0.07);border-color:#ef4444;border-style:dashed;"></div>50 mm buffer zone around position</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:rgba(34,197,94,0.12);border-color:#22c55e;border-style:dashed;"></div>Meter zone (600&ndash;2000 mm AGL, Metering Annexure cl. 2.13)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:rgba(239,68,68,0.07);border-color:#ef4444;border-style:dashed;"></div>50 mm spacing around position (typical, not a rule)</div>
           </div>
         </div>
       </div>
@@ -144,7 +153,7 @@
             <svg id="panelSvg" xmlns="http://www.w3.org/2000/svg"></svg>
           </div>
           <div style="font-size:0.78em;color:var(--text-secondary);margin-top:6px;">
-            Diagram is schematic only — not to scale. Confirm all dimensions with the switchboard manufacturer and your DNSP metering cubicle specification.
+            Diagram is schematic only — not to scale. Confirm all dimensions with the switchboard manufacturer and the Metering Coordinator / Metering Provider.
           </div>
         </div>
       </div>
@@ -152,111 +161,77 @@
 
     <!-- DNSP Specs Reference Table -->
     <div class="calc-section" style="margin-top:8px;">
-      <h2>NSW DNSP Metering Position Standards</h2>
+      <h2>NSW Meter Panel Requirements (whole-current)</h2>
       <div class="info-box" style="margin-bottom:10px;">
-        Position dimensions and arrangement rules sourced from <strong>Ausgrid NUS 080</strong>, <strong>Endeavour Energy Metering Cubicle Standard</strong>, and <strong>Essential Energy Customer Installation Requirements</strong>.
-        These standards specify minimum requirements — the metering cubicle manufacturer must provide type-tested enclosures to <strong>AS/NZS 61439.1</strong>.
+        Requirements below are from the <a href="https://www.energy.nsw.gov.au/sites/default/files/2026-05/Service-and-Installation-Rules-NSW-April-2026.pdf" target="_blank" rel="noopener">S&amp;IR NSW (April 2026)</a> and the
+        <a href="https://www.energy.nsw.gov.au/sites/default/files/2022-08/2018_07_NSW_AnnexureToServiceAndInstallationRulesOfNSW.pdf" target="_blank" rel="noopener">Metering Annexure (July 2018)</a>. Rows marked <strong>Typical</strong> have no published NSW source.
+        Enclosures to AS/NZS 3000 or AS/NZS 61439 as appropriate (S&amp;IR cl. 4.5.2). The meter height limits are stated in the
+        Annexure&rsquo;s CT metering clause; this tool applies them to whole-current meters as a design limit.
       </div>
       <div style="overflow-x:auto;">
         <table class="spec-table">
-          <thead>
-            <tr>
-              <th>Parameter</th>
-              <th>Ausgrid</th>
-              <th>Endeavour Energy</th>
-              <th>Essential Energy</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Parameter</th><th>Value</th><th>Source</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>1-phase position W × H</td><td>173 × 263 mm</td><td>173 × 263 mm</td><td>173 × 263 mm</td></tr>
-            <tr><td>3-phase position W × H</td><td>173 × 263 mm</td><td>173 × 263 mm</td><td>173 × 263 mm</td></tr>
-            <tr><td>Max positions per column (1ph)</td><td>5</td><td>5</td><td>4</td></tr>
-            <tr><td>Max positions per column (3ph)</td><td>3</td><td>3</td><td>3</td></tr>
-            <tr><td>Max columns per panel section</td><td>2</td><td>2</td><td>2</td></tr>
-            <tr><td>Max positions per section (1ph)</td><td>10</td><td>10</td><td>8</td></tr>
-            <tr><td>Max positions per section (3ph)</td><td>6</td><td>6</td><td>6</td></tr>
-            <tr><td>Cable duct width (per section)</td><td>100 mm</td><td>100 mm</td><td>100 mm</td></tr>
-            <tr><td>Incoming isolator compartment height</td><td>400 mm</td><td>400 mm</td><td>350 mm</td></tr>
-            <tr><td>Underground cable gland zone (base)</td><td>300 mm</td><td>300 mm</td><td>300 mm</td></tr>
-            <tr><td>Min. height of lowest meter AGL</td><td>300 mm</td><td>300 mm</td><td>300 mm</td></tr>
-            <tr><td>Max. height of highest meter AGL</td><td>1800 mm</td><td>1800 mm</td><td>1700 mm</td></tr>
-            <tr><td>Working zone height (usable)</td><td>1500 mm</td><td>1500 mm</td><td>1400 mm</td></tr>
-            <tr><td>Outdoor enclosure IP rating (min.)</td><td>IP54</td><td>IP55</td><td>IP54</td></tr>
-            <tr><td>Indoor enclosure IP rating (min.)</td><td>IP31</td><td>IP31</td><td>IP31</td></tr>
-            <tr><td>Panel depth — outdoor</td><td>300 mm</td><td>300 mm</td><td>300 mm</td></tr>
-            <tr><td>Panel depth — indoor</td><td>250 mm</td><td>250 mm</td><td>250 mm</td></tr>
-            <tr><td>Min. working clearance in front</td><td>1000 mm</td><td>1000 mm</td><td>1000 mm</td></tr>
-            <tr><td>Smart meter model (typical)</td><td>Landis+Gyr E350 / Itron ACE9000</td><td>Landis+Gyr E350</td><td>Landis+Gyr E350</td></tr>
+            <tr><td>Lowest metering equipment</td><td>&ge; 600 mm above floor/ground</td><td>Annexure 2.13(b)</td><td>Rule (CT clause, applied here)</td></tr>
+            <tr><td>Top edge of meter</td><td>&le; 2000 mm above floor/ground</td><td>Annexure 2.13(a)</td><td>Rule (CT clause, applied here)</td></tr>
+            <tr><td>Clear space in front</td><td>600 mm horizontal &times; 2000 mm high</td><td>S&amp;IR 4.2(c); Annexure 2.2</td><td>Rule</td></tr>
+            <tr><td>Hinged panel open 90&deg;</td><td>200 mm to any fixed object</td><td>S&amp;IR 4.2</td><td>Rule</td></tr>
+            <tr><td>Panel face to enclosure door</td><td>175 mm</td><td>S&amp;IR 4.2</td><td>Rule</td></tr>
+            <tr><td>Recessed enclosure</td><td>50 mm from the building</td><td>Annexure 2.2</td><td>Rule</td></tr>
+            <tr><td>Equipment to hinged edge</td><td>&ge; 32 mm</td><td>S&amp;IR 4.5.1; Annexure 2.5.7</td><td>Rule</td></tr>
+            <tr><td>Obstructions below the panel</td><td>&le; 300 mm projection from the wall</td><td>S&amp;IR 4.2</td><td>Rule</td></tr>
+            <tr><td>Service protection device</td><td>top &le; 2000 mm, line terminals &ge; 500 mm above floor</td><td>S&amp;IR 4.7.2(c)</td><td>Rule</td></tr>
+            <tr><td>Whole-current metering</td><td>maximum demand &le; 80 A per phase</td><td>Annexure 2.1</td><td>Rule</td></tr>
+            <tr><td>Meter protection device</td><td>one per meter, &le; 80 A; fuse base &ge; 100 A, sealable</td><td>Annexure 2.8.1, 2.8.2</td><td>Rule</td></tr>
+            <tr><td>Spacing to high-current conductors</td><td>Table 2-2 (150 A nil &hellip; 400 A 500 mm &hellip; 1000 A 900 mm)</td><td>Annexure 2.10</td><td>Rule</td></tr>
+            <tr><td>Meter panel material</td><td>non-metallic / non-conductive to IEC 60893-1</td><td>Annexure 2.9.4; S&amp;IR 4.12.1</td><td>Rule</td></tr>
+            <tr><td>Grouping</td><td>one metering position accessible to all tenants, not inside any occupancy</td><td>Annexure 2.2.3</td><td>Rule</td></tr>
+            <tr><td>Labelling</td><td>occupancy identification on each meter; doors &ldquo;Electricity Meters&rdquo;</td><td>Annexure 2.9.6, 2.2</td><td>Rule</td></tr>
+            <tr><td>Enclosure IP rating</td><td>none specified &mdash; protect from weather, damage, corrosion, vandalism</td><td>S&amp;IR 4.5.4; Annexure 2.5.3</td><td>Not specified</td></tr>
+            <tr><td>Meter position</td><td>173 &times; 263 mm</td><td>none</td><td>Typical &mdash; confirm with MC/MP</td></tr>
+            <tr><td>Positions per column / columns</td><td>5 (1-ph) or 3 (3-ph) / 2</td><td>none</td><td>Typical</td></tr>
+            <tr><td>Cable duct / incoming compartment / gland zone</td><td>100 / 400 / 300 mm</td><td>none</td><td>Typical</td></tr>
+            <tr><td>Enclosure depth</td><td>300 outdoor / 250 indoor</td><td>none</td><td>Typical &mdash; confirm with manufacturer</td></tr>
           </tbody>
         </table>
       </div>
       <div class="warn-box" style="margin-top:12px;">
-        <strong>Always verify with your DNSP.</strong> Standards are updated periodically. Contact Ausgrid (1300 137 078), Endeavour Energy (02 9853 6000), or Essential Energy (132 391) for current requirements before finalising design drawings.
-        Underground cable entry requires watertight glands and conduit seal rated to the outdoor IP classification.
+        <strong>Confirm before finalising drawings.</strong> Meter type, space and panel layout with the Metering Coordinator / Metering Provider
+        (Metering Annexure cl. 2.5.1(b), 2.2.3.1), and service equipment with the electricity distributor.
       </div>
     </div>
   </div>
 
   <script>
     // ══════════════════════════════════════════════════════════════
-    // DNSP specification data (based on published DNSP standards)
+    // NSW rules (sourced) and typical fabrication values (no NSW source)
     // ══════════════════════════════════════════════════════════════
-    const DNSP_SPECS = {
-      ausgrid: {
-        name: 'Ausgrid',
-        pos1ph:  { w: 173, h: 263 },
-        pos3ph:  { w: 173, h: 263 },
-        maxRows1ph: 5,
-        maxRows3ph: 3,
-        maxCols:    2,
-        ductW:     100,
-        incomingH: 400,
-        glandH:    300,
-        minAGL:    300,
-        maxAGL:   1800,
-        depthOut:  300,
-        depthIn:   250,
-        ipOut:    'IP54',
-        ipIn:     'IP31',
-        sectionGap: 20
-      },
-      endeavour: {
-        name: 'Endeavour Energy',
-        pos1ph:  { w: 173, h: 263 },
-        pos3ph:  { w: 173, h: 263 },
-        maxRows1ph: 5,
-        maxRows3ph: 3,
-        maxCols:    2,
-        ductW:     100,
-        incomingH: 400,
-        glandH:    300,
-        minAGL:    300,
-        maxAGL:   1800,
-        depthOut:  300,
-        depthIn:   250,
-        ipOut:    'IP55',
-        ipIn:     'IP31',
-        sectionGap: 20
-      },
-      essential: {
-        name: 'Essential Energy',
-        pos1ph:  { w: 173, h: 263 },
-        pos3ph:  { w: 173, h: 263 },
-        maxRows1ph: 4,
-        maxRows3ph: 3,
-        maxCols:    2,
-        ductW:     100,
-        incomingH: 350,
-        glandH:    300,
-        minAGL:    300,
-        maxAGL:   1700,
-        depthOut:  300,
-        depthIn:   250,
-        ipOut:    'IP54',
-        ipIn:     'IP31',
-        sectionGap: 20
-      }
+    const NSW_RULES = {
+      minAGL: 600,          // Metering Annexure Jul 2018 cl. 2.13(b) (CT clause, applied as design limit)
+      maxAGL: 2000,         // Metering Annexure cl. 2.13(a) (top edge of meter)
+      clearFrontH: 600, clearFrontV: 2000,   // S&IR Apr 2026 cl. 4.2(c); Annexure cl. 2.2
+      openPanelClear: 200,  // S&IR cl. 4.2
+      panelToDoor: 175,     // S&IR cl. 4.2
+      hingeEdgeMin: 32,     // S&IR cl. 4.5.1; Annexure cl. 2.5.7
+      spdTopMax: 2000, spdLineTermMin: 500,  // S&IR cl. 4.7.2(c)
+      wcMaxA: 80,           // Annexure cl. 2.1
+      // Annexure Table 2-2: conductor current (A) -> minimum spacing to metering equipment (mm)
+      hcSpacing: [[150, 0], [200, 100], [400, 500], [600, 700], [1000, 900], [1500, 1200], [2000, 1400], [3000, 1700], [4000, 2000]]
     };
+    const TYPICAL = {       // no published NSW value: confirm with Metering Coordinator / Provider and manufacturer
+      pos1ph: { w: 173, h: 263 }, pos3ph: { w: 173, h: 263 },
+      maxRows1ph: 5, maxRows3ph: 3, maxCols: 2,
+      ductW: 100, incomingH: 400, glandH: 300,
+      depthOut: 300, depthIn: 250, sectionGap: 20
+    };
+    function hcSpacing(a) {
+      const t = NSW_RULES.hcSpacing;
+      if (a <= t[0][0]) return 0;
+      for (let i = 1; i < t.length; i++) {
+        if (a <= t[i][0]) return Math.round(t[i - 1][1] + (t[i][1] - t[i - 1][1]) * (a - t[i - 1][0]) / (t[i][0] - t[i - 1][0]));
+      }
+      return t[t.length - 1][1];
+    }
 
     // ── Helpers ────────────────────────────────────────────────────────────────
     function syncUnits(v) {
@@ -267,7 +242,7 @@
     }
 
     function getSpec() {
-      return DNSP_SPECS[document.getElementById('dnsp').value];
+      return Object.assign({ name: 'NSW (S&IR Apr 2026 / Metering Annexure Jul 2018)' }, TYPICAL, NSW_RULES);
     }
 
     // ── Layout computation ─────────────────────────────────────────────────────
@@ -334,16 +309,19 @@
       // Total structural height (from ground):
       //   glandH (base cable zone) + workH (meters) + incomingH (if selected) + top cap 50
       const TOP_CAP = 50;
-      const structH = sp.glandH + workH + (hasInc ? sp.incomingH : 0) + TOP_CAP;
+      const base    = Math.max(sp.glandH, sp.minAGL);   // bottom of the lowest meter (>= 600 AGL)
+      const structH = base + workH + (hasInc ? sp.incomingH : 0) + TOP_CAP;
 
       const panelDepth = install === 'outdoor' ? sp.depthOut : sp.depthIn;
-      const ip         = install === 'outdoor' ? sp.ipOut : sp.ipIn;
+      const mdA        = parseFloat(document.getElementById('mdA').value) || 0;
+      const mainsA     = parseFloat(document.getElementById('mainsA').value) || 0;
+      const spaced     = document.getElementById('spacedCond').checked;
 
       return {
         sp, ph, posW, posH, maxRows, maxCols, maxPerSection,
         numUnits, numCommon, totalPos, hasCommon, hasInc, install,
         numSections, sections, secW, totalPanelW,
-        workH, workZoneH, structH, panelDepth, ip, TOP_CAP
+        workH, workZoneH, structH, panelDepth, TOP_CAP, base, mdA, mainsA, spaced
       };
     }
 
@@ -363,21 +341,25 @@
       row('Overall Assembly', '', true);
       row('Total width (all sections)',   L.totalPanelW + ' mm  (' + L.numSections + ' section' + (L.numSections > 1 ? 's' : '') + ')');
       row('Total height (ground to top)', L.structH + ' mm');
-      row('Panel depth',                  L.panelDepth + ' mm  (' + L.install + ', ' + L.ip + ' min.)');
+      row('Panel depth',                  L.panelDepth + ' mm  (' + L.install + ', typical &ndash; confirm with manufacturer)');
+      row('Panel face to enclosure door',  sp.panelToDoor + ' mm min. (S&amp;IR 2026 cl. 4.2)');
+      row('Clear space in front',          sp.clearFrontH + ' mm horizontal &times; ' + sp.clearFrontV + ' mm high (S&amp;IR 2026 cl. 4.2(c))');
+      row('Hinged panel open 90&deg;',      sp.openPanelClear + ' mm to any fixed object (S&amp;IR 2026 cl. 4.2)');
       row('Number of sections (bays)',    '' + L.numSections);
 
       row('Per Section', '', true);
       row('Section width',  L.secW + ' mm  (' + L.maxCols + ' col × ' + L.posW + ' mm + ' + sp.ductW + ' mm duct)');
       row('Columns / rows per section', L.maxCols + ' cols × ' + L.maxRows + ' rows = ' + L.maxPerSection + ' positions');
-      row('Position size (' + (L.ph === 1 ? '1ph' : '3ph') + ')', L.posW + ' × ' + L.posH + ' mm  (W × H)');
-      row('Cable duct width', sp.ductW + ' mm');
+      row('Position size (' + (L.ph === 1 ? '1ph' : '3ph') + ')', L.posW + ' × ' + L.posH + ' mm  (W × H, typical)');
+      row('Cable duct width', sp.ductW + ' mm (typical)');
 
       row('Height Breakdown (per section)', '', true);
-      row('Ground to bottom of lowest meter',    sp.minAGL + ' mm AGL  (cable gland zone)');
-      row('Bottom to top of meter working zone', L.workH + ' mm  (' + L.maxRows + ' × ' + L.posH + ' mm)');
-      row('Top of highest meter AGL',            (sp.minAGL + L.workH) + ' mm AGL  (spec. max ' + sp.maxAGL + ' mm)');
-      if (L.hasInc) row('Incoming isolator compartment', sp.incomingH + ' mm  (above working zone)');
-      row('Top cap / busbar zone',               L.TOP_CAP + ' mm');
+      row('Cable gland / entry zone',            sp.glandH + ' mm (typical)');
+      row('Ground to bottom of lowest meter',    L.base + ' mm AGL  (min ' + sp.minAGL + ' &ndash; Metering Annexure cl. 2.13(b))');
+      row('Bottom to top of meter zone',         L.workH + ' mm  (' + L.maxRows + ' × ' + L.posH + ' mm)');
+      row('Top of highest meter AGL',            (L.base + L.workH) + ' mm AGL  (max ' + sp.maxAGL + ' &ndash; Metering Annexure cl. 2.13(a))');
+      if (L.hasInc) row('Incoming isolator compartment', sp.incomingH + ' mm  (above meters, typical)');
+      row('Top cap',                             L.TOP_CAP + ' mm (typical)');
       row('Total structural height (AGL)',       L.structH + ' mm');
 
       row('Metering Summary', '', true);
@@ -387,12 +369,28 @@
 
       const wa = document.getElementById('warnArea');
       wa.innerHTML = '';
+      const warn = (cls, html) => { wa.innerHTML += '<div class="' + cls + '" style="margin-top:8px;">' + html + '</div>'; };
+      const meterTop = L.base + L.workH;
+      if (L.mdA > sp.wcMaxA) {
+        warn('warn-box', '<strong>Maximum demand ' + L.mdA + ' A exceeds 80 A per phase &mdash; CT metering required</strong> (Metering Annexure cl. 2.1). This whole-current layout does not apply.');
+      }
+      if (meterTop > sp.maxAGL || L.base < sp.minAGL) {
+        warn('warn-box', '<strong>Meter height.</strong> Top of highest meter position is ' + meterTop + '&nbsp;mm above floor (limit ' + sp.maxAGL + '&nbsp;mm, Metering Annexure cl. 2.13(a)); lowest metering equipment at least ' + sp.minAGL + '&nbsp;mm (cl. 2.13(b), unless approved by the Metering Provider). Reduce meters per column.');
+      }
+      if (L.hasInc && meterTop + sp.incomingH > sp.spdTopMax) {
+        warn('warn-box', '<strong>Service protection device height.</strong> With the incoming compartment above the meters its top is at ' + (meterTop + sp.incomingH) + '&nbsp;mm. S&amp;IR 2026 cl. 4.7.2(c): top of the device no higher than 2.0&nbsp;m and line-side terminals no lower than 0.5&nbsp;m above the floor. Mount the device lower or beside the meter columns.');
+      }
+      if (L.hasInc && L.spaced && L.mainsA > 150) {
+        const req = hcSpacing(L.mainsA);
+        warn('warn-box', '<strong>Spacing to high-current conductors.</strong> ' + L.mainsA + '&nbsp;A spaced conductors need about ' + req + '&nbsp;mm to any metering equipment, or ' + Math.round(req * 0.5) + '&nbsp;mm behind 2.5&nbsp;mm steel (Metering Annexure cl. 2.10, Tables 2-2 and 2-3). The Metering Provider may waive this for some meters (cl. 2.10.4).');
+      } else if (L.hasInc) {
+        warn('info-box', 'Meters sit below the incoming compartment. No spacing is required for multicore or bunched single-core cables (Metering Annexure cl. 2.10.1); tick the box above if spaced single-core conductors or busbars run near the meters.');
+      }
       if (L.numSections > 1) {
-        wa.innerHTML += `<div class="warn-box"><strong>${L.numSections} separate panel sections required.</strong> Each section is ${L.secW}&nbsp;mm wide. Sections are typically mounted side-by-side in a row on a common base frame. Confirm with your DNSP that a multi-section arrangement is acceptable for the connection point.</div>`;
+        warn('info-box', '<strong>' + L.numSections + ' sections required</strong> (' + L.secW + '&nbsp;mm each). Meters for new multiple-occupancy premises are grouped at one metering position accessible to all tenants and not inside any occupancy (Metering Annexure cl. 2.2.3); multi-storey buildings may group per floor as directed by the Metering Provider (cl. 2.2.3.1).');
       }
-      if (sp.minAGL + L.workH > sp.maxAGL) {
-        wa.innerHTML += `<div class="warn-box" style="margin-top:8px;"><strong>Working zone overflow.</strong> ${L.maxRows} rows × ${L.posH}&nbsp;mm = ${L.workH}&nbsp;mm. Top of highest meter = ${sp.minAGL + L.workH}&nbsp;mm AGL, which exceeds the ${sp.sp ? '' : sp.name} maximum of ${sp.maxAGL}&nbsp;mm. Reduce positions per column or contact ${sp.name}.</div>`;
-      }
+      warn('info-box', '<strong>Position size is typical.</strong> No NSW rule sets it: the panel must provide space &ldquo;as required by the MC&rdquo; (Metering Annexure cl. 2.5.1(b)). Some three-phase meters are larger than ' + L.posW + ' &times; ' + L.posH + '&nbsp;mm (e.g. 175 wide &times; 292 high, Ausgrid ES3 Part B cl. 6.5.3).');
+      warn('info-box', 'Each meter needs its own meter protection device &le; 80&nbsp;A, adjacent to the meter or labelled with the meter it protects; fuse bases &ge; 100&nbsp;A with sealable escutcheon (Metering Annexure cl. 2.8.1, 2.8.2). Panels non-metallic (cl. 2.9.4); equipment &ge; 32&nbsp;mm from the hinged edge (S&amp;IR 2026 cl. 4.5.1). No IP rating is specified &mdash; choose to suit the location (<a href="iprating.html">IP rating guide</a>). Label each meter with its occupancy (cl. 2.9.6) and doors &ldquo;Electricity Meters&rdquo; (cl. 2.2).');
     }
 
     // ── SVG Drawing ────────────────────────────────────────────────────────────
@@ -443,7 +441,7 @@
       const L = computeLayout();
       updateDimTable(L);
       document.getElementById('diagramSubtitle').textContent =
-        '— ' + L.sp.name + '  |  ' + L.numSections + ' section' + (L.numSections > 1 ? 's' : '') +
+        '— NSW  |  ' + L.numSections + ' section' + (L.numSections > 1 ? 's' : '') +
         '  |  ' + L.totalPanelW + ' mm W × ' + L.structH + ' mm H';
       drawSVG(L);
     }
@@ -462,7 +460,8 @@
       // Each meter cell is pitched at pitchW × pitchH so buffer zones never overlap.
       const dSecW   = L.maxCols * pitchW + sp.ductW;
       const dWorkH  = L.maxRows * pitchH;
-      const dStructH = sp.glandH + dWorkH + (L.hasInc ? sp.incomingH : 0) + L.TOP_CAP;
+      const dBase    = L.base;
+      const dStructH = dBase + dWorkH + (L.hasInc ? sp.incomingH : 0) + L.TOP_CAP;
       const dTotalW  = L.numSections * dSecW + (L.numSections - 1) * sp.sectionGap;
 
       // Scale: fit within viewport
@@ -493,8 +492,8 @@
       txt(svg, ow - 16, groundY + 14, 'GL', 9, '#374151', 'middle');
 
       // Working-zone shaded band
-      const wzTop = mmToY(sp.glandH + dWorkH);
-      const wzBot = mmToY(sp.glandH);
+      const wzTop = mmToY(dBase + dWorkH);
+      const wzBot = mmToY(dBase);
       rect(svg, ow, wzTop, panelTotalPx, wzBot - wzTop, 'rgba(34,197,94,0.08)', '#22c55e', 0.7);
 
       // Draw each section side by side
@@ -517,8 +516,8 @@
         }
 
         // ── METER WORKING ZONE ──
-        const meterY_top = mmToY(sp.glandH + dWorkH);
-        const meterY_bot = mmToY(sp.glandH);
+        const meterY_top = mmToY(dBase + dWorkH);
+        const meterY_bot = mmToY(dBase);
         const gridX      = sx;
 
         // Cable duct (right of all columns)
@@ -572,13 +571,18 @@
         rect(svg, sx, glandY_top, sWpx, glandY_bot - glandY_top, '#fef9c3', '#ca8a04', 0.8);
         txt(svg, sx + sWpx / 2, (glandY_top + glandY_bot) / 2, '▼ CABLE GLAND / ENTRY ZONE',
           Math.max(7, Math.min(9, sWpx / 18)), '#92400e');
+        if (dBase > sp.glandH) {
+          const cTop = mmToY(dBase), cBot = mmToY(sp.glandH);
+          txt(svg, sx + sWpx / 2, (cTop + cBot) / 2, 'NO METERS BELOW ' + sp.minAGL + ' mm',
+            Math.max(7, Math.min(9, sWpx / 18)), '#64748b');
+        }
 
         sxOff += dSecW + sp.sectionGap;
       }
 
       // ── Working zone label ──
       const wzLabelX = ow + panelTotalPx + 10;
-      txt(svg, wzLabelX + 8, (wzTop + wzBot) / 2, 'Working zone', 8, '#16a34a', 'start',
+      txt(svg, wzLabelX + 8, (wzTop + wzBot) / 2, 'Meter zone', 8, '#16a34a', 'start',
         false, `rotate(-90,${wzLabelX + 8},${(wzTop + wzBot) / 2})`);
 
       // ── Dimension callouts (physical dimensions as labels) ──
@@ -588,7 +592,7 @@
       dimV(svg, ow - 42, oy, oy + svgH_content, L.structH + ' mm');
 
       // Working zone height (left, inner)
-      dimV(svg, ow - 22, wzTop, wzBot, (sp.maxAGL - sp.minAGL) + ' mm');
+      dimV(svg, ow - 22, wzTop, wzBot, L.workH + ' mm');
 
       // Panel face width callout (173 mm, positioned above first panel face in section 0)
       if (L.posW * sc > 20) {
@@ -604,7 +608,8 @@
       const sp = L.sp;
       const hdr = ['Parameter', 'Value'];
       const rows = [
-        ['DNSP',                         sp.name],
+        ['Rules',                        sp.name],
+        ['Max demand per tenancy (A/phase)', L.mdA],
         ['Phase per tenancy',             L.ph === 1 ? 'Single-phase' : 'Three-phase'],
         ['Tenancy positions',             L.numUnits],
         ['Common area positions',         L.numCommon],
@@ -619,11 +624,10 @@
         ['Total structural height (mm)',  L.structH],
         ['Panel depth (mm)',              L.panelDepth],
         ['Installation type',            L.install],
-        ['IP rating',                    L.ip],
         ['Cable gland zone height (mm)', sp.glandH],
         ['Meter working zone (mm)',       L.workH],
-        ['Min AGL of lowest meter (mm)', sp.minAGL],
-        ['Max AGL of highest meter (mm)', sp.minAGL + L.workH],
+        ['Bottom of lowest meter AGL (mm, min 600)', L.base],
+        ['Top of highest meter AGL (mm, max 2000)', L.base + L.workH],
         ['Incoming compartment height (mm)', L.hasInc ? sp.incomingH : 'Not included'],
         ['Cable duct width per section (mm)', sp.ductW]
       ];
