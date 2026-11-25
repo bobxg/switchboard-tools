@@ -131,7 +131,7 @@
     <!-- Main -->
     <div class="as-content">
       <div class="as-toolbar">
-        <span class="tb-label">Page</span>
+        <span class="tb-label" title="Printed page number of the Standard">Page</span>
         <input type="number" id="pageInput" class="tb-input" min="1" value="1" />
         <button id="btnGo" class="tb-btn">Go</button>
         <span class="sep">|</span>
@@ -159,36 +159,37 @@
     const pageInput = document.getElementById('pageInput');
     const statusMsg = document.getElementById('statusMsg');
 
-    /* Exact physical page numbers from the official AS3000:2018 TOC.
-       Physical page = document page + 3 (3-page front matter offset). */
+    /* Printed page numbers from the official AS/NZS 3000:2018 Contents list.
+       The HTML viewer is a pdf2htmlEX conversion of the full 611-page PDF:
+       physical page = printed page + 3, and page div ids are hexadecimal
+       (e.g. printed p33 -> physical 36 -> id "pf24"). */
+    const PAGE_OFFSET = 3;
     const EXACT_PAGES = {
-      // Section 1 (pf24=doc33; gaps at doc39-44, 55-60, 71-76)
-      '1.1':24, '1.2':25, '1.3':26, '1.4':26, '1.5':40,
-      '1.6':46, '1.7':49, '1.8':49, '1.9':49,
-      // Section 2 (gaps at doc87-92, 103-8, 119-24, 135-40)
-      '2.1':50, '2.2':52, '2.3':53, '2.4':60, '2.5':60,
-      '2.6':80, '2.7':86, '2.8':87, '2.9':88, '2.10':90,
-      // Section 3 (pf98=doc149; doc151-252 absent → all point to pf100=doc253)
-      '3.1':98, '3.2':98, '3.3':99,
-      '3.4':100,'3.5':100,'3.6':100,'3.7':100,'3.8':100,
-      '3.9':100,'3.10':100,'3.11':100,'3.12':100,'3.13':100,
-      '3.14':100,'3.15':100,'3.16':100,
-      // Section 4 (doc212-252 absent → pf100; doc253+=pf100-109)
-      '4.1':100,'4.2':100,'4.3':100,'4.4':100,'4.5':100,
-      '4.6':100,'4.7':100,'4.8':100,'4.9':100,'4.10':100,'4.11':100,
-      '4.12':100,'4.13':100,'4.14':103,'4.15':104,'4.16':107,
-      '4.17':107,'4.18':107,'4.19':110,'4.20':110,
-      // Section 5 (gaps at doc263-68, 279-84, 295-300, 311-16)
-      '5.1':110,'5.2':112,'5.3':113,'5.4':120,'5.5':124,
-      '5.6':132,'5.7':140,'5.8':140,
-      // Section 6 (gaps at doc327-32, 343-48, 359-64)
-      '6.1':140,'6.2':140,'6.3':153,'6.4':160,'6.5':165,'6.6':169,'6.7':170,
-      // Section 7 (gaps at doc375-80, 391-96; doc407-508 absent → pf199)
-      '7.1':170,'7.2':170,'7.3':183,'7.4':190,'7.5':195,
-      '7.6':199,'7.7':199,'7.8':199,'7.9':199,
-      // Section 8 (doc416-429 absent from HTML → pf199=doc406 nearest)
-      '8.1':199,'8.2':199,'8.3':199,'8.4':199
+      '1':33, '1.1':33, '1.2':33, '1.3':34, '1.4':34, '1.5':54,
+      '1.6':66, '1.7':68, '1.8':70, '1.9':71,
+      '2':75, '2.1':75, '2.2':75, '2.3':79, '2.4':92, '2.5':93,
+      '2.6':119, '2.7':130, '2.8':131, '2.9':133, '2.10':134,
+      '3':149, '3.1':149, '3.2':149, '3.3':150, '3.4':155, '3.5':159, '3.6':162,
+      '3.7':163, '3.8':167, '3.9':171, '3.10':189, '3.11':192, '3.12':204,
+      '3.13':209, '3.14':209, '3.15':210, '3.16':210,
+      '4':212, '4.1':212, '4.2':216, '4.3':218, '4.4':223, '4.5':228, '4.6':243,
+      '4.7':243, '4.8':245, '4.9':246, '4.10':247, '4.11':249, '4.12':249,
+      '4.13':253, '4.14':256, '4.15':257, '4.16':260, '4.17':260, '4.18':260,
+      '4.19':264, '4.20':265,
+      '5':267, '5.1':267, '5.2':271, '5.3':272, '5.4':284, '5.5':289,
+      '5.6':303, '5.7':312, '5.8':315,
+      '6':316, '6.1':316, '6.2':317, '6.3':336, '6.4':348, '6.5':354,
+      '6.6':358, '6.7':360,
+      '7':362, '7.1':362, '7.2':363, '7.3':384, '7.4':397, '7.5':402,
+      '7.6':407, '7.7':408, '7.8':409, '7.9':413,
+      '8':416, '8.1':416, '8.2':417, '8.3':419, '8.4':429,
+      'A':430, 'B':439, 'C':456, 'D':491, 'E':513, 'F':521, 'G':527, 'H':532,
+      'I':540, 'J':543, 'K':545, 'L':558, 'M':559, 'N':561, 'O':565, 'P':568,
+      'Q':575, 'INDEX':578
     };
+
+    /* Printed page -> pdf2htmlEX page element id */
+    function pageId(page) { return 'pf' + (page + PAGE_OFFSET).toString(16); }
 
     /* Resolve a clause (including sub-clauses) to a page number.
        Falls back to progressively shorter parent clauses if exact match not found. */
@@ -236,20 +237,20 @@
         {cl:'4.5',t:'Lighting equipment and accessories'},{cl:'4.6',t:'Smoke alarms'},
         {cl:'4.7',t:'Cooking appliances'},{cl:'4.8',t:'Appliances producing hot water or steam'},
         {cl:'4.9',t:'Room heaters'},
-        {cl:'4.10',t:'Electric heating cables for floors and ceilings and trace heating'},
+        {cl:'4.10',t:'Electric heating cables for floors and ceilings and trace heating applications'},
         {cl:'4.11',t:'Electric duct heaters'},
         {cl:'4.12',t:'Electricity converters'},{cl:'4.13',t:'Motors'},{cl:'4.14',t:'Transformers'},
         {cl:'4.15',t:'Capacitors'},{cl:'4.16',t:'Electrical equipment containing liquid dielectrics'},
         {cl:'4.17',t:'Batteries'},{cl:'4.18',t:'Gas appliances and equipment'},
         {cl:'4.19',t:'Airconditioning and heat pump systems'},{cl:'4.20',t:'Lifts'}
       ]},
-      { sec:5, title:'EARTHING ARRANGEMENTS AND EQUIPOTENTIAL BONDING', clauses:[
+      { sec:5, title:'EARTHING ARRANGEMENTS AND EARTHING CONDUCTORS', clauses:[
         {cl:'5.1',t:'General'},{cl:'5.2',t:'Earthing functions'},{cl:'5.3',t:'Earthing system parts'},
         {cl:'5.4',t:'Earthing of equipment'},{cl:'5.5',t:'Earthing arrangements'},
         {cl:'5.6',t:'Equipotential bonding'},{cl:'5.7',t:'Earth fault-loop impedance'},
         {cl:'5.8',t:'Other earthing arrangements'}
       ]},
-      { sec:6, title:'DAMP SITUATIONS, WATER HEATERS AND SWIMMING POOLS', clauses:[
+      { sec:6, title:'DAMP SITUATIONS', clauses:[
         {cl:'6.1',t:'General'},{cl:'6.2',t:'Baths, showers and other fixed water containers'},
         {cl:'6.3',t:'Swimming pools, paddling pools and spa pools or tubs'},
         {cl:'6.4',t:'Fountains and water features'},{cl:'6.5',t:'Saunas'},
@@ -268,6 +269,21 @@
       { sec:8, title:'VERIFICATION', clauses:[
         {cl:'8.1',t:'General'},{cl:'8.2',t:'Visual inspection'},
         {cl:'8.3',t:'Testing'},{cl:'8.4',t:'Verification records'}
+      ]},
+      { sec:'APP', title:'APPENDICES', clauses:[
+        {cl:'A',t:'Referenced documents'},{cl:'B',t:'Circuit protection guide'},
+        {cl:'C',t:'Circuit arrangements'},
+        {cl:'D',t:'Minimum sizes of posts, poles and struts for aerial line conductors'},
+        {cl:'E',t:'Electrical installation requirements in national construction codes'},
+        {cl:'F',t:'Surge protective devices'},{cl:'G',t:'Degrees of protection of enclosed equipment'},
+        {cl:'H',t:'WS classification of wiring systems'},
+        {cl:'I',t:'Protective device ratings and metric equivalent sizes for imperial cables used in alterations and repairs'},
+        {cl:'J',t:'Symbols used in this Standard'},{cl:'K',t:'Switchboard requirement summary'},
+        {cl:'L',t:'(Deleted)'},
+        {cl:'M',t:'Reducing the impact of power supply outages\u2014continuity of supply for active assisted living and homecare medical situations'},
+        {cl:'N',t:'Electrical conduits'},{cl:'O',t:'Installation of arc fault detection devices (AFDDs)'},
+        {cl:'P',t:'Guidance for installation and location of electrical vehicle socket-outlets and charging stations'},
+        {cl:'Q',t:'D.C. circuit protection application guide'},{cl:'INDEX',t:'Index'}
       ]}
     ];
 
@@ -279,8 +295,10 @@
 
       var btn = document.createElement('button');
       btn.className = 'toc-section-title collapsed';
-      btn.innerHTML = '<span class="arrow">&#9660;</span>&ensp;Section ' +
-                      section.sec + ' &mdash; ' + section.title;
+      btn.innerHTML = '<span class="arrow">&#9660;</span>&ensp;' +
+        (typeof section.sec === 'number'
+          ? 'Section ' + section.sec + ' &mdash; ' + section.title
+          : section.title);
       var ul = document.createElement('ul');
       ul.className = 'toc-clauses hidden';
       btn.addEventListener('click', function () {
@@ -296,14 +314,13 @@
 
         var clBtn = document.createElement('button');
         clBtn.className = 'cl-btn';
-        clBtn.textContent = c.cl + '\u2002' + c.t;
+        clBtn.textContent = (c.cl === 'INDEX' ? '' : (/^[A-Z]$/.test(c.cl) ? 'Appendix ' + c.cl : c.cl) + '\u2002') + c.t;
 
         var badge = document.createElement('span');
         badge.className = 'cl-badge exact';
         badge.dataset.cl = c.cl;
-        var mapped = EXACT_PAGES[c.cl] ? parseInt(String(EXACT_PAGES[c.cl]), 16) : 0;
-        badge.title = 'Click to navigate to page ' + (mapped || '?');
-        badge.textContent = mapped ? 'p' + mapped : '?';
+        badge.title = 'Click to navigate to page ' + (EXACT_PAGES[c.cl] || '?');
+        badge.textContent = EXACT_PAGES[c.cl] ? 'p' + EXACT_PAGES[c.cl] : '?';
 
         clBtn.addEventListener('click', function () { tocNav(c.cl, row); });
         badge.addEventListener('click', function () { tocNav(c.cl, row); });
@@ -328,7 +345,8 @@
       page = parseInt(page, 10);
       if (!page || page < 1) return;
       pageInput.value = page;
-      var targetId = 'pf' + page.toString(16); /* pdf2htmlEX page ids are hex */
+      if (page + PAGE_OFFSET > 611) return;
+      var targetId = pageId(page);
       if (iframeReady) {
         navigateToPage(targetId);
       } else {
@@ -392,9 +410,9 @@
       rowEl.scrollIntoView({ block: 'nearest' });
 
       /* Prefer the clause heading found in the document; fall back to the map
-         (whose values are hex page ids) while the document is loading. */
+         (document page numbers) while the document is loading. */
       var id = (iframeReady && findClausePage(cl)) ||
-               (EXACT_PAGES[cl] ? 'pf' + EXACT_PAGES[cl] : null);
+               (EXACT_PAGES[cl] ? pageId(EXACT_PAGES[cl]) : null);
       if (!id) {
         showToast('Page unknown for clause ' + cl);
         return;
@@ -454,7 +472,7 @@
       pendingClause = cl;
       var page = lookupClause(cl);
       if (page) {
-        pendingPageId = 'pf' + page;
+        pendingPageId = pageId(page);
         setStatus('Clause ' + cl + ' \u2014 page ' + page, 'ok');
         /* Highlight the closest sidebar row */
         var topCl = cl.split('.').slice(0, 2).join('.');
@@ -492,7 +510,8 @@
       return null;
     }
 
-    function pageNo(id) { return parseInt(id.slice(2), 16); }
+    /* pf id -> printed document page number (inverse of pageId) */
+    function pageNo(id) { return parseInt(id.slice(2), 16) - PAGE_OFFSET; }
 
     /* Once the document is loaded, point each sidebar badge at the page
        where its clause heading actually is. */
