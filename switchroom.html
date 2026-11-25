@@ -75,7 +75,7 @@
 
     /* Doors */
     .door-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
-    .door-svg .door-g { pointer-events: all; cursor: grab; }
+    .door-svg .door-g { pointer-events: all; cursor: grab; touch-action: none; }
     .door-svg .door-g.dragging { cursor: grabbing; }
     .door-svg .door-hit { fill: transparent; }
     .door-svg .door-g:hover .door-leaf, .door-svg .door-g.dragging .door-leaf { stroke: #2563eb; }
@@ -126,7 +126,7 @@
   <div id="srToast" class="sr-toast"></div>
   <div class="main-content">
     <h1>Switchroom Sizer</h1>
-    <p>Add equipment to calculate the minimum switchroom size per <strong>AS/NZS 3000:2018 Cl.&nbsp;2.10</strong>. The floor plan updates automatically.</p>
+    <p>Add equipment to calculate the minimum switchroom size per <strong>AS/NZS 3000:2018 <a href="as3000viewer.html#cl-2.10" target="_blank">Cl.&nbsp;2.10</a></strong>. The floor plan updates automatically.</p>
 
     <div class="sr-wrap">
 
@@ -213,8 +213,8 @@
           <ul style="margin:0 0 10px 18px;line-height:2;font-size:0.89em;">
             <li><span style="color:#dc2626;">&#9632;</span> <strong>Primary zone:</strong> 600 mm (maintenance access)</li>
             <li><span style="color:#d97706;">&#9632;</span> <strong>Secondary zone:</strong> 600&ndash;1000 mm (operation)</li>
-            <li><strong>Min. front clearance:</strong> 1000 mm (AS/NZS 3000 Cl. 2.10.2)</li>
-            <li><strong>Min. side clearance:</strong> 600 mm (AS/NZS 3000 Cl. 2.10.2)</li>
+            <li><strong>Min. front clearance:</strong> 1000 mm (AS/NZS 3000 <a href="as3000viewer.html#cl-2.10.2" target="_blank">Cl. 2.10.2</a>)</li>
+            <li><strong>Min. side clearance:</strong> 600 mm (AS/NZS 3000 <a href="as3000viewer.html#cl-2.10.2" target="_blank">Cl. 2.10.2</a>)</li>
             <li><strong>Min. room dimensions:</strong> 2000 &times; 2000 mm</li>
           </ul>
           <div class="legend">
@@ -284,6 +284,8 @@
     let nextDoorId = 1;
     const DOOR_W = { single: 900, double: 1800 };
     const AUTO_DOOR_AMPS = 800;
+    const DOOR_CLR = 600;  // mm — minimum distance from a door opening to equipment
+    let wallObstacles = []; // { side: 'left'|'right', y0, y1 } mm along wall from top
     let lastRoom = null;
 
     /* ─── Input helpers ──────────────────────────────────── */
@@ -360,6 +362,25 @@
       if (d) { d.type = type; d.auto = false; renderDoorList(); renderCanvas(); }
     }
 
+    function rotateDoor(id) {
+      const d = doors.find(x => x.id === id);
+      if (!d || !lastRoom) return;
+      const W = px(lastRoom.roomD), H = px(lastRoom.wallW), P = 2 * (W + H);
+      const starts = [0, W, W + H, 2 * W + H], lens = [W, H, W, H];
+      const { side, c } = doorGeom(d, W, H);
+      const i = ['top', 'right', 'bottom', 'left'].indexOf(side), j = (i + 1) % 4;
+      d.pos = (starts[j] + (c / lens[i]) * lens[j]) / P;  // same relative spot on the next wall
+      d.auto = false;
+      renderCanvas();
+    }
+
+    function flipDoor(id) {
+      const d = doors.find(x => x.id === id);
+      if (!d || d.type === 'double') return;
+      d.hinge = d.hinge === 'R' ? 'L' : 'R';
+      renderCanvas();
+    }
+
     function renderDoorList() {
       const tbody = document.getElementById('doorBody');
       if (!doors.length) {
@@ -375,7 +396,11 @@
               <option value="double"${d.type === 'double' ? ' selected' : ''}>Double</option>
             </select>
           </td>
-          <td style="width:34px;"><button class="rm-btn" onclick="removeDoor(${d.id})" title="Remove">&#10005;</button></td>
+          <td style="white-space:nowrap;width:1%;">
+            <button class="rm-btn" onclick="rotateDoor(${d.id})" title="Move to next wall">&#8635;</button>
+            <button class="rm-btn" onclick="flipDoor(${d.id})" title="Flip hinge side"${d.type === 'double' ? ' disabled style="opacity:0.35;"' : ''}>&#8644;</button>
+            <button class="rm-btn" onclick="removeDoor(${d.id})" title="Remove">&#10005;</button>
+          </td>
         </tr>`).join('');
     }
 
@@ -391,8 +416,85 @@
       let i = 0;
       while (t > edges[i].len && i < 3) { t -= edges[i].len; i++; }
       const e = edges[i];
-      const c = Math.max(dw / 2, Math.min(e.len - dw / 2, t)); // keep door fully on one wall
-      return { side: e.side, c, dw };
+      const lo = dw / 2, hi = e.len - dw / 2;            // keep door fully on one wall
+      // Forbidden door-centre ranges: behind equipment on this wall, plus DOOR_CLR each side
+      const bad = wallObstacles.filter(o => o.side === e.side).map(o => {
+        let a = px(o.y0 - DOOR_CLR), b = px(o.y1 + DOOR_CLR);
+        if (e.side === 'left') [a, b] = [H - b, H - a];   // left wall runs bottom → top
+        return [a - dw / 2, b + dw / 2];
+      });
+      const ok = v => v >= lo - 0.01 && v <= hi + 0.01 && !bad.some(([a, b]) => v > a + 0.01 && v < b - 0.01);
+      const tc = Math.max(lo, Math.min(hi, t));
+      let c = tc, blocked = false;
+      if (!ok(tc)) {
+        const cands = [lo, hi, ...bad.flat()].filter(ok);
+        if (cands.length) c = cands.reduce((m, v) => Math.abs(v - tc) < Math.abs(m - tc) ? v : m);
+        else blocked = true;
+      }
+      return { side: e.side, c, dw, blocked };
+    }
+
+    // Slide each door to the nearest perimeter spot that is clear of equipment and of earlier doors
+    function settleDoors(W, H) {
+      const placed = [];
+      const fits = d => {
+        const g = doorGeom(d, W, H);
+        if (g.blocked) return null;
+        if (placed.some(o => o.side === g.side && Math.abs(o.c - g.c) < (o.dw + g.dw) / 2 + 4)) return null;
+        return g;
+      };
+      doors.forEach(d => {
+        const start = d.pos;
+        let g = fits(d);
+        for (let k = 1; !g && k <= 500; k++) {
+          for (const sgn of [1, -1]) {
+            d.pos = ((start + sgn * k * 0.002) % 1 + 1) % 1;
+            if ((g = fits(d))) break;
+          }
+        }
+        if (!g) { d.pos = start; g = doorGeom(d, W, H); }
+        placed.push(g);
+      });
+    }
+
+    // Door zones (mm from top of wall) on the board walls, incl. DOOR_CLR each side
+    let doorZones = { left: [], right: [] };
+    function computeDoorZones(room) {
+      const W = px(room.roomD), H = px(room.wallW);
+      doorZones = { left: [], right: [] };
+      doors.forEach(d => {
+        const g = doorGeom(d, W, H);
+        if (g.side !== 'left' && g.side !== 'right') return;
+        const cTop = g.side === 'left' ? H - g.c : g.c;          // px from top
+        const a = (cTop - g.dw / 2) / SCALE * 1000, b = (cTop + g.dw / 2) / SCALE * 1000;
+        doorZones[g.side].push([a - DOOR_CLR, b + DOOR_CLR]);
+      });
+    }
+    // Next board start at or after y (mm) whose span [y, y+w] stays clear of door zones
+    function pastDoors(side, y, w) {
+      let moved = true;
+      while (moved) {
+        moved = false;
+        for (const [a, b] of doorZones[side]) {
+          if (y < b && y + w > a) { y = b; moved = true; }
+        }
+      }
+      return y;
+    }
+    // Shift boards along their wall away from doors; grow the room if they no longer fit
+    function fitBoardsAroundDoors(room) {
+      for (let iter = 0; iter < 6; iter++) {
+        computeDoorZones(room);
+        let need = room.wallW;
+        [['left', room.wall1], ['right', room.wall2 || []]].forEach(([side, list]) => {
+          if (room.layout === 'single' && side === 'right') return;
+          let y = SIDE_CLR;
+          list.forEach(eq => { y = pastDoors(side, y, eq.w) + eq.w + SIDE_CLR; });
+          if (list.length) need = Math.max(need, Math.ceil(y / 50) * 50);
+        });
+        if (need <= room.wallW) return;
+        room.wallW = need;
+      }
     }
 
     function pointToPos(x, y, W, H) {
@@ -412,6 +514,7 @@
       const canvas = document.getElementById('srCanvas');
       canvas.querySelectorAll('.door-svg').forEach(n => n.remove());
       if (!doors.length) return;
+      settleDoors(W, H);
       const NS = 'http://www.w3.org/2000/svg';
       const svg = document.createElementNS(NS, 'svg');
       svg.setAttribute('class', 'door-svg');
@@ -421,7 +524,7 @@
       const mk = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v)); parent.appendChild(n); return n; };
 
       doors.forEach((d, idx) => {
-        const { side, c, dw } = doorGeom(d, W, H);
+        const { side, c, dw, blocked } = doorGeom(d, W, H);
         // Local frame: door opening along +x from 0..dw on the wall line y=0, swinging into room (+y)
         let tf;
         if (side === 'top')    tf = `translate(${c - dw / 2},0)`;
@@ -436,32 +539,45 @@
         mk('line', { x1: dw, y1: -4, x2: dw, y2: 4, stroke: fg, 'stroke-width': 2 }, g);
         const leaves = d.type === 'double'
           ? [{ hx: 0, r: dw / 2, dir: 1 }, { hx: dw, r: dw / 2, dir: -1 }]
-          : [{ hx: 0, r: dw, dir: 1 }];
+          : (d.hinge === 'R' ? [{ hx: dw, r: dw, dir: -1 }] : [{ hx: 0, r: dw, dir: 1 }]);
+        const col = blocked ? '#dc2626' : fg;
         leaves.forEach(l => {
-          mk('line', { class: 'door-leaf', x1: l.hx, y1: 0, x2: l.hx, y2: -l.r, stroke: fg, 'stroke-width': 2.5 }, g);
+          mk('line', { class: 'door-leaf', x1: l.hx, y1: 0, x2: l.hx, y2: -l.r, stroke: col, 'stroke-width': 2.5 }, g);
           const ex = l.hx + l.dir * l.r;
-          mk('path', { d: `M ${l.hx} ${-l.r} A ${l.r} ${l.r} 0 0 ${l.dir === 1 ? 1 : 0} ${ex} 0`, fill: 'none', stroke: fg, 'stroke-width': 1, 'stroke-dasharray': '4 3' }, g);
+          mk('path', { d: `M ${l.hx} ${-l.r} A ${l.r} ${l.r} 0 0 ${l.dir === 1 ? 1 : 0} ${ex} 0`, fill: 'none', stroke: col, 'stroke-width': 1, 'stroke-dasharray': '4 3' }, g);
         });
-        const lbl = mk('text', { x: dw / 2, y: 16, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: fg }, g);
+        // Label: upright, just outside the wall at the opening centre (clear of equipment labels, which sit in the room / label column)
+        const OUT = 12;
+        const lp = side === 'top' ? [c, -OUT] : side === 'right' ? [W + OUT, c] : side === 'bottom' ? [W - c, H + OUT] : [-OUT, H - c];
+        const lbl = mk('text', { x: lp[0], y: lp[1], 'text-anchor': 'middle', 'dominant-baseline': 'middle', 'font-size': 11, 'font-weight': 700,
+          fill: col, stroke: bg, 'stroke-width': 4, 'paint-order': 'stroke', class: 'door-lbl' }, svg);
         lbl.textContent = 'D' + (idx + 1);
-        if (side === 'bottom' || side === 'left') lbl.setAttribute('transform', `rotate(180 ${dw / 2} 12)`);
 
+        g.addEventListener('dblclick', () => flipDoor(d.id));
         g.addEventListener('pointerdown', ev => {
           ev.preventDefault();
           g.setPointerCapture(ev.pointerId);
           g.classList.add('dragging');
+          const ptrPos = e => {
+            const r = document.querySelector('#srCanvas .door-svg').getBoundingClientRect(); // svg is rebuilt each move
+            return pointToPos(e.clientX - r.left, e.clientY - r.top, px(lastRoom.roomD), px(lastRoom.wallW));
+          };
+          // Keep the grab point under the cursor so the door doesn't snap its centre to the pointer
+          let off = d.pos - ptrPos(ev);
+          if (off > 0.5) off -= 1; if (off < -0.5) off += 1;
           const move = e2 => {
-            const r = svg.getBoundingClientRect();
-            d.pos = pointToPos(e2.clientX - r.left, e2.clientY - r.top, W, H);
-            renderDoors(W, H);
+            d.pos = ((ptrPos(e2) + off) % 1 + 1) % 1;
+            renderCanvas();   // boards shift away from the door as it moves
           };
           const up = () => {
             window.removeEventListener('pointermove', move);
             window.removeEventListener('pointerup', up);
+            window.removeEventListener('pointercancel', up);
             updateInfo(lastRoom);
           };
           window.addEventListener('pointermove', move);
           window.addEventListener('pointerup', up);
+          window.addEventListener('pointercancel', up);
         });
       });
       canvas.appendChild(svg);
@@ -548,6 +664,7 @@
 
     function renderCanvas() {
       const room   = calcRoom();
+      fitBoardsAroundDoors(room);
       const canvas = document.getElementById('srCanvas');
 
       /*
@@ -581,6 +698,7 @@
 
       // ── Draw boards + clearances ──
       const labelEntries = [];
+      wallObstacles = [];
 
       function drawWall(wallEquip, wallPosMM) {
         // wallPosMM: position (mm) of the wall surface boards sit against
@@ -591,6 +709,7 @@
         let yOffMM = SIDE_CLR;
 
         wallEquip.forEach((eq) => {
+          yOffMM = pastDoors(rightWall ? 'right' : 'left', yOffMM, eq.w);
           const bx = rightWall ? px(wallPosMM - eq.d) : 0;  // board left in canvas
           const by = px(yOffMM);
           const bw = px(eq.d);   // board depth → canvas width
@@ -777,7 +896,7 @@
           `<div class="warn-box danger">` +
           `<strong>&#9888;&nbsp; Two exits required</strong><br>` +
           `The MSB exceeds 3 m &mdash; the switchroom must have <strong>two exits</strong> ` +
-          `(AS/NZS&nbsp;3000:2018 Cl.&nbsp;2.10.6). Position exits so no worker can be trapped ` +
+          `(AS/NZS&nbsp;3000:2018 <a href="as3000viewer.html#cl-2.10.6" target="_blank">Cl.&nbsp;2.10.6</a>). Position exits so no worker can be trapped ` +
           `at either end of the switchboard.` +
           `</div>`
         );
@@ -787,7 +906,7 @@
       if (needsTwoDoors()) {
         const big = equipment.filter(e => (e.rating || 0) >= AUTO_DOOR_AMPS).map(e => `${e.type} ${e.rating} A`).join(', ');
         const W = px(room.roomD), H = px(room.wallW);
-        const sides = new Set(doors.map(d => doorGeom(d, W, H).side));
+        const sides = new Set(doors.filter(d => !doorGeom(d, W, H).blocked).map(d => doorGeom(d, W, H).side));
         const ok = doors.length >= 2 && sides.size >= 2;
         warnings.push(
           `<div class="warn-box ${ok ? 'caution' : 'danger'}">` +
@@ -797,6 +916,14 @@
               : `Place at least two doors on <strong>different walls</strong> so a worker cannot be trapped.`) +
           `</div>`
         );
+      }
+
+      {
+        const W = px(room.roomD), H = px(room.wallW);
+        const blk = doors.map((d, i) => doorGeom(d, W, H).blocked ? 'D' + (i + 1) : null).filter(Boolean);
+        if (blk.length) warnings.push(
+          `<div class="warn-box danger"><strong>&#9888;&nbsp; Door blocked</strong><br>` +
+          `${blk.join(', ')} cannot fit on its wall with ${DOOR_CLR} mm clearance to equipment &mdash; drag or rotate it to another wall.</div>`);
       }
 
       // Narrow room advisory
