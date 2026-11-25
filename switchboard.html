@@ -405,6 +405,17 @@
           </select>
           <div class="sb-incomer-note" id="incomerNote"></div>
         </div>
+        <div class="sb-field" style="margin-top:10px">
+          <label for="formSel">Form of separation</label>
+          <select id="formSel" class="sb-select">
+            <option value="2b">Form 2b</option>
+            <option value="3b" selected>Form 3b</option>
+            <option value="3bih">Form 3bih</option>
+            <option value="4a">Form 4a</option>
+            <option value="4b">Form 4b</option>
+          </select>
+          <div class="sb-incomer-note" id="formNote"></div>
+        </div>
       </div>
 
       <div class="sb-card">
@@ -483,7 +494,7 @@
             <div class="sb-field"><label for="h250">250 A height</label><input type="number" id="h250" min="150" max="1800" step="50" value="200" /></div>
             <div class="sb-field"><label for="cableW">Cable zone W</label><input type="number" id="cableW" min="150" max="800" step="50" value="400" /></div>
           </div>
-          <button type="button" class="sb-linkbtn" id="resetSizesBtn">Reset to defaults</button>
+          <button type="button" class="sb-linkbtn" id="resetSizesBtn">Reset to form defaults</button>
           <p class="sb-hint">Typical Form 3b values for 3-pole fixed MCCBs. The 250 A and 400 A heights assume the breaker is mounted on its side (horizontal); use 300 for a 4-pole or withdrawable 250 A unit. Tier heights vary between switchboard systems &mdash; set them to your builder&rsquo;s module sizes. Feeder cubicles are 600 wide; the incoming section follows the main switch rating.</p>
         </details>
       </div>
@@ -526,8 +537,19 @@
       '250A': { h: 200 }
     };
     const RATING_ORDER = ['800A', '630A', '400A', '250A'];
-    const DEFAULT_H = { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 };
-    const DEFAULT_CABLE_W = 400;
+    /* Form of internal separation (AS/NZS 61439.2) sets the default feeder compartment
+       heights and cable zone width. FORM_PRESETS_PLACEHOLDER */
+    const FORM_PRESETS = {
+      '2b':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: 'Sizes for this form are not set yet; Form 3b sizes are used.' },
+      '3b':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: '' },
+      '3bih': { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: 'Sizes for this form are not set yet; Form 3b sizes are used.' },
+      '4a':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: 'Sizes for this form are not set yet; Form 3b sizes are used.' },
+      '4b':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: 'Sizes for this form are not set yet; Form 3b sizes are used.' }
+    };
+    let formKey = '3b';
+    function formPreset() { return FORM_PRESETS[formKey] || FORM_PRESETS['3b']; }
+    const DEFAULT_H = FORM_PRESETS['3b'].h;
+    const DEFAULT_CABLE_W = FORM_PRESETS['3b'].cableW;
     const MOD_W = 600;          // module / cubicle width
     let CABLE_W = DEFAULT_CABLE_W;   // outgoing cable zone width (user-adjustable)
     const BUSBAR_H = 400;       // busbar chamber height
@@ -834,7 +856,7 @@
         '<line x1="' + x0 + '" y1="' + (y0 + 128) + '" x2="' + x1 + '" y2="' + (y0 + 128) + '"/>' +
         '<line x1="' + x0 + '" y1="' + (y0 + 244) + '" x2="' + x1 + '" y2="' + (y0 + 244) + '"/>' +
         '<text class="tb-name" x="' + cx + '" y="' + (y0 + 66) + '" font-size="86">' + esc(name) + '</text>' +
-        '<text class="tb-sub" x="' + cx + '" y="' + (y0 + 188) + '" font-size="52">SWITCHBOARD &mdash; FRONT ELEVATION</text>' +
+        '<text class="tb-sub" x="' + cx + '" y="' + (y0 + 188) + '" font-size="52">SWITCHBOARD &mdash; FRONT ELEVATION &#183; FORM ' + formKey + '</text>' +
         '<text class="tb-meta" x="' + cx + '" y="' + (y0 + 304) + '" font-size="44">' +
           totalW + ' &#215; ' + TOTAL_H + ' &#215; ' + boardDepth() + ' mm &#183; Scale ' + drawingScale(viewW, viewH, printLayout) + ' (' + printLayout.name + ' ' + printLayout.orientation + ') &#183; ' + date +
         '</text></g>';
@@ -1112,10 +1134,25 @@
       };
       RATING_ORDER.forEach(t => {
         const n = t.replace('A', '');
-        RATINGS[t].h = snap('h' + n, 150, USABLE_H, DEFAULT_H[t]);
+        RATINGS[t].h = snap('h' + n, 150, USABLE_H, formPreset().h[t]);
         document.getElementById('sub' + n).innerHTML = MOD_W + ' &times; ' + RATINGS[t].h + ' mm';
       });
-      CABLE_W = snap('cableW', 150, 800, DEFAULT_CABLE_W);
+      CABLE_W = snap('cableW', 150, 800, formPreset().cableW);
+      const pr = formPreset();
+      const edited = CABLE_W !== pr.cableW || RATING_ORDER.some(t => RATINGS[t].h !== pr.h[t]);
+      document.getElementById('formNote').innerHTML = pr.note + (edited ? ' <strong>Sizes edited from the form defaults.</strong>' : '');
+    }
+
+    /* Load a form's default sizes into the inputs */
+    function setFormSelect(k) {
+      const sel = document.getElementById('formSel');
+      sel.value = FORM_PRESETS[k] ? k : '3b';
+      formKey = sel.value;
+    }
+    function loadFormSizes() {
+      const pr = formPreset();
+      RATING_ORDER.forEach(t => { document.getElementById('h' + t.replace('A', '')).value = pr.h[t]; });
+      document.getElementById('cableW').value = pr.cableW;
     }
 
     /* Re-pack the modules already on the board (keeps feeder labels) */
@@ -1165,9 +1202,13 @@
     ['h800', 'h630', 'h400', 'h250', 'cableW'].forEach(id => {
       document.getElementById(id).addEventListener('change', applySizes);
     });
+    document.getElementById('formSel').addEventListener('change', function () {
+      formKey = this.value;
+      loadFormSizes();
+      applySizes();
+    });
     document.getElementById('resetSizesBtn').addEventListener('click', function () {
-      RATING_ORDER.forEach(t => { document.getElementById('h' + t.replace('A', '')).value = DEFAULT_H[t]; });
-      document.getElementById('cableW').value = DEFAULT_CABLE_W;
+      loadFormSizes();
       applySizes();
     });
 
@@ -1352,6 +1393,7 @@
         fireCounts: { m800: val('fireModules800'), m630: val('fireModules630'), m400: val('fireModules400'), m250: val('fireModules250') },
         ct: document.getElementById('ctMeterChk').checked,
         incomer: incomerA,
+        form: formKey,
         sizes: { h800: RATINGS['800A'].h, h630: RATINGS['630A'].h, h400: RATINGS['400A'].h, h250: RATINGS['250A'].h, cableW: CABLE_W },
         columns: currentColumns.map(c => ({
           kind: c.kind, fire: c.fire,
@@ -1381,6 +1423,7 @@
         document.getElementById('fireModules250').value = cfg.fireCounts.m250;
         document.getElementById('ctMeterChk').checked = !!cfg.ct;
         setIncomerSelect(cfg.incomer);
+        setFormSelect(cfg.form);
         const sz = cfg.sizes || { h800: 1000, h630: 600, h400: 400, h250: 200, cableW: 400 };
         ['h800', 'h630', 'h400', 'h250', 'cableW'].forEach(id => { if (sz[id]) document.getElementById(id).value = sz[id]; });
         readIncomer(); readSizes();
@@ -1407,6 +1450,7 @@
         if (cfg.fireModules250 !== null && cfg.fireModules250 !== undefined) document.getElementById('fireModules250').value = cfg.fireModules250;
         document.getElementById('ctMeterChk').checked = !!cfg.ctMeterChk;
         setIncomerSelect(null); readIncomer();
+        setFormSelect('3b'); loadFormSizes(); readSizes();
         doGenerate();
         OmniToast.show('Board loaded (legacy save)', 'success');
         return;
