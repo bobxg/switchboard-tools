@@ -495,7 +495,7 @@
             <div class="sb-field"><label for="cableW">Cable zone W</label><input type="number" id="cableW" min="150" max="800" step="50" value="400" /></div>
           </div>
           <button type="button" class="sb-linkbtn" id="resetSizesBtn">Reset to form defaults</button>
-          <p class="sb-hint">Typical Form 3b values for 3-pole fixed MCCBs. The 250 A and 400 A heights assume the breaker is mounted on its side (horizontal); use 300 for a 4-pole or withdrawable 250 A unit. Tier heights vary between switchboard systems &mdash; set them to your builder&rsquo;s module sizes. Feeder cubicles are 600 wide; the incoming section follows the main switch rating.</p>
+          <p class="sb-hint">Defaults follow the Form of separation chosen under Incomer, for 3-pole fixed MCCBs. The Form 3b 250 A and 400 A heights assume the breaker is mounted on its side (horizontal); use 300 for a 4-pole or withdrawable 250 A unit. Tier heights vary between switchboard systems &mdash; set them to your builder&rsquo;s module sizes. Feeder cubicles are 600 wide; the incoming section follows the main switch rating.</p>
         </details>
       </div>
 
@@ -540,11 +540,19 @@
     /* Form of internal separation (AS/NZS 61439.2) sets the default feeder compartment
        heights and cable zone width. FORM_PRESETS_PLACEHOLDER */
     const FORM_PRESETS = {
-      '2b':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: 'Sizes for this form are not set yet; Form 3b sizes are used.' },
+      // Catalogue single-device kit heights (Hager quadro evo); no cell per breaker
+      '2b':   { h: { '800A': 400,  '630A': 300, '400A': 300, '250A': 200 }, cableW: 400,
+                note: 'Units not separated from each other. Heights are catalogue kit heights without a cell per breaker.' },
       '3b':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: '' },
-      '3bih': { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: 'Sizes for this form are not set yet; Form 3b sizes are used.' },
-      '4a':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: 'Sizes for this form are not set yet; Form 3b sizes are used.' },
-      '4b':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: 'Sizes for this form are not set yet; Form 3b sizes are used.' }
+      // Insulated busbar chassis + IP2X breaker housings (NHP XBP/XCP chassis pitch; Siemens S4 kits for 630/800)
+      '3bih': { h: { '800A': 400,  '630A': 300, '400A': 200, '250A': 150 }, cableW: 400,
+                note: 'Relies on an insulated busbar chassis and the breakers&rsquo; IP2X housings. 630/800 A heights are kit heights: no insulated chassis was verified for these frames.' },
+      // 3b + 100: cable terminates inside each compartment (step from Eaton Form 4 box solution, +50 to +100)
+      '4a':   { h: { '800A': 1100, '630A': 700, '400A': 500, '250A': 300 }, cableW: 400,
+                note: 'Cable terminates inside each compartment. The +100 mm over Form 3b is an assumption; some systems (Siemens SIVACON S4) use the same height.' },
+      // Same cell as 3b (ABB, Hager); cable zone + 200 for one terminal box per circuit (Prisma W200 cover)
+      '4b':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 600,
+                note: 'Cable zone widened to 600 for one terminal box per circuit. Box size for 800 A not verified.' }
     };
     let formKey = '3b';
     function formPreset() { return FORM_PRESETS[formKey] || FORM_PRESETS['3b']; }
@@ -1015,9 +1023,20 @@
         add(pct < 20 ? 'warn' : 'ok', 'Spare cubicle space ' + pct + '%',
           pct < 20 ? 'Below the usual 20&ndash;30% allowance for future feeders.' : 'Meets the usual 20&ndash;30% allowance for future feeders.');
       }
+      const formName = 'Form ' + formKey;
       if (incomerA >= 800) {
-        add('warn', 'Arc-fault protection applies (&ge; 800 A)', 'AS/NZS 3000 cl. 2.5.5: internal separation Form 3b/4a/4b (cl. 2.5.5.2), protection settings to cl. 2.5.5.3, or both.' +
-          (fireUnits ? ' Under cl. 2.5.5.2 the safety services section is also separated from the general section.' : ''));
+        if (formKey === '2b') {
+          add('fail', formName + ' does not meet the internal separation route (&ge; 800 A)',
+            'AS/NZS 3000 cl. 2.5.5.2 requires functional units separated from one another (Form 3b, 4a, 4b or their i/h variants). Otherwise limit arc effects to cl. 2.5.5.3.');
+        } else {
+          add('ok', formName + ' meets the internal separation route of cl. 2.5.5.2 (&ge; 800 A)',
+            'AS/NZS 3000 cl. 2.5.5 and Appendix K6.2. Mark the form and IP rating on the board (App. K8.1).' +
+            (fireUnits ? ' The safety services section is also separated from the general section.' : ''));
+        }
+      }
+      if (formKey === '3bih') {
+        add('warn', 'Form 3bih: check the client accepts it',
+          'Some client standards (e.g. University of Sydney, Snowy Hydro, Urban Utilities) do not accept the i/h variants. Limited to the insulated chassis rating.');
       }
       if (incomerA >= 800 || totalW > 3000) {
         add('warn', 'Two emergency exit paths needed', 'AS/NZS 3000 cl. 2.10.2.2: ' + (incomerA >= 800 ? 'board rated &ge; 800 A' : 'board longer than 3 m') +

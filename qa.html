@@ -174,6 +174,26 @@ Rating   Cubicle W &times; H     Basis
       </div>
       <p>Modules are packed tallest first into 1800 mm tiers (first-fit decreasing); leftover space is shown as 250 A spares. Each feeder tier has its own cable zone.</p>
 
+      <h3>Form of Separation</h3>
+      <div class="formula-box">
+Form    250 A   400 A   630 A   800 A   Cable zone W   Basis
+3bih    150     200     300     400     400            NHP insulated chassis pitch (250/400 A); Siemens S4 kit heights (630/800 A)
+2b      200     300     300     400     400            Hager quadro evo single-device kit heights
+3b      200     400     600     1000    400            tool defaults, cross-checked earlier
+4a      300     500     700     1100    400            3b + 100 (assumption; step from Eaton Form 4 box solution)
+4b      200     400     600     1000    600            same cell as 3b (ABB, Hager); + 200 for terminal boxes (Prisma W200)
+      </div>
+      <div class="variable-list">
+        <dl>
+          <dt>Definitions</dt>
+          <dd>Forms 2b, 3b, 4a and 4b as AS/NZS 3000:2018 Appendix K Table K2 (from AS/NZS 61439.2). 3bih is Form 3b achieved by insulated busbars (i) and the devices' own housings (h).</dd>
+          <dt>What is not verified</dt>
+          <dd>No catalogue read gives a different compartment height for Form 4a than Form 3b, or a cable zone width by form: the 4a heights and the 4b cable zone are assumptions. No insulated chassis was verified for 630 or 800 A frames. Tier width, incomer width, busbar chamber and depth do not change with form in any source read.</dd>
+          <dt>Check</dt>
+          <dd>At 800 A or more, AS/NZS 3000 cl. 2.5.5.2 lists Forms 3b, 4a, 4b and their i/h variants. Form 2b is flagged as not meeting that route.</dd>
+        </dl>
+      </div>
+
       <h3>Incoming Section</h3>
       <div class="formula-box">
 Main switch      Device   Section W   Mains cable zone W   Board depth
