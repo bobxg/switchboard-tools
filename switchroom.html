@@ -457,6 +457,46 @@
       });
     }
 
+    // Door zones (mm from top of wall) on the board walls, incl. DOOR_CLR each side
+    let doorZones = { left: [], right: [] };
+    function computeDoorZones(room) {
+      const W = px(room.roomD), H = px(room.wallW);
+      doorZones = { left: [], right: [] };
+      doors.forEach(d => {
+        const g = doorGeom(d, W, H);
+        if (g.side !== 'left' && g.side !== 'right') return;
+        const cTop = g.side === 'left' ? H - g.c : g.c;          // px from top
+        const a = (cTop - g.dw / 2) / SCALE * 1000, b = (cTop + g.dw / 2) / SCALE * 1000;
+        doorZones[g.side].push([a - DOOR_CLR, b + DOOR_CLR]);
+      });
+    }
+    // Next board start at or after y (mm) whose span [y, y+w] stays clear of door zones
+    function pastDoors(side, y, w) {
+      let moved = true;
+      while (moved) {
+        moved = false;
+        for (const [a, b] of doorZones[side]) {
+          if (y < b && y + w > a) { y = b; moved = true; }
+        }
+      }
+      return y;
+    }
+    // Shift boards along their wall away from doors; grow the room if they no longer fit
+    function fitBoardsAroundDoors(room) {
+      for (let iter = 0; iter < 6; iter++) {
+        computeDoorZones(room);
+        let need = room.wallW;
+        [['left', room.wall1], ['right', room.wall2 || []]].forEach(([side, list]) => {
+          if (room.layout === 'single' && side === 'right') return;
+          let y = SIDE_CLR;
+          list.forEach(eq => { y = pastDoors(side, y, eq.w) + eq.w + SIDE_CLR; });
+          if (list.length) need = Math.max(need, Math.ceil(y / 50) * 50);
+        });
+        if (need <= room.wallW) return;
+        room.wallW = need;
+      }
+    }
+
     function pointToPos(x, y, W, H) {
       x = Math.max(0, Math.min(W, x)); y = Math.max(0, Math.min(H, y));
       const dist = { top: y, bottom: H - y, left: x, right: W - x };
@@ -520,8 +560,9 @@
           g.classList.add('dragging');
           const move = e2 => {
             const r = document.querySelector('#srCanvas .door-svg').getBoundingClientRect(); // svg is rebuilt each move
-            d.pos = pointToPos(e2.clientX - r.left, e2.clientY - r.top, W, H);
-            renderDoors(W, H);
+            const cw = px(lastRoom.roomD), ch = px(lastRoom.wallW);
+            d.pos = pointToPos(e2.clientX - r.left, e2.clientY - r.top, cw, ch);
+            renderCanvas();   // boards shift away from the door as it moves
           };
           const up = () => {
             window.removeEventListener('pointermove', move);
@@ -616,6 +657,7 @@
 
     function renderCanvas() {
       const room   = calcRoom();
+      fitBoardsAroundDoors(room);
       const canvas = document.getElementById('srCanvas');
 
       /*
@@ -660,6 +702,7 @@
         let yOffMM = SIDE_CLR;
 
         wallEquip.forEach((eq) => {
+          yOffMM = pastDoors(rightWall ? 'right' : 'left', yOffMM, eq.w);
           const bx = rightWall ? px(wallPosMM - eq.d) : 0;  // board left in canvas
           const by = px(yOffMM);
           const bw = px(eq.d);   // board depth → canvas width
@@ -754,7 +797,6 @@
             text:    `${eq.type}  ${(eq.w/1000).toFixed(1)} m \u00D7 ${(eq.d/1000).toFixed(1)} m`
           });
 
-          wallObstacles.push({ side: rightWall ? 'right' : 'left', y0: yOffMM, y1: yOffMM + eq.w });
           yOffMM += eq.w + SIDE_CLR;
         });
       }
