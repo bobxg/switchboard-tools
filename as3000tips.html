@@ -305,6 +305,11 @@
       // "Section 6" &#8594; link to as3000viewer.html#cl-6.1
       var s = cl.match(/^Section\s+(\d+)/i);
       if (s) return '<a href="as3000viewer.html#cl-' + s[1] + '.1" target="_blank">' + cl + '</a>';
+      // "Clauses 2.5.4 / 3.4" &#8594; link each clause number
+      if (/^Clauses\s/i.test(cl)) return cl.replace(/\d+(\.\d+)+/g, function (n) { return '<a href="as3000viewer.html#cl-' + n + '" target="_blank">' + n + '</a>'; });
+      // "Appendix C ..." &#8594; link the appendix label to as3000viewer.html#cl-C1
+      var a = cl.match(/^Appendix\s+([A-Z])\b/);
+      if (a) return '<a href="as3000viewer.html#cl-' + a[1] + '1" target="_blank">Appendix ' + a[1] + '</a>' + cl.slice(a[0].length);
       return cl; // Table refs, other standards &mdash; leave unlinked
     }
 

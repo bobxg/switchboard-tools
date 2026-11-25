@@ -493,6 +493,9 @@
        Note: pdf2htmlEX page ids are hexadecimal. */
     var pendingClause = null;
     function findClausePage(cl) {
+      /* Appendix letters and INDEX have no numbered heading ("C" would match
+         "COPYRIGHT"); leave those to the page map. */
+      if (!/\d/.test(cl)) return null;
       try {
         var doc = frame.contentWindow.document;
         var pages = doc.querySelectorAll('#page-container > .pf');
@@ -507,6 +510,10 @@
           }
         }
       } catch (e) { /* fall back to page map */ }
+      /* A sub-clause with no heading of its own (e.g. a number from an older
+         edition): use the nearest parent heading below section level. */
+      var parts = cl.split('.');
+      if (parts.length > 3) return findClausePage(parts.slice(0, -1).join('.'));
       return null;
     }
 

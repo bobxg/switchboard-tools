@@ -720,7 +720,7 @@ const OmniQuickCalc = {
             '<div class="qc-field"><label for="qc-vd-ph">System</label><select id="qc-vd-ph"><option value="3" selected>3-ph 400 V</option><option value="1">1-ph 230 V</option></select></div>' +
           '</div>' +
           '<div class="qc-readout" id="qc-vd-out">&mdash;</div>' +
-          '<p class="qc-hint">Estimate only (typical Cu mV/A&middot;m, 75&deg;C). For compliance use the <a href="cablesizing.html">Cable Sizing</a> tool &mdash; AS/NZS 3000 cl. 3.6 limits total drop to 5%.</p>' +
+          '<p class="qc-hint">Estimate only (typical Cu mV/A&middot;m, 75&deg;C). For compliance use the <a href="cablesizing.html">Cable Sizing</a> tool &mdash; AS/NZS 3000 <a href="as3000viewer.html#cl-3.6" target="_blank">cl. 3.6</a> limits total drop to 5%.</p>' +
         '</div>' +
 
         // ── Converter ──
