@@ -73,6 +73,13 @@
       overflow: visible;
     }
 
+    /* Doors */
+    .door-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+    .door-svg .door-g { pointer-events: all; cursor: grab; }
+    .door-svg .door-g.dragging { cursor: grabbing; }
+    .door-svg .door-hit { fill: transparent; }
+    .door-svg .door-g:hover .door-leaf, .door-svg .door-g.dragging .door-leaf { stroke: #2563eb; }
+
     /* Clearance zones */
     .clr-red  { position: absolute; background: rgba(220,38,38,0.18); border: 1.5px solid #dc2626; box-sizing: border-box; pointer-events: none; }
     .clr-yel  { position: absolute; background: rgba(245,158,11,0.14); border: 1.5px dashed #d97706; box-sizing: border-box; pointer-events: none; }
@@ -148,6 +155,10 @@
               <label for="eqD">Depth (mm)</label>
               <input type="number" id="eqD" value="600" min="100" max="2000" />
             </div>
+            <div class="input-group">
+              <label for="eqA">Rating (A)</label>
+              <input type="number" id="eqA" value="400" min="0" max="10000" step="10" />
+            </div>
             <div class="input-group eq-add-btn" style="align-self:flex-end;">
               <button class="calc-button" style="margin:0;padding:8px 14px;font-size:0.95em;width:100%;" onclick="addEquip()">+ Add</button>
             </div>
@@ -165,13 +176,35 @@
                 <th>Type</th>
                 <th style="text-align:right;">W (mm)</th>
                 <th style="text-align:right;">D (mm)</th>
+                <th style="text-align:right;">A</th>
                 <th style="width:34px;"></th>
               </tr>
             </thead>
             <tbody id="eqBody">
-              <tr><td colspan="5" style="color:var(--text-secondary);font-style:italic;text-align:center;padding:14px;">No equipment &mdash; click Add to begin</td></tr>
+              <tr><td colspan="6" style="color:var(--text-secondary);font-style:italic;text-align:center;padding:14px;">No equipment &mdash; click Add to begin</td></tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Doors -->
+        <div class="calc-section">
+          <h3 style="margin-top:0;margin-bottom:10px;">Doors</h3>
+          <div class="eq-form" style="grid-template-columns:1fr auto;">
+            <div class="input-group">
+              <label for="doorType">Door type</label>
+              <select id="doorType">
+                <option value="single">Single (900 mm)</option>
+                <option value="double">Double (1800 mm)</option>
+              </select>
+            </div>
+            <div class="input-group" style="align-self:flex-end;">
+              <button class="calc-button" style="margin:0;padding:8px 14px;font-size:0.95em;width:100%;" onclick="addDoor()">+ Add Door</button>
+            </div>
+          </div>
+          <table class="eq-list" style="margin-top:12px;">
+            <tbody id="doorBody"></tbody>
+          </table>
+          <p style="font-size:0.82em;color:var(--text-secondary);margin:8px 0 0;">Drag doors around the room perimeter on the floor plan. Boards rated 800&nbsp;A or more automatically get two independent exit doors.</p>
         </div>
 
         <!-- Clearance reference -->
@@ -247,6 +280,11 @@
 
     let equipment = [];
     let nextId = 1;
+    let doors = [];        // { id, type: 'single'|'double', pos: 0..1 around perimeter, auto }
+    let nextDoorId = 1;
+    const DOOR_W = { single: 900, double: 1800 };
+    const AUTO_DOOR_AMPS = 800;
+    let lastRoom = null;
 
     /* ─── Input helpers ──────────────────────────────────── */
     function applyDefaults() {
@@ -263,7 +301,8 @@
       const w = Math.max(100, parseInt(document.getElementById('eqW').value) || TYPE_DEFAULTS[type].w);
       const d = Math.max(100, parseInt(document.getElementById('eqD').value) || TYPE_DEFAULTS[type].d);
       const panels = (type === 'MSB' && document.getElementById('eqPanels').checked);
-      equipment.push({ id: nextId++, type, w, d, panels });
+      const rating = Math.max(0, parseInt(document.getElementById('eqA').value) || 0);
+      equipment.push({ id: nextId++, type, w, d, panels, rating });
       refreshAll();
     }
 
@@ -274,16 +313,165 @@
 
     function updateField(id, field, val) {
       const eq = equipment.find(e => e.id === id);
-      if (eq) { eq[field] = Math.max(100, parseInt(val) || eq[field]); renderCanvas(); }
+      if (!eq) return;
+      if (field === 'rating') { eq.rating = Math.max(0, parseInt(val) || 0); refreshAll(); return; }
+      eq[field] = Math.max(100, parseInt(val) || eq[field]); renderCanvas();
     }
 
-    function refreshAll() { renderList(); renderCanvas(); }
+    function refreshAll() { syncAutoDoors(); renderList(); renderDoorList(); renderCanvas(); }
+
+    /* ─── Doors ──────────────────────────────────────────── */
+    function needsTwoDoors() { return equipment.some(e => (e.rating || 0) >= AUTO_DOOR_AMPS); }
+
+    function syncAutoDoors() {
+      if (needsTwoDoors()) {
+        // Place auto doors at opposite ends of the board run (top & bottom walls)
+        const slots = [0.125, 0.625];
+        while (doors.length < 2) {
+          const used = doors.map(d => d.pos);
+          const pos = slots.find(p => !used.some(u => Math.abs(u - p) < 0.05)) ?? Math.random();
+          doors.push({ id: nextDoorId++, type: 'single', pos, auto: true });
+        }
+      } else {
+        doors = doors.filter(d => !d.auto);
+      }
+    }
+
+    function addDoor() {
+      const type = document.getElementById('doorType').value;
+      const used = doors.map(d => d.pos);
+      const pos = [0.125, 0.625, 0.375, 0.875].find(p => !used.some(u => Math.abs(u - p) < 0.05)) ?? 0.25;
+      doors.push({ id: nextDoorId++, type, pos, auto: false });
+      renderDoorList(); renderCanvas();
+    }
+
+    function removeDoor(id) {
+      const d = doors.find(x => x.id === id);
+      if (d && d.auto && needsTwoDoors() && doors.length <= 2) {
+        showToast('Two independent doors are required for boards rated 800 A or more.', true);
+        return;
+      }
+      doors = doors.filter(x => x.id !== id);
+      renderDoorList(); renderCanvas();
+    }
+
+    function setDoorType(id, type) {
+      const d = doors.find(x => x.id === id);
+      if (d) { d.type = type; d.auto = false; renderDoorList(); renderCanvas(); }
+    }
+
+    function renderDoorList() {
+      const tbody = document.getElementById('doorBody');
+      if (!doors.length) {
+        tbody.innerHTML = '<tr><td colspan="3" style="color:var(--text-secondary);font-style:italic;text-align:center;padding:10px;">No doors</td></tr>';
+        return;
+      }
+      tbody.innerHTML = doors.map((d, i) => `
+        <tr>
+          <td style="font-weight:600;">D${i + 1}${d.auto ? ' <span style="font-weight:400;font-size:0.8em;color:var(--text-secondary);">(auto)</span>' : ''}</td>
+          <td>
+            <select onchange="setDoorType(${d.id}, this.value)">
+              <option value="single"${d.type === 'single' ? ' selected' : ''}>Single</option>
+              <option value="double"${d.type === 'double' ? ' selected' : ''}>Double</option>
+            </select>
+          </td>
+          <td style="width:34px;"><button class="rm-btn" onclick="removeDoor(${d.id})" title="Remove">&#10005;</button></td>
+        </tr>`).join('');
+    }
+
+    // Perimeter geometry (canvas px). Walk clockwise from top-left: top, right, bottom, left.
+    function doorGeom(d, W, H) {
+      const P = 2 * (W + H);
+      const dw = Math.min(px(DOOR_W[d.type]), Math.min(W, H));
+      let t = ((d.pos % 1) + 1) % 1 * P;
+      const edges = [
+        { len: W, side: 'top' }, { len: H, side: 'right' },
+        { len: W, side: 'bottom' }, { len: H, side: 'left' }
+      ];
+      let i = 0;
+      while (t > edges[i].len && i < 3) { t -= edges[i].len; i++; }
+      const e = edges[i];
+      const c = Math.max(dw / 2, Math.min(e.len - dw / 2, t)); // keep door fully on one wall
+      return { side: e.side, c, dw };
+    }
+
+    function pointToPos(x, y, W, H) {
+      x = Math.max(0, Math.min(W, x)); y = Math.max(0, Math.min(H, y));
+      const dist = { top: y, bottom: H - y, left: x, right: W - x };
+      const side = Object.keys(dist).reduce((a, b) => dist[a] <= dist[b] ? a : b);
+      const P = 2 * (W + H);
+      let t;
+      if (side === 'top') t = x;
+      else if (side === 'right') t = W + y;
+      else if (side === 'bottom') t = W + H + (W - x);
+      else t = 2 * W + H + (H - y);
+      return t / P;
+    }
+
+    function renderDoors(W, H) {
+      const canvas = document.getElementById('srCanvas');
+      canvas.querySelectorAll('.door-svg').forEach(n => n.remove());
+      if (!doors.length) return;
+      const NS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('class', 'door-svg');
+      svg.setAttribute('width', W); svg.setAttribute('height', H);
+      const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-input').trim() || '#fff';
+      const fg = drawColor();
+      const mk = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v)); parent.appendChild(n); return n; };
+
+      doors.forEach((d, idx) => {
+        const { side, c, dw } = doorGeom(d, W, H);
+        // Local frame: door opening along +x from 0..dw on the wall line y=0, swinging into room (+y)
+        let tf;
+        if (side === 'top')    tf = `translate(${c - dw / 2},0)`;
+        if (side === 'right')  tf = `translate(${W},${c - dw / 2}) rotate(90)`;
+        if (side === 'bottom') tf = `translate(${W - c + dw / 2},${H}) rotate(180)`;
+        if (side === 'left')   tf = `translate(0,${H - c + dw / 2}) rotate(270)`;
+        const g = mk('g', { class: 'door-g', transform: tf }, svg);
+        mk('rect', { class: 'door-hit', x: -4, y: -8, width: dw + 8, height: dw / (d.type === 'double' ? 2 : 1) + 8 }, g);
+        // Gap in wall
+        mk('line', { x1: 0, y1: 0, x2: dw, y2: 0, stroke: bg, 'stroke-width': 5 }, g);
+        mk('line', { x1: 0, y1: -4, x2: 0, y2: 4, stroke: fg, 'stroke-width': 2 }, g);
+        mk('line', { x1: dw, y1: -4, x2: dw, y2: 4, stroke: fg, 'stroke-width': 2 }, g);
+        const leaves = d.type === 'double'
+          ? [{ hx: 0, r: dw / 2, dir: 1 }, { hx: dw, r: dw / 2, dir: -1 }]
+          : [{ hx: 0, r: dw, dir: 1 }];
+        leaves.forEach(l => {
+          mk('line', { class: 'door-leaf', x1: l.hx, y1: 0, x2: l.hx, y2: l.r, stroke: fg, 'stroke-width': 2.5 }, g);
+          const ex = l.hx + l.dir * l.r;
+          mk('path', { d: `M ${l.hx} ${l.r} A ${l.r} ${l.r} 0 0 ${l.dir === 1 ? 0 : 1} ${ex} 0`, fill: 'none', stroke: fg, 'stroke-width': 1, 'stroke-dasharray': '4 3' }, g);
+        });
+        const lbl = mk('text', { x: dw / 2, y: -8, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: fg }, g);
+        lbl.textContent = 'D' + (idx + 1);
+        if (side === 'bottom' || side === 'left') lbl.setAttribute('transform', `rotate(180 ${dw / 2} -12)`);
+
+        g.addEventListener('pointerdown', ev => {
+          ev.preventDefault();
+          g.setPointerCapture(ev.pointerId);
+          g.classList.add('dragging');
+          const move = e2 => {
+            const r = svg.getBoundingClientRect();
+            d.pos = pointToPos(e2.clientX - r.left, e2.clientY - r.top, W, H);
+            renderDoors(W, H);
+          };
+          const up = () => {
+            window.removeEventListener('pointermove', move);
+            window.removeEventListener('pointerup', up);
+            updateInfo(lastRoom);
+          };
+          window.addEventListener('pointermove', move);
+          window.addEventListener('pointerup', up);
+        });
+      });
+      canvas.appendChild(svg);
+    }
 
     /* ─── Equipment list ─────────────────────────────────── */
     function renderList() {
       const tbody = document.getElementById('eqBody');
       if (equipment.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-secondary);font-style:italic;text-align:center;padding:14px;">No equipment &mdash; click Add to begin</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-secondary);font-style:italic;text-align:center;padding:14px;">No equipment &mdash; click Add to begin</td></tr>';
         return;
       }
       tbody.innerHTML = equipment.map(eq => `
@@ -297,6 +485,10 @@
           <td style="text-align:right;">
             <input class="eq-w-input" type="number" value="${eq.d}" min="100" max="2000"
               onchange="updateField(${eq.id},'d',this.value)" />
+          </td>
+          <td style="text-align:right;">
+            <input class="eq-w-input" type="number" value="${eq.rating || 0}" min="0" max="10000" step="10"
+              onchange="updateField(${eq.id},'rating',this.value)" />
           </td>
           <td><button class="rm-btn" onclick="removeEquip(${eq.id})" title="Remove">&#10005;</button></td>
         </tr>
@@ -313,7 +505,7 @@
       const maxDepth = Math.max(...equipment.map(e => e.d));
       const maxFrontClr = Math.max(...equipment.map(e => (e.type === 'MSB' && e.panels) ? 1400 : FRONT_CLR));
 
-      if (totalW <= 3400) {
+      if (totalW <= 3400 || equipment.length < 2) {
         // Single-wall layout
         return {
           wallW: Math.max(totalW, MIN_ROOM),
@@ -536,6 +728,10 @@
         lblDiv.appendChild(document.createTextNode(lbl.text));
       });
 
+      // ── Doors ──
+      lastRoom = room;
+      renderDoors(roomW_px, roomH_px);
+
       // ── Scale bar ──
       const scaleBar = el('div', canvas, { class: 'scale-bar', style: `left:0;top:${roomH_px + 10}px;` });
       el('div', scaleBar, { style: `width:${SCALE}px;height:2px;background:var(--text-secondary);` });
@@ -580,6 +776,22 @@
           `The MSB exceeds 3 m &mdash; the switchroom must have <strong>two exits</strong> ` +
           `(AS/NZS&nbsp;3000:2018 Cl.&nbsp;2.10.6). Position exits so no worker can be trapped ` +
           `at either end of the switchboard.` +
+          `</div>`
+        );
+      }
+
+      // Door checks
+      if (needsTwoDoors()) {
+        const big = equipment.filter(e => (e.rating || 0) >= AUTO_DOOR_AMPS).map(e => `${e.type} ${e.rating} A`).join(', ');
+        const W = px(room.roomD), H = px(room.wallW);
+        const sides = new Set(doors.map(d => doorGeom(d, W, H).side));
+        const ok = doors.length >= 2 && sides.size >= 2;
+        warnings.push(
+          `<div class="warn-box ${ok ? 'caution' : 'danger'}">` +
+          `<strong>&#128682;&nbsp; Two independent exits</strong><br>` +
+          `${big} &ge; ${AUTO_DOOR_AMPS} A &mdash; two independent exit doors are required. ` +
+          (ok ? `${doors.length} doors placed on separate walls.`
+              : `Place at least two doors on <strong>different walls</strong> so a worker cannot be trapped.`) +
           `</div>`
         );
       }
@@ -630,7 +842,7 @@
     }
 
     function saveLayout() {
-      setCookie(SR_KEY, JSON.stringify({ equipment, savedAt: Date.now() }), 365);
+      setCookie(SR_KEY, JSON.stringify({ equipment, doors, savedAt: Date.now() }), 365);
       updateSaveInfo();
       showToast('Layout saved.');
     }
@@ -642,6 +854,8 @@
         const data = JSON.parse(raw);
         equipment = data.equipment || [];
         nextId = equipment.length ? Math.max(...equipment.map(e => e.id)) + 1 : 1;
+        doors = data.doors || [];
+        nextDoorId = doors.length ? Math.max(...doors.map(d => d.id)) + 1 : 1;
         refreshAll();
         showToast(`Loaded ${equipment.length} item(s).`);
       } catch(e) {
@@ -651,7 +865,7 @@
 
     function exportJSON() {
       const blob = new Blob(
-        [JSON.stringify({ equipment, exportedAt: new Date().toISOString() }, null, 2)],
+        [JSON.stringify({ equipment, doors, exportedAt: new Date().toISOString() }, null, 2)],
         { type: 'application/json' }
       );
       const a = document.createElement('a');
@@ -670,6 +884,8 @@
           const data = JSON.parse(e.target.result);
           equipment = data.equipment || [];
           nextId = equipment.length ? Math.max(...equipment.map(e => e.id)) + 1 : 1;
+          doors = data.doors || [];
+          nextDoorId = doors.length ? Math.max(...doors.map(d => d.id)) + 1 : 1;
           refreshAll();
           showToast(`Imported ${equipment.length} item(s).`);
         } catch(err) {
@@ -683,6 +899,7 @@
     /* ─── Initialise ─────────────────────────────────────── */
     applyDefaults();
     renderList();
+    renderDoorList();
     renderCanvas();
     updateSaveInfo();
   </script>
