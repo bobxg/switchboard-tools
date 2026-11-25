@@ -280,7 +280,7 @@
 
     let equipment = [];
     let nextId = 1;
-    let doors = [];        // { id, type: 'single'|'double', pos: 0..1 around perimeter, auto }
+    let doors = [];        // { id, type: 'single'|'double', wall: 'top'|'right'|'bottom'|'left', at: mm from top/left to door centre (null = centre), hinge, auto }
     let nextDoorId = 1;
     const DOOR_W = { single: 900, double: 1800 };
     const AUTO_DOOR_AMPS = 800;
@@ -328,11 +328,9 @@
     function syncAutoDoors() {
       if (needsTwoDoors()) {
         // Place auto doors at opposite ends of the board run (top & bottom walls)
-        const slots = [0.125, 0.625];
         while (doors.length < 2) {
-          const used = doors.map(d => d.pos);
-          const pos = slots.find(p => !used.some(u => Math.abs(u - p) < 0.05)) ?? Math.random();
-          doors.push({ id: nextDoorId++, type: 'single', pos, auto: true });
+          const wall = ['top', 'bottom', 'right'].find(w => !doors.some(d => d.wall === w)) || 'right';
+          doors.push({ id: nextDoorId++, type: 'single', wall, at: null, auto: true });
         }
       } else {
         doors = doors.filter(d => !d.auto);
@@ -341,9 +339,8 @@
 
     function addDoor() {
       const type = document.getElementById('doorType').value;
-      const used = doors.map(d => d.pos);
-      const pos = [0.125, 0.625, 0.375, 0.875].find(p => !used.some(u => Math.abs(u - p) < 0.05)) ?? 0.25;
-      doors.push({ id: nextDoorId++, type, pos, auto: false });
+      const wall = ['top', 'bottom', 'right', 'left'].find(w => !doors.some(d => d.wall === w)) || 'top';
+      doors.push({ id: nextDoorId++, type, wall, at: null, auto: false });
       renderDoorList(); renderCanvas();
     }
 
@@ -365,11 +362,11 @@
     function rotateDoor(id) {
       const d = doors.find(x => x.id === id);
       if (!d || !lastRoom) return;
-      const W = px(lastRoom.roomD), H = px(lastRoom.wallW), P = 2 * (W + H);
-      const starts = [0, W, W + H, 2 * W + H], lens = [W, H, W, H];
+      const W = px(lastRoom.roomD), H = px(lastRoom.wallW);
+      const P = 2 * (W + H), lens = [W, H, W, H], starts = [0, W, W + H, 2 * W + H];
       const { side, c } = doorGeom(d, W, H);
       const i = ['top', 'right', 'bottom', 'left'].indexOf(side), j = (i + 1) % 4;
-      d.pos = (starts[j] + (c / lens[i]) * lens[j]) / P;  // same relative spot on the next wall
+      setPos(d, (starts[j] + (c / lens[i]) * lens[j]) / P, W, H);  // same relative spot on the next wall
       d.auto = false;
       renderCanvas();
     }
@@ -405,17 +402,33 @@
     }
 
     // Perimeter geometry (canvas px). Walk clockwise from top-left: top, right, bottom, left.
-    function doorGeom(d, W, H) {
+    // Perimeter fraction (0..1, clockwise from top-left) ↔ wall + mm anchor.
+    // Doors are stored anchored to a wall in mm so they stay put when the room resizes.
+    const mm = v => v / SCALE * 1000;
+    function setPos(d, pos, W, H) {
       const P = 2 * (W + H);
+      let t = ((pos % 1) + 1) % 1 * P;
+      if (t <= W) { d.wall = 'top'; d.at = mm(t); }
+      else if ((t -= W) <= H) { d.wall = 'right'; d.at = mm(t); }
+      else if ((t -= H) <= W) { d.wall = 'bottom'; d.at = mm(W - t); }
+      else { t -= W; d.wall = 'left'; d.at = mm(H - t); }
+      delete d.pos;
+    }
+    function posOf(d, W, H) {
+      const { side, c } = doorGeom(d, W, H);
+      const starts = { top: 0, right: W, bottom: W + H, left: 2 * W + H };
+      return (starts[side] + c) / (2 * (W + H));
+    }
+
+    function doorGeom(d, W, H) {
+      if (!d.wall) setPos(d, d.pos ?? 0.125, W, H);   // layouts saved before wall anchoring
       const dw = Math.min(px(DOOR_W[d.type]), Math.min(W, H));
-      let t = ((d.pos % 1) + 1) % 1 * P;
-      const edges = [
-        { len: W, side: 'top' }, { len: H, side: 'right' },
-        { len: W, side: 'bottom' }, { len: H, side: 'left' }
-      ];
-      let i = 0;
-      while (t > edges[i].len && i < 3) { t -= edges[i].len; i++; }
-      const e = edges[i];
+      const horiz = d.wall === 'top' || d.wall === 'bottom';
+      const len = horiz ? W : H;
+      const a = d.at == null ? len / 2 : px(d.at);    // px from top / left
+      // c = distance along the wall in the clockwise direction
+      const t = (d.wall === 'top' || d.wall === 'right') ? a : len - a;
+      const e = { side: d.wall, len };
       const lo = dw / 2, hi = e.len - dw / 2;            // keep door fully on one wall
       // Forbidden door-centre ranges: behind equipment on this wall, plus DOOR_CLR each side
       const bad = wallObstacles.filter(o => o.side === e.side).map(o => {
@@ -444,15 +457,17 @@
         return g;
       };
       doors.forEach(d => {
-        const start = d.pos;
         let g = fits(d);
-        for (let k = 1; !g && k <= 500; k++) {
-          for (const sgn of [1, -1]) {
-            d.pos = ((start + sgn * k * 0.002) % 1 + 1) % 1;
-            if ((g = fits(d))) break;
+        if (!g) {
+          const saved = { wall: d.wall, at: d.at }, start = posOf(d, W, H);
+          for (let k = 1; !g && k <= 500; k++) {
+            for (const sgn of [1, -1]) {
+              setPos(d, start + sgn * k * 0.002, W, H);
+              if ((g = fits(d))) break;
+            }
           }
+          if (!g) { Object.assign(d, saved); g = doorGeom(d, W, H); }
         }
-        if (!g) { d.pos = start; g = doorGeom(d, W, H); }
         placed.push(g);
       });
     }
@@ -563,10 +578,10 @@
             return pointToPos(e.clientX - r.left, e.clientY - r.top, px(lastRoom.roomD), px(lastRoom.wallW));
           };
           // Keep the grab point under the cursor so the door doesn't snap its centre to the pointer
-          let off = d.pos - ptrPos(ev);
+          let off = posOf(d, px(lastRoom.roomD), px(lastRoom.wallW)) - ptrPos(ev);
           if (off > 0.5) off -= 1; if (off < -0.5) off += 1;
           const move = e2 => {
-            d.pos = ((ptrPos(e2) + off) % 1 + 1) % 1;
+            setPos(d, ptrPos(e2) + off, px(lastRoom.roomD), px(lastRoom.wallW));
             renderCanvas();   // boards shift away from the door as it moves
           };
           const up = () => {
