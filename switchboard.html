@@ -538,15 +538,17 @@
     };
     const RATING_ORDER = ['800A', '630A', '400A', '250A'];
     /* Form of internal separation (AS/NZS 61439.2) sets the default feeder compartment
-       heights and cable zone width. FORM_PRESETS_PLACEHOLDER */
+       heights and cable zone width. Size order: 2b < 3bih < 3b < 4a / 4b. */
     const FORM_PRESETS = {
-      // Catalogue single-device kit heights (Hager quadro evo); no cell per breaker
-      '2b':   { h: { '800A': 400,  '630A': 300, '400A': 300, '250A': 200 }, cableW: 400,
-                note: 'Units not separated from each other. Heights are catalogue kit heights without a cell per breaker.' },
+      // Several devices per kit, allowed only in 2b (Hager quadro evo 3.7.2.1): 2 x P250 in
+      // 300 x 600 -> 150; 2 x P630 (250-630 A) in 400 x 600 -> 200; H1000 single kit 400 x 600
+      '2b':   { h: { '800A': 400,  '630A': 200, '400A': 200, '250A': 150 }, cableW: 400,
+                note: 'Units not separated from each other: the most compact form. Heights are Hager two-devices-per-kit sizes (2b only).' },
       '3b':   { h: { '800A': 1000, '630A': 600, '400A': 400, '250A': 200 }, cableW: 400, note: '' },
-      // Insulated busbar chassis + IP2X breaker housings (NHP XBP/XCP chassis pitch; Siemens S4 kits for 630/800)
-      '3bih': { h: { '800A': 400,  '630A': 300, '400A': 200, '250A': 150 }, cableW: 400,
-                note: 'Relies on an insulated busbar chassis and the breakers&rsquo; IP2X housings. 630/800 A heights are kit heights: no insulated chassis was verified for these frames.' },
+      // One device per kit/row: Hager single-device kits 250 A 200, 400 A 300; NHP XBP/XCP
+      // insulated chassis pitch + 50 busbar extension each end gives 155 and ~305. 630/800 A judgement.
+      '3bih': { h: { '800A': 600,  '630A': 400, '400A': 300, '250A': 200 }, cableW: 400,
+                note: 'Insulated busbars and the breakers&rsquo; IP2X housings provide the separation. 250/400 A from catalogue kits and NHP chassis; 630/800 A are judgement (no insulated chassis found for these frames).' },
       // 3b + 100: cable terminates inside each compartment (step from Eaton Form 4 box solution, +50 to +100)
       '4a':   { h: { '800A': 1100, '630A': 700, '400A': 500, '250A': 300 }, cableW: 400,
                 note: 'Cable terminates inside each compartment. The +100 mm over Form 3b is an assumption; some systems (Siemens SIVACON S4) use the same height.' },
@@ -619,7 +621,7 @@
     function colWidth(col) {
       if (col.kind === 'cable') return CABLE_W;
       if (col.kind === 'incomer200') return incomerSpec().cableW;   // mains cable zone (kind name kept for old saves)
-      if (col.kind === 'incoming') return incomerSpec().w;
+      if (col.kind === 'incoming' || col.kind === 'genmain') return incomerSpec().w;
       if (col.kind === 'ct') return ctSpec().w;
       return MOD_W;
     }
@@ -693,6 +695,9 @@
         columns.push({ kind: 'incoming', fire: false, items: [] });
         columns.push({ kind: 'incomer200', fire: false, items: [] });
       }
+      // With a safety services section the incomer is the supply isolating device and the
+      // general installation gets its own main switch (AS/NZS 3000 cl. 2.3.3.2, 7.2.4.2, Fig 7.2(A))
+      if (fireActive) columns.push({ kind: 'genmain', fire: false, items: [] });
       packModules(mainMods).forEach(c => {
         columns.push(c);
         columns.push({ kind: 'cable', fire: false, items: [] });
@@ -884,9 +889,13 @@
       parts.push('<rect class="sb-sheet" x="' + viewX + '" y="' + viewY + '" width="' + viewW + '" height="' + viewH + '"/>');
 
       // section brackets
+      const hasGenMain = currentColumns.some(c => c.kind === 'genmain');
       const fireW = currentColumns.filter(c => c.fire).reduce((s, c) => s + colWidth(c), 0);
       if (fireW > 0) parts.push(sectionLabel(0, fireW, 'SAFETY SERVICES', true));
-      if (fireW > 0 && totalW > fireW) parts.push(sectionLabel(fireW, totalW, 'GENERAL INSTALLATION', false));
+      let genX = fireW;
+      currentColumns.reduce((xx, c) => { if (c.kind === 'genmain') genX = xx; return xx + colWidth(c); }, 0);
+      if (hasGenMain) parts.push(sectionLabel(fireW, genX, 'SUPPLY', false));
+      if (fireW > 0 && totalW > genX) parts.push(sectionLabel(genX, totalW, 'GENERAL INSTALLATION', false));
 
       // columns
       let x = 0;
@@ -904,11 +913,24 @@
         } else if (col.kind === 'incoming') {
           parts.push(busbarBlock(x, w, 'BUSBAR ' + w + '&#215;400'));
           const cy = BUSBAR_H + USABLE_H / 2;
+          const isolator = hasGenMain;   // incomer becomes the supply isolating device
           parts.push('<g class="sb-incoming"><rect class="box" x="' + x + '" y="' + BUSBAR_H + '" width="' + w + '" height="' + USABLE_H + '"/>' +
             '<text class="big" x="' + (x + w / 2) + '" y="' + (cy - 170) + '" font-size="96">INCOMING</text>' +
             '<text class="big" x="' + (x + w / 2) + '" y="' + (cy - 50) + '" font-size="96">SECTION</text>' +
             '<text class="big" x="' + (x + w / 2) + '" y="' + (cy + 80) + '" font-size="84">' + incomerA + ' A ' + incomerSpec().device + '</text>' +
-            '<text class="mdims" x="' + (x + w / 2) + '" y="' + (cy + 190) + '" font-size="52">' + w + ' &#215; 1800</text></g>');
+            '<text class="mdims" x="' + (x + w / 2) + '" y="' + (cy + 190) + '" font-size="52">' + w + ' &#215; 1800</text>' +
+            (isolator ? '<text class="mdims" x="' + (x + w / 2) + '" y="' + (cy + 300) + '" font-size="40">SUPPLY ISOLATING DEVICE</text>' +
+                        '<text class="mdims" x="' + (x + w / 2) + '" y="' + (cy + 360) + '" font-size="40">LOCKED ON &#183; AUTHORIZED PERSONS</text>' : '') +
+            '</g>');
+        } else if (col.kind === 'genmain') {
+          parts.push(busbarBlock(x, w, 'BUSBAR ' + w + '&#215;400'));
+          const cy = BUSBAR_H + USABLE_H / 2;
+          parts.push('<g class="sb-incoming"><rect class="box" x="' + x + '" y="' + BUSBAR_H + '" width="' + w + '" height="' + USABLE_H + '"/>' +
+            '<text class="big" x="' + (x + w / 2) + '" y="' + (cy - 170) + '" font-size="96">MAIN</text>' +
+            '<text class="big" x="' + (x + w / 2) + '" y="' + (cy - 50) + '" font-size="96">SWITCH</text>' +
+            '<text class="big" x="' + (x + w / 2) + '" y="' + (cy + 70) + '" font-size="64">GENERAL</text>' +
+            '<text class="big" x="' + (x + w / 2) + '" y="' + (cy + 150) + '" font-size="64">INSTALLATION</text>' +
+            '<text class="mdims" x="' + (x + w / 2) + '" y="' + (cy + 250) + '" font-size="52">' + incomerA + ' A ' + incomerSpec().device + ' &#183; ' + w + ' &#215; 1800</text></g>');
         } else if (col.kind === 'ct') {
           parts.push(busbarBlock(x, w, 'BUSBAR ' + w + '&#215;400'));
           const cx = x + w / 2;
@@ -1048,7 +1070,8 @@
       // ── Safety services (AS/NZS 3000 cl. 7.2) ──
       if (fireUnits) {
         add('warn', 'Safety services: confirm main switch arrangement',
-          'AS/NZS 3000 <a href="as3000viewer.html#cl-7.2.4.2" target="_blank">cl. 7.2.4.2</a>: their main switches shall be on the supply side of all general main switches, not controlled by any of them, and control only safety services. The ' + incomerA + ' A incomer may stay upstream only as a supply isolating device for authorized persons, e.g. locked on (<a href="as3000viewer.html#cl-7.2.4.2" target="_blank">cl. 7.2.4.2</a> Exception). A separate general installation main switch is then required (<a href="as3000viewer.html#cl-2.3.3.2" target="_blank">cl. 2.3.3.2</a>) and is not drawn.');
+          'AS/NZS 3000 <a href="as3000viewer.html#cl-7.2.4.2" target="_blank">cl. 7.2.4.2</a>: their main switches shall be on the supply side of all general main switches, not controlled by any of them, and control only safety services. The ' + incomerA + ' A incomer may stay upstream only as a supply isolating device for authorized persons, e.g. locked on (<a href="as3000viewer.html#cl-7.2.4.2" target="_blank">cl. 7.2.4.2</a> Exception). A separate general installation main switch is then required (<a href="as3000viewer.html#cl-2.3.3.2" target="_blank">cl. 2.3.3.2</a>)' +
+          (currentColumns.some(c => c.kind === 'genmain') ? ' and is drawn, rated as the incomer; mark it MAIN SWITCH GENERAL INSTALLATION (<a href="as3000viewer.html#cl-2.3.3.5" target="_blank">cl. 2.3.3.5</a>).' : ' and is not drawn: press Auto-arrange to add it.'));
         add(fireUnnamed ? 'warn' : 'ok', fireUnnamed ? fireUnnamed + ' of ' + fireUnits + ' safety services main switch' + (fireUnits > 1 ? 'es' : '') + ' not named' : 'Safety services main switches named',
           '<a href="as3000viewer.html#cl-7.2.4.4" target="_blank">cl. 7.2.4.4</a>: mark each MAIN SWITCH with the equipment it controls and IN THE EVENT OF FIRE, DO NOT SWITCH OFF. One main switch per type of service (<a href="as3000viewer.html#cl-7.2.4.1" target="_blank">cl. 7.2.4.1</a>). Double-click a unit to name it.');
         add('warn', 'Metal partition between safety services and general switchgear',
@@ -1224,7 +1247,8 @@
     document.getElementById('formSel').addEventListener('change', function () {
       formKey = this.value;
       loadFormSizes();
-      applySizes();
+      readSizes();
+      repack();   // a different form is a different board: re-pack so its width is comparable
     });
     document.getElementById('resetSizesBtn').addEventListener('click', function () {
       loadFormSizes();
