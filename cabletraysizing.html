@@ -752,7 +752,7 @@
         '<td><input type="number" id="dia_' + id + '" min="1" step="0.1" value="" style="width:65px;" /></td>' +
         '<td><input type="number" id="qty_' + id + '" min="1" value="1" style="width:50px;" /></td>' +
         '<td><input type="number" id="wt_' + id + '" min="0" step="0.01" value="" style="width:60px;" /></td>' +
-        '<td><button class="ct-btn ct-btn-remove" onclick="removeCableRow(' + id + ')">✕</button></td>';
+        '<td><button class="ct-btn ct-btn-remove" onclick="removeCableRow(' + id + ')">&times;</button></td>';
 
       tbody.appendChild(tr);
       onTypeChange(id);
@@ -892,13 +892,13 @@
         var trayWt = TRAY_WEIGHT[material] ? (TRAY_WEIGHT[material][tw] || 0) : 0;
         var totalLoadWt = totalWeight + trayWt;
 
-        var status = ok ? '✓ Suitable' : '✗ Too small';
+        var status = ok ? 'Suitable' : 'Too small';
         var rowClass = '';
         if (ok && !foundTray) {
           foundTray = tw;
           selectedDepth = depth;
           selectedFillPct = fillWithReserve;
-          status = '★ SELECTED';
+          status = 'SELECTED';
           rowClass = ' class="ct-selected"';
         }
 
