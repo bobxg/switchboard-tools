@@ -90,7 +90,7 @@
       let required = true;
       let sensitivity = 30;
       let rcdType = 'Type II (A)';
-      let clause = '2.6.3.2';
+      let clause = '<a href="as3000viewer.html#cl-2.6.3.2" target="_blank">2.6.3.2</a>';
       let notes = [];
       let priority = 'required'; // required, recommended, optional
 
@@ -100,16 +100,16 @@
         case 'socket_indoor':
           required = true;
           sensitivity = 30;
-          clause = '2.6.3.2';
+          clause = '<a href="as3000viewer.html#cl-2.6.3.2" target="_blank">2.6.3.2</a>';
           if (rating > 20 && location !== 'residential') { required = false; priority = 'recommended'; notes.push('Socket outlets > 20 A: RCD recommended but not mandatory unless in wet/outdoor area.'); }
           else { notes.push('All socket outlet circuits &#8804; 20 A require 30 mA RCD protection.'); }
           break;
         case 'socket_outdoor':
-          required = true; sensitivity = 30; clause = '2.6.3.2';
+          required = true; sensitivity = 30; clause = '<a href="as3000viewer.html#cl-2.6.3.2" target="_blank">2.6.3.2</a>';
           notes.push('All outdoor socket outlets require 30 mA RCD protection.');
           break;
         case 'lighting':
-          if (location === 'residential') { required = true; clause = '2.6.3.3'; notes.push('All lighting final subcircuits in domestic installations require 30 mA RCD.'); }
+          if (location === 'residential') { required = true; clause = '<a href="as3000viewer.html#cl-2.6.3.3" target="_blank">2.6.3.3</a>'; notes.push('All lighting final subcircuits in domestic installations require 30 mA RCD.'); }
           else { required = false; priority = 'recommended'; notes.push('Lighting in commercial: RCD recommended for personal protection, not mandatory unless specific risk.'); }
           break;
         case 'fixed_appliance':
@@ -128,7 +128,7 @@
         case 'ev_charger':
           required = true; sensitivity = 30;
           rcdType = 'Type III (B) or Type II (A) with DC 6 mA detection';
-          clause = '2.6.3.2 + AS/NZS 3001';
+          clause = '<a href="as3000viewer.html#cl-2.6.3.2" target="_blank">2.6.3.2</a> + AS/NZS 3001';
           notes.push('EV chargers (Mode 3) MUST have RCD with DC fault current detection. Type B RCD or Type A with integrated 6 mA DC detection per IEC 62955.');
           break;
         case 'vsd_motor':
@@ -146,7 +146,7 @@
         case 'fire_essential':
           required = false; priority = 'optional';
           sensitivity = 0;
-          clause = '2.6.3.5';
+          clause = '<a href="as3000viewer.html#cl-2.6.3" target="_blank">2.6.3.5</a>';
           notes.push('Fire and essential services circuits are generally EXEMPT from RCD requirements to avoid nuisance tripping compromising life safety systems.');
           notes.push('Where RCD is unavoidable, use 300 mA time-delayed type to minimise nuisance trips.');
           break;
@@ -160,7 +160,7 @@
 
       // Location overrides
       if (location === 'wet_area' || location === 'pool') {
-        required = true; sensitivity = 30; clause = '2.6.3.4';
+        required = true; sensitivity = 30; clause = '<a href="as3000viewer.html#cl-2.6.3" target="_blank">2.6.3.4</a>';
         notes.push('Wet areas and pool zones: 30 mA RCD mandatory on ALL circuits (including lighting and fixed appliances).');
       }
       if (location === 'construction') {
